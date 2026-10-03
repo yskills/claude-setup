@@ -14,7 +14,7 @@ is about performance or final look. Fill pages with realistic data; an empty pag
 ## 2. Shoot
 
 ```
-node ~/.claude/skills/ui-review/scripts/shoot.mjs --base http://localhost:3000 --out .shots / /pricing
+node <ui-review skill folder>/scripts/shoot.mjs --base http://localhost:3000 --out .shots / /pricing
 ```
 
 - Each target is saved as `<page>-phone.png` (390x844 @2x) and `<page>-desktop.png` (1440x900).

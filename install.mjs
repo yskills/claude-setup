@@ -8,8 +8,8 @@
 //   1. backs up ~/.claude/CLAUDE.md and ~/.claude/settings.json
 //   2. installs the ECC hook runtime (npx ecc-universal, pinned in config/ecc.json)
 //   3. installs plugins from config/plugins.json with the claude CLI
-//   4. copies skills, agents and rules into ~/.claude (curated ECC subset + our own)
-//   5. writes the managed block of ~/.claude/CLAUDE.md
+//   4. copies .claude/skills, agents and rules into ~/.claude (curated ECC subset + our own)
+//   5. writes CLAUDE.md into the managed block of ~/.claude/CLAUDE.md
 //   6. merges global/settings.json into ~/.claude/settings.json
 //   7. reports useful command-line tools that are missing (gh, ffmpeg, docker...)
 import { spawnSync } from 'node:child_process'
@@ -109,10 +109,12 @@ const prev = readJson(MANIFEST, { files: [] })
 const items = []
 const listDirs = (p) => (existsSync(p) ? readdirSync(p).filter((n) => statSync(join(p, n)).isDirectory()) : [])
 const listMd = (p) => (existsSync(p) ? readdirSync(p).filter((n) => n.endsWith('.md')) : [])
-for (const base of ['vendor/ecc/skills', 'skills']) for (const n of listDirs(join(ROOT, base))) items.push([join(base, n), join('skills', n)])
-for (const base of ['vendor/ecc/agents', 'agents']) for (const n of listMd(join(ROOT, base))) items.push([join(base, n), join('agents', n)])
-for (const n of listDirs(join(ROOT, 'vendor/ecc/rules'))) items.push([join('vendor/ecc/rules', n), join('rules', 'ecc', n)])
-items.push(['vendor/ecc/LICENSE', join('rules', 'ecc', 'LICENSE')])
+// The repo's own .claude/ folder is the source, so cloud sessions that attach this repo load
+// exactly what the installer copies.
+for (const n of listDirs(join(ROOT, '.claude/skills'))) items.push([join('.claude/skills', n), join('skills', n)])
+for (const n of listMd(join(ROOT, '.claude/agents'))) items.push([join('.claude/agents', n), join('agents', n)])
+for (const n of listDirs(join(ROOT, '.claude/rules/ecc'))) items.push([join('.claude/rules/ecc', n), join('rules', 'ecc', n)])
+items.push(['licenses/ECC-LICENSE', join('rules', 'ecc', 'LICENSE')])
 items.push(['global/statusline.mjs', join('claude-setup', 'statusline.mjs')])
 
 const now = new Set(items.map(([, dest]) => dest))
@@ -137,7 +139,7 @@ write(MANIFEST, JSON.stringify({ version: 1, source: ROOT, installedAt: new Date
 // ---------------------------------------------------------------- 5. CLAUDE.md
 step('CLAUDE.md')
 const claudeMdPath = join(CLAUDE_DIR, 'CLAUDE.md')
-const block = `${START}\n${readFileSync(join(ROOT, 'global/CLAUDE.md'), 'utf8').trim()}\n${END}`
+const block = `${START}\n${readFileSync(join(ROOT, 'CLAUDE.md'), 'utf8').trim()}\n${END}`
 const current = existsSync(claudeMdPath) ? readFileSync(claudeMdPath, 'utf8') : ''
 const s = current.indexOf(START.slice(0, 26))
 const e = current.indexOf(END)

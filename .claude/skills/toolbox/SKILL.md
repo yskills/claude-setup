@@ -30,7 +30,7 @@ Read only the catalog files that match (each one is a short table with picks and
 Then search live, because tools change faster than the catalog (dated at the top of each file):
 
 ```
-node ~/.claude/skills/toolbox/scripts/find.mjs video caption subtitle
+node <toolbox skill folder>/scripts/find.mjs video caption subtitle
 ```
 
 It searches every installed plugin marketplace and all 293 ECC skills and prints install
@@ -54,7 +54,7 @@ Run from the project root:
 - **MCP server:** `claude mcp add --scope project --transport http <name> <url>`
   (writes `.mcp.json`; OAuth ones are signed in with `/mcp`). Never put keys in `.mcp.json`;
   use `${ENV_VAR}` references and document them in `.env.example`.
-- **ECC skill:** `node ~/.claude/skills/toolbox/scripts/add-skill.mjs <skill> [<skill>...]`
+- **ECC skill:** `node <toolbox skill folder>/scripts/add-skill.mjs <skill> [<skill>...]`
   (copies it into `.claude/skills/`, pinned to the ECC version this setup uses).
 - **Library / CLI:** add to `package.json` or note the system tool (e.g. FFmpeg) in README and
   the CI workflow.
@@ -65,4 +65,4 @@ env vars it needs. Start a new session (or `/reload-plugins`) so the additions l
 ## 5. Keep it current
 
 When a pick turns out wrong or a better tool appears, fix the catalog file in yskills/claude-setup
-(`skills/toolbox/catalog/`) so the next project starts from the better answer.
+(`.claude/skills/toolbox/catalog/`) so the next project starts from the better answer.

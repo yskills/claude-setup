@@ -64,7 +64,7 @@ Source: [MCP docs](https://code.claude.com/docs/en/mcp).
 - `permissions.defaultMode: "auto"` (a classifier approves safe actions; default since v2.1.283;
   only honored in user settings). [Docs](https://code.claude.com/docs/en/permission-modes)
 - `effortLevel: "high"`, `alwaysThinkingEnabled: true`.
-- Best-practice notes applied in `global/CLAUDE.md`: keep it short, give Claude a way to verify
+- Best-practice notes applied in `CLAUDE.md`: keep it short, give Claude a way to verify
   its work, `/clear` between tasks, subagents for big reads.
   [Docs](https://code.claude.com/docs/en/best-practices)
 

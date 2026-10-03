@@ -31,21 +31,28 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 
 | Piece | What | Where it comes from |
 |---|---|---|
-| `CLAUDE.md` | How Claude works for you: owns tasks end to end, verifies before pushing, screenshot-reviews UI, your default stack | `global/CLAUDE.md` |
+| `CLAUDE.md` | How Claude works for you: owns tasks end to end, verifies before pushing, screenshot-reviews UI, your default stack | `CLAUDE.md` |
 | Settings | Auto permission mode, safe allow list, asks before force-push and deploys, never reads `.env` files, high effort, status line with context bar | `global/settings.json` |
 | 16 plugins on | superpowers, frontend-design, code-review, security-guidance, TypeScript and Python LSP, Context7, Playwright, Chrome DevTools, commit-commands, code-simplifier, feature-dev, claude-md-management, claude-code-setup, skill-creator, claude-api | official Anthropic marketplaces, `config/plugins.json` |
 | 7 plugins per project | Cloudflare, Firebase, Stripe, Sentry, PostHog, Supabase, Vercel: installed but off; a repo turns one on in its `.claude/settings.json` | same |
-| 27 ECC skills | Vue, Nuxt 4, Vite, API design, security review, e2e, SEO, i18n, deep research, continuous learning... | `vendor/ecc`, list in `config/ecc.json` |
-| 16 ECC agents | planner, architect, code/TS/Vue/Python/security/database reviewers, build-error-resolver, e2e-runner, a11y, performance, SEO... | `vendor/ecc` |
-| ECC rules | common + TypeScript, Vue, Nuxt, web, Python (language rules load only for matching files) | `vendor/ecc/rules` |
+| 27 ECC skills | Vue, Nuxt 4, Vite, API design, security review, e2e, SEO, i18n, deep research, continuous learning... | `.claude/skills`, list in `config/ecc.json` |
+| 16 ECC agents | planner, architect, code/TS/Vue/Python/security/database reviewers, build-error-resolver, e2e-runner, a11y, performance, SEO... | `.claude/agents` |
+| ECC rules | common + TypeScript, Vue, Nuxt, web, Python (language rules load only for matching files) | `.claude/rules/ecc` |
 | ECC hooks | session memory across restarts, quality gate after edits, design-quality warning, console.log and secret checks before commits, compaction hints | `npx ecc-universal@2.2.3` |
-| Toolbox | Knows which plugins, APIs and skills any kind of app needs (video, AI, payments, ads, auth, email, analytics, mobile, scraping...), searches all ~315 plugins and 293 ECC skills live, and adds them to that one project | `skills/toolbox` |
-| Own skills | `onboard-project` (set a repo up for Claude in one PR), `ship-check` (run CI locally + self-review), `ui-review` (phone/desktop screenshots + critique) | `skills/` |
-| Own agent | `design-critic`: reviews screenshots for the "looks AI" problem | `agents/` |
+| Toolbox | Knows which plugins, APIs and skills any kind of app needs (video, AI, payments, ads, auth, email, analytics, mobile, scraping...), searches all ~315 plugins and 293 ECC skills live, and adds them to that one project | `.claude/skills/toolbox` |
+| Own skills | `onboard-project` (set a repo up for Claude in one PR), `ship-check` (run CI locally + self-review), `ui-review` (phone/desktop screenshots + critique) | `.claude/skills` |
+| Own agent | `design-critic`: reviews screenshots for the "looks AI" problem | `.claude/agents` |
 
 Measured in a fresh session: about 37k tokens of a 500k window before you type anything
 (skills 9.9k, CLAUDE.md + rules 7.6k, agents 1.9k; MCP tools are deferred). The full ECC plugin
 alone would add ~45k.
+
+## Project threads (cloud)
+
+Threads in the "Claude Setup" project run in the cloud, not on your machine. Add this repo to
+the project (Project settings, Repositories) and every thread loads it the way a local install
+does: `CLAUDE.md`, all skills, agents, rules and the global plugins from `.claude/`. The
+installer copies from the same `.claude/` folder, so both always match.
 
 ## Using it
 
@@ -60,7 +67,7 @@ alone would add ~45k.
 
 ## Changing it
 
-- Rules for how Claude works: edit `global/CLAUDE.md`.
+- Rules for how Claude works: edit `CLAUDE.md`.
 - Plugins: edit `config/plugins.json` (move one between `global` and `project`).
 - ECC subset: edit `config/ecc.json`, check out that ECC version, run
   `node scripts/sync-ecc.mjs <ECC checkout>`.
