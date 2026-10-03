@@ -26,6 +26,7 @@ Read only the catalog files that match (each one is a short table with picks and
 | `catalog/growth.md` | analytics, SEO, social publishing, email, marketing, A/B tests |
 | `catalog/app-platform.md` | auth, databases, storage, jobs, realtime, mobile and desktop, hosting, docs/PDF |
 | `catalog/data-web.md` | search, scraping, browser automation, 3D and games, maps |
+| `catalog/claude-addons.md` | add-ons for Claude Code itself that videos push: token savers, model routers, rule packs |
 
 Then search live, because tools change faster than the catalog (dated at the top of each file):
 
@@ -44,6 +45,11 @@ stack in the global CLAUDE.md, a hosted API. For each pick note: cost model, API
 license (e.g. Remotion is paid for companies over 3 people), DSGVO/GDPR impact, and whether it
 runs in Cloudflare Workers or needs a container/server. Present the stack in the PRD as one
 table; ask yskills only about picks that cost money or lock them in.
+
+Anything from outside the official marketplace or ECC (a community plugin, a skill repo, an MCP
+server from a video or post) gets read before it is installed: its scripts, hooks and MCP
+config, what it sends where, and which env vars or files it reads. Skip it if anything is
+unclear; agent skills shared online have shipped credential stealers.
 
 ## 4. Wire it into the project
 

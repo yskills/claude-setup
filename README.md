@@ -42,6 +42,7 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 | Toolbox | Knows which plugins, APIs and skills any kind of app needs (video, AI, payments, ads, auth, email, analytics, mobile, scraping...), searches all ~315 plugins and 293 ECC skills live, and adds them to that one project | `.claude/skills/toolbox` |
 | Own skills | `onboard-project` (set a repo up for Claude in one PR), `ship-check` (run CI locally + self-review), `ui-review` (phone/desktop screenshots + critique) | `.claude/skills` |
 | Own agent | `design-critic`: reviews screenshots for the "looks AI" problem | `.claude/agents` |
+| Ponytail | Write the least code that works: reuse, standard library, platform, installed dependency, one line, then new code | `.claude/skills/ponytail` (MIT, see `THIRD_PARTY.md`) |
 
 Measured in a fresh session: about 37k tokens of a 500k window before you type anything
 (skills 9.9k, CLAUDE.md + rules 7.6k, agents 1.9k; MCP tools are deferred). The full ECC plugin
@@ -49,10 +50,31 @@ alone would add ~45k.
 
 ## Project threads (cloud)
 
-Threads in the "Claude Setup" project run in the cloud, not on your machine. Add this repo to
-the project (Project settings, Repositories) and every thread loads it the way a local install
-does: `CLAUDE.md`, all skills, agents, rules and the global plugins from `.claude/`. The
-installer copies from the same `.claude/` folder, so both always match.
+Threads in a Claude project run in the cloud, not on your machine. Add this repo to the
+project (Project settings, Repositories) and every thread loads `CLAUDE.md` and all skills,
+agents and rules from `.claude/`, the same files the installer copies.
+
+Plugins and network need a [cloud environment](https://code.claude.com/docs/en/cloud-environments)
+(Project settings > Cloud environment > Add cloud environment). Pick the same one in every
+project that uses this setup.
+
+- **Setup script:** paste [`cloud/setup.sh`](cloud/setup.sh). Without it a thread reads this
+  repo's plugins only when it runs inside this repo, and even then 3 of the 16 were missing. It
+  installs all 16 at user scope; the result is cached and rebuilt about weekly, so threads do
+  not pay for it each time. Plugin tools connect a few seconds after a thread starts.
+- **Network access:** Custom, tick "Also include default list of common package managers", and
+  add:
+  - `context7.com`, `mcp.context7.com` (live library docs; blocked otherwise)
+  - `cdn.jsdelivr.net`, `unpkg.com` (CDN scripts, e.g. GSAP for HyperFrames)
+  - `*.youtube.com`, `*.googlevideo.com`, only if threads work on video
+- **Not needed:** `api.stripe.com`, `api.cloudflare.com`. Deploys and payments setup run in
+  GitHub Actions with repo secrets, never from a thread. Optional: a Stripe *test* key as an
+  API credential for `api.stripe.com` (Pro/Max plans); the proxy adds it and Claude never sees it.
+
+On your PC, `global/settings.json` lets Claude read the official docs of your stack (Nuxt, Vue,
+Cloudflare, Stripe, GitHub, MDN, German law texts...) without asking each time. Cloud threads
+still ask before opening a link nobody posted in the chat. That check belongs to the cloud
+service, and whether these settings skip it there is untested.
 
 ## Using it
 
