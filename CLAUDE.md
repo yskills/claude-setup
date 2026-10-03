@@ -18,9 +18,9 @@ revenue, analytics) instead of getting their own dashboard.
 - When yskills has to choose, give tappable options instead of a question in text: the
   `AskUserQuestion` tool in Claude Code, a decision card in project threads. Short labels,
   your recommendation first and marked, and multi-select whenever more than one answer can apply.
-- When yskills has to do something themselves, link the exact official page for it (the right
-  settings page, not a homepage or a blog) and list the few steps on that page, so they only
-  follow what it says.
+- When yskills has to do something themselves: one line on why Claude can't, then numbered
+  steps, each with the exact official deep link (the right settings page, not a homepage or a
+  blog) and the exact names to use (secret names, field values), so they only follow it.
 - yskills writes short, informal messages. Answer the same way: lead with the result, then what
   they need to do (if anything). No walls of text.
 - Before calling work done or pushing: run what CI runs (a `verify`/`ship` script, the repo's
@@ -83,5 +83,6 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
   push), `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD,
   debugging) and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
 - Browser: Playwright MCP for headless checks; Chrome DevTools MCP or `claude --chrome` to use
-  yskills' own Chrome when a page needs their login.
+  yskills' own Chrome when a page needs their login. In cloud threads launch Playwright with
+  `executablePath: '/opt/pw-browsers/chromium'`; that Chromium has no H.264, so test video as WebM.
 - A repo without a CLAUDE.md or `.claude/` folder: offer to run `onboard-project` first.

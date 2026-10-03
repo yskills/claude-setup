@@ -9,6 +9,7 @@ installing (global CLAUDE.md), and never add one only because a video says so.
 | **rtk** (Rust Token Killer) | Optional | Rust binary hooked into Bash that trims noisy command output by 60 to 90% (Apache-2.0). Only touches Bash output, not Read or Grep, so it pays off with long build and test logs |
 | **Graphify** | Per project, big repos only (luna-monorepo) | Builds a map of a codebase that Claude queries instead of reading every file (Apache-2.0/MIT, read 2026-10-03). Install: `uv tool install graphifyy` (package name has two y's), then in the repo `graphify claude install` (adds a section to that repo's CLAUDE.md and a PreToolUse hook) and `/graphify .`. Use `graphify extract . --code-only` to keep everything local; the full pass sends docs, PDFs and images to an LLM. New apps are too small to need it |
 | **agent-skills** (Addy Osmani) | Skip as a whole | Well written (MIT, read 2026-10-03), but most of its 24 skills repeat superpowers, ECC and Ponytail, its rollout advice (canaries, 5% flags) is for big teams, and `interview-me` asks one question at a time where yskills wants one batch. Pull a single skill into a project only if a need comes up |
+| **Agent Reach** | Optional, your PC only | Lets Claude read YouTube subtitles (yt-dlp), web pages (Jina Reader), GitHub, RSS and Exa search: that is how it "watches" a video. MIT, read at v1.5.0 on 2026-10-03, no telemetry found. Only the original `Panniantong/Agent-Reach`, not look-alike forks. Install `pipx install git+https://github.com/Panniantong/Agent-Reach@v1.5.0`, then `agent-reach install`; not the paste-an-install-link flow. Leave cookie logins off (account bans). Whisper transcription uploads the audio. Cloud threads would also need `*.youtube.com` and `*.googlevideo.com` allowed |
 | **caveman** | Skip | Makes replies telegraphic; CLAUDE.md already asks for short answers |
 | **OmniRoute** | Never | Sends requests to whatever free model is up, so code goes to unknown providers and quality drops. Using a Claude Pro/Max login through a third-party gateway breaks Anthropic's terms (since Feb 2026) and risks the account |
 | **pxpipe** | Never for code | Proxy that renders context as images. The model cannot read exact IDs, paths or hashes back from them and silently makes them up |
@@ -18,5 +19,6 @@ Sources: [Ponytail](https://github.com/DietrichGebert/ponytail),
 [benchmark write-up](https://flaviocopes.com/ponytail/),
 [rtk, caveman, pxpipe compared](https://pasqualepillitteri.it/en/news/7881/caveman-rtk-pxpipe-headroom-claude-code-tokens),
 [Graphify](https://github.com/Graphify-Labs/graphify),
+[Agent Reach](https://github.com/Panniantong/Agent-Reach),
 [subscription logins in third-party apps](https://winbuzzer.com/2026/02/19/anthropic-bans-claude-subscription-oauth-in-third-party-apps-xcxwbn/),
 [Snyk ToxicSkills](https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/).

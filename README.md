@@ -54,17 +54,22 @@ Threads in a Claude project run in the cloud, not on your machine. Add this repo
 project (Project settings, Repositories) and every thread loads `CLAUDE.md` and all skills,
 agents and rules from `.claude/`, the same files the installer copies.
 
-Plugins need one more step, because a thread only reads this repo's `.claude/settings.json`
-when it runs inside this repo, and even then 3 of the 16 were missing in a test. In
-Project settings > Cloud environment > Add cloud environment:
+Plugins and network need a [cloud environment](https://code.claude.com/docs/en/cloud-environments)
+(Project settings > Cloud environment > Add cloud environment). Pick the same one in every
+project that uses this setup.
 
-- **Setup script:** paste [`cloud/setup.sh`](cloud/setup.sh). It installs the 16 global
-  plugins at user scope (about 20 seconds per new thread), so they load whatever repo a
-  thread works in.
-- **Network access:** Custom, keep the default package managers and add `context7.com` and
-  `mcp.context7.com`. Context7's live library docs are blocked otherwise.
-
-Pick the same environment in every project that uses this setup.
+- **Setup script:** paste [`cloud/setup.sh`](cloud/setup.sh). Without it a thread reads this
+  repo's plugins only when it runs inside this repo, and even then 3 of the 16 were missing. It
+  installs all 16 at user scope; the result is cached and rebuilt about weekly, so threads do
+  not pay for it each time. Plugin tools connect a few seconds after a thread starts.
+- **Network access:** Custom, tick "Also include default list of common package managers", and
+  add:
+  - `context7.com`, `mcp.context7.com` (live library docs; blocked otherwise)
+  - `cdn.jsdelivr.net`, `unpkg.com` (CDN scripts, e.g. GSAP for HyperFrames)
+  - `*.youtube.com`, `*.googlevideo.com`, only if threads work on video
+- **Not needed:** `api.stripe.com`, `api.cloudflare.com`. Deploys and payments setup run in
+  GitHub Actions with repo secrets, never from a thread. Optional: a Stripe *test* key as an
+  API credential for `api.stripe.com` (Pro/Max plans); the proxy adds it and Claude never sees it.
 
 On your PC, `global/settings.json` lets Claude read the official docs of your stack (Nuxt, Vue,
 Cloudflare, Stripe, GitHub, MDN, German law texts...) without asking each time. Cloud threads
