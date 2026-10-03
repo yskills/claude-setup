@@ -53,3 +53,13 @@ change config/ecc.json and re-run the script.
 - agents/performance-optimizer
 - agents/seo-specialist
 - rules/ecc (common, typescript, vue, nuxt, web, python)
+
+## Ponytail
+
+Source: https://github.com/DietrichGebert/ponytail (MIT, see .claude/skills/ponytail/LICENSE)
+Version: 4.10.3
+Commit: c982cd411abb53323c4baa1baa3c2f020b8d0b08
+
+Only the core skill is copied, unchanged: .claude/skills/ponytail/SKILL.md. Its hooks (which
+re-inject the skill on every session start and subagent) and its five extra skills are left
+out. Read in full before adding; it runs nothing and makes no network calls.

@@ -19,8 +19,12 @@ if (!src || !existsSync(join(src, 'agents'))) {
 const cfg = JSON.parse(readFileSync(join(root, 'config/ecc.json'), 'utf8'));
 const out = join(root, '.claude');
 const prev = existsSync(join(root, 'THIRD_PARTY.md')) ? readFileSync(join(root, 'THIRD_PARTY.md'), 'utf8') : '';
-// Remove what the previous sync wrote (listed in THIRD_PARTY.md), so dropped items disappear.
-for (const m of prev.matchAll(/^- (skills|agents)\/([a-z0-9-]+)/gm)) rmSync(join(out, m[1], m[1] === 'agents' ? `${m[2]}.md` : m[2]), { recursive: true, force: true });
+// THIRD_PARTY.md has one section per source. This script owns the ECC one; the others are kept.
+const sections = prev.split(/\n(?=## )/).slice(1);
+const eccPrev = sections.find((x) => x.startsWith('## Everything Claude Code')) ?? '';
+const others = sections.filter((x) => !x.startsWith('## Everything Claude Code'));
+// Remove what the previous sync wrote (listed in its section), so dropped items disappear.
+for (const m of eccPrev.matchAll(/^- (skills|agents)\/([a-z0-9-]+)/gm)) rmSync(join(out, m[1], m[1] === 'agents' ? `${m[2]}.md` : m[2]), { recursive: true, force: true });
 rmSync(join(out, 'rules', 'ecc'), { recursive: true, force: true });
 mkdirSync(join(out, 'skills'), { recursive: true });
 mkdirSync(join(out, 'agents'), { recursive: true });
@@ -57,7 +61,8 @@ writeFileSync(join(root, 'THIRD_PARTY.md'),
   `change config/ecc.json and re-run the script.\n\n` +
   cfg.skills.map((x) => `- skills/${x}\n`).join('') +
   cfg.agents.map((x) => `- agents/${x}\n`).join('') +
-  `- rules/ecc (${cfg.rules.join(', ')})\n`);
+  `- rules/ecc (${cfg.rules.join(', ')})\n` +
+  others.map((x) => `\n${x.trimEnd()}\n`).join(''));
 
 // Index of every ECC skill, so the toolbox skill can find and pull in extras per project.
 const index = []
