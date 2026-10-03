@@ -35,7 +35,9 @@ rediscover; no generic advice that the global setup already gives.
 **`.claude/settings.json`** (see `templates/settings.json`):
 - `permissions.allow` for the repo's own safe scripts (test, build, typecheck, lint, verify).
 - `permissions.deny` for reading or editing real env files.
-- `enabledPlugins` for the per-project plugins this repo uses:
+- Per-project plugins this repo uses, added with
+  `claude plugin install <id> --scope project` (writes `enabledPlugins`). Common signals below;
+  for anything else use the `toolbox` skill:
 
   | Signal in the repo | Plugin |
   |---|---|

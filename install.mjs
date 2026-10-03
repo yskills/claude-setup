@@ -11,6 +11,7 @@
 //   4. copies skills, agents and rules into ~/.claude (curated ECC subset + our own)
 //   5. writes the managed block of ~/.claude/CLAUDE.md
 //   6. merges global/settings.json into ~/.claude/settings.json
+//   7. reports useful command-line tools that are missing (gh, ffmpeg, docker...)
 import { spawnSync } from 'node:child_process'
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
@@ -182,6 +183,25 @@ for (const p of plugins.project) settings.enabledPlugins[p.id] = false
 if (settings.enabledPlugins['ecc@ecc']) { settings.enabledPlugins['ecc@ecc'] = false; warn('turned off the full ecc@ecc plugin: this setup installs a curated part of it instead') }
 write(settingsPath, JSON.stringify(settings, null, 2) + '\n')
 log(`  merged (permissions mode: ${settings.permissions.defaultMode}, ${Object.values(settings.enabledPlugins).filter(Boolean).length} plugins on)`)
+
+// ---------------------------------------------------------------- 7. tools on this machine
+step('Command-line tools (checked, not installed)')
+const TOOLS = [
+  ['gh', 'GitHub CLI: PRs, CI status', { win: 'winget install GitHub.cli', mac: 'brew install gh', linux: 'see https://cli.github.com' }],
+  ['ffmpeg', 'video and audio processing', { win: 'winget install Gyan.FFmpeg', mac: 'brew install ffmpeg', linux: 'sudo apt install ffmpeg' }],
+  ['docker', 'containers (Luna, local services)', { win: 'winget install Docker.DockerDesktop', mac: 'brew install --cask docker', linux: 'curl -fsSL https://get.docker.com | sh' }],
+  ['python3', 'Python scripts and AI tools', { win: 'winget install Python.Python.3.13', mac: 'brew install python', linux: 'sudo apt install python3' }],
+  ['uv', 'fast Python package manager', { win: 'winget install astral-sh.uv', mac: 'brew install uv', linux: 'curl -LsSf https://astral.sh/uv/install.sh | sh' }],
+  ['fnm', 'Node version per project (.node-version)', { win: 'winget install Schniz.fnm', mac: 'brew install fnm', linux: 'curl -fsSL https://fnm.vercel.app/install | bash' }],
+]
+const os = IS_WIN ? 'win' : process.platform === 'darwin' ? 'mac' : 'linux'
+const missingTools = []
+for (const [cmd, what, hint] of TOOLS) {
+  const found = has(cmd) || (cmd === 'python3' && has('python')) || (cmd === 'ffmpeg' && spawnSync('ffmpeg', ['-version'], { shell: IS_WIN }).status === 0)
+  log(`  ${found ? '+' : '-'} ${cmd.padEnd(8)} ${what}`)
+  if (!found) missingTools.push(`${hint[os]}`)
+}
+if (missingTools.length) log(`  Install the missing ones with:\n    ${missingTools.join('\n    ')}`)
 
 // ---------------------------------------------------------------- done
 step(DRY ? 'Dry run finished' : 'Done')

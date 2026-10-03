@@ -3,7 +3,7 @@
 // Usage: node scripts/sync-ecc.mjs <path-to-ECC-checkout>
 // Check out the tag you want first (git -C <path> checkout vX.Y.Z), then update
 // "version" and "commit" in config/ecc.json and re-run.
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -50,6 +50,18 @@ writeFileSync(join(out, 'SOURCE.md'),
   `Only the subset listed in config/ecc.json is copied. Do not edit these files by hand;\n` +
   `change config/ecc.json and run \`node scripts/sync-ecc.mjs <ECC checkout>\`.\n`);
 
+// Index of every ECC skill, so the toolbox skill can find and pull in extras per project.
+const index = []
+for (const name of readdirSync(join(src, 'skills')).sort()) {
+  const f = join(src, 'skills', name, 'SKILL.md')
+  if (!existsSync(f)) continue
+  const fm = readFileSync(f, 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)
+  const desc = fm?.[1].match(/^description:\s*(.*)$/m)?.[1].replace(/^["']|["']$/g, '') ?? ''
+  index.push({ name, description: desc.slice(0, 300), installedGlobally: cfg.skills.includes(name) })
+}
+writeFileSync(join(root, 'skills/toolbox/ecc-index.json'),
+  JSON.stringify({ repo: cfg.repo, version: cfg.version, commit, skills: index }, null, 1) + '\n')
+
 if (commit !== cfg.commit) console.warn(`warning: checkout is at ${commit}, config/ecc.json pins ${cfg.commit}`);
 if (missing.length) { console.error(`missing in ECC checkout: ${missing.join(', ')}`); process.exit(1); }
-console.log(`vendored ${cfg.skills.length} skills, ${cfg.agents.length} agents, ${cfg.rules.length} rule packs from ECC ${cfg.version}`);
+console.log(`indexed ${index.length} ECC skills; vendored ${cfg.skills.length} skills, ${cfg.agents.length} agents, ${cfg.rules.length} rule packs from ECC ${cfg.version}`);

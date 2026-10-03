@@ -54,5 +54,16 @@ if (plugins) {
   if (new Set(ids).size !== ids.length) errors.push('config/plugins.json: duplicate plugin id')
 }
 
+// Every ECC skill a toolbox catalog names must exist in the ECC index.
+const index = json('skills/toolbox/ecc-index.json')
+if (index) {
+  const names = new Set(index.skills.map((x) => x.name))
+  for (const f of readdirSync(join(root, 'skills/toolbox/catalog'))) {
+    for (const m of readFileSync(join(root, 'skills/toolbox/catalog', f), 'utf8').matchAll(/ECC skills? ([^|\n]*)/g)) {
+      for (const n of m[1].matchAll(/`([a-z0-9-]+)`/g)) if (!names.has(n[1])) errors.push(`catalog/${f}: unknown ECC skill ${n[1]}`)
+    }
+  }
+}
+
 if (errors.length) { console.error(errors.map((e) => `x ${e}`).join('\n')); process.exit(1) }
 console.log(`ok: ${seen.skill.size} skills, ${seen.agent.size} agents, ${plugins?.global.length ?? 0}+${plugins?.project.length ?? 0} plugins`)

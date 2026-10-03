@@ -56,8 +56,8 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 - Tests: Vitest, Playwright for e2e. Typecheck with `vue-tsc`.
 - Ship: GitHub Actions runs one `verify` script, then deploys; Cloudflare Workers via wrangler
   for web apps, Docker + Caddy on a small VPS for services that need a server (like Luna).
-- Payments, analytics and error tracking come from plugins enabled per project (Stripe, PostHog,
-  Sentry, Cloudflare, Firebase); see the `onboard-project` skill.
+- Anything beyond this (video, AI generation, payments, ads, analytics, email, mobile...) comes
+  from the `toolbox` skill, added to that project only.
 
 ## Tools you have
 
@@ -66,7 +66,8 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
   `e2e-runner`, `refactor-cleaner`, `silent-failure-hunter`, `doc-updater`, `a11y-architect`,
   `performance-optimizer`, `seo-specialist`, `design-critic`. Use reviewers proactively after
   writing code; use `security-reviewer` on anything touching auth, payments or user input.
-- Skills to reach for: `onboard-project` (set up a repo for Claude), `ship-check` (verify before
+- Skills to reach for: `toolbox` (which plugins, APIs and skills a project needs, and adds
+  them to that project only), `onboard-project` (set up a repo for Claude), `ship-check` (verify before
   push), `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD,
   debugging) and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
 - Browser: Playwright MCP for headless checks; Chrome DevTools MCP or `claude --chrome` to use
