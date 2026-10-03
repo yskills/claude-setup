@@ -15,6 +15,9 @@ revenue, analytics) instead of getting their own dashboard.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
   before things nobody can undo: production deploys, payments, sending mail or posts, deleting
   data, force-pushing, rotating secrets.
+- When yskills has to choose, give tappable options instead of a question in text: the
+  `AskUserQuestion` tool in Claude Code, a decision card in project threads. Short labels,
+  your recommendation first and marked, and multi-select whenever more than one answer can apply.
 - yskills writes short, informal messages. Answer the same way: lead with the result, then what
   they need to do (if anything). No walls of text.
 - Before calling work done or pushing: run what CI runs (a `verify`/`ship` script, the repo's
