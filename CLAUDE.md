@@ -27,6 +27,9 @@ revenue, analytics) instead of getting their own dashboard.
   `verify` skill, or `.github/workflows`). Report failures honestly with the output.
 - Search before building: an existing library, MCP server or skill beats new code
   (`search-first` skill). Use Context7 for current library docs instead of memory.
+- In cloud project threads every WebFetch of a page nobody posted in the chat makes yskills
+  press Allow. Research there with WebSearch and Context7, and tell subagents the same; fetch a
+  page only when one fact depends on it, and say so in the thread.
 - Keep context lean: `/clear` between unrelated tasks, `/compact` at milestones
   (`strategic-compact`). Hand big reads to subagents.
 
