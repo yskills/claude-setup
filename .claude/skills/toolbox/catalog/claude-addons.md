@@ -1,0 +1,21 @@
+# Add-ons for Claude Code itself
+
+Checked 2026-10-03. Mostly tools pushed by Instagram and YouTube reels. Read any of them before
+installing (global CLAUDE.md), and never add one only because a video says so.
+
+| Tool | Verdict | Why |
+|---|---|---|
+| **Ponytail** | In this setup (core skill only) | Makes Claude reuse code and write less of it. The author's benchmark on one repo: 54% fewer added lines, 22% fewer tokens. Hooks left out; see THIRD_PARTY.md |
+| **rtk** (Rust Token Killer) | Optional | Rust binary hooked into Bash that trims noisy command output by 60 to 90% (Apache-2.0). Only touches Bash output, not Read or Grep, so it pays off with long build and test logs |
+| **Graphify** | Only for big repos like luna-monorepo | Builds a map of a codebase that Claude queries instead of reading every file. New apps are too small to need it |
+| **caveman** | Skip | Makes replies telegraphic; CLAUDE.md already asks for short answers |
+| **OmniRoute** | Never | Sends requests to whatever free model is up, so code goes to unknown providers and quality drops. Using a Claude Pro/Max login through a third-party gateway breaks Anthropic's terms (since Feb 2026) and risks the account |
+| **pxpipe** | Never for code | Proxy that renders context as images. The model cannot read exact IDs, paths or hashes back from them and silently makes them up |
+| "Install these 20 skills/MCPs" lists | Skip | Every one costs context. Snyk scanned about 4,000 public skills: 37% had security flaws, 76 were built to steal credentials |
+
+Sources: [Ponytail](https://github.com/DietrichGebert/ponytail),
+[benchmark write-up](https://flaviocopes.com/ponytail/),
+[rtk, caveman, pxpipe compared](https://pasqualepillitteri.it/en/news/7881/caveman-rtk-pxpipe-headroom-claude-code-tokens),
+[Graphify](https://github.com/Graphify-Labs/graphify),
+[subscription logins in third-party apps](https://winbuzzer.com/2026/02/19/anthropic-bans-claude-subscription-oauth-in-third-party-apps-xcxwbn/),
+[Snyk ToxicSkills](https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/).

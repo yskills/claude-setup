@@ -31,6 +31,9 @@ revenue, analytics) instead of getting their own dashboard.
 
 - Conventional commits with a subject that says what changed for the user, e.g.
   `fix(game): sheets a phone can actually upload`. Small PRs, one concern each.
+- Write the least code that works (`ponytail` skill): reuse what the repo already has, then the
+  standard library, native platform features, an installed dependency, one line, and only then
+  new code. Tests still follow the next line, not ponytail's "one check, no framework".
 - Tests for new behavior; a bug fix starts with a failing test when practical.
 - Secrets never go in git, logs, screenshots or the frontend bundle. `VITE_*` and
   `NUXT_PUBLIC_*` values are public. Keep `.env.example` current; never read real `.env` files.

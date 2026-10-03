@@ -42,6 +42,7 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 | Toolbox | Knows which plugins, APIs and skills any kind of app needs (video, AI, payments, ads, auth, email, analytics, mobile, scraping...), searches all ~315 plugins and 293 ECC skills live, and adds them to that one project | `.claude/skills/toolbox` |
 | Own skills | `onboard-project` (set a repo up for Claude in one PR), `ship-check` (run CI locally + self-review), `ui-review` (phone/desktop screenshots + critique) | `.claude/skills` |
 | Own agent | `design-critic`: reviews screenshots for the "looks AI" problem | `.claude/agents` |
+| Ponytail | Write the least code that works: reuse, standard library, platform, installed dependency, one line, then new code | `.claude/skills/ponytail` (MIT, see `THIRD_PARTY.md`) |
 
 Measured in a fresh session: about 37k tokens of a 500k window before you type anything
 (skills 9.9k, CLAUDE.md + rules 7.6k, agents 1.9k; MCP tools are deferred). The full ECC plugin
