@@ -45,6 +45,11 @@ license (e.g. Remotion is paid for companies over 3 people), DSGVO/GDPR impact, 
 runs in Cloudflare Workers or needs a container/server. Present the stack in the PRD as one
 table; ask yskills only about picks that cost money or lock them in.
 
+Anything from outside the official marketplace or ECC (a community plugin, a skill repo, an MCP
+server from a video or post) gets read before it is installed: its scripts, hooks and MCP
+config, what it sends where, and which env vars or files it reads. Skip it if anything is
+unclear; agent skills shared online have shipped credential stealers.
+
 ## 4. Wire it into the project
 
 Run from the project root:
