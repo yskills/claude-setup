@@ -66,6 +66,11 @@ Project settings > Cloud environment > Add cloud environment:
 
 Pick the same environment in every project that uses this setup.
 
+On your PC, `global/settings.json` lets Claude read the official docs of your stack (Nuxt, Vue,
+Cloudflare, Stripe, GitHub, MDN, German law texts...) without asking each time. Cloud threads
+still ask before opening a link nobody posted in the chat; that check belongs to the cloud
+service, and settings did not change it in a test.
+
 ## Using it
 
 - **New idea:** just describe it. Claude loads `toolbox` on its own, picks the tools, and adds them to that project only (tested: "video editor app that cuts my videos for social media" pulled in the video catalog, HyperFrames, fal.ai and the ECC video skills).
