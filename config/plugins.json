@@ -1,0 +1,32 @@
+{
+  "$comment": "Token costs are what `claude plugin details` reported on 2026-10-03 (always-on tokens added to every session). 'global' plugins are on everywhere; 'project' plugins are installed but off, and a project turns one on in its .claude/settings.json (the onboard-project skill does this).",
+  "marketplaces": [
+    { "name": "claude-plugins-official", "source": "anthropics/claude-plugins-official" }
+  ],
+  "global": [
+    { "id": "superpowers@claude-plugins-official", "why": "brainstorm, plan, TDD, systematic debugging, subagent-driven development", "tokens": 840 },
+    { "id": "frontend-design@claude-plugins-official", "why": "distinctive UI instead of generic 'AI-looking' pages", "tokens": 80 },
+    { "id": "code-review@claude-plugins-official", "why": "multi-agent PR review", "tokens": 22 },
+    { "id": "security-guidance@claude-plugins-official", "why": "warns on risky code as it is written (hooks only)", "tokens": 0 },
+    { "id": "typescript-lsp@claude-plugins-official", "why": "go-to-definition, references and type errors for TS/JS", "tokens": 0 },
+    { "id": "pyright-lsp@claude-plugins-official", "why": "same for Python", "tokens": 0 },
+    { "id": "context7@claude-plugins-official", "why": "current library docs (Vue, Nuxt, Vite, Tailwind...) instead of stale memory", "tokens": 0 },
+    { "id": "playwright@claude-plugins-official", "why": "headless browser: screenshots, e2e, checking pages", "tokens": 0 },
+    { "id": "chrome-devtools-mcp@claude-plugins-official", "why": "drive and inspect a live Chrome: console, network, performance", "tokens": 806 },
+    { "id": "commit-commands@claude-plugins-official", "why": "/commit, /commit-push-pr", "tokens": 105 },
+    { "id": "code-simplifier@claude-plugins-official", "why": "clean up code after a feature lands", "tokens": 66 },
+    { "id": "feature-dev@claude-plugins-official", "why": "guided feature workflow with explorer and architect agents", "tokens": 240 },
+    { "id": "claude-md-management@claude-plugins-official", "why": "keep each repo's CLAUDE.md accurate", "tokens": 177 },
+    { "id": "claude-code-setup@claude-plugins-official", "why": "recommends hooks, skills and MCP servers for a repo", "tokens": 141 },
+    { "id": "skill-creator@claude-plugins-official", "why": "build and test new skills", "tokens": 114 }
+  ],
+  "project": [
+    { "id": "cloudflare@claude-plugins-official", "when": "wrangler.toml or wrangler.jsonc", "tokens": 1033 },
+    { "id": "firebase@claude-plugins-official", "when": "firebase in package.json", "tokens": 0 },
+    { "id": "stripe@claude-plugins-official", "when": "stripe in package.json, or payments are being added", "tokens": 2240 },
+    { "id": "sentry@claude-plugins-official", "when": "@sentry/* in package.json", "tokens": 1066 },
+    { "id": "posthog@claude-plugins-official", "when": "posthog-js or posthog-node in package.json", "tokens": 30164 },
+    { "id": "supabase@claude-plugins-official", "when": "@supabase/* in package.json", "tokens": null },
+    { "id": "vercel@claude-plugins-official", "when": "vercel.json", "tokens": null }
+  ]
+}

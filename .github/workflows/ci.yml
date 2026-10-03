@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/check.mjs
+      # Full install (ECC hooks included) into a throwaway home; plugins need the claude CLI,
+      # which CI does not have, so the installer skips them with a warning.
+      - name: install into a temp home
+        shell: bash
+        run: |
+          export HOME="$RUNNER_TEMP/home" USERPROFILE="$RUNNER_TEMP/home"
+          mkdir -p "$HOME/.claude"
+          echo '# my notes' > "$HOME/.claude/CLAUDE.md"
+          node install.mjs
+          node install.mjs --skip-hooks
+          test "$(grep -c 'claude-setup:start' "$HOME/.claude/CLAUDE.md")" = 1
+          grep -q '# my notes' "$HOME/.claude/CLAUDE.md"
+          test -f "$HOME/.claude/skills/ship-check/SKILL.md"
+          test -f "$HOME/.claude/agents/design-critic.md"
+          node -e "const s=require(process.env.HOME+'/.claude/settings.json'); if(!s.hooks||!s.statusLine||s.permissions.defaultMode!=='auto') process.exit(1)"
+          echo '{"model":{"display_name":"Test"},"workspace":{"current_dir":"."},"context_window":{"remaining_percentage":70}}' | node "$HOME/.claude/claude-setup/statusline.mjs"

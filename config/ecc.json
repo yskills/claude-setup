@@ -1,0 +1,74 @@
+{
+  "$comment": "Curated subset of Everything Claude Code (affaan-m/ECC). The full plugin adds ~45k tokens to every session; this subset keeps what fits yskills' stack. Refresh with: node scripts/sync-ecc.mjs <path-to-ECC-checkout>",
+  "repo": "https://github.com/affaan-m/ECC",
+  "version": "2.2.3",
+  "commit": "c05b2d6614f62f6db0047669aa4eefb223d478f9",
+  "npmPackage": "ecc-universal@2.2.3",
+  "skills": [
+    "search-first",
+    "strategic-compact",
+    "verification-loop",
+    "security-review",
+    "continuous-learning-v2",
+    "context-budget",
+    "codebase-onboarding",
+    "deep-research",
+    "product-lens",
+    "vue-patterns",
+    "nuxt4-patterns",
+    "vite-patterns",
+    "frontend-patterns",
+    "backend-patterns",
+    "api-design",
+    "database-migrations",
+    "e2e-testing",
+    "browser-qa",
+    "make-interfaces-feel-better",
+    "design-system",
+    "i18n-sync",
+    "seo",
+    "deployment-patterns",
+    "docker-patterns",
+    "python-patterns",
+    "python-testing"
+  ],
+  "agents": [
+    "planner",
+    "architect",
+    "code-reviewer",
+    "typescript-reviewer",
+    "vue-reviewer",
+    "python-reviewer",
+    "security-reviewer",
+    "database-reviewer",
+    "build-error-resolver",
+    "e2e-runner",
+    "refactor-cleaner",
+    "silent-failure-hunter",
+    "doc-updater",
+    "a11y-architect",
+    "performance-optimizer",
+    "seo-specialist"
+  ],
+  "rules": [
+    "common",
+    "typescript",
+    "vue",
+    "nuxt",
+    "web",
+    "python"
+  ],
+  "hooks": {
+    "profile": "standard",
+    "disabled": [
+      "pre:bash:auto-tmux-dev",
+      "pre:bash:tmux-reminder",
+      "pre:bash:gateguard-fact-force",
+      "pre:edit-write:gateguard-fact-force"
+    ]
+  },
+  "ruleExcludes": [
+    "common/agents.md"
+  ],
+  "$comment_ruleExcludes": "common/agents.md names agents as ecc:<name>, which only exists with the full plugin; our CLAUDE.md lists the agents instead."
+}

@@ -1,0 +1,60 @@
+---
+name: onboard-project
+description: Set up an existing repository for Claude - a short CLAUDE.md, .claude/settings.json with safe permissions and the right per-project plugins, and a verify skill that mirrors CI. Use when a repo has no CLAUDE.md or .claude folder, or when asked to "set up Claude" for a project.
+---
+
+# Onboard a project
+
+Goal: any future Claude session in this repo knows what it is, how to check its work, and what
+not to touch, without reading the whole codebase. Deliver it as one PR.
+
+## 1. Learn the repo (read, don't guess)
+
+- `README*`, `package.json` / `pyproject.toml` scripts and dependencies, `.node-version`,
+  framework configs (`nuxt.config.*`, `vite.config.*`, `wrangler.*`, `firebase.json`,
+  `docker-compose.yml`), `.github/workflows/*`, existing `CLAUDE.md` / `AGENTS.md` / `.claude/`.
+- `git log --format=%s -20` for commit style.
+- Use the `codebase-onboarding` skill if the repo is large or unfamiliar.
+
+## 2. Hygiene check (report, fix only what is safe)
+
+- Tracked files that should not be: `git ls-files | grep -E '(^|/)(\.env(\..*)?|node_modules/|dist/|\.output/)'`
+  (`.env.example` is fine). Untrack them in the PR with `git rm --cached` and fix `.gitignore`.
+  If a tracked env file holds a real secret, tell yskills to rotate it: removing it from git
+  does not remove it from history.
+- Secrets in frontend env vars (`VITE_*`, `NUXT_PUBLIC_*`) are public; flag any that guard
+  something (admin PINs, API keys that are not meant to be public).
+
+## 3. Write the files
+
+**`CLAUDE.md`** (under ~60 lines; see `templates/CLAUDE.md`): what the project is in two lines,
+layout, the commands that matter, project rules (security model, language of docs and UI,
+deploy target), and how UI changes are verified. Only facts a session could not cheaply
+rediscover; no generic advice that the global setup already gives.
+
+**`.claude/settings.json`** (see `templates/settings.json`):
+- `permissions.allow` for the repo's own safe scripts (test, build, typecheck, lint, verify).
+- `permissions.deny` for reading or editing real env files.
+- `enabledPlugins` for the per-project plugins this repo uses:
+
+  | Signal in the repo | Plugin |
+  |---|---|
+  | `wrangler.toml` / `wrangler.jsonc` | `cloudflare@claude-plugins-official` |
+  | `firebase` dependency or `firebase.json` | `firebase@claude-plugins-official` |
+  | `stripe` dependency | `stripe@claude-plugins-official` |
+  | `@sentry/*` dependency | `sentry@claude-plugins-official` |
+  | `posthog-js` / `posthog-node` dependency | `posthog@claude-plugins-official` |
+  | `@supabase/*` dependency | `supabase@claude-plugins-official` |
+  | `vercel.json` | `vercel@claude-plugins-official` |
+
+**`.claude/skills/verify/SKILL.md`**: the exact commands CI runs, in order, from the repo root,
+plus repo-specific review questions. If there is no CI, add a `verify` npm script and a minimal
+`.github/workflows/ci.yml` that runs it on pull requests.
+
+Add `.shots/` to `.gitignore`.
+
+## 4. Prove it and ship
+
+Run the verify steps you wrote; they must pass on the current main (if main is already red, say
+what fails and keep the skill honest about it). Open a PR titled
+`chore(claude): set up Claude for <project>` listing what was added and every hygiene finding.
