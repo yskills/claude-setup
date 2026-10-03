@@ -62,7 +62,7 @@ Stripe only takes the money. Stripe.js never loads on our pages either.
 | `server/api/checkout/confirm.post.ts` | same | Return page check |
 | `server/api/stripe/webhook.post.ts` | same | Paid, SEPA, failed, expired, refunded, disputed |
 | `server/migrations/0001_orders.sql` | the D1 `migrations_dir` | `orders` table |
-| `scripts/deploy.mjs` | `scripts/` | D1, migrations, deploy, Worker secrets, Stripe webhook (created once, events kept up to date). `SITE_URL` for a custom domain |
+| `scripts/deploy.mjs` | `scripts/` | Token check (`--check`: can it create a Worker, not just read), D1, migrations, deploy, Worker secrets, a fresh Stripe webhook. `SITE_URL` for a custom domain |
 | `ci.yml` | `.github/workflows/` | Verify on PRs; deploy from `main` with the `production` environment |
 | `tests/shop.spec.ts` | `tests/e2e/` | Signed fake webhooks against `wrangler dev`, order validation, and real sessions against stripe-mock |
 | `playwright.config.ts` | project root | Starts `wrangler dev` with the test webhook secret, plus the stripe-mock vars when `STRIPE_MOCK` is set |

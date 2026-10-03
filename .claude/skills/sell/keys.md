@@ -27,7 +27,7 @@ Use these secret names exactly. `deploy.mjs` and the Worker expect them.
 
 | Secret | For | Create it | Test / live |
 |---|---|---|---|
-| `CLOUDFLARE_API_TOKEN` | Deploy | [Cloudflare: API tokens](https://dash.cloudflare.com/profile/api-tokens) → Create Token → template "Edit Cloudflare Workers". Add Account · D1 · Edit if the app uses D1, and limit Account Resources to the one account (and Zone Resources to the shop's domain). Guide: [GitHub Actions deploys](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/) | One token per project |
+| `CLOUDFLARE_API_TOKEN` | Deploy | [Cloudflare: API tokens](https://dash.cloudflare.com/profile/api-tokens) → Create Token → template "Edit Cloudflare Workers". Add Account · D1 · Edit if the app uses D1, and limit Account Resources to the one account (and Zone Resources to the shop's domain). Keep Workers on all Workers, not specific ones: a token limited to specific Workers can't create a new one. `deploy.mjs --check` proves the token can create a Worker before CI builds. Guide: [GitHub Actions deploys](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/) | One token per project |
 | `CLOUDFLARE_ACCOUNT_ID` | Deploy | [Cloudflare dashboard](https://dash.cloudflare.com) → Workers & Pages → Account ID in the right column | n/a |
 | `STRIPE_SECRET_KEY` | Checkout, refunds, creating the webhook | [Stripe: API keys](https://dashboard.stripe.com/apikeys) → Create restricted key. Permissions: Checkout Sessions **Write**, Webhook Endpoints **Write**. Add more only when a call fails with a permission error. Guide: [restricted keys](https://docs.stripe.com/keys/restricted-api-keys) | Test key from a sandbox now; live key at go-live. A live key is shown only once |
 | `STRIPE_WEBHOOK_SECRET` | Verifying webhooks | Nothing to do: `deploy.mjs` creates the endpoint and stores it | Separate per mode, handled automatically |
@@ -60,7 +60,8 @@ project doesn't need.
 >    Selected branches and add `main`.
 > 2. In the same environment, use Add environment secret for each of these:
 >    - `CLOUDFLARE_API_TOKEN`: [create the token](https://dash.cloudflare.com/profile/api-tokens)
->      from the template "Edit Cloudflare Workers", and add Account · D1 · Edit.
+>      from the template "Edit Cloudflare Workers", and add Account · D1 · Edit. Leave it on
+>      all Workers (not specific Workers) and your one account.
 >    - `CLOUDFLARE_ACCOUNT_ID`: it's in the right column of
 >      [Workers & Pages](https://dash.cloudflare.com).
 >    - `STRIPE_SECRET_KEY`: in your Stripe sandbox, open
