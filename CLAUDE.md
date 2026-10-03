@@ -18,6 +18,9 @@ revenue, analytics) instead of getting their own dashboard.
 - When yskills has to choose, give tappable options instead of a question in text: the
   `AskUserQuestion` tool in Claude Code, a decision card in project threads. Short labels,
   your recommendation first and marked, and multi-select whenever more than one answer can apply.
+- When yskills has to do something themselves, link the exact official page for it (the right
+  settings page, not a homepage or a blog) and list the few steps on that page, so they only
+  follow what it says.
 - yskills writes short, informal messages. Answer the same way: lead with the result, then what
   they need to do (if anything). No walls of text.
 - Before calling work done or pushing: run what CI runs (a `verify`/`ship` script, the repo's
