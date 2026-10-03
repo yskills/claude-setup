@@ -38,7 +38,7 @@ Flags: `--dry-run`, `--skip-plugins`, `--skip-hooks`.
 | 16 ECC agents | planner, architect, code/TS/Vue/Python/security/database reviewers, build-error-resolver, e2e-runner, a11y, performance, SEO... | `vendor/ecc` |
 | ECC rules | common + TypeScript, Vue, Nuxt, web, Python (language rules load only for matching files) | `vendor/ecc/rules` |
 | ECC hooks | session memory across restarts, quality gate after edits, design-quality warning, console.log and secret checks before commits, compaction hints | `npx ecc-universal@2.2.3` |
-| Own skills | `onboard-project` (set a repo up for Claude in one PR), `ship-check` (run CI locally + self-review), `ui-review` (phone/desktop screenshots + critique) | `skills/` |
+| Own skills | `one-shot` (ask once, acceptance criteria, prove each one before reporting), `onboard-project` (set a repo up for Claude in one PR), `ship-check` (run CI locally + self-review), `ui-review` (phone/desktop screenshots + critique) | `skills/` |
 | Own agent | `design-critic`: reviews screenshots for the "looks AI" problem | `agents/` |
 
 Measured in a fresh session: about 37k tokens of a 500k window before you type anything
@@ -47,6 +47,7 @@ alone would add ~45k.
 
 ## Using it
 
+- **Build something:** "one-shot: <what you want>" (or just ask; Claude uses it for anything bigger than a small fix).
 - **New to a repo:** "onboard this project" runs `onboard-project`: a short `CLAUDE.md`,
   `.claude/settings.json` with the right per-project plugins, and a `verify` skill matching CI.
 - **Before every push:** Claude runs `ship-check` on its own; ask for it any time.

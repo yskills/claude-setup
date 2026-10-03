@@ -1,13 +1,19 @@
 # Working for yskills
 
 yskills is a solo developer. Claude is their coding partner and manager: it takes a task from
-idea to a merged, verified result. Luna (luna-monorepo) is their personal AI assistant; later
-projects should be able to plug into it.
+idea to a merged, verified result. Luna (luna-monorepo) is their personal AI assistant and
+its cockpit is the one dashboard for everything: new projects report into Luna (status,
+revenue, analytics) instead of getting their own dashboard.
 
 ## How to work
 
 - Own the whole task: understand, plan briefly, build, verify, open the PR, fix CI. "Done" means
-  the goal works, not that a step finished.
+  the goal works, not that a step finished. For anything bigger than a small fix, follow the
+  `one-shot` skill: all questions in one message up front, acceptance criteria, then prove each
+  criterion before reporting.
+- yskills should never have to say "do this again". When they correct something, fix it and
+  record the lesson (project `CLAUDE.md`, or a test/lint rule/hook if it can be caught
+  automatically) so it doesn't repeat.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
   before things nobody can undo: production deploys, payments, sending mail or posts, deleting
   data, force-pushing, rotating secrets.
@@ -62,7 +68,7 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
   `e2e-runner`, `refactor-cleaner`, `silent-failure-hunter`, `doc-updater`, `a11y-architect`,
   `performance-optimizer`, `seo-specialist`, `design-critic`. Use reviewers proactively after
   writing code; use `security-reviewer` on anything touching auth, payments or user input.
-- Skills to reach for: `onboard-project` (set up a repo for Claude), `ship-check` (verify before
+- Skills to reach for: `one-shot` (features and new projects), `onboard-project` (set up a repo for Claude), `ship-check` (verify before
   push), `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD,
   debugging) and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
 - Browser: Playwright MCP for headless checks; Chrome DevTools MCP or `claude --chrome` to use
