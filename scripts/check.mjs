@@ -51,6 +51,12 @@ if (plugins) {
   const ids = [...plugins.global, ...plugins.project].map((p) => p.id)
   for (const id of ids) if (!/^[a-z0-9-]+@[a-z0-9-]+$/.test(id)) errors.push(`config/plugins.json: bad plugin id ${id}`)
   if (new Set(ids).size !== ids.length) errors.push('config/plugins.json: duplicate plugin id')
+  // cloud/setup.sh installs the global plugins in cloud threads; it must list exactly the same ones.
+  const sh = readFileSync(join(root, 'cloud/setup.sh'), 'utf8')
+  const shIds = [...sh.matchAll(/^\s+([a-z0-9-]+@[a-z0-9-]+)/gm)].map((m) => m[1])
+  const want = plugins.global.map((p) => p.id)
+  if (shIds.join() !== want.join()) errors.push('cloud/setup.sh plugin list differs from config/plugins.json global')
+  for (const m of plugins.marketplaces) if (!sh.includes(`marketplace add ${m.source}`)) errors.push(`cloud/setup.sh does not add marketplace ${m.source}`)
 }
 
 // Every ECC skill a toolbox catalog names must exist in the ECC index.

@@ -49,10 +49,21 @@ alone would add ~45k.
 
 ## Project threads (cloud)
 
-Threads in the "Claude Setup" project run in the cloud, not on your machine. Add this repo to
-the project (Project settings, Repositories) and every thread loads it the way a local install
-does: `CLAUDE.md`, all skills, agents, rules and the global plugins from `.claude/`. The
-installer copies from the same `.claude/` folder, so both always match.
+Threads in a Claude project run in the cloud, not on your machine. Add this repo to the
+project (Project settings, Repositories) and every thread loads `CLAUDE.md` and all skills,
+agents and rules from `.claude/`, the same files the installer copies.
+
+Plugins need one more step, because a thread only reads this repo's `.claude/settings.json`
+when it runs inside this repo, and even then 3 of the 16 were missing in a test. In
+Project settings > Cloud environment > Add cloud environment:
+
+- **Setup script:** paste [`cloud/setup.sh`](cloud/setup.sh). It installs the 16 global
+  plugins at user scope (about 20 seconds per new thread), so they load whatever repo a
+  thread works in.
+- **Network access:** Custom, keep the default package managers and add `context7.com` and
+  `mcp.context7.com`. Context7's live library docs are blocked otherwise.
+
+Pick the same environment in every project that uses this setup.
 
 ## Using it
 
