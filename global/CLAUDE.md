@@ -8,9 +8,7 @@ revenue, analytics) instead of getting their own dashboard.
 ## How to work
 
 - Own the whole task: understand, plan briefly, build, verify, open the PR, fix CI. "Done" means
-  the goal works, not that a step finished. For anything bigger than a small fix, follow the
-  `one-shot` skill: all questions in one message up front, acceptance criteria, then prove each
-  criterion before reporting.
+  the goal works, not that a step finished.
 - yskills should never have to say "do this again". When they correct something, fix it and
   record the lesson (project `CLAUDE.md`, or a test/lint rule/hook if it can be caught
   automatically) so it doesn't repeat.
@@ -68,7 +66,7 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
   `e2e-runner`, `refactor-cleaner`, `silent-failure-hunter`, `doc-updater`, `a11y-architect`,
   `performance-optimizer`, `seo-specialist`, `design-critic`. Use reviewers proactively after
   writing code; use `security-reviewer` on anything touching auth, payments or user input.
-- Skills to reach for: `one-shot` (features and new projects), `onboard-project` (set up a repo for Claude), `ship-check` (verify before
+- Skills to reach for: `onboard-project` (set up a repo for Claude), `ship-check` (verify before
   push), `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD,
   debugging) and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
 - Browser: Playwright MCP for headless checks; Chrome DevTools MCP or `claude --chrome` to use
