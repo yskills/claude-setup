@@ -2,9 +2,13 @@ import Stripe from 'stripe'
 import type { H3Event } from 'h3'
 
 export function useStripe(event: H3Event): Stripe {
-  const key = useEnv(event).STRIPE_SECRET_KEY
+  const { STRIPE_SECRET_KEY: key, STRIPE_API_BASE: base } = useEnv(event)
   if (!key) throw createError({ statusCode: 503, statusMessage: 'Payments are not set up' })
-  return new Stripe(key, { httpClient: Stripe.createFetchHttpClient() })
+  const mock = base ? new URL(base) : undefined
+  return new Stripe(key, {
+    httpClient: Stripe.createFetchHttpClient(),
+    ...(mock && { host: mock.hostname, port: Number(mock.port), protocol: 'http' as const }),
+  })
 }
 
 /** Verifies the Stripe signature on the raw body. Anything unsigned or altered is a 400. */

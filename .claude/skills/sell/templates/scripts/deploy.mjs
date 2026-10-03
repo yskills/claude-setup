@@ -1,10 +1,11 @@
-// Deploys to Cloudflare from GitHub Actions. Idempotent: creates the D1 database and the Stripe
-// webhook on first run, and copies the runtime keys from the CI environment into Worker secrets.
-// Needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID. Every key in RUNTIME_KEYS is optional.
-// From yskills/duo-test, where it ran green; set the names below to the ones in wrangler.jsonc.
+// Deploys to Cloudflare from GitHub Actions. Idempotent: creates the D1 database on first run,
+// copies the runtime keys from the CI environment into Worker secrets, and gives Stripe a fresh
+// webhook endpoint each deploy. Needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID; every key
+// in RUNTIME_KEYS is optional. Based on yskills/duo-test; set the names below to wrangler.jsonc's.
 import { spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
+import Stripe from 'stripe'
 
 const WORKER = 'shop'
 const DB_NAME = 'shop'
@@ -20,8 +21,11 @@ const WEBHOOK_EVENTS = [
   'charge.dispute.created',
 ]
 
+// Wrangler gets the Cloudflare credentials, not the shop's keys; secret values go in via stdin.
+const wranglerEnv = Object.fromEntries(Object.entries(process.env).filter(([name]) => !RUNTIME_KEYS.includes(name)))
+
 function wrangler(args, input) {
-  const run = spawnSync('npx', ['wrangler', ...args], { encoding: 'utf8', input })
+  const run = spawnSync('npx', ['wrangler', ...args], { encoding: 'utf8', input, env: wranglerEnv })
   if (run.status !== 0) {
     const error = new Error(`wrangler ${args.slice(0, 2).join(' ')} failed:\n${run.stderr || run.stdout}`)
     error.output = `${run.stdout}\n${run.stderr}`
@@ -41,6 +45,7 @@ function ensureDatabase() {
 function writeDatabaseId(id) {
   const config = readFileSync('wrangler.jsonc', 'utf8')
   const pattern = new RegExp(`("database_name": "${DB_NAME}",)(\\s*"database_id": "[^"]*",)?`)
+  if (!pattern.test(config)) throw new Error(`wrangler.jsonc needs "database_name": "${DB_NAME}", followed by another property`)
   writeFileSync('wrangler.jsonc', config.replace(pattern, `$1\n      "database_id": "${id}",`))
 }
 
@@ -49,7 +54,7 @@ function existingSecrets() {
   try {
     return JSON.parse(wrangler(['secret', 'list', '--name', WORKER, '--format', 'json'])).map((s) => s.name)
   } catch (error) {
-    if (/10007|not found|does not exist/i.test(error.output ?? '')) return []
+    if (/10007/.test(error.output ?? '')) return []
     throw error
   }
 }
@@ -70,22 +75,20 @@ async function stripe(path, method = 'GET', form) {
 }
 
 /**
- * One webhook endpoint per site URL and Stripe mode. Its signing secret is shown only once, so the
- * endpoint is recreated when the Worker lost it, e.g. after switching from a test to a live key.
+ * A fresh endpoint every deploy: its signing secret is shown only once, and this way the Worker's
+ * secret always matches the current key's mode (sandbox or live), the event list and the SDK's API
+ * version, and a disabled endpoint heals itself. New first, then the secret, then the old ones go,
+ * so no event is lost; anything signed with the other secret in between gets a 400 and Stripe
+ * retries it.
  */
-async function ensureStripeWebhook(siteUrl, secrets) {
+async function replaceStripeWebhook(siteUrl) {
   const url = `${siteUrl}/api/stripe/webhook`
-  const form = { description: WORKER }
-  WEBHOOK_EVENTS.forEach((type, i) => (form[`enabled_events[${i}]`] = type))
   const { data } = await stripe('webhook_endpoints?limit=100')
-  const existing = data.filter((endpoint) => endpoint.url === url)
-  if (existing.length === 1 && secrets.includes('STRIPE_WEBHOOK_SECRET')) {
-    await stripe(`webhook_endpoints/${existing[0].id}`, 'POST', form)
-    return
-  }
-  for (const endpoint of existing) await stripe(`webhook_endpoints/${endpoint.id}`, 'DELETE')
-  const created = await stripe('webhook_endpoints', 'POST', { ...form, url })
+  const form = { url, description: WORKER, api_version: Stripe.API_VERSION }
+  WEBHOOK_EVENTS.forEach((type, i) => (form[`enabled_events[${i}]`] = type))
+  const created = await stripe('webhook_endpoints', 'POST', form)
   putSecret('STRIPE_WEBHOOK_SECRET', created.secret)
+  for (const old of data.filter((endpoint) => endpoint.url === url)) await stripe(`webhook_endpoints/${old.id}`, 'DELETE')
 }
 
 const id = ensureDatabase()
@@ -98,6 +101,6 @@ if (!siteUrl) throw new Error('Set SITE_URL: no workers.dev URL in the deploy ou
 const secrets = existingSecrets()
 for (const name of GENERATED) if (!secrets.includes(name)) putSecret(name, randomBytes(32).toString('hex'))
 for (const name of RUNTIME_KEYS) if (process.env[name]) putSecret(name, process.env[name])
-if (process.env.STRIPE_SECRET_KEY) await ensureStripeWebhook(siteUrl, secrets)
+if (process.env.STRIPE_SECRET_KEY) await replaceStripeWebhook(siteUrl)
 
 console.log(`Deployed: ${siteUrl}`)

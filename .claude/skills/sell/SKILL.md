@@ -8,8 +8,9 @@ description: Take money in a project from Germany - pages that bill (one-off or 
 What works, as of 2026-10-03:
 
 - **Digital payments** were proven in yskills/duo-test.
-- **The shop templates** (`templates/`) pass `nuxt typecheck`, `nuxt build` and 6 e2e tests in
-  the real Workers runtime.
+- **The shop templates** (`templates/`) pass `nuxt typecheck`, `nuxt build` and 9 e2e tests in
+  the real Workers runtime. Two of those tests run against Stripe's official mock. A security
+  review's fixes are in.
 - **The legal and tax facts** were researched and fact-checked.
 
 This is not legal or tax advice. The kit says what is required. The legal texts come from a
@@ -122,15 +123,20 @@ In the same message, ask for this project's keys from `keys.md`:
 9. **Report into Luna** once Luna's ingest API exists: one small signed event per paid and
    per refunded order.
 
-Tests that every shop gets:
+Tests that every shop gets (all in `templates/tests/shop.spec.ts`):
 
 - A signed fake webhook marks an order paid exactly once, even when it is sent twice.
+- A paid session that is not the order's own never pays it.
 - An unsigned or forged webhook gets 400.
 - A price sent by the client is ignored.
 - SEPA order: `completed` unpaid, then `async_payment_succeeded`, then paid.
 - A refund event flips the status.
-- The checkout endpoint rejects unknown products, quantities of 0 or below, and countries we
-  don't ship to.
+- The checkout endpoint rejects:
+  - unknown products and quantities of 0 or below;
+  - orders too heavy for any shipping rate;
+  - countries we don't ship to;
+  - malformed postal codes and control characters.
+- A valid order against stripe-mock is stored as `pending` with its session id.
 
 Run `security-reviewer` on every slice that touches money or addresses.
 
@@ -146,16 +152,22 @@ Claude prepares everything, then posts one manual-steps message.
 4. Approve the legal texts.
 5. Physical goods: register in LUCID and license the packaging before the first parcel.
 
-**Claude does:**
+**Claude does, as soon as the first test key arrives:** one real sandbox checkout end to end
+(order page, Stripe page with test card `4242 4242 4242 4242`, webhook, email). stripe-mock only
+checks parameter names.
 
-1. Redeploys. The deploy script creates the live webhook by itself.
-2. Checks the live site:
+**Claude does at go-live:**
+
+1. Checks that no placeholder is left (`example-mug`, `Beispielshop`, `example.de`), that the
+   rate-limiting rule on `/api/checkout*` exists, and deletes the sandbox orders.
+2. Redeploys. The deploy script creates the live webhook by itself.
+3. Checks the live site:
    - a Checkout Session opens in live mode;
    - the legal pages are linked from every page;
    - the order button, shipping costs and delivery time read right.
-3. Asks yskills to buy once with their own card. Then checks the order, the emails and the
+4. Asks yskills to buy once with their own card. Then checks the order, the emails and the
    Sendcloud entry, and refunds it.
-4. Turns on the weekly smoke test.
+5. Turns on the weekly smoke test.
 
 ## 5. Keep it working
 

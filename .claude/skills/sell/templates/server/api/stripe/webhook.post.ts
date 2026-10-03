@@ -19,13 +19,18 @@ export default defineEventHandler(async (event) => {
       const charge = stripeEvent.data.object
       // Partial refunds keep the order as it is; the Dashboard shows the amount.
       if (charge.refunded && typeof charge.payment_intent === 'string') {
-        await setOrderStatus(event, { paymentIntent: charge.payment_intent }, 'refunded', ['paid', 'shipped', 'disputed'])
+        const changed = await setOrderStatus(event, { paymentIntent: charge.payment_intent }, 'refunded', ['paid', 'shipped', 'disputed'])
+        // Zero is normal for charges of other projects on the same account; log so a refund that
+        // overtook its payment event can still be found.
+        if (!changed) console.warn(`[webhook] refund for ${charge.payment_intent} matched no paid order`)
       }
       break
     }
     case 'charge.dispute.created': {
       const paymentIntent = stripeEvent.data.object.payment_intent
-      if (typeof paymentIntent === 'string') await setOrderStatus(event, { paymentIntent }, 'disputed', ['paid', 'shipped'])
+      if (typeof paymentIntent === 'string' && !(await setOrderStatus(event, { paymentIntent }, 'disputed', ['paid', 'shipped']))) {
+        console.warn(`[webhook] dispute for ${paymentIntent} matched no paid order`)
+      }
       break
     }
   }

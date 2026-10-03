@@ -1,5 +1,7 @@
 // Goes to tests/e2e/. Runs against `wrangler dev` with a local D1, the same code path as production.
-// playwright.config.ts starts it with `--var STRIPE_WEBHOOK_SECRET:${WEBHOOK_SECRET}` (see stripe-workers.md).
+// playwright.config.ts starts it with `--var STRIPE_WEBHOOK_SECRET:${WEBHOOK_SECRET}`, and with
+// STRIPE_MOCK set (CI runs stripe-mock as a service) also points the Stripe client at the mock.
+// See stripe-workers.md.
 import { execFileSync } from 'node:child_process'
 import { expect, test, type APIRequestContext } from '@playwright/test'
 import Stripe from 'stripe'
@@ -17,7 +19,7 @@ function d1(sql: string): Array<Record<string, unknown>> {
 function seedOrder(): string {
   const id = `order-${Date.now()}-${++counter}`
   const items = JSON.stringify([{ id: 'example-mug', name: 'Beispieltasse', quantity: 1, unitAmount: 1900 }])
-  d1(`INSERT INTO orders (id, status, items, email, country, created_at) VALUES ('${id}', 'pending', '${items}', 'kunde@example.com', 'DE', 0)`)
+  d1(`INSERT INTO orders (id, status, items, email, country, stripe_session_id, created_at) VALUES ('${id}', 'pending', '${items}', 'kunde@example.com', 'DE', 'cs_test_${id}', 0)`)
   return id
 }
 
@@ -61,6 +63,13 @@ test('a paid checkout marks the order paid once, even when Stripe sends it twice
   expect(order).toMatchObject({ status: 'paid', payment_intent: `pi_${id}`, amount_total: 2490 })
 })
 
+test('a paid session that is not the order\'s own never marks it paid', async ({ request }) => {
+  const id = seedOrder()
+  // e.g. a cheap Payment Link on the same Stripe account with ?client_reference_id=<this order>
+  await signedPost(request, stripeEvent('checkout.session.completed', { ...session(id, 'paid'), id: 'cs_test_someone_else' }))
+  expect(statusOf(id)).toBe('pending')
+})
+
 test('SEPA: completed unpaid stays pending until the async payment succeeds', async ({ request }) => {
   const id = seedOrder()
   await signedPost(request, stripeEvent('checkout.session.completed', session(id, 'unpaid')))
@@ -89,22 +98,47 @@ test('a full refund marks the order refunded; a partial one leaves it', async ({
   expect(statusOf(id)).toBe('refunded')
 })
 
+const validOrder = {
+  items: [{ id: 'example-mug', quantity: 1 }],
+  email: 'kunde@example.com',
+  address: { name: 'Mia Muster', line1: 'Hauptstr. 1', postalCode: '10115', city: 'Berlin', country: 'DE' },
+  shippingRate: 0,
+  locale: 'de',
+}
+
 test('the order endpoint rejects what it cannot price or ship, before calling Stripe', async ({ request }) => {
-  const valid = {
-    items: [{ id: 'example-mug', quantity: 1 }],
-    email: 'kunde@example.com',
-    address: { name: 'Mia Muster', line1: 'Hauptstr. 1', postalCode: '10115', city: 'Berlin', country: 'DE' },
-    shippingRate: 0,
-    locale: 'de',
-  }
-  const post = (change: Record<string, unknown>) => request.post('/api/checkout', { data: { ...valid, ...change } })
+  const post = (change: Record<string, unknown>) => request.post('/api/checkout', { data: { ...validOrder, ...change } })
+  const address = (change: Record<string, string>) => ({ address: { ...validOrder.address, ...change } })
   expect((await post({ items: [{ id: 'nope', quantity: 1 }] })).status()).toBe(400)
   expect((await post({ items: [{ id: 'constructor', quantity: 1 }] })).status()).toBe(400)
   expect((await post({ items: [{ id: 'example-mug', quantity: 0 }] })).status()).toBe(400)
   expect((await post({ items: [] })).status()).toBe(400)
+  expect((await post({ items: Array.from({ length: 4 }, () => ({ id: 'example-mug', quantity: 20 })) })).status()).toBe(400)
   expect((await post({ email: 'not-an-email' })).status()).toBe(400)
-  expect((await post({ address: { ...valid.address, country: 'US' } })).status()).toBe(400)
+  expect((await post(address({ country: 'US' }))).status()).toBe(400)
+  expect((await post(address({ postalCode: 'ABC' }))).status()).toBe(400)
+  expect((await post(address({ name: 'Mia\nMuster' }))).status()).toBe(400)
   expect((await post({ shippingRate: 7 })).status()).toBe(400)
-  // A valid order only fails because this test server has no Stripe key.
-  expect((await post({})).status()).toBe(503)
+  // Without stripe-mock a valid order only fails because there is no Stripe key.
+  if (!process.env.STRIPE_MOCK) expect((await post({})).status()).toBe(503)
+})
+
+test.describe('against stripe-mock', () => {
+  test.skip(!process.env.STRIPE_MOCK, 'set STRIPE_MOCK to run stripe-mock tests')
+
+  test('a valid order is stored as pending and bound to its Checkout Session', async ({ request }) => {
+    const email = `kunde-${Date.now()}@example.com`
+    const response = await request.post('/api/checkout', { data: { ...validOrder, email } })
+    expect(response.status()).toBe(200)
+    expect((await response.json()).url).toMatch(/^https:\/\//)
+    const [order] = d1(`SELECT status, stripe_session_id, items FROM orders WHERE email = '${email}'`)
+    expect(order).toMatchObject({ status: 'pending' })
+    expect(String(order!.stripe_session_id)).toMatch(/^cs_/)
+    expect(JSON.parse(String(order!.items))[0]).toMatchObject({ id: 'example-mug', unitAmount: 1900 })
+  })
+
+  test('the return page check answers for a known session and 400s for junk', async ({ request }) => {
+    expect((await request.post('/api/checkout/confirm', { data: { sessionId: 'cs_test_123' } })).status()).toBe(200)
+    expect((await request.post('/api/checkout/confirm', { data: { sessionId: 'nope' } })).status()).toBe(400)
+  })
 })

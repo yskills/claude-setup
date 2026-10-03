@@ -7,7 +7,20 @@ The templates in `templates/` were checked on 2026-10-03:
 - They ran in a minimal Nuxt 4 app (`nitro` preset `cloudflare_module`) with `stripe@23.0.0`
   (API `2026-09-30.endive`) and `zod@4`.
 - `nuxt typecheck` and `nuxt build` both passed.
-- The 6 tests in `templates/tests/shop.spec.ts` passed against `wrangler dev` with a local D1.
+- The 9 tests in `templates/tests/shop.spec.ts` passed against `wrangler dev` with a local D1.
+  Two of them create real Checkout Sessions against
+  [stripe-mock](https://github.com/stripe/stripe-mock), Stripe's official mock, which rejects
+  any parameter its API spec does not know.
+- A security review covered:
+  - binding each order to its session;
+  - fulfilment retries;
+  - weight limits;
+  - deploy webhook handling;
+  - key scope.
+
+  Its fixes are in.
+- stripe-mock checks parameter names, not every business rule. The first sandbox checkout with
+  a real test key is the final check (SKILL.md, go-live).
 
 The digital-product variant below ran green in yskills/duo-test.
 
@@ -21,12 +34,15 @@ The digital-product variant below ran green in yskills/duo-test.
    - writes it to D1 as `pending`;
    - creates a Checkout Session on the Stripe-hosted page and returns its URL.
 3. **The buyer pays on Stripe's page.**
-4. **We learn about the payment twice, both through `markOrderPaid`, which flips the order
-   exactly once:**
+4. **We learn about the payment twice, both through `markOrderPaid`.** It flips the order
+   exactly once, and only for the Checkout Session the order was created with:
    - the webhook `POST /api/stripe/webhook`;
    - the return page `/danke?session=cs_…`, which calls `POST /api/checkout/confirm`.
 5. **Whichever call flips it runs `fulfilOrder`** with `waitUntil`: the confirmation email with
    the legal PDFs attached and, for physical goods, the Sendcloud order.
+   - `fulfilled_at` is set only when all of that worked.
+   - The admin view lists paid orders without it and has a button that runs `fulfilOrder`
+     again. The email carries an idempotency key, so a retry never sends it twice.
 
 **Why the button is on our page:** German law wants the order button to say "zahlungspflichtig
 bestellen" or something just as clear (§ 312j BGB). Stripe's hosted button can only say "Pay"
@@ -38,9 +54,9 @@ Stripe only takes the money. Stripe.js never loads on our pages either.
 | Template | Goes to | What it does |
 |---|---|---|
 | `shared/shop.ts` | `shared/` | Products, prices in cents, shipping countries and rates, Kleinunternehmer switch |
-| `server/utils/env.ts` | `server/utils/` | Typed Worker env; merge with an existing one |
-| `server/utils/stripe.ts` | `server/utils/` | `useStripe` (fetch client), `readStripeEvent` (raw body + SubtleCrypto signature check) |
-| `server/utils/orders.ts` | `server/utils/` | `createPendingOrder`, `markOrderPaid` (idempotent), `setOrderStatus` (moves only from listed states) |
+| `server/utils/env.ts` | `server/utils/` | Typed Worker env (merge with an existing one); `siteUrl` from the `SITE_URL` var |
+| `server/utils/stripe.ts` | `server/utils/` | `useStripe` (fetch client; `STRIPE_API_BASE` points it at stripe-mock in tests), `readStripeEvent` (raw body + SubtleCrypto signature check) |
+| `server/utils/orders.ts` | `server/utils/` | `createPendingOrder` (also deletes unpaid orders after 30 days), `attachSession`, `markOrderPaid` (idempotent, session-bound, logs money for closed orders), `setOrderStatus`, `markFulfilled` |
 | `server/utils/fulfil.ts` | `server/utils/` | Confirmation email via Resend with AGB, Widerrufsbelehrung and Muster-Widerrufsformular attached. Add the Sendcloud call here (`physical.md`) |
 | `server/api/checkout/index.post.ts` | same | The order button's endpoint |
 | `server/api/checkout/confirm.post.ts` | same | Return page check |
@@ -48,7 +64,8 @@ Stripe only takes the money. Stripe.js never loads on our pages either.
 | `server/migrations/0001_orders.sql` | the D1 `migrations_dir` | `orders` table |
 | `scripts/deploy.mjs` | `scripts/` | D1, migrations, deploy, Worker secrets, Stripe webhook (created once, events kept up to date). `SITE_URL` for a custom domain |
 | `ci.yml` | `.github/workflows/` | Verify on PRs; deploy from `main` with the `production` environment |
-| `tests/shop.spec.ts` | `tests/e2e/` | Signed fake webhooks against `wrangler dev`, plus order validation |
+| `tests/shop.spec.ts` | `tests/e2e/` | Signed fake webhooks against `wrangler dev`, order validation, and real sessions against stripe-mock |
+| `playwright.config.ts` | project root | Starts `wrangler dev` with the test webhook secret, plus the stripe-mock vars when `STRIPE_MOCK` is set |
 
 **What the project still adds:**
 
@@ -57,9 +74,14 @@ Stripe only takes the money. Stripe.js never loads on our pages either.
 - the legal pages and PDFs (`legal-de.md`);
 - the Widerrufsbutton flow;
 - the Sendcloud call;
-- an admin orders view.
+- an admin orders view, with the fulfilment retry button.
 
-All of these are built in the project's design.
+All of these are built in the project's design. Replace the placeholders `example-mug`,
+`Beispielshop` and `example.de` in the same PR.
+
+Before launch, add a Cloudflare rate-limiting rule on `/api/checkout*` in the zone's
+Security → WAF settings. Without it, anyone can loop the endpoint, filling D1 and burning the
+Stripe API rate limit.
 
 ## Wiring
 
@@ -69,13 +91,14 @@ All of these are built in the project's design.
   - `migrations_dir` pointing at the migrations.
 - `package.json` needs `"deploy": "node scripts/deploy.mjs"` and a `verify` script that runs
   typecheck, unit tests, build and the e2e tests.
-- In `playwright.config.ts`, the `webServer` starts the real runtime with a test-only webhook
-  secret, as duo-test does:
+- `wrangler.jsonc` `vars`: `SITE_URL` is the canonical `https://` address. Links and email
+  attachments use it instead of whatever host a request came in on.
+- `playwright.config.ts` from the templates starts the real runtime with a test-only webhook
+  secret. CI runs stripe-mock as a service (`ci.yml`). Locally:
 
-  ```ts
-  export const WEBHOOK_SECRET = 'whsec_e2e_only_not_a_real_secret'
-  // webServer.command:
-  `rm -rf .wrangler/state && npx wrangler d1 migrations apply DB --local && npx wrangler dev --port ${PORT} --ip 127.0.0.1 --var STRIPE_WEBHOOK_SECRET:${WEBHOOK_SECRET}`
+  ```bash
+  docker run -p 12111:12111 stripe/stripe-mock
+  STRIPE_MOCK=http://127.0.0.1:12111 npx playwright test
   ```
 
 - In cloud threads, launch Playwright's browser with `executablePath: '/opt/pw-browsers/chromium'`.
@@ -120,6 +143,17 @@ Stripe becomes the seller, so it works through Checkout only. Check `recheck.md`
   retries for up to 3 days.
 - **Stripe sends events more than once and out of order.** Every write is guarded by the state
   it expects.
-- **The webhook secret differs between sandbox and live.** `deploy.mjs` creates a new endpoint
-  when the key's mode has none.
+- **The webhook secret differs between sandbox and live.** `deploy.mjs` creates a fresh endpoint
+  on every deploy:
+  - first the new endpoint, then its secret, then the old endpoint is deleted;
+  - its `api_version` is pinned to the SDK's.
+
+  So switching keys, adding events or a disabled endpoint never needs a hand fix.
+- **One Stripe account serves several projects.**
+  - Every endpoint gets every account event, so handlers ignore sessions and charges they
+    don't know. `markOrderPaid` requires the order's own session id, because a Payment Link
+    can carry any `client_reference_id`.
+  - Refunds and disputes that match nothing are logged, not failed.
+- **Sandbox orders stay in the live D1.** `livemode` marks them; delete them at go-live
+  (`DELETE FROM orders WHERE livemode = 0 OR livemode IS NULL`).
 - **Never put a price in a request body or in metadata the client can influence.**
