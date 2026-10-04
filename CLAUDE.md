@@ -69,11 +69,10 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 - Web: Nuxt 4 (SSR/static) or Vue 3 + Vite (SPA/PWA), Pinia, Tailwind v4, `@nuxtjs/i18n` (de, en).
 - API: Nuxt server routes or a small Express service. SQLite or Postgres with prepared statements.
 - Tests: Vitest, Playwright for e2e. Typecheck with `vue-tsc`.
-- Ship: GitHub Actions runs one `verify` script, then deploys `main`; Cloudflare Workers via
-  wrangler for web apps. In cloud threads with `CLOUDFLARE_API_TOKEN` set, deploy a project's
-  first version yourself and upload a preview per PR (`npx wrangler versions upload
-  --preview-alias <branch>`), then put the link in the PR; production stays on Actions. Without
-  the token, send yskills the README's cloud environment steps. Services that need a server
+- Ship: keys live only in GitHub. GitHub Actions runs one `verify` script, posts a preview link
+  on every PR (`wrangler versions upload --preview-alias pr-<n>`) and deploys `main`; Cloudflare
+  Workers via wrangler for web apps (the `sell` skill's `templates/ci.yml` has all three jobs).
+  Put the preview link in the PR reply. Services that need a server
   (like Luna): Docker + Caddy on a small VPS.
 - Anything beyond this (video, AI generation, payments, ads, analytics, email, mobile...) comes
   from the `toolbox` skill, added to that project only. Anything that takes money (checkout,

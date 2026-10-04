@@ -67,20 +67,11 @@ project that uses this setup.
   - `context7.com`, `mcp.context7.com` (live library docs; blocked otherwise)
   - `cdn.jsdelivr.net`, `unpkg.com` (CDN scripts, e.g. GSAP for HyperFrames)
   - `*.youtube.com`, `*.googlevideo.com`, only if threads work on video
-  - `api.cloudflare.com`, `*.workers.dev` (threads deploy and check the live page)
-- **Environment variables** (so threads deploy like Claude in VS Code does):
-  - `CLOUDFLARE_API_TOKEN`: a token of its own for this environment, from
-    [API tokens](https://dash.cloudflare.com/profile/api-tokens) → Create Token → "Edit Cloudflare
-    Workers", plus Account · D1 · Edit, on all Workers and your one account. Every thread can read
-    it, so never reuse the GitHub one; delete it there to cut threads off.
-  - `CLOUDFLARE_ACCOUNT_ID`: from [Workers & Pages](https://dash.cloudflare.com), right column.
-  - `WRANGLER_SEND_METRICS=false` (wrangler's telemetry host stays blocked).
-- **Who deploys what:** a thread with the token deploys a new project's first version and
-  uploads a preview of each PR (`npx wrangler versions upload --preview-alias <branch>`), so you
-  get a link right away. The live site still deploys from GitHub Actions on every merge to
-  `main`, so it always matches `main`. Stripe stays in Actions too. Optional: a Stripe *test* key
-  as an API credential for `api.stripe.com` (Pro/Max plans); the proxy adds it and Claude never
-  sees it.
+- **No deploy keys here.** Keys live only in GitHub. CI deploys `main` to the live site and
+  posts a preview link on every PR (the `sell` skill's `templates/ci.yml`), so a thread never
+  needs a Cloudflare token. A thread can't start an Actions run itself (GitHub answers 403), so
+  after adding a key you press Run workflow. Optional: a Stripe *test* key as an API credential
+  for `api.stripe.com` (Pro/Max plans); the proxy adds it and Claude never sees it.
 
 On your PC, `global/settings.json` lets Claude read the official docs of your stack (Nuxt, Vue,
 Cloudflare, Stripe, GitHub, MDN, German law texts...) without asking each time. Cloud threads
