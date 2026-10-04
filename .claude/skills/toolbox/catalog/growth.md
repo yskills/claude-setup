@@ -1,6 +1,7 @@
 # Growth: analytics, SEO, social, email
 
-Checked 2026-10-03. Plugins are `@claude-plugins-official` unless noted.
+Checked 2026-10-03. Plugins are `@claude-plugins-official` unless noted. The marketing plan,
+launch sequence and German advertising law are in the `market` skill; this table is the tools.
 
 | Need | Pick | Why / watch out | Add it |
 |---|---|---|---|

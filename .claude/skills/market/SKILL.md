@@ -1,0 +1,135 @@
+---
+name: market
+description: Plan and run marketing for a project as a solo developer in Germany - the one-page marketing plan in the PRD, positioning, channels (short video, SEO, communities, email, ads, marketplaces), launch sequence, German advertising law, budgets, tracking and a weekly routine reporting into Luna. Use when a project needs users or buyers, a launch, a marketing plan, ads, social content, a newsletter or growth.
+---
+
+# Market
+
+Checked 2026-10-03. This skill plans the marketing. The copy, posts and videos come from
+skills and tools that are added to each project with `toolbox`:
+
+| Need | Tool |
+|---|---|
+| Campaign copy, landing page, emails, ad variants | ECC `marketing-campaign` |
+| Platform-native posts | ECC `content-engine` |
+| Consistent voice | ECC `brand-voice` |
+| Short videos and ads | HyperFrames |
+| Scheduled posting | Postiz |
+| Audience and competitors | `market-research`, `product-lens` (both global) |
+| SEO | `seo` and `seo-specialist` (both global) |
+
+Markers: **[S]** search results and legal publishers agree; **[K]** known but not re-read.
+
+## 1. The one-page plan goes into the PRD
+
+Marketing changes what gets built: the landing page, a waitlist, share features, tracking
+events. So the plan is part of the PRD, not an afterthought.
+
+1. **Buyer.** Who buys, in one sentence, and the moment they need it.
+2. **Positioning.** "[Product] helps [audience] [outcome] by [mechanism]". Name 3 competitors and
+   what we do differently.
+3. **Goal.** The 90-day goal in numbers, e.g. 300 on the waitlist and 50 paid. Pick one metric
+   that matters most.
+4. **Channels.** One or two main channels plus one test, from the table below. Never all of
+   them.
+5. **Budget.**
+   - Start organic, at €0.
+   - Pay for ads only once organic posts show which message sells.
+   - Then test small: one ad set for about a week before judging it [K].
+6. **Launch dates.** Section 3.
+7. **Tracking.** The events and UTM tags. Section 5.
+8. **Legal check.** Section 4.
+
+### Questions for the first batch
+
+Ask these with the PRD questions, as tap cards:
+
+- **Market:** Germany first (recommended), German-speaking countries, or English worldwide.
+- **Monthly ad budget:** €0 (recommended at the start), up to €100, or up to €500.
+- **Accounts yskills will use or create** (multi-select): TikTok, Instagram, YouTube, LinkedIn,
+  X, Reddit, none.
+- **Showing their face or voice in videos:** yes, hands and product only, or no (Claude makes
+  motion-graphics videos).
+- **Hours per week for marketing:** 1, 3, or 5+.
+
+## 2. Channels for a solo developer
+
+| Channel | Fits | Claude does | yskills does |
+|---|---|---|---|
+| Short video (TikTok, Reels, Shorts) | Consumer apps, physical products, anything you can show in 15 seconds | Hooks, scripts, HyperFrames clips (demos, captions, before/after), a posting calendar | Films face or hands clips if wanted; approves the weekly batch |
+| SEO and content | Things people search for: tools, how-tos, comparisons | Keyword map, one page per search intent, structured data, page speed | Nothing |
+| Communities (subreddits, forums, Discord, Product Hunt and Hacker News for English) | Dev tools, niches, honest maker stories | Drafts in an honest "I built this" tone, following each community's rules | Posts from their own account |
+| Email list | Everything | Waitlist, launch sequence, monthly update (Resend audiences) | Nothing |
+| Paid ads (Meta, TikTok, Google) | A message that already sells, and a margin that pays for ads | Ad variants, server-side conversion events, weekly cost-per-sale report | Pays; connects the ad accounts |
+| Marketplaces (Etsy, Amazon) | Physical products | Listing copy and photos brief; compares fees against our own shop | Opens the seller account |
+| Creators and UGC | Consumer products | Creator shortlist, brief, offer | Sends products, signs off |
+
+## 3. Launch sequence
+
+| When | What |
+|---|---|
+| 4 weeks before | Landing page with a waitlist (double opt-in). Analytics and UTM tags work. Social profiles link to the Impressum. The first 3 posts are out |
+| 2 weeks before | 3 to 5 short videos a week. Early testers; ask them for honest feedback and real testimonials |
+| Launch day | Email the waitlist. Post in the chosen communities. Run a launch offer only if it follows § 11 PAngV (section 4) |
+| Weeks 1 to 4 | Weekly review: which post or page brought paying users. Do more of that. Start ads only on the winning message |
+
+## 4. German advertising law
+
+These are the rules small sellers get warning letters for. The legal-text service from the
+`sell` skill can check anything unclear.
+
+- **Impressum on social profiles.** Business profiles need an Impressum within two clicks,
+  e.g. a link in the bio to the site's Impressum [S].
+  [e-recht24](https://www.e-recht24.de/impressum/13078-impressum-auf-instagram.html)
+- **Label advertising.**
+  - Paid or sponsored posts, and anything a creator gets money or products for, are labelled
+    "Werbung" or "Anzeige", visible at the start.
+  - A business account showing its own products is clearly commercial, but if in doubt, label
+    it [S].
+  - [IHK on labelling](https://www.ihk.de/chemnitz/recht-und-steuern/rechtsinformationen/internetrecht/kennzeichnung-von-werbung-durch-influencer-5270264)
+- **Newsletters need double opt-in.**
+  - Log the proof of consent.
+  - Put an unsubscribe link in every email.
+  - Mailing existing customers without consent (§ 7 Abs. 3 UWG) is a narrow exception: skip
+    it [S].
+- **AI-generated people, voices or realistic scenes.** Since 2026-08-02 these must be disclosed
+  as AI-generated (AI Act Art. 50). Plain motion graphics and text animations are not
+  deepfakes [S].
+  [Heidicker](https://www.kanzlei-heidicker.de/aktuelles-und-urteile/eu-ki-verordnung-ab-02-08-2026-deepfakes-kennzeichnen-wettbewerbsrechtliche-risiken.html)
+- **Reviews and testimonials.**
+  - Real ones only. Never buy them or invent them.
+  - If reviews are shown, say whether and how they are verified (§ 5b UWG) [K].
+- **Prices and claims.**
+  - A discount shows the lowest price of the last 30 days (§ 11 PAngV) [S].
+  - General eco claims such as "klimaneutral" are banned without proof since 2026-09-27 [S].
+  - Comparisons with competitors must be factual and checkable (§ 6 UWG) [K].
+- **Music.** Business accounts use the platforms' commercial music libraries only [K].
+- **Ad tracking.** The Meta Pixel, TikTok Pixel and Google tag load only after consent
+  (§ 25 TDDDG) [K]. A consent banner then becomes necessary, so plan it in the PRD.
+
+## 5. Measure, then report into Luna
+
+- **Events:** visit (with UTM source), waitlist signup, checkout started, paid. Use cookieless
+  analytics (Plausible, Umami or PostHog cookieless).
+- **Every link Claude writes for a post carries UTM tags,** so a sale can be traced to the post.
+- **Weekly routine.** A scheduled trigger in the project, set up at launch:
+  - collects the week's numbers;
+  - lists which channel and which post brought paying users, and cost per sale for ads;
+  - proposes the next week's 3 actions and the content batch for yskills to approve.
+- **Luna.** Numbers go into Luna's cockpit once its ingest API exists. Projects get no
+  dashboard of their own.
+
+## 6. Who does what
+
+- **Claude:**
+  - the plan, copy, scripts and videos;
+  - landing pages and email sequences;
+  - ad drafts;
+  - the weekly report;
+  - scheduling the approved batch through Postiz once it is connected.
+- **yskills:**
+  - approves each week's batch once; posting and emailing go to the public and cannot be
+    taken back, so nothing goes out unapproved;
+  - connects the accounts;
+  - pays for ads;
+  - films their own content if they want to.

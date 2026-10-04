@@ -39,13 +39,15 @@ You send one message with the idea. Everything after that runs in project thread
 
 | Step | What happens | You do |
 |---|---|---|
-| 1. Research + PRD | A thread researches competitors, monetization (ads, premium, in-app), legal (DSGVO, cookie consent, licensing) and the tech risks. It writes a PRD with locked decisions. The same batch lists every key the project needs, each with its deep link and exact GitHub secret name, so nothing stalls mid-build. | Answer **one** batch of questions; add the keys in GitHub |
+| 1. Research + PRD | A thread researches competitors, monetization (ads, premium, in-app), legal (DSGVO, cookie consent, licensing) and the tech risks. It writes a PRD with locked decisions and a one-page marketing plan (who buys, positioning, 90-day goal, channels, budget). The same batch lists every key the project needs, each with its deep link and exact GitHub secret name, so nothing stalls mid-build. | Answer **one** batch of questions; add the keys in GitHub |
 | 2. Scaffold | Your stack template is set up with Node pinned, a `verify` script, CI, CLAUDE.md, security headers and a deploy target. Toolchain problems are solved here once, not halfway through. | Nothing |
 | 3. Design first | 2 or 3 directions are shown as real screenshots at phone and desktop size. | Pick one |
 | 4. Slices | Planned as vertical slices, the riskiest first. Threads run in parallel when slices are independent. | Approve the slice list |
 | 5. Each slice | Test first, then build. Screenshots are scored against the design by `design-critic`. Then code review and security review, then a PR with screenshots once CI is green. | Merge |
 | 6. Launch | Deploy through GitHub Actions, analytics (PostHog), errors (Sentry), payments (`sell` skill's go-live list) and ads. Numbers report into Luna's cockpit. | Swap test keys for live ones and approve the go-live |
-| 7. Learn | Every correction you make becomes a rule, test or hook, so it doesn't come back. | Nothing |
+| 7. Market | The marketing plan from the PRD (`market` skill) runs: landing page and waitlist 4 weeks before launch, short videos and posts, launch day, then ads only on the message that sells. | Approve each week's batch of posts; connect accounts; pay for ads |
+| 8. Measure | A weekly routine reports which channel and post brought paying users, cost per sale, and next week's 3 actions; numbers go into Luna. | Read it, pick |
+| 9. Learn | Every correction you make becomes a rule, test or hook, so it doesn't come back. | Nothing |
 
 ### Selling (pages that bill, shops, shipping)
 
