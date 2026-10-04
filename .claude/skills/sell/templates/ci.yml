@@ -42,10 +42,15 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run verify
 
-  # A preview link on every PR, so yskills can click through before merging. Previews are new
-  # versions of the live Worker that take no traffic: they share its D1 and secrets, so test
-  # orders there land in the live database (livemode marks them). Needs one deploy from main
-  # first, and "preview_urls": true in wrangler.jsonc.
+  # A preview link on every PR, so yskills can click through before merging. Previews are
+  # versions of a separate Worker, <name>-preview (env.preview in wrangler.jsonc), which the
+  # main deploy keeps up to date. It has its own empty D1 and no shop keys, and the "preview"
+  # environment's token is limited to that one Worker, so PR code never reaches live data.
+  # Old pr-<n> aliases stay up after a PR closes; with no data and no keys behind them that is
+  # harmless, and the next main deploy replaces the Worker they point at. wrangler.jsonc:
+  #   "env": { "preview": { "name": "shop-preview", "preview_urls": true, "vars": { "SITE_URL": "" },
+  #     "d1_databases": [{ "binding": "DB", "database_name": "shop-preview", "database_id": "",
+  #       "migrations_dir": "server/migrations" }] } }
   preview:
     needs: verify
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
@@ -63,7 +68,7 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm run build
       - name: Upload preview
         env:
@@ -72,10 +77,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
         run: |
-          out=$(npx wrangler versions upload --preview-alias "pr-$PR" 2>&1) || { echo "$out"; exit 1; }
+          out=$(npx wrangler versions upload --env preview --preview-alias "pr-$PR" 2>&1) || { echo "$out"; exit 1; }
           echo "$out"
           url=$(echo "$out" | grep -oE "https://pr-$PR-[a-z0-9.-]+\.workers\.dev" | head -1)
-          if [ -z "$url" ]; then echo "::error::No preview URL in wrangler's output. Is preview_urls on?"; exit 1; fi
+          if [ -z "$url" ]; then echo "::error::No preview URL in wrangler's output. Is preview_urls on in env.preview?"; exit 1; fi
           echo "Preview: $url" >> "$GITHUB_STEP_SUMMARY"
           gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --edit-last --create-if-none --body "Preview: $url"
 
