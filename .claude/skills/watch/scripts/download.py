@@ -67,7 +67,8 @@ def network_diagnostic(stderr: str) -> str:
 
 
 def _run(cmd: list[str]):
-    result = run_text(cmd)
+    # claude-setup: run outside the project, so a yt-dlp.conf in the current repo can't add options.
+    result = run_text(cmd, cwd=tempfile.gettempdir())
     if result.returncode != 0:
         raise SystemExit(f'yt-dlp failed (exit {result.returncode}): {network_diagnostic(result.stderr)}')
     return result

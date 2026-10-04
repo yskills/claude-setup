@@ -79,8 +79,11 @@ Version: 0.3.2
 Commit: 03ceb42
 
 Copied into .claude/skills/watch: SKILL.md and scripts/, minus the packaging script
-build-skill.sh. The plugin's SessionStart hook (a setup check) is left out. Read in full before
+build-skill.sh. The plugin's SessionStart hook (a setup check) is left out. Two local changes,
+from a security review: keys are never read from the current project's `.env`
+(`scripts/config.py`), and yt-dlp runs from the temp directory so a repo's `yt-dlp.conf` can't
+add options (`scripts/download.py`). Read in full before
 adding: standard-library Python that runs yt-dlp and ffmpeg. It talks only to the video site,
-and to Gemini, Groq or OpenAI when a key for one is set, in the environment,
-~/.config/watch/.env or the current project's .env. Optional WhisperX setup downloads uv and
+and to Gemini, Groq or OpenAI when a key for one is set in the environment or
+~/.config/watch/.env. Optional WhisperX setup downloads uv and
 PyTorch.

@@ -100,7 +100,7 @@ def load_api_key(preferred: str | None = None) -> tuple[str | None, str | None]:
             continue
         value = os.environ.get(name, '').strip()
         if not value:
-            for path in (CONFIG_FILE, Path.cwd() / '.env'):
+            for path in (CONFIG_FILE,):  # claude-setup: never a project's .env
                 value = read_env_file(path).get(name, '').strip()
                 if value:
                     break
@@ -110,10 +110,10 @@ def load_api_key(preferred: str | None = None) -> tuple[str | None, str | None]:
 
 
 def load_gemini_key() -> str | None:
-    """Environment, then the user config, then a project .env; never logged."""
+    """Environment, then the user config; never logged."""
     value = os.environ.get('GEMINI_API_KEY', '').strip()
     if not value:
-        for path in (CONFIG_FILE, Path.cwd() / '.env'):
+        for path in (CONFIG_FILE,):  # claude-setup: never a project's .env
             value = read_env_file(path).get('GEMINI_API_KEY', '').strip()
             if value:
                 break
