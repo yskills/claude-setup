@@ -12,6 +12,9 @@ revenue, analytics) instead of getting their own dashboard.
 - yskills should never have to say "do this again". When they correct something, fix it and
   record the lesson (project `CLAUDE.md`, or a test/lint rule/hook if it can be caught
   automatically) so it doesn't repeat.
+- Merging: a thread merges its own app PR once CI is green on the latest commit and a fresh
+  review is clean, until the app launches (real users or money); after that, and always for
+  claude-setup, yskills merges. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
   before things nobody can undo: production deploys, payments, sending mail or posts, deleting
   data, force-pushing, rotating secrets.
@@ -61,7 +64,7 @@ yskills' verdict on early work was that it "looks very AI". For every UI change:
    animation: none` lands on the finished screen.
 2. Screenshot at phone (390px) and desktop (1440px) widths with Playwright, look at the images,
    and have the `design-critic` agent review them. Fix what it finds.
-3. Put the screenshots in the PR. yskills merges on screenshots plus green CI.
+3. Put the screenshots in the PR; whoever merges (see Merging above) looks at them.
 
 UI text is German first, English second, unless the project says otherwise.
 
