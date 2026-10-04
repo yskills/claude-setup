@@ -64,6 +64,8 @@ Once, before your first real sale (the skill links each step):
 
 Keys go into the repo's GitHub environment `production`, which only `main` can read, and the
 deploy copies them into Cloudflare. Test keys first, live keys at go-live.
+After adding or changing a key, press Run workflow on the repo's Actions page: Claude in cloud
+threads can't start a run (GitHub answers 403), so the key would otherwise wait for the next merge.
 
 ### Security, always on
 - `security-guidance` warns while code is being written.
