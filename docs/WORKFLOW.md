@@ -40,7 +40,7 @@ You send one message with the idea. Everything after that runs in project thread
 | Step | What happens | You do |
 |---|---|---|
 | 1. Research + PRD | A thread researches competitors, monetization (ads, premium, in-app), legal (DSGVO, cookie consent, licensing) and the tech risks. It writes a PRD with locked decisions and a one-page marketing plan (who buys, positioning, 90-day goal, channels, budget). The same batch lists every key the project needs, each with its deep link and exact GitHub secret name, so nothing stalls mid-build. | Answer **one** batch of questions; add the keys in GitHub |
-| 2. Scaffold | Your stack template is set up with Node pinned, a `verify` script, CI, CLAUDE.md, security headers and a deploy target. Toolchain problems are solved here once, not halfway through. | Nothing |
+| 2. Scaffold | The default stack from CLAUDE.md is scaffolded with Node pinned, a `verify` script, CI, CLAUDE.md, security headers and a deploy target. Toolchain problems are solved here once, not halfway through. | Nothing |
 | 3. Design first | 2 or 3 directions are shown as real screenshots at phone and desktop size. | Pick one |
 | 4. Slices | Planned as vertical slices, the riskiest first. Threads run in parallel when slices are independent. | Approve the slice list |
 | 5. Each slice | Test first, then build. Screenshots are scored against the design by `design-critic`. Then code review and security review, then a PR with screenshots once CI is green. | Merge |
@@ -69,9 +69,9 @@ threads can't start a run (GitHub answers 403), so the key would otherwise wait 
 
 ### Security, always on
 - `security-guidance` warns while code is being written.
-- ECC hooks block secrets and `--no-verify` at commit time.
+- ECC hooks block secrets and `--no-verify` at commit time (on your PC; cloud threads don't run them).
 - `security-reviewer` checks auth, payment and input changes.
-- CI runs `npm audit` and a secret scan.
+- GitHub secret scanning and `npm audit` are worth turning on per project; the `sell` CI template doesn't add them.
 
 ### What would have changed for TellMeY
 - **Toolchain:** the Node 20 / F5 hunt in phase 0 would already be solved by the template.

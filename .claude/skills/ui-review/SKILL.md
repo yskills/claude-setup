@@ -32,6 +32,9 @@ credentials.
 ## 3. Review
 
 1. Open every PNG yourself first.
-2. Run the `design-critic` agent with the screenshot paths. Fix every **blocking** finding and
+2. Run `.claude/skills/impeccable/scripts/impeccable detect` on the changed files (a local
+   linter for AI-look anti-patterns, no LLM) and check the diff against the
+   `web-interface-guidelines` skill. Fix what they flag.
+3. Run the `design-critic` agent with the screenshot paths. Fix every **blocking** finding and
    the cheap **polish** ones, then shoot again.
-3. Attach the final phone and desktop screenshots to the PR description.
+4. Attach the final phone and desktop screenshots to the PR description.

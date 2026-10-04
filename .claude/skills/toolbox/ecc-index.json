@@ -111,7 +111,7 @@
   {
    "name": "backend-patterns",
    "description": "Backend architecture patterns, API design, database optimization, and server-side best practices for Node.js, Express, and Next.js API routes. Use when building or reviewing Node.js, Express, or Next.js API routes and their data access.",
-   "installedGlobally": true
+   "installedGlobally": false
   },
   {
    "name": "benchmark",
@@ -151,7 +151,7 @@
   {
    "name": "browser-qa",
    "description": "Run automated post-deploy UI verification with a browser automation MCP (claude-in-chrome, Playwright, or Puppeteer): console-error and Core Web Vitals smoke checks, form and auth-flow interaction tests, screenshot visual regression across three breakpoints, and axe-core accessibility audits ending ",
-   "installedGlobally": true
+   "installedGlobally": false
   },
   {
    "name": "bun-runtime",
@@ -201,7 +201,7 @@
   {
    "name": "codebase-onboarding",
    "description": "Analyze an unfamiliar codebase and generate a structured onboarding guide with architecture map, key entry points, conventions, and a starter CLAUDE.md. Use when joining a new project or setting up Claude Code for the first time in a repo.",
-   "installedGlobally": true
+   "installedGlobally": false
   },
   {
    "name": "codehealth-mcp",
@@ -271,7 +271,7 @@
   {
    "name": "continuous-learning-v2",
    "description": "Instinct-based learning system that observes sessions via hooks, creates atomic instincts with confidence scoring, and evolves them into skills/commands/agents. v2.1 adds project-scoped instincts to prevent cross-project contamination. Use when capturing lessons from a session, managing instincts, o",
-   "installedGlobally": true
+   "installedGlobally": false
   },
   {
    "name": "contract-first",
@@ -361,7 +361,7 @@
   {
    "name": "deep-research",
    "description": "Produce cited research reports from multiple web sources using firecrawl and exa MCP tools — plan sub-questions, search and deep-read sources, then synthesize findings with inline citations and confidence levels. Use when the user asks to research a topic in depth, run a deep dive or investigation, ",
-   "installedGlobally": true
+   "installedGlobally": false
   },
   {
    "name": "defi-amm-security",
@@ -376,7 +376,7 @@
   {
    "name": "deployment-patterns",
    "description": "Deployment workflows, CI/CD pipeline patterns, Docker containerization, health checks, rollback strategies, and production readiness checklists for web applications. Use when setting up CI/CD, containerizing an app, or checking production readiness before a release.",
-   "installedGlobally": true
+   "installedGlobally": false
   },
   {
    "name": "design-system",
@@ -541,7 +541,7 @@
   {
    "name": "frontend-patterns",
    "description": "Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices. Use when building or reviewing React or Next.js components, state, or render performance.",
-   "installedGlobally": true
+   "installedGlobally": false
   },
   {
    "name": "frontend-slides",
@@ -1091,12 +1091,12 @@
   {
    "name": "python-patterns",
    "description": "Pythonic idioms, PEP 8 standards, type hints, and best practices for building robust, efficient, and maintainable Python applications. Use when writing or reviewing Python code and idiomatic structure, typing, or PEP 8 is in question.",
-   "installedGlobally": true
+   "installedGlobally": false
   },
   {
    "name": "python-testing",
    "description": "Python testing strategies using pytest, TDD methodology, fixtures, mocking, parametrization, and coverage requirements. Use when writing pytest tests — fixtures, mocks, parametrization, or coverage.",
-   "installedGlobally": true
+   "installedGlobally": false
   },
   {
    "name": "pytorch-patterns",
@@ -1426,7 +1426,7 @@
   {
    "name": "verification-loop",
    "description": "Run a six-phase verification of a Claude Code session's work — build, type check, lint, tests with coverage, security grep, and diff review — then produce a PASS/FAIL verification report. Use when verifying work after completing a feature or refactor, before creating a PR, or when quality gates must",
-   "installedGlobally": true
+   "installedGlobally": false
   },
   {
    "name": "video-editing",

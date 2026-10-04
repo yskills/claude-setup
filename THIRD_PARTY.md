@@ -11,37 +11,26 @@ change config/ecc.json and re-run the script.
 
 - skills/search-first
 - skills/strategic-compact
-- skills/verification-loop
 - skills/security-review
-- skills/continuous-learning-v2
 - skills/context-budget
-- skills/codebase-onboarding
-- skills/deep-research
 - skills/product-lens
 - skills/market-research
 - skills/vue-patterns
 - skills/nuxt4-patterns
 - skills/vite-patterns
-- skills/frontend-patterns
-- skills/backend-patterns
 - skills/api-design
 - skills/database-migrations
 - skills/e2e-testing
-- skills/browser-qa
 - skills/make-interfaces-feel-better
 - skills/design-system
 - skills/i18n-sync
 - skills/seo
-- skills/deployment-patterns
 - skills/docker-patterns
-- skills/python-patterns
-- skills/python-testing
 - agents/planner
 - agents/architect
 - agents/code-reviewer
 - agents/typescript-reviewer
 - agents/vue-reviewer
-- agents/python-reviewer
 - agents/security-reviewer
 - agents/database-reviewer
 - agents/build-error-resolver
@@ -52,7 +41,7 @@ change config/ecc.json and re-run the script.
 - agents/a11y-architect
 - agents/performance-optimizer
 - agents/seo-specialist
-- rules/ecc (common, typescript, vue, nuxt, web, python)
+- rules/ecc (common, typescript, vue, nuxt, web)
 
 ## Ponytail
 
@@ -63,3 +52,22 @@ Commit: c982cd411abb53323c4baa1baa3c2f020b8d0b08
 Only the core skill is copied, unchanged: .claude/skills/ponytail/SKILL.md. Its hooks (which
 re-inject the skill on every session start and subagent) and its five extra skills are left
 out. Read in full before adding; it runs nothing and makes no network calls.
+
+## Impeccable
+
+Source: https://github.com/pbakaus/impeccable (Apache-2.0, see licenses/IMPECCABLE-LICENSE)
+Version: skill 4.5.0
+Commit: 6e802bd
+
+Copied unchanged into .claude/skills/impeccable. Read before adding: the skill is instructions
+plus reference files; `scripts/impeccable detect` downloads the engine binary from the project's
+GitHub releases and checks its sha256 before running it. It sends no code anywhere.
+
+## Vercel Web Interface Guidelines
+
+Source: https://github.com/vercel-labs/web-interface-guidelines (MIT, see
+licenses/WEB-INTERFACE-GUIDELINES-LICENSE)
+Commit: e3d624b
+
+The guideline text is pinned in .claude/skills/web-interface-guidelines/SKILL.md instead of
+fetched live, so a review never needs a web read.
