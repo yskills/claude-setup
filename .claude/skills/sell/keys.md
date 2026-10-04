@@ -68,4 +68,10 @@ project doesn't need.
 >      [API keys](https://dashboard.stripe.com/apikeys), choose Create restricted key, and set
 >      Checkout Sessions and Webhook Endpoints to Write.
 >    - …
-> 3. Reply "keys done". Claude runs the deploy and tells you if anything is missing.
+> 3. Open the repo's [Actions](https://github.com/OWNER/REPO/actions/workflows/ci.yml) page,
+>    press Run workflow, keep `main`, and press the green Run workflow. Then reply "keys done";
+>    Claude reads the run and tells you if anything is missing.
+
+Claude can't start that run itself: cloud threads get "403 Resource not accessible by
+integration" on `workflow_dispatch` and re-runs (duo-test, 2026-10-03). Without the button, a new
+key only reaches the site with the next merge to `main`.
