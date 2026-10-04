@@ -67,6 +67,8 @@ project that uses this setup.
   add:
   - `context7.com`, `mcp.context7.com` (live library docs; blocked otherwise)
   - `cdn.jsdelivr.net`, `unpkg.com` (CDN scripts, e.g. GSAP for HyperFrames)
+  - `*.yskills.workers.dev` (your own live sites and PR previews, so threads can open and
+    screenshot what they deployed; blocked otherwise)
   - `*.youtube.com`, `*.googlevideo.com`, only if threads work on video
 - **No deploy keys here.** Keys live only in GitHub. CI deploys `main` to the live site and
   posts a preview link on every PR (the `sell` skill's `templates/ci.yml`), so a thread never
