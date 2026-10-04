@@ -71,3 +71,16 @@ Commit: e3d624b
 
 The guideline text is pinned in .claude/skills/web-interface-guidelines/SKILL.md instead of
 fetched live, so a review never needs a web read.
+
+## claude-video (watch)
+
+Source: https://github.com/bradautomates/claude-video (MIT, see licenses/CLAUDE-VIDEO-LICENSE)
+Version: 0.3.2
+Commit: 03ceb42
+
+Copied into .claude/skills/watch: SKILL.md and scripts/, minus the packaging script
+build-skill.sh. The plugin's SessionStart hook (a setup check) is left out. Read in full before
+adding: standard-library Python that runs yt-dlp and ffmpeg. It talks only to the video site,
+and to Gemini, Groq or OpenAI when a key for one is set, in the environment,
+~/.config/watch/.env or the current project's .env. Optional WhisperX setup downloads uv and
+PyTorch.
