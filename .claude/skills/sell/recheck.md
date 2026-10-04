@@ -36,3 +36,5 @@ pre-allowed. "open" means it was never confirmed; confirm it before relying on i
 | Cloudflare Secrets Store | Beta since 2025-04-09; use Worker secrets until it is GA | [changelog](https://developers.cloudflare.com/changelog/product/secrets-store/) | 2026-10-03 |
 | Shopify (alternative) | From about €25/month; Shopify Payments EU cards 2.1% + €0.30 on Basic (third-party figures) | [shopify.com/de/preise](https://www.shopify.com/de/preise) | open |
 | App stores | Take 15 to 30% of digital sales; the exceptions keep changing | Apple and Google developer policies | when going to a store |
+| Stripe plugin | `stripe@claude-plugins-official` 0.10.3: `stripe-best-practices` skill (Stripe's plan; checks API version, restricted keys, webhooks, tax). MCP at `mcp.stripe.com` needs a browser OAuth login. Its hooks ask Claude to offer `stripe feedback` after Stripe work; nothing is sent without yskills' OK | [Stripe MCP](https://docs.stripe.com/mcp) | 2026-10-04 |
+| Better Auth Stripe plugin | `@better-auth/stripe` 1.7.7, peer `stripe` ^18 to ^22 (so not `stripe@23`) | [npm](https://www.npmjs.com/package/@better-auth/stripe) | 2026-10-04 |

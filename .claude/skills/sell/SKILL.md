@@ -26,6 +26,11 @@ Files next to this one:
 | `physical.md` | anything gets shipped |
 | `legal-de.md` | legal pages, checkout wording, registrations |
 
+Also turn on the official Stripe plugin in the project (`"stripe@claude-plugins-official": true`
+in `.claude/settings.json`) and follow its `stripe-best-practices` skill; it is Stripe's own
+integration plan. Its MCP server (`mcp.stripe.com`) needs a browser login, so it works on
+yskills' PC (`/mcp`), not in cloud threads; the skill works everywhere.
+
 ## 0. Re-check
 
 Open `recheck.md`. For each row checked more than 3 months ago:
