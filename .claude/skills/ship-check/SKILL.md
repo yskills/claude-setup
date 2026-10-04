@@ -1,6 +1,6 @@
 ---
 name: ship-check
-description: Run the checks CI runs, then review your own diff like a strict reviewer, before any push or PR update. Use whenever work is about to be committed, pushed, or called done.
+description: Run the checks CI runs, then have fresh code-reviewer agents review the diff until clean, before any push or PR update. Use whenever work is about to be committed, pushed, or called done.
 ---
 
 # Ship check
@@ -20,8 +20,17 @@ green. If the repo has none of this, say so and suggest adding a `verify` script
 
 ## 2. Review the diff
 
-`git diff origin/HEAD...` (or against the base branch). Read it as a reviewer who wants to
-reject it:
+The writer misses its own mistakes: a model reviewing its work in the same context waves through
+most of them and catches them when shown the same diff fresh. So the review is never yours alone:
+
+1. Hand `git diff origin/HEAD...` (or against the base branch) to the `code-reviewer` agent with
+   only the diff, the task goal in one or two sentences, and the checklist below. Not your
+   reasoning or plan: it should judge the code, not your story about it.
+2. Fix every blocking finding, rerun step 1, then hand the new diff to a **fresh** `code-reviewer`
+   agent. Repeat until a pass finds nothing blocking; each pass tends to find more.
+3. Optional findings: fix the plainly correct ones, skip the rest.
+
+The checklist, for the reviewer and for your own read:
 
 - Secrets, tokens, personal data, real emails in code, tests, fixtures or screenshots? `.env`
   files staged? `VITE_*` / `NUXT_PUBLIC_*` holding anything secret?
