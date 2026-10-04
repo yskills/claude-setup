@@ -38,3 +38,4 @@ pre-allowed. "open" means it was never confirmed; confirm it before relying on i
 | App stores | Take 15 to 30% of digital sales; the exceptions keep changing | Apple and Google developer policies | when going to a store |
 | Stripe plugin | `stripe@claude-plugins-official` 0.10.3: `stripe-best-practices` skill (Stripe's plan; checks API version, restricted keys, webhooks, tax). MCP at `mcp.stripe.com` needs a browser OAuth login. Its hooks ask Claude to offer `stripe feedback` after Stripe work; nothing is sent without yskills' OK | [Stripe MCP](https://docs.stripe.com/mcp) | 2026-10-04 |
 | Better Auth Stripe plugin | `@better-auth/stripe` 1.7.7, peer `stripe` ^18 to ^22 (so not `stripe@23`) | [npm](https://www.npmjs.com/package/@better-auth/stripe) | 2026-10-04 |
+| Retention periods | Invoices and payment records 8 years (BEG IV, since 2025-01-01); books and annual accounts 10 | § 147 AO, § 257 HGB | 2026-10-04 |
