@@ -33,8 +33,9 @@ credentials.
 ## 3. Review
 
 1. Open every PNG yourself first.
-2. Run `.claude/skills/impeccable/scripts/impeccable detect` on the changed files (a local
-   linter for AI-look anti-patterns, no LLM) and check the diff against the
+2. Run `.claude/skills/impeccable/scripts/impeccable detect` on the changed source files (a local
+   linter for AI-look anti-patterns, no LLM; scan files, not a URL, because URL scans can't start
+   Chromium as root in cloud threads) and check the diff against the
    `web-interface-guidelines` skill. Fix what they flag.
 3. Run the `design-critic` agent with the screenshot paths, and tell it to return its findings as
    its final text (a report "delivered as a message" can get lost). Fix every **blocking** finding and
