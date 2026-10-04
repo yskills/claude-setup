@@ -67,8 +67,10 @@ def network_diagnostic(stderr: str) -> str:
 
 
 def _run(cmd: list[str]):
-    # claude-setup: run outside the project, so a yt-dlp.conf in the current repo can't add options.
-    result = run_text(cmd, cwd=tempfile.gettempdir())
+    # claude-setup: run in a fresh private directory, so no yt-dlp.conf in the repo (or a shared
+    # temp dir) can add options. The user's own ~/.config/yt-dlp still applies.
+    with tempfile.TemporaryDirectory(prefix='watch-cwd-') as cwd:
+        result = run_text(cmd, cwd=cwd)
     if result.returncode != 0:
         raise SystemExit(f'yt-dlp failed (exit {result.returncode}): {network_diagnostic(result.stderr)}')
     return result
