@@ -75,6 +75,9 @@ try {
     for (let i = 0; i < targets.length; i++) {
       await page.goto(urls[i], { waitUntil: 'networkidle' }).catch((e) => errors.push(`goto ${urls[i]}: ${e.message}`))
       await page.waitForTimeout(wait)
+      // Let one-shot animations finish so shots show the settled screen; loops are ignored.
+      await page.waitForFunction(() => document.getAnimations().every((a) =>
+        a.playState === 'finished' || a.effect?.getTiming().iterations === Infinity), null, { timeout: 5000 }).catch(() => {})
       const file = path.join(out, `${slug(targets[i])}-${name}.png`)
       await page.screenshot({ path: file, fullPage })
       saved.push(file)

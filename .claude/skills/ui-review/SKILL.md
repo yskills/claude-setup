@@ -17,6 +17,7 @@ is about performance or final look. Fill pages with realistic data; an empty pag
 node <ui-review skill folder>/scripts/shoot.mjs --base http://localhost:3000 --out .shots / /pricing
 ```
 
+- The phone size runs as a touch device, and each shot waits for one-shot animations to end.
 - Each target is saved as `<page>-phone.png` (390x844 @2x) and `<page>-desktop.png` (1440x900).
 - `--full` captures the whole scrolling page, `--only phone|desktop` skips one size,
   `--wait 1500` waits longer for animations or WebGL.
@@ -35,6 +36,7 @@ credentials.
 2. Run `.claude/skills/impeccable/scripts/impeccable detect` on the changed files (a local
    linter for AI-look anti-patterns, no LLM) and check the diff against the
    `web-interface-guidelines` skill. Fix what they flag.
-3. Run the `design-critic` agent with the screenshot paths. Fix every **blocking** finding and
+3. Run the `design-critic` agent with the screenshot paths, and tell it to return its findings as
+   its final text (a report "delivered as a message" can get lost). Fix every **blocking** finding and
    the cheap **polish** ones, then shoot again.
 4. Attach the final phone and desktop screenshots to the PR description.
