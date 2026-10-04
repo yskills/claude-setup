@@ -58,6 +58,10 @@ project doesn't need.
 > 1. In GitHub, open the repo's [Environments](https://github.com/OWNER/REPO/settings/environments)
 >    page and click New environment. Name it `production`. Under Deployment branches, choose
 >    Selected branches and add `main`.
+>    Then make a second environment named `preview` (no branch rule) with
+>    `CLOUDFLARE_ACCOUNT_ID` and its own `CLOUDFLARE_API_TOKEN`: a second token with only
+>    Account · Workers Scripts · Edit, limited under Workers to `<name>-preview` (it exists after
+>    the first deploy). PRs then get preview links without touching the live site.
 > 2. In the same environment, use Add environment secret for each of these:
 >    - `CLOUDFLARE_API_TOKEN`: [create the token](https://dash.cloudflare.com/profile/api-tokens)
 >      from the template "Edit Cloudflare Workers", and add Account · D1 · Edit. Leave it on

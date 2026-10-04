@@ -67,9 +67,11 @@ project that uses this setup.
   - `context7.com`, `mcp.context7.com` (live library docs; blocked otherwise)
   - `cdn.jsdelivr.net`, `unpkg.com` (CDN scripts, e.g. GSAP for HyperFrames)
   - `*.youtube.com`, `*.googlevideo.com`, only if threads work on video
-- **Not needed:** `api.stripe.com`, `api.cloudflare.com`. Deploys and payments setup run in
-  GitHub Actions with repo secrets, never from a thread. Optional: a Stripe *test* key as an
-  API credential for `api.stripe.com` (Pro/Max plans); the proxy adds it and Claude never sees it.
+- **No deploy keys here.** Keys live only in GitHub. CI deploys `main` to the live site and
+  posts a preview link on every PR (the `sell` skill's `templates/ci.yml`), so a thread never
+  needs a Cloudflare token. A thread can't start an Actions run itself (GitHub answers 403), so
+  after adding a key you press Run workflow. Optional: a Stripe *test* key as an API credential
+  for `api.stripe.com` (Pro/Max plans); the proxy adds it and Claude never sees it.
 
 On your PC, `global/settings.json` lets Claude read the official docs of your stack (Nuxt, Vue,
 Cloudflare, Stripe, GitHub, MDN, German law texts...) without asking each time. Cloud threads

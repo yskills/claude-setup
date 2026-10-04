@@ -121,19 +121,31 @@ async function ensureWorker() {
   if (status !== 200) throw tokenError([`Account > Workers Scripts > Edit on all Workers (HTTP ${status} creating the Worker: ${created?.errors?.[0]?.message ?? 'no detail'})`])
 }
 
-function ensureDatabase() {
-  const find = () => JSON.parse(wrangler(['d1', 'list', '--json'])).find((db) => db.name === DB_NAME)
-  if (!find()) wrangler(['d1', 'create', DB_NAME])
+function ensureDatabase(name) {
+  const find = () => JSON.parse(wrangler(['d1', 'list', '--json'])).find((db) => db.name === name)
+  if (!find()) wrangler(['d1', 'create', name])
   const db = find()
-  if (!db) throw new Error(`D1 database ${DB_NAME} was not created`)
+  if (!db) throw new Error(`D1 database ${name} was not created`)
   return db.uuid
 }
 
-function writeDatabaseId(id) {
+function writeDatabaseId(name, id) {
   const config = readFileSync('wrangler.jsonc', 'utf8')
-  const pattern = new RegExp(`("database_name": "${DB_NAME}",)(\\s*"database_id": "[^"]*",)?`)
-  if (!pattern.test(config)) throw new Error(`wrangler.jsonc needs "database_name": "${DB_NAME}", followed by another property`)
+  const pattern = new RegExp(`("database_name": "${name}",)(\\s*"database_id": "[^"]*",)?`)
+  if (!pattern.test(config)) throw new Error(`wrangler.jsonc needs "database_name": "${name}", followed by another property`)
   writeFileSync('wrangler.jsonc', config.replace(pattern, `$1\n      "database_id": "${id}",`))
+}
+
+/**
+ * The PR previews' own Worker (`env.preview` in wrangler.jsonc) with its own empty D1 and no
+ * shop keys. CI's preview job uploads versions of it with a token limited to this one Worker,
+ * so code on a PR branch can never reach the live Worker, its data or its keys.
+ */
+function deployPreviewWorker() {
+  const name = `${DB_NAME}-preview`
+  writeDatabaseId(name, ensureDatabase(name))
+  wrangler(['d1', 'migrations', 'apply', 'DB', '--remote', '--env', 'preview'])
+  wrangler(['deploy', '--env', 'preview'])
 }
 
 /** Secret names already on the worker. Only "worker not found" (first deploy) counts as none. */
@@ -183,8 +195,7 @@ async function main() {
   await ensureWorker()
   // CI runs `deploy.mjs --check` before the build, so a bad token fails in seconds.
   if (process.argv.includes('--check')) return console.log('Cloudflare token can deploy.')
-  const id = ensureDatabase()
-  writeDatabaseId(id)
+  writeDatabaseId(DB_NAME, ensureDatabase(DB_NAME))
   wrangler(['d1', 'migrations', 'apply', 'DB', '--remote'])
   const deployOutput = wrangler(['deploy'])
   const siteUrl = process.env.SITE_URL
@@ -197,6 +208,7 @@ async function main() {
   for (const name of RUNTIME_KEYS) if (process.env[name]) putSecret(name, process.env[name])
   if (process.env.STRIPE_SECRET_KEY) await replaceStripeWebhook(siteUrl)
 
+  deployPreviewWorker()
   console.log(`Deployed: ${siteUrl}`)
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Live: ${siteUrl}\n`)
 }
