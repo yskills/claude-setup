@@ -14,6 +14,7 @@ installing (global CLAUDE.md), and never add one only because a video says so.
 | **caveman** | Skip | Makes replies telegraphic; CLAUDE.md already asks for short answers |
 | **OmniRoute** | Never | Sends requests to whatever free model is up, so code goes to unknown providers and quality drops. Using a Claude Pro/Max login through a third-party gateway breaks Anthropic's terms (since Feb 2026) and risks the account |
 | **pxpipe** | Never for code | Proxy that renders context as images. The model cannot read exact IDs, paths or hashes back from them and silently makes them up |
+| Second, non-Claude PR reviewer | Later, once a project takes real money: **GitHub Copilot Pro** ($10/mo) | Until then `ship-check` hands every diff to fresh `code-reviewer` agents. Checked 2026-10-04: CodeRabbit's free plan only summarises private repos (reviews from $24/mo), and Gemini Code Assist's free tier ended June 2026 |
 | "Install these 20 skills/MCPs" lists | Skip | Every one costs context. Snyk scanned about 4,000 public skills: 37% had security flaws, 76 were built to steal credentials |
 
 Sources: [Ponytail](https://github.com/DietrichGebert/ponytail),
