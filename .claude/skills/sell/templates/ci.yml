@@ -50,9 +50,11 @@ jobs:
   # Without that secret it posts a notice instead. A same-repo PR that edits this file runs its
   # edit with every repo-level secret, which is why the live keys sit in the "production"
   # environment and only CLOUDFLARE_ACCOUNT_ID and the preview token are repo secrets (keys.md).
-  # Bindings (D1, KV, ratelimits...) are not inherited by env.preview, so it repeats each one, and
-  # a D1 binding there has neither database_name nor database_id: deploy.mjs fills them in at
-  # deploy time and a PR upload inherits the binding. wrangler.jsonc (plain JSON, no comments):
+  # Bindings are not inherited by env.preview, so it repeats the allowed ones; a D1 binding there has
+  # neither database_name nor database_id: deploy.mjs fills them in at deploy time and a PR upload
+  # inherits the binding. Only D1 and ratelimits are allowed: a KV, R2, queue, Hyperdrive or
+  # service binding names its resource in the PR's own config, which could point at live data.
+  # A project that needs one gives the preview its own resource in deploy.mjs --preview first. wrangler.jsonc (plain JSON, no comments):
   #   "env": { "preview": { "name": "shop-preview", "preview_urls": true,
   #     "d1_databases": [{ "binding": "DB", "migrations_dir": "server/migrations" }] } }
   # Old pr-<n> aliases stay up after a PR closes; with no data and no keys behind them that is
@@ -92,9 +94,9 @@ jobs:
           WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.ndjson
         run: |
           # Catches an accidental config change; the token's scope is what actually limits this job.
-          jq -e '.env.preview | (keys - ["name", "preview_urls", "d1_databases", "kv_namespaces", "r2_buckets", "ratelimits", "services", "queues", "hyperdrive"] | length == 0)
+          jq -e '.env.preview | (keys - ["name", "preview_urls", "ratelimits", "d1_databases"] | length == 0)
             and (.d1_databases | all(keys - ["binding", "migrations_dir"] | length == 0))' wrangler.jsonc > /dev/null || {
-            echo "::error::env.preview in wrangler.jsonc may only hold name, preview_urls, bindings, and a DB binding without a database name or id."
+            echo "::error::env.preview in wrangler.jsonc may only hold name, preview_urls, ratelimits and a DB binding without a database name or id."
             exit 1
           }
           # --name pins the upload to the preview Worker whatever the PR's config says. Renaming the

@@ -64,7 +64,7 @@ Stripe only takes the money. Stripe.js never loads on our pages either.
 | `server/migrations/0001_orders.sql` | the D1 `migrations_dir` | `orders` table |
 | `scripts/deploy.mjs` | `scripts/` | Token check (`--check`: can it create a Worker, not just read), D1, migrations, deploy, Worker secrets, a fresh Stripe webhook. `SITE_URL` for a custom domain. `--preview` updates the PR preview Worker |
 | `ci.yml` | `.github/workflows/` | Verify on PRs, a preview link per PR (`ci.yml` comments say how `env.preview` must look); deploy from `main` with the `production` environment |
-| `tests/wrangler-config.test.ts` | `tests/unit/` | `wrangler.jsonc` stays plain JSON, and `env.preview` repeats every binding (wrangler envs inherit none) |
+| `tests/wrangler-config.test.ts` | `tests/unit/` | `wrangler.jsonc` stays plain JSON, `env.preview` repeats the D1 and ratelimits bindings (wrangler envs inherit none), and no binding that names its resource in the config (KV, R2, queues, services) sneaks in |
 | `tests/shop.spec.ts` | `tests/e2e/` | Signed fake webhooks against `wrangler dev`, order validation, and real sessions against stripe-mock |
 | `playwright.config.ts` | project root | Starts `wrangler dev` with the test webhook secret, plus the stripe-mock vars when `STRIPE_MOCK` is set |
 
@@ -96,7 +96,7 @@ refuse. On a custom domain this is a backstop rather than the only guard.
   - `"compatibility_flags": ["nodejs_compat"]`
   - a D1 binding `DB`
   - `migrations_dir` pointing at the migrations
-  - an `env.preview` block for PR previews, repeating every binding (`ci.yml` comments show it;
+  - an `env.preview` block for PR previews, repeating the D1 and ratelimits bindings (`ci.yml` comments show it and why others need care;
     `tests/wrangler-config.test.ts` checks it). Keep the file plain JSON, no comments.
 - `package.json` needs `"deploy": "node scripts/deploy.mjs"` and a `verify` script that runs
   typecheck, unit tests, build and the e2e tests.
