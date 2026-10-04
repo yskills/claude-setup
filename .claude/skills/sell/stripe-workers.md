@@ -120,15 +120,31 @@ Stripe API rate limit.
   - The endpoint rejects the request without it and stores the consent in the session metadata.
   - The confirmation email repeats it.
 
-**Subscription:**
+**Subscription (Billing):**
 
-- `mode: 'subscription'` with a Price created once in the Dashboard. The Stripe Customer Portal
-  handles cancelling and card changes.
-- The [Better Auth Stripe plugin](https://www.better-auth.com/docs/plugins/stripe) links plans
-  to users.
-- Add these to the deploy script's `WEBHOOK_EVENTS`: `customer.subscription.created`,
-  `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`.
-- Add a Kündigungsbutton (`legal-de.md`).
+Not yet run on Workers; the first subscription project proves it and updates this section.
+
+- **Catalog:** one Product per plan (Starter, Pro…), monthly and yearly as two Prices of that
+  Product. Give every Price a `lookup_key` and find it by that key, so sandbox and live need no
+  id changes.
+- **Checkout:** `mode: 'subscription'` with the user's Stripe Customer (`customer`), never
+  `payment_method_types`. The order button rules above still apply.
+- **The [Better Auth Stripe plugin](https://www.better-auth.com/docs/plugins/stripe)** does the
+  customer, checkout, portal and webhook parts when the app uses Better Auth. As of 1.7.7 its
+  peer range is `stripe` ^18 to ^22, so pin `stripe@22` in that project (check `recheck.md`).
+- **Webhook events** (add to the deploy script's `WEBHOOK_EVENTS`): `checkout.session.completed`,
+  `customer.subscription.created`, `customer.subscription.updated`,
+  `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`. They are not
+  optional: renewals, failed payments and cancellations only arrive this way.
+  - Access follows the stored subscription `status` (`active`, `trialing`), not the return page.
+  - Map each event to the user through its Stripe customer or subscription id, stored in our
+    DB. Metadata is a fallback only.
+  - Payment retries and failed-payment emails: turn on Smart Retries and the customer emails in
+    the Dashboard (Billing → Revenue recovery) instead of coding them.
+- **Customer Portal** for cancelling, plan changes and card updates. Configure it once in the
+  Dashboard (Settings → Billing → Customer portal). Add a Kündigungsbutton (`legal-de.md`).
+- **Restricted key** additionally needs Customers Write, Prices Read, Subscriptions Read and
+  Customer portal Write.
 
 **Selling across the EU above the VAT threshold, digital only:** Stripe Managed Payments.
 Stripe becomes the seller, so it works through Checkout only. Check `recheck.md` first.
@@ -156,4 +172,11 @@ Stripe becomes the seller, so it works through Checkout only. Check `recheck.md`
   - Refunds and disputes that match nothing are logged, not failed.
 - **Sandbox orders stay in the live D1.** `livemode` marks them; delete them at go-live
   (`DELETE FROM orders WHERE livemode = 0 OR livemode IS NULL`).
+- **`automatic_tax` silently collects nothing** until Tax settings have a head office address
+  and an active registration for the buyer's country; there is no error. Before turning it on,
+  check both in the sandbox, run a test Tax Calculation and make sure `taxability_reason` is not
+  `not_collecting`. Product tax codes come from Stripe's [tax code list](https://docs.stripe.com/tax/tax-codes);
+  never guess one, let yskills (or the Steuerberater) confirm it.
+- **A 100% promotion code** completes with `payment_status: 'no_payment_required'`. Fulfil on
+  that too if the project offers such codes; otherwise leave promotion codes off.
 - **Never put a price in a request body or in metadata the client can influence.**
