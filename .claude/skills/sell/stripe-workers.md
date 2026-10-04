@@ -118,7 +118,15 @@ Stripe API rate limit.
   mit der Ausführung beginnt, und weiß, dass ich dadurch mein Widerrufsrecht verliere"
   (§ 356 Abs. 5 BGB).
   - The endpoint rejects the request without it and stores the consent in the session metadata.
-  - The confirmation email repeats it.
+  - The confirmation email repeats it. The waiver only counts once that email is sent, so it is
+    part of the recipe, not optional: send it whenever `confirmation_sent_at` is NULL (webhook
+    retry or return page), not only on the first insert, with a Resend idempotency key.
+- Refuse a second purchase of the same one-off product (409), and accept a session only when
+  `mode`, `amount_total`, `currency` and the product all match.
+- **Live-key lock:** checkout refuses a `sk_live_`/`rk_live_` key until the seller details in
+  `shared/business.ts` (name, street, city, email, phone) are filled and `RESEND_API_KEY` and
+  `MAIL_FROM` exist. Keep it a pure, unit-tested function in `shared/checkout.ts`; it suits every
+  project.
 
 **Subscription (Billing):**
 
@@ -180,3 +188,8 @@ Stripe becomes the seller, so it works through Checkout only. Check `recheck.md`
 - **A 100% promotion code** completes with `payment_status: 'no_payment_required'`. Fulfil on
   that too if the project offers such codes; otherwise leave promotion codes off.
 - **Never put a price in a request body or in metadata the client can influence.**
+- **Rate-limit checkout, confirm and withdrawal** with the Workers rate-limit binding
+  (`ratelimits` in `wrangler.jsonc`, keyed on `cf-connecting-ip`). It works in `wrangler dev`
+  too.
+- **Legal texts live in one shared TS module**, so the pages and the confirmation email can't
+  drift apart.

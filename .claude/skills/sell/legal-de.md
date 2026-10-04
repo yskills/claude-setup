@@ -70,6 +70,8 @@ Claude builds this; the law is specific.
     whole withdrawal period.
   - Step 2 asks for the details needed to identify the buyer and the contract, then a button
     "Widerruf bestätigen".
+  - The receipt must not echo text the buyer typed, or the form becomes an open mail relay. A
+    per-recipient send limit may skip the receipt but must never block storing the withdrawal.
   - Then email a confirmation of receipt (durable medium).
   - Build it as a page linked from the footer and from the confirmation email: order number
     plus email, then confirm.
@@ -81,6 +83,14 @@ Claude builds this; the law is specific.
   - The confirmation email repeats it.
   - The Widerrufsbutton then only matters until delivery.
 - **Subscriptions:** a Kündigungsbutton, "Verträge hier kündigen" (§ 312k BGB) [K].
+- **Accounts:** a shop with logins needs password reset, account deletion and a JSON data
+  export (DSGVO Art. 17 and 20), all behind working mail. With Better Auth: `sendResetPassword`
+  with `advanced.backgroundTasks.handler` set to `event.waitUntil`, and
+  `user.deleteUser.enabled`.
+- **Retention:** invoices and payment records 8 years since the BEG IV (from 2025-01-01), books
+  and annual accounts still 10 [S]. So deleting an account keeps its purchases: make
+  `purchase.user_id` nullable with `ON DELETE SET NULL` (D1 enforces foreign keys) and test the
+  deletion on a copy that has rows.
 
 ## Cookies, accessibility, tax
 
