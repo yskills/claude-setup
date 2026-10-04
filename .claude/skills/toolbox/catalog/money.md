@@ -1,14 +1,18 @@
 # Making money
 
 Checked 2026-10-03. Plugins are `@claude-plugins-official` unless noted. yskills is in Germany:
-EU VAT and German legal pages apply from the first euro.
+EU VAT and German legal pages apply from the first euro. **Anything that sells (checkout, shop,
+subscriptions, shipping) is built with the `sell` skill**, which has the questions, keys,
+tested templates and German law; this table is the overview.
 
 | Need | Pick | Why / watch out | Add it |
 |---|---|---|---|
-| Subscriptions or one-off payments, EU VAT handled for you | **Stripe Managed Payments** (Stripe as merchant of record; GA for German businesses, 195 markets) | Stripe handles tax and compliance; higher fee than plain Stripe, check current terms | `stripe` plugin; MCP `https://mcp.stripe.com` |
-| Same, full control | **Stripe Checkout + Billing + Customer Portal**, Stripe Tax | You file VAT yourself (OSS) | `stripe` plugin |
-| Alternative merchant of record | **Paddle** | | API key |
-| PayPal buyers | **PayPal** | | `paypal` plugin |
+| One-off payments or subscriptions (default) | **Stripe Checkout** (hosted page) + Billing + Customer Portal | 1.5% + €0.25 per EEA card, no monthly fee. Kleinunternehmer charge no VAT; above €10k EU sales a year see `sell` | `stripe` plugin; MCP `https://mcp.stripe.com`; `sell` skill |
+| Digital goods sold EU-wide, VAT handled for you | **Stripe Managed Payments** (Stripe is merchant of record) | +3.5%; digital only; German sellers supported; Checkout or Payment Links only | same |
+| Physical product with shipping | **Stripe Checkout** after our own order page, **Sendcloud** for labels | No merchant of record takes physical goods; packaging and product law apply (`sell` → `physical.md`) | `sell` skill |
+| Many products, variants, stock, or a non-developer runs the shop | **Shopify** | Monthly fee plus payment fees, but admin, stock and checkout included | Shopify admin |
+| Alternative merchant of record (digital only) | **Paddle** or **Polar** (5% + €0.50) | | API key |
+| PayPal, Klarna, SEPA, Apple Pay buyers | **Turn them on in Stripe** (Dashboard > Payment methods) | Checkout shows them with no code; PayPal adds its own fee | Stripe Dashboard |
 | In-app purchases (iOS / Android) | **RevenueCat** | One API over App Store and Play billing | `revenuecat` plugin |
 | Ads on a website | **Google AdSense** | Needs cookie consent in the EU (TCF CMP) | script tag + consent banner |
 | Ads in a web game (interstitial, rewarded) | **AdSense H5 Games Ads** (beta) | Made for HTML5 games like TellMeY | AdSense sign-up, Ad Placement API |
@@ -19,11 +23,10 @@ EU VAT and German legal pages apply from the first euro.
 
 ## German / EU legal checklist (before going live)
 
-- **Impressum** (required for any commercial site in Germany).
-- **Datenschutzerklärung** naming every processor (Stripe, analytics, ads, AI APIs, hosting).
+- Shops and paid apps: everything in the `sell` skill's `legal-de.md` (Impressum, Datenschutz,
+  AGB, Widerruf with the 2026 Widerrufsbutton, order button, price notes, warranty notice).
 - **Cookie consent** before any non-essential cookie or tracker (TDDDG + GDPR); cookieless
   analytics (Plausible, Umami, PostHog cookieless mode) avoid the banner for analytics alone.
-- **AGB and Widerrufsbelehrung** for paid digital products; the checkout must collect the
-  consumer's consent to start immediately, or the 14-day withdrawal right applies.
+  Google ads need a certified TCF 2.2 consent banner.
 - **Licensing** of content you use (music, stock, AI-generated assets' terms).
 - Data processing agreements (AVV) with processors; prefer EU regions where offered.

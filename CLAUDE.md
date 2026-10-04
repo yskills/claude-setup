@@ -72,7 +72,8 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 - Ship: GitHub Actions runs one `verify` script, then deploys; Cloudflare Workers via wrangler
   for web apps, Docker + Caddy on a small VPS for services that need a server (like Luna).
 - Anything beyond this (video, AI generation, payments, ads, analytics, email, mobile...) comes
-  from the `toolbox` skill, added to that project only.
+  from the `toolbox` skill, added to that project only. Anything that takes money (checkout,
+  shop, subscriptions, shipping) follows the `sell` skill.
 
 ## Tools you have
 

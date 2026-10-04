@@ -40,7 +40,7 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 | ECC rules | common + TypeScript, Vue, Nuxt, web, Python (language rules load only for matching files) | `.claude/rules/ecc` |
 | ECC hooks | session memory across restarts, quality gate after edits, design-quality warning, console.log and secret checks before commits, compaction hints | `npx ecc-universal@2.2.3` |
 | Toolbox | Knows which plugins, APIs and skills any kind of app needs (video, AI, payments, ads, auth, email, analytics, mobile, scraping...), searches all ~315 plugins and 293 ECC skills live, and adds them to that one project | `.claude/skills/toolbox` |
-| Own skills | `onboard-project` (set a repo up for Claude in one PR), `ship-check` (run CI locally + self-review), `ui-review` (phone/desktop screenshots + critique) | `.claude/skills` |
+| Own skills | `onboard-project` (set a repo up for Claude in one PR), `ship-check` (run CI locally + self-review), `ui-review` (phone/desktop screenshots + critique), `sell` (checkout, shop and shipping from Germany: keys, tested Stripe-on-Workers code, German shop law, go-live) | `.claude/skills` |
 | Own agent | `design-critic`: reviews screenshots for the "looks AI" problem | `.claude/agents` |
 | Ponytail | Write the least code that works: reuse, standard library, platform, installed dependency, one line, then new code | `.claude/skills/ponytail` (MIT, see `THIRD_PARTY.md`) |
 

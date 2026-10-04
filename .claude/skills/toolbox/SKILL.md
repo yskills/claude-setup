@@ -22,7 +22,7 @@ Read only the catalog files that match (each one is a short table with picks and
 |---|---|
 | `catalog/video-audio.md` | editing, captions, reframing, programmatic video, AI video/image/voice/music, streaming, heavy processing |
 | `catalog/ai.md` | Claude API features, agents, RAG and vectors, local models, LLM observability and cost |
-| `catalog/money.md` | payments, subscriptions, in-app purchases, ads, EU VAT, German legal pages |
+| `catalog/money.md` | payments, subscriptions, in-app purchases, ads, EU VAT, German legal pages (building a checkout or shop: the `sell` skill) |
 | `catalog/growth.md` | analytics, SEO, social publishing, email, marketing, A/B tests |
 | `catalog/app-platform.md` | auth, databases, storage, jobs, realtime, mobile and desktop, hosting, docs/PDF |
 | `catalog/data-web.md` | search, scraping, browser automation, 3D and games, maps |
