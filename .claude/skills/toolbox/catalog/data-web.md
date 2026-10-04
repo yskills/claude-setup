@@ -17,4 +17,5 @@ Checked 2026-10-03. Plugins are `@claude-plugins-official` unless noted.
 | 3D models and game assets | **Blender** with its official MCP connector by the Blender developers ([Claude for Creative Work](https://www.anthropic.com/news/claude-for-creative-work)) | PC only: Blender must be open. Export `.glb` for Three.js. Skip the look-alike community servers | Blender connector |
 | Maps, geocoding, routing | MapLibre + OpenStreetMap, or Amazon Location | | npm; `amazon-location-service` plugin |
 | Design files | **Figma**, **Canva** | Pull frames, export assets. Figma's official remote server works on every plan; only worth adding if the design lives in Figma | `figma` / `canva` plugins |
+| Hand-tweaking a design before code | **Paper** ([MCP docs](https://paper.design/docs/mcp)): a design canvas Claude can read and write | Optional and off by default. PC only: it runs through the Paper Desktop app, and the free tier is limited. Only when yskills wants to adjust a screen by hand; otherwise designs stay in code | Paper MCP (local) |
 | Slides and pitch decks | | | ECC skills `frontend-slides`, `investor-materials` |
