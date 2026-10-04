@@ -35,16 +35,17 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 | Settings | Auto permission mode, safe allow list, asks before force-push and deploys, never reads `.env` files, high effort, status line with context bar | `global/settings.json` |
 | 16 plugins on | superpowers, frontend-design, code-review, security-guidance, TypeScript and Python LSP, Context7, Playwright, Chrome DevTools, commit-commands, code-simplifier, feature-dev, claude-md-management, claude-code-setup, skill-creator, claude-api | official Anthropic marketplaces, `config/plugins.json` |
 | 7 plugins per project | Cloudflare, Firebase, Stripe, Sentry, PostHog, Supabase, Vercel: installed but off; a repo turns one on in its `.claude/settings.json` | same |
-| 27 ECC skills | Vue, Nuxt 4, Vite, API design, security review, e2e, SEO, i18n, deep research, continuous learning... | `.claude/skills`, list in `config/ecc.json` |
-| 16 ECC agents | planner, architect, code/TS/Vue/Python/security/database reviewers, build-error-resolver, e2e-runner, a11y, performance, SEO... | `.claude/agents` |
+| 17 ECC skills | Vue, Nuxt 4, Vite, API design, security review, e2e, SEO, i18n... | `.claude/skills`, list in `config/ecc.json` |
+| 15 ECC agents | planner, architect, code/TS/Vue/security/database reviewers, build-error-resolver, e2e-runner, a11y, performance, SEO... | `.claude/agents` |
 | ECC rules | common + TypeScript, Vue, Nuxt, web, Python (language rules load only for matching files) | `.claude/rules/ecc` |
-| ECC hooks | session memory across restarts, quality gate after edits, design-quality warning, console.log and secret checks before commits, compaction hints | `npx ecc-universal@2.2.3` |
+| ECC hooks | session memory across restarts, quality gate after edits, design-quality warning, console.log and secret checks before commits, compaction hints (PC only: cloud threads don't run hooks) | `npx ecc-universal@2.2.3` |
 | Toolbox | Knows which plugins, APIs and skills any kind of app needs (video, AI, payments, ads, auth, email, analytics, mobile, scraping...), searches all ~315 plugins and 293 ECC skills live, and adds them to that one project | `.claude/skills/toolbox` |
 | Own skills | `onboard-project` (set a repo up for Claude in one PR), `ship-check` (run CI locally + self-review), `ui-review` (phone/desktop screenshots + critique), `sell` (checkout, shop and shipping from Germany: keys, tested Stripe-on-Workers code, German shop law, go-live), `market` (marketing plan in the PRD, launch, channels, German advertising law, weekly report) | `.claude/skills` |
 | Own agent | `design-critic`: reviews screenshots for the "looks AI" problem | `.claude/agents` |
+| Design taste | `impeccable` (design skill plus a local `detect` linter for AI-look patterns) and `web-interface-guidelines` (Vercel's UI checklist); `ui-review` runs both | `.claude/skills` (Apache-2.0 and MIT, see `THIRD_PARTY.md`) |
 | Ponytail | Write the least code that works: reuse, standard library, platform, installed dependency, one line, then new code | `.claude/skills/ponytail` (MIT, see `THIRD_PARTY.md`) |
 
-Measured in a fresh session: about 37k tokens of a 500k window before you type anything
+Measured in a fresh session before the 2026-10-04 cleanup (10 skills cut since): about 37k tokens of a 500k window before you type anything
 (skills 9.9k, CLAUDE.md + rules 7.6k, agents 1.9k; MCP tools are deferred). The full ECC plugin
 alone would add ~45k.
 

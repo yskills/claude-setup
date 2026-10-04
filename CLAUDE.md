@@ -53,7 +53,8 @@ revenue, analytics) instead of getting their own dashboard.
 yskills' verdict on early work was that it "looks very AI". For every UI change:
 
 1. Read the project's design doc if it has one (`design/DESIGN.md`, `DESIGN.md`); otherwise use
-   the `frontend-design` skill and commit to a clear direction. No default gradients, emoji
+   the `frontend-design` and `impeccable` skills and commit to a clear direction. Motion in Vue:
+   `motion-v`. No default gradients, emoji
    icons, generic card grids or stock hero sections.
 2. Screenshot at phone (390px) and desktop (1440px) widths with Playwright, look at the images,
    and have the `design-critic` agent review them. Fix what it finds.
@@ -82,7 +83,7 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 ## Tools you have
 
 - Agents: `planner`, `architect`, `code-reviewer`, `typescript-reviewer`, `vue-reviewer`,
-  `python-reviewer`, `security-reviewer`, `database-reviewer`, `build-error-resolver`,
+  `security-reviewer`, `database-reviewer`, `build-error-resolver`,
   `e2e-runner`, `refactor-cleaner`, `silent-failure-hunter`, `doc-updater`, `a11y-architect`,
   `performance-optimizer`, `seo-specialist`, `design-critic`. Use reviewers proactively after
   writing code; use `security-reviewer` on anything touching auth, payments or user input.
@@ -90,7 +91,7 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
   them to that project only), `onboard-project` (set up a repo for Claude), `ship-check` (verify before
   push), `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD,
   debugging) and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
-- Browser: Playwright MCP for headless checks; Chrome DevTools MCP or `claude --chrome` to use
-  yskills' own Chrome when a page needs their login. In cloud threads launch Playwright with
+- Browser: Playwright MCP for headless checks; `claude --chrome` to use yskills' own Chrome
+  when a page needs their login. In cloud threads launch Playwright with
   `executablePath: '/opt/pw-browsers/chromium'`; that Chromium has no H.264, so test video as WebM.
 - A repo without a CLAUDE.md or `.claude/` folder: offer to run `onboard-project` first.

@@ -14,7 +14,7 @@ not to touch, without reading the whole codebase. Deliver it as one PR.
   framework configs (`nuxt.config.*`, `vite.config.*`, `wrangler.*`, `firebase.json`,
   `docker-compose.yml`), `.github/workflows/*`, existing `CLAUDE.md` / `AGENTS.md` / `.claude/`.
 - `git log --format=%s -20` for commit style.
-- Use the `codebase-onboarding` skill if the repo is large or unfamiliar.
+- For a large or unfamiliar repo, map it with an Explore subagent first.
 
 ## 2. Hygiene check (report, fix only what is safe)
 
