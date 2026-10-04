@@ -28,7 +28,8 @@ revenue, analytics) instead of getting their own dashboard.
 - Search before building: an existing library, MCP server or skill beats new code
   (`search-first` skill). Use Context7 for current library docs instead of memory.
 - In cloud project threads every WebFetch of a page nobody posted in the chat makes yskills
-  press Allow. Research there with WebSearch and Context7, and tell subagents the same; fetch a
+  press Allow. Research there with WebSearch (Context7 asks threads for a sign-in they can't
+  do), and tell subagents the same; fetch a
   page only when one fact depends on it, and say so in the thread.
 - Keep context lean: `/clear` between unrelated tasks, `/compact` at milestones
   (`strategic-compact`). Hand big reads to subagents.
@@ -54,8 +55,10 @@ yskills' verdict on early work was that it "looks very AI". For every UI change:
 
 1. Read the project's design doc if it has one (`design/DESIGN.md`, `DESIGN.md`); otherwise use
    the `frontend-design` and `impeccable` skills and commit to a clear direction. Motion in Vue:
-   `motion-v`. No default gradients, emoji
-   icons, generic card grids or stock hero sections.
+   `motion-v`. No default gradients, emoji icons, generic card grids, stock hero sections or
+   SaaS keyboard-shortcut chips. Motion answers an action or plays once; nothing loops forever.
+   Keyframes describe only the start state (`from {…}`), so `prefers-reduced-motion:
+   animation: none` lands on the finished screen.
 2. Screenshot at phone (390px) and desktop (1440px) widths with Playwright, look at the images,
    and have the `design-critic` agent review them. Fix what it finds.
 3. Put the screenshots in the PR. yskills merges on screenshots plus green CI.
@@ -93,5 +96,6 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
   debugging) and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
 - Browser: Playwright MCP for headless checks; `claude --chrome` to use yskills' own Chrome
   when a page needs their login. In cloud threads launch Playwright with
-  `executablePath: '/opt/pw-browsers/chromium'`; that Chromium has no H.264, so test video as WebM.
+  `executablePath: '/opt/pw-browsers/chromium'`; that Chromium has no H.264, so test video as WebM. Stop a dev server by
+  port (`fuser -k 8787/tcp`), never `pkill -f wrangler`: it kills the thread's own shell.
 - A repo without a CLAUDE.md or `.claude/` folder: offer to run `onboard-project` first.

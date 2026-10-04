@@ -65,7 +65,8 @@ project that uses this setup.
   not pay for it each time. Plugin tools connect a few seconds after a thread starts.
 - **Network access:** Custom, tick "Also include default list of common package managers", and
   add:
-  - `context7.com`, `mcp.context7.com` (live library docs; blocked otherwise)
+  - `context7.com`, `mcp.context7.com` (live library docs; blocked otherwise). Even then the
+    plugin asks for a sign-in a thread can't do, so in threads Context7 is effectively PC-only.
   - `cdn.jsdelivr.net`, `unpkg.com` (CDN scripts, e.g. GSAP for HyperFrames)
   - `*.yskills.workers.dev` (your own live sites and PR previews, so threads can open and
     screenshot what they deployed; blocked otherwise)
