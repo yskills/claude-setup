@@ -91,8 +91,17 @@ Templates in `templates/`.
 4. **Scaffold + design.** Scaffold thread: "Scaffold PLAN.md's app on branch `scaffold`: the
    default stack from CLAUDE.md, the `publish` skill's files, `verify`, CI, legal pages per the
    `legal` skill. Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
-   directions. **Brief (b)** carries the one-time Cloudflare setup and test keys. Building starts
-   once the scaffold PR is merged and brief (b) is answered.
+   directions. **Brief (b)** carries only what every build needs: the Cloudflare import and the D1
+   ids. Building starts once the scaffold PR is merged and brief (b) is answered.
+
+   **Keys and accounts just in time.** Every other key or account is asked for by a **key card**
+   (`briefs.md`) at the moment the next slice needs it ("you want payments: add a Stripe key
+   here"), one card per slice, never a list up front. The slice builds what it can without the
+   key (tests use fakes) and waits only for the step that needs it. Exception, **lead time**:
+   anything with a wait (identity checks, Google's 14-day test, domain verification) gets its
+   card as soon as PLAN.md knows it is needed, so the clock runs during the build. The card's
+   steps come from the skill that owns the key (`sell` `keys.md`, `store` §1, `publish`,
+   `toolbox` picks). Keys go into the service's own settings page, never into chat or git.
 5. **Build.** One builder thread per slice, at most three at once: "Build slice <id> of PLAN.md;
    its criteria are in features.json (read only). Read PLAN.md, PROGRESS.md and CLAUDE.md first.
    Tests first, then code, then ship-check. Push branch `slice/<id>`, open a PR with phone and

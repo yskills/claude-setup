@@ -17,7 +17,7 @@ Probe: landing page + waitlist, <channel>, <n> days; go at <go number>, else a k
 Größe: <small site: 1 build | app: n slices, riskiest first: <slice 1>>
 Slices: 1. <name> 2. <name> ...
 Rechtliches: <must-haves from the legal team, e.g. Impressum, Datenschutz, no cookie banner needed>
-Keys: <none | the list; you add them with brief (b)>
+Keys: <none | what will be needed, each asked by a key card when its slice gets there>
 Repo: create `<name>` (private) at https://github.com/new, then reply ok
 Kosten: ~<€/month to run> + ~<tokens or $ to build>, estimate
 Risiko: <the one thing most likely to fail>
@@ -47,4 +47,16 @@ Branch builds off before live keys: <yes | not needed, no live keys>
 Offene Risiken: <max 3 lines>
 
 ok = set the keys above, then tap Merge it on <link>, which goes live / no
+```
+
+## Key card (any time a slice needs a key or account)
+
+Not a brief: no ok/no, just steps. One card per slice, all its keys together.
+
+```
+Need: <what for, in user words, e.g. "so people can pay">
+1. Open <exact deep link to the settings page>
+2. <click path, exact field values>
+3. Copy <what> and add it at <exact place>, name <SECRET_NAME>
+Then reply "done". Meanwhile: <what the slice keeps building>
 ```

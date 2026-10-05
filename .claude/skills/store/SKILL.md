@@ -33,7 +33,7 @@ Consumer subscriptions live in the stores: Health & Fitness apps convert trials 
 categories, and annual plans bring 60.6% of that category's revenue
 ([RevenueCat 2026](https://www.revenuecat.com/state-of-subscription-apps)) [S].
 
-## 1. One-time setup (yskills, in brief (b))
+## 1. yskills' steps (each sent as a key card when the build gets there; the accounts with a wait, steps 1, 3 and 4, as soon as PLAN.md picks the store)
 
 Claude can't sign contracts, pay fees or verify identity. Numbered steps for yskills:
 
