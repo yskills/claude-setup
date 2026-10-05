@@ -12,9 +12,10 @@ Shape from Anthropic's long-running-agent harness (planner, generator, evaluator
 files; a fresh context per job) and the ECC hackathon winner's flow (`docs/RESEARCH.md`).
 
 **What yskills does, all of it:** one brainstorm batch, three ok/no briefs (`briefs.md`), and one
-**Merge it** tap per PR once the gate posts 5/5 (plus tap options in the rare case a PR fails
-the gate three times). Claude's auto mode blocks a thread from merging
-a PR no human approved (tested 2026-10-05), so the tap is the approval.
+**Merge it** tap per PR once the gate posts 5/5. A PR that fails the gate twice, or an important
+one (auth, payments, migrations, secrets), reaches yskills with a plain summary first
+(`gate.md`). Claude's auto mode blocks a thread from merging a PR no human approved (tested
+2026-10-05), so the tap is the approval.
 
 **Starting threads.** In a Claude Project the project conversation starts threads itself; each
 reports back when it finishes and keeps fixing CI and review comments on its PR. From inside a
@@ -111,7 +112,11 @@ conversation can continue later; a plain chat idle for over an hour hands off to
 - Coordinator on Opus; threads (medium effort) and every agent on Sonnet. Built-in subagents
   default to Sonnet via `CLAUDE_CODE_SUBAGENT_MODEL`.
 - Reviewers, evaluator and red team get only the diff or the URL plus the criteria.
-- One job per thread; never revive a worker idle for over an hour.
+- One job per thread. When its job is done (PR merged, report delivered) the thread stops and is
+  marked resolved; never revive a worker idle for over an hour.
+- After a usage-limit stop or reset, nothing restarts on its own: post one line ("paused at <step>")
+  and wait for yskills' go, then continue only what `PROGRESS.md` lists as open, one thread at a
+  time.
 - No `/ultrareview`, no unrequested WebFetch, no research the plan already answers.
 - The evaluator runs once per gate round. Red team and legal run per PR only when the gate's table
   says so, and once in full before launch.

@@ -28,8 +28,9 @@ After launch, phases 5-6 repeat for every improvement the weekly numbers suggest
 
 Five pass/fail checks by agents that didn't write the code: CI, evaluator on the preview, fresh
 code review, security + red team, design + legal. 5/5 → you tap **Merge it** (Claude's auto mode
-won't let a thread merge a PR no human approved; tested 2026-10-05). 3 failed rounds → you get
-tap options. Risky PRs (auth, payments, migrations, secrets) are flagged on the table.
+won't let a thread merge a PR no human approved; tested 2026-10-05). 2 failed rounds → you get a
+plain summary of what's wrong and tap options. Important PRs (auth, payments, migrations, secrets)
+come with three lines: what changes, what could break, how to undo it.
 claude-setup PRs always get your full review. Details: `operator` skill, `gate.md`.
 
 ## Learning

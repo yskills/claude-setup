@@ -29,11 +29,12 @@ gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
   and its ok is the merge.
 - **Less:** post the blocking findings as one PR review and stop. The builder fixes them; the next
   round re-runs the failed checks with fresh agents on the new head.
-- **3 failed rounds:** stop. One message to yskills: the PR, the check that keeps failing, its last
-  report, and two or three ways forward as tap options.
+- **2 failed rounds:** stop. Send one message to yskills: what the PR does, what is wrong in plain words (from
+  the last reports), and two or three ways forward as tap options.
 
-PRs touching auth, payments, database migrations or secrets say so on the table's first line, so
-yskills knows which taps deserve a look. claude-setup PRs always get yskills' full review.
+**Important PRs** (auth, payments, database migrations, secrets, or anything that can lose data or
+money): even at 5/5, the table comes with three plain lines for yskills: what changes, what could
+break, how to undo it. claude-setup PRs always get yskills' full review.
 
 ```
 Gate 5/5 (round <n>), ready to merge | hold: brief (c) first   [risky: auth | payments | migration | secrets]
