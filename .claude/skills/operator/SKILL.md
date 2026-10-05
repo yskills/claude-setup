@@ -12,12 +12,15 @@ fixed criteria and keeps pushing until the goal in `PLAN.md` is live. Shape from
 long-running-agent harness (planner, generator, evaluator; progress in files; a fresh context per
 job) and the ECC hackathon winner's flow; sources in claude-setup `docs/RESEARCH.md`.
 
-**In a Claude Project** (preferred) the project starts threads itself: ask it to start a thread
-for a job and it does, each thread reports back when it finishes, opens its PR and fixes its own
-CI. Project settings once: **Thread model** Sonnet, **Thread effort** medium, coordinator Opus;
-paste `templates/project-instructions.md` into Project instructions. **In a plain chat**, start
-workers with `create_session` (pass `model`) and check on them with `send_later`, because a
-finished session doesn't report back there.
+**In a Claude Project** (preferred) the project conversation starts threads itself; each thread
+reports back when it finishes, opens its PR and keeps fixing CI and review comments on it. When
+the operator runs inside a thread instead, it asks the coordinator to start the thread
+(`get_channel_session_id`, then `send_message` with the filled-in task). Project settings once:
+**Thread model** Sonnet, **Thread effort** medium, coordinator Opus; paste
+`templates/project-instructions.md` into Project instructions. **In a plain claude.ai/code
+chat**, start workers with `create_session` (`model: claude-sonnet-5-5`, `outcome_branch` =
+the branch the task names) and check on them with `send_later` plus `subscribe_pr_activity`,
+because a finished session doesn't report back there.
 
 ## 1. Size the job first
 
@@ -41,7 +44,7 @@ PR's gate). Each gets a short brief: the goal, the files to read, what to return
 | Legal | `legal` skill + `legal-reviewer` agent; shops: `sell`'s `legal-de.md`; ads: `market` section 4 | Anthropic `privacy-legal` (DPIA, DPA review), `ip-legal` (trademark clearance, OSS licenses), `ai-governance-legal` | legal must-haves for the plan, then pass/fail on the preview |
 | Design | `frontend-design`, `impeccable`, `ui-review`, `design-critic` agent | `Figma` plugin when yskills designs there; Canva connector for social assets | 2-3 directions as screenshots, then reviews |
 | Build | builder threads (Sonnet); `architect`, `database-reviewer`, `build-error-resolver` on call | stack plugins via `toolbox` (Cloudflare, Stripe, Sentry, PostHog...) | a PR with green CI and a preview link |
-| QA | `evaluator` agent (Opus), `code-reviewer`, `a11y-architect`, `performance-optimizer` | | the 5/5 gate (`gate.md`) |
+| QA | `evaluator` agent, `code-reviewer`, `a11y-architect`, `performance-optimizer` | | the 5/5 gate (`gate.md`) |
 | Security | `security-reviewer` (reads the diff), `red-team` agent (attacks the preview like an outsider) | | check 4 of the gate; a full red-team pass before launch |
 | Launch | `publish` and `sell` skills, Sentry and PostHog through `toolbox` | | live site, errors and analytics on |
 | Marketing | `market` skill, `seo-specialist` agent | Anthropic `Marketing` plugin (campaign plan, SEO audit, performance report) | the one-page plan, launch posts, the weekly numbers |
@@ -71,8 +74,9 @@ Threads forget; the repo doesn't. Templates in `templates/`.
 ## 4. The run
 
 1. **Brainstorm once.** One batch of questions as tap cards (`AskUserQuestion` or decision cards),
-   including the `sell` skill's money questions when it sells. No more questions after this
-   batch except the three briefs.
+   including the `sell` skill's money questions when it sells and the Impressum data (name,
+   postal address, email, a second contact channel) when the site is public. No more questions
+   after this batch except the three briefs.
 2. **Research, in parallel subagents, one page each:**
    - **Inside:** what we already have. claude-setup's skills and catalog, the lessons table in
      its `docs/TEST-PROJECTS.md`, yskills' other repos with code to reuse (`list_repos`).
@@ -83,10 +87,13 @@ Threads forget; the repo doesn't. Templates in `templates/`.
      volume). No evidence → brief (a) recommends **no** or a smaller first version.
    - **Legal:** the `legal` skill's table for this idea (plus `sell` or `market` parts).
 3. **Plan.** `planner` (read-only) proposes the plan; the operator writes `PLAN.md` and
-   `features.json` from it (criteria per slice, each testable on a preview by clicking). The
-   operator creates the private repo itself (`create_repository`, then `add_repo`). Send **brief (a)**.
-4. **Scaffold + design.** One thread scaffolds the default stack (CLAUDE.md) with `publish`'s
-   setup, `verify`, CI. The design team shoots 2-3 directions. Send **brief (b)**; it carries
+   `features.json` from it (criteria per slice, each testable on a preview by clicking). Send
+   **brief (a)**; its one step for yskills is creating the private repo at
+   [github.com/new](https://github.com/new) with the plan's exact name (threads get 403 on
+   `create_repository`). Then `add_repo` it.
+4. **Scaffold + design.** One thread scaffolds ("Scaffold PLAN.md's app on branch `scaffold`:
+   the default stack from CLAUDE.md, the `publish` skill's files, `verify`, CI, legal pages
+   written per the `legal` skill. Open a PR, don't merge, stop."). The design team shoots 2-3 directions. Send **brief (b)**; it carries
    yskills' one-time setup from the `publish` skill (Cloudflare import, D1, Previews Base) and
    any test keys as numbered deep links, so nothing asks again later.
 5. **Build.** One fresh builder thread per slice (or one for a small site), at most three in
@@ -95,15 +102,20 @@ Threads forget; the repo doesn't. Templates in `templates/`.
    text, filled in: "Build slice <id> of PLAN.md; its criteria are in features.json (read only,
    never edit it). Read PLAN.md, PROGRESS.md and CLAUDE.md first. Write the tests first, then the
    code. Run ship-check. Push branch `slice/<id>` and open a PR with phone and desktop
-   screenshots, the preview link and a 3-line progress note in its body. Don't merge. Report
-   the PR link and stop." The first slice's task also says "commit the D1 ids from PROGRESS.md
+   screenshots and a 3-line progress note in its body. Don't merge. Keep fixing CI and the
+   review findings posted on the PR until it is merged or closed." The first slice's task also says "commit the D1 ids from PROGRESS.md
    into wrangler.jsonc". Only the operator writes `PROGRESS.md`: it copies the builder's note
-   from the PR and the thread's cost, so parallel builders never conflict.
+   from the PR and the thread's cost (`get_session`: `external_metadata.usage.cost_usd`), so parallel builders never conflict.
 6. **Gate each PR** in a fresh gate thread ("Run the operator skill's gate.md on PR <link>,
-   slice <id>"), so the verdict comes from a context that never saw the build. 5/5 merges. Less fixes and re-checks; after 3 failed rounds,
+   slice <id>"), so the verdict comes from a context that never saw the build. The preview URL
+   comes from the `Workers Builds` check or Cloudflare's PR comment, not from the builder. Less
+   than 5/5: the gate thread posts the blocking findings as one PR review and stops; the builder
+   fixes them and the next gate round starts on the new head. 5/5 merges. Less fixes and re-checks; after 3 failed rounds,
    stop and ping yskills with the evaluator's report.
-7. **Launch.** A full `red-team` and `legal-reviewer` pass on the preview, then **brief (c)**.
-   On ok, the go-live steps of `publish` (and `sell`).
+7. **Launch.** The last PR before launch (the only one for a small site) gets the full
+   `red-team` and `legal-reviewer` pass in its gate and does **not** merge at 5/5: send
+   **brief (c)** first, because merging to `main` is going live. On ok: merge, plus `sell`'s
+   go-live (section 4) when it sells.
 8. **Grow.** At launch, `create_trigger` a weekly routine (fresh session per run, jittered time).
    It collects the numbers (`market` skill's section 5) and opens one PR with that week's
    `metrics/` file and the best next step as a new slice with criteria in `features.json`; the
@@ -121,9 +133,9 @@ The three briefs are in `briefs.md`. One message each, fixed template, ok/no ans
 
 ## 5. Spend little
 
-- **Models.** Coordinator and evaluator: Opus (the evaluator's skepticism is the one judgment
-  Anthropic kept on its strongest model; its agent file pins it). Threads: Sonnet at medium
-  effort via Project settings, not the default Opus/high. Reviewer agents run on Sonnet.
+- **Models.** The coordinator on Opus; everything else on Sonnet: threads at medium effort via
+  Project settings (not the default Opus/high), and every agent including the evaluator, which
+  follows a fixed checklist. Built-in subagents default to Sonnet too (`CLAUDE_CODE_SUBAGENT_MODEL`).
 - **Fresh context.** Reviewers and the evaluator get only the diff or the URL plus the criteria,
   never the chat. A thread lives for one job (one plan or one PR) and then closes.
 - **Never revive a worker thread idle for more than an hour**: its cache is gone and it re-reads

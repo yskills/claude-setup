@@ -15,6 +15,7 @@ Größe: <small site: 1 build | app: n slices, riskiest first: <slice 1>>
 Slices: 1. <name> 2. <name> ...
 Rechtliches: <must-haves from the legal team, e.g. Impressum, Datenschutz, no cookie banner needed>
 Keys: <none | the list; you add them with brief (b)>
+Repo: create `<name>` (private) at https://github.com/new, then reply ok
 Kosten: ~<€/month to run> + ~<tokens or $ to build>, estimate
 Risiko: <the one thing most likely to fail>
 

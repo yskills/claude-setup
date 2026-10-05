@@ -25,12 +25,14 @@ A check that doesn't apply counts as passed; say so in the table.
 ## Rounds
 
 - **5/5:** the gate thread commits the evaluator's verdict into `features.json` on the PR branch.
-  A commit that touches only `features.json` doesn't restart checks 2-5: wait for check 1 on
-  its SHA, then merge (squash) and archive the builder thread. Any other new commit restarts the
-  gate. GitHub doesn't let an
-  author approve their own PR and threads push as yskills, so the merge is the approval.
-- **Less than 5/5:** the builder fixes every blocking finding, then the failed checks run
-  again, each with a **fresh** agent. That is one round.
+  A commit that touches only `features.json` doesn't restart checks 2-5: wait for check 1 on its
+  SHA, then merge (squash). Any other new commit restarts the gate. GitHub doesn't let an author
+  approve their own PR and threads push as yskills, so the merge is the approval.
+- **Last PR before launch:** don't merge at 5/5. Merging to `main` is going live, so it waits
+  for brief (c)'s ok.
+- **Less than 5/5:** post the blocking findings as one PR review and stop. The builder (still
+  watching its PR) fixes them; the next round runs the failed checks again on the new head, each
+  with a **fresh** agent.
 - **3 failed rounds:** stop. Send yskills one message: the PR link, which check keeps failing,
   the evaluator's or reviewer's last report, and two or three ways forward as tap options.
 

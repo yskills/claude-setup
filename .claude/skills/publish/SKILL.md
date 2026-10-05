@@ -23,10 +23,9 @@ No deploy keys in GitHub, in the cloud environment or in chat.
 
 ## A new project
 
-The operator creates the **private** repo itself (`create_repository`, then `add_repo`). The
-steps below go into brief (b), after the scaffold, as numbered deep links, so yskills does them in one sitting.
-Threads can open the previews only because the cloud environment allows
-`*.yskills.workers.dev` (README, Network access); a new account subdomain needs adding there.
+yskills creates the **private** repo at [github.com/new](https://github.com/new) in brief (a)
+(threads get 403 on `create_repository`); Claude adds it with `add_repo`. The steps below go into
+brief (b), after the scaffold, as numbered deep links, so yskills does them in one sitting.
 
 yskills, once:
 

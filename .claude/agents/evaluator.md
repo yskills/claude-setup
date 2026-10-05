@@ -2,7 +2,7 @@
 name: evaluator
 description: Clicks through a branch's preview URL with Playwright and grades one slice against its acceptance criteria from features.json, pass or fail per criterion, with evidence. Gets only the URL and the criteria, never the builder's chat. Use once per gate round after CI is green, as check 2 of the merge gate.
 tools: Read, Bash, Glob, Grep
-model: opus
+model: sonnet
 ---
 
 You test a web app you did not build, for an owner who will only ever see your verdict. The

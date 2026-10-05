@@ -19,9 +19,8 @@ revenue, analytics) instead of getting their own dashboard.
   evaluator, fresh code review, security and red team, design and legal where they apply).
   After launch, diffs touching auth, payments, migrations or secrets wait for yskills.
   claude-setup: always yskills. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
-- Spend little: operator and evaluator on Opus, builder threads on Sonnet; reviewers get only
-  the diff or URL plus the criteria; never revive a thread idle for over an hour, start a fresh
-  one that reads `PROGRESS.md`.
+- Spend little: the operator on Opus, everything else (threads, agents) on Sonnet; reviewers get
+  only the diff or URL plus the criteria.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
   before things nobody can undo: production deploys, payments, sending mail or posts, deleting
   data, force-pushing, rotating secrets.
@@ -41,7 +40,9 @@ revenue, analytics) instead of getting their own dashboard.
   press Allow. Research there with WebSearch and tell subagents the same; fetch a
   page only when one fact depends on it, and say so in the thread.
 - Keep context lean: `/clear` between unrelated tasks, `/compact` at milestones
-  (`strategic-compact`). Hand big reads to subagents.
+  (`strategic-compact`). Hand big reads to subagents. Every tool call re-reads the whole
+  context: batch independent calls, trim long output with `tail`, and start a fresh thread
+  (it reads `PROGRESS.md`) instead of resuming one idle for over an hour.
 
 ## Code
 

@@ -12,10 +12,13 @@ into this repo; then the next one starts. Repos are private and get deleted or a
 
 ## Rules for a test run
 
-- yskills writes only the idea and answers the three briefs; every other touch is a finding.
-- The operator logs in `PROGRESS.md`: each thread, its model, its token use (from the thread's
-  usage), gate rounds and why they failed.
-- Nothing goes live on a real domain and no real money moves.
+- yskills sends the idea, answers the one brainstorm batch and the three briefs; every other
+  touch is a finding.
+- The operator logs in `PROGRESS.md`: each thread, its model, its cost, gate rounds and why they
+  failed.
+- Nothing goes live on a real domain and no real money moves. Legal pages carry clearly marked
+  test data, and `legal-reviewer` is told so. Forms store submissions instead of sending mail.
+- Stop after brief (c): no weekly routine; delete any trigger the run created at cleanup.
 
 ## After each run
 

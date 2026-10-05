@@ -33,7 +33,7 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 |---|---|---|
 | `CLAUDE.md` | How Claude works for you: owns tasks end to end, verifies before pushing, screenshot-reviews UI, your default stack | `CLAUDE.md` |
 | Settings | Auto permission mode, safe allow list, asks before force-push and deploys, never reads `.env` files, high effort, status line with context bar | `global/settings.json` |
-| 16 plugins on | superpowers, frontend-design, code-review, security-guidance, TypeScript and Python LSP, Context7, Playwright, Chrome DevTools, commit-commands, code-simplifier, feature-dev, claude-md-management, claude-code-setup, skill-creator, claude-api | official Anthropic marketplaces, `config/plugins.json` |
+| 13 plugins on | superpowers, frontend-design, security-guidance, TypeScript and Python LSP, Context7, Playwright, commit-commands, code-simplifier, feature-dev, claude-md-management, claude-code-setup, skill-creator (`/code-review` and the `claude-api` skill are built into Claude Code now) | official Anthropic marketplaces, `config/plugins.json` |
 | 7 plugins per project | Cloudflare, Firebase, Stripe, Sentry, PostHog, Supabase, Vercel: installed but off; a repo turns one on in its `.claude/settings.json` | same |
 | 17 ECC skills | Vue, Nuxt 4, Vite, API design, security review, e2e, SEO, i18n... | `.claude/skills`, list in `config/ecc.json` |
 | 15 ECC agents | planner, architect, code/TS/Vue/security/database reviewers, build-error-resolver, e2e-runner, a11y, performance, SEO... | `.claude/agents` |
@@ -55,7 +55,9 @@ Threads in a Claude project run in the cloud, not on your machine. Add this repo
 project (Project settings, Repositories) and every thread loads `CLAUDE.md` and all skills,
 agents and rules from `.claude/`, the same files the installer copies.
 
-Per project, once: in Project settings set **Thread model** Sonnet and **Thread effort** medium
+Per project, once: install the Claude GitHub App on
+[all repositories](https://github.com/apps/claude/installations/select_target) so new project
+repos are reachable, then in Project settings set **Thread model** Sonnet and **Thread effort** medium
 (the default is Opus at high effort), and paste
 [`operator/templates/project-instructions.md`](.claude/skills/operator/templates/project-instructions.md)
 into Project instructions.
@@ -64,11 +66,11 @@ Plugins and network need a [cloud environment](https://code.claude.com/docs/en/c
 (Project settings > Cloud environment > Add cloud environment). Pick the same one in every
 project that uses this setup.
 
-- **Setup script:** paste [`cloud/setup.sh`](cloud/setup.sh). Without it a thread reads this
-  repo's plugins only when it runs inside this repo, and even then 3 of the 16 were missing. It
-  installs 15 of the 16 at user scope (Context7 stays PC-only: it asks for a sign-in a thread
-  can't do); the result is cached and rebuilt about weekly, so threads do
-  not pay for it each time. Plugin tools connect a few seconds after a thread starts.
+- **Setup script:** paste [`cloud/setup.sh`](cloud/setup.sh). It installs 11 of the 13 global
+  plugins at user scope (Context7 and skill-creator stay on the PC: Context7 asks for a sign-in a
+  thread can't do, and threads have Anthropic's skill-creator built in) and makes built-in
+  subagents default to Sonnet. The result is cached and rebuilt about weekly, so threads don't
+  pay for it each time. Plugin tools connect a few seconds after a thread starts.
 - **Network access:** Custom, tick "Also include default list of common package managers", and
   add:
   - `cdn.jsdelivr.net`, `unpkg.com` (CDN scripts, e.g. GSAP for HyperFrames)

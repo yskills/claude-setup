@@ -31,7 +31,7 @@ plugins). Always-on token costs were measured with `claude plugin details`; see
 - **mattpocock-skills** (1.6k tokens, 25 skills) overlaps superpowers: left out; easy to add.
 - **posthog** costs ~30k tokens always-on, so it and the other product plugins (Stripe,
   Cloudflare, Sentry, Firebase, Supabase, Vercel) are installed but off, enabled per project.
-- `chrome-devtools-mcp` is the correct plugin name (some blogs say `chrome-devtools`).
+- `chrome-devtools-mcp` was dropped on 2026-10-05: Playwright covers headless checks, and the two together loaded ~54 browser tools. `code-review` and `claude-api` were dropped the same day because Claude Code bundles them.
 
 Sources: [Anthropic marketplaces](https://code.claude.com/docs/en/plugins/anthropic-marketplaces),
 [discover plugins](https://code.claude.com/docs/en/discover-plugins),
