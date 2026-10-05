@@ -1,5 +1,7 @@
 # The 5/5 merge gate
 
+Run by a fresh gate thread per PR (or, in a plain chat, by the operator with fresh subagents).
+
 Five pass/fail checks, never a star score: AI judges grade their own team's work too kindly, so
 each check is a hard yes or no from someone who did not write the code.
 
@@ -17,12 +19,12 @@ A check that doesn't apply counts as passed; say so in the table.
 - The scaffold PR (before yskills connects Workers Builds in brief (b)) merges on CI alone,
   checks 2-5 n/a.
 - Once branch builds are off (live payment keys, `publish` skill), check 1 is CI alone, and the
-  operator runs the PR's build locally (`wrangler dev` with the local preview D1) so the
+  gate thread runs the PR's build locally (`wrangler dev` with the local preview D1) so the
   evaluator, red team and legal reviewer use that URL instead.
 
 ## Rounds
 
-- **5/5:** the operator commits the evaluator's verdict into `features.json` on the PR branch.
+- **5/5:** the gate thread commits the evaluator's verdict into `features.json` on the PR branch.
   A commit that touches only `features.json` doesn't restart checks 2-5: wait for check 1 on
   its SHA, then merge (squash) and archive the builder thread. Any other new commit restarts the
   gate. GitHub doesn't let an

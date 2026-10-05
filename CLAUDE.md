@@ -15,7 +15,7 @@ revenue, analytics) instead of getting their own dashboard.
   check (`docs/WORKFLOW.md`, Learning) moves lasting notes into the repo and deletes the rest.
 - New app idea or "continue the project": follow the `operator` skill. It sizes the job, writes
   acceptance criteria before building, and sends yskills exactly three ok/no briefs.
-- Merging: the operator merges an app PR when the `operator` skill's 5/5 gate passes (CI,
+- Merging: a fresh gate thread merges an app PR when the `operator` skill's 5/5 gate passes (CI,
   evaluator, fresh code review, security and red team, design and legal where they apply).
   After launch, diffs touching auth, payments, migrations or secrets wait for yskills.
   claude-setup: always yskills. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).

@@ -55,6 +55,11 @@ Threads in a Claude project run in the cloud, not on your machine. Add this repo
 project (Project settings, Repositories) and every thread loads `CLAUDE.md` and all skills,
 agents and rules from `.claude/`, the same files the installer copies.
 
+Per project, once: in Project settings set **Thread model** Sonnet and **Thread effort** medium
+(the default is Opus at high effort), and paste
+[`operator/templates/project-instructions.md`](.claude/skills/operator/templates/project-instructions.md)
+into Project instructions.
+
 Plugins and network need a [cloud environment](https://code.claude.com/docs/en/cloud-environments)
 (Project settings > Cloud environment > Add cloud environment). Pick the same one in every
 project that uses this setup.

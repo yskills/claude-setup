@@ -5,11 +5,19 @@ description: Run a project from idea to live app with the least of yskills' time
 
 # Operator
 
-The operator is the project's plan thread (Opus). It never builds. It decides what is needed,
+The operator is the **project conversation** of a Claude Project (the coordinator), or in a plain
+chat the chat itself. It never builds. It decides what is needed,
 hands each job to a fresh worker with only the files that job needs, checks the result against
 fixed criteria and keeps pushing until the goal in `PLAN.md` is live. Shape from Anthropic's
 long-running-agent harness (planner, generator, evaluator; progress in files; a fresh context per
 job) and the ECC hackathon winner's flow; sources in claude-setup `docs/RESEARCH.md`.
+
+**In a Claude Project** (preferred) the project starts threads itself: ask it to start a thread
+for a job and it does, each thread reports back when it finishes, opens its PR and fixes its own
+CI. Project settings once: **Thread model** Sonnet, **Thread effort** medium, coordinator Opus;
+paste `templates/project-instructions.md` into Project instructions. **In a plain chat**, start
+workers with `create_session` (pass `model`) and check on them with `send_later`, because a
+finished session doesn't report back there.
 
 ## 1. Size the job first
 
@@ -24,8 +32,8 @@ in past projects went to threads re-reading their own history (`docs/RESEARCH.md
 
 ## 2. The teams
 
-Workers are subagents (inside the operator thread, for reviews and research) or fresh project
-threads (for building). Each gets a short brief: the goal, the files to read, what to return.
+Workers are subagents (for research and reviews) or fresh threads (for building and for each
+PR's gate). Each gets a short brief: the goal, the files to read, what to return.
 
 | Team | Who (always on) | Add-ons, per project only when the plan needs them | Brings back |
 |---|---|---|---|
@@ -52,7 +60,7 @@ Threads forget; the repo doesn't. Templates in `templates/`.
 - `PLAN.md`: for yskills. The PRD with locked decisions, the slices, the marketing plan, the
   keys list, the cost estimate.
 - `features.json`: for agents. Every slice with its acceptance criteria, written **before** the
-  slice is built. Builders never touch it; the operator records the evaluator's verdict in it
+  slice is built. Builders never touch it; the gate thread records the evaluator's verdict in it
   (`passes`) on the PR branch. JSON because agents edit it less casually than Markdown.
 - `PROGRESS.md`: the handoff between threads. What is done, what is next, what broke, which
   decision was made and why, and what each thread cost. Every thread reads it first; only
@@ -83,46 +91,42 @@ Threads forget; the repo doesn't. Templates in `templates/`.
    any test keys as numbered deep links, so nothing asks again later.
 5. **Build.** One fresh builder thread per slice (or one for a small site), at most three in
    parallel, each reading only `PLAN.md`, its slice in `features.json` and `PROGRESS.md`. Test
-   first, then build, `ship-check`, PR with screenshots and the preview link. Mechanics:
-   - start it with `create_session` (`source_url` = the project repo, `model` = Sonnet; effort
-     can't be set per session) and this prompt, filled in: "Build slice <id> of PLAN.md; its
-     criteria are in features.json (read only, never edit it). Read PLAN.md, PROGRESS.md and
-     CLAUDE.md first. Write the tests first, then the code. Run ship-check. Push branch
-     `slice/<id>` and open a PR with phone and desktop screenshots, the preview link and a
-     3-line progress note in its body. Then stop." The first slice's prompt also says "commit
-     the D1 ids from PROGRESS.md into wrangler.jsonc";
-   - one `send_later` check-in after about 50 minutes (a finished child session doesn't report
-     back): find the PR by branch `slice/<id>`, `subscribe_pr_activity` on it and gate it. No PR
-     yet: check again once; still none, ping yskills with the session link;
-   - only the operator writes `PROGRESS.md`: it copies the builder's progress note from the PR
-     and adds the session's cost (`get_session`, `usage.cost_usd`), so parallel builders never
-     conflict.
-6. **Gate each PR** with `gate.md`. 5/5 merges. Less fixes and re-checks; after 3 failed rounds,
+   first, then build, `ship-check`, PR with screenshots and the preview link. The builder's task
+   text, filled in: "Build slice <id> of PLAN.md; its criteria are in features.json (read only,
+   never edit it). Read PLAN.md, PROGRESS.md and CLAUDE.md first. Write the tests first, then the
+   code. Run ship-check. Push branch `slice/<id>` and open a PR with phone and desktop
+   screenshots, the preview link and a 3-line progress note in its body. Don't merge. Report
+   the PR link and stop." The first slice's task also says "commit the D1 ids from PROGRESS.md
+   into wrangler.jsonc". Only the operator writes `PROGRESS.md`: it copies the builder's note
+   from the PR and the thread's cost, so parallel builders never conflict.
+6. **Gate each PR** in a fresh gate thread ("Run the operator skill's gate.md on PR <link>,
+   slice <id>"), so the verdict comes from a context that never saw the build. 5/5 merges. Less fixes and re-checks; after 3 failed rounds,
    stop and ping yskills with the evaluator's report.
 7. **Launch.** A full `red-team` and `legal-reviewer` pass on the preview, then **brief (c)**.
    On ok, the go-live steps of `publish` (and `sell`).
 8. **Grow.** At launch, `create_trigger` a weekly routine (fresh session per run, jittered time).
    It collects the numbers (`market` skill's section 5) and opens one PR with that week's
    `metrics/` file and the best next step as a new slice with criteria in `features.json`; the
-   operator merges docs-only PRs on CI alone. If the step fits in one slice it starts a fresh
-   operator (`create_session`) to build it; anything bigger goes to yskills as tap options.
+   operator merges docs-only PRs on CI alone and starts a builder thread for a step that fits in
+   one slice; anything bigger goes to yskills as tap options.
 9. **Learn.** Anything yskills corrects, any gate round that failed for a reason a rule could
    catch, and anything a test project taught goes into claude-setup (a rule in CLAUDE.md, a skill
    line, a test or a check) in a small PR.
 
-**Waiting on yskills.** Before sending a brief, write the state to `PROGRESS.md`. If the answer
-comes back after more than an hour, don't continue in the cold thread: start a fresh operator
-(`create_session`, "continue the project: brief <x> answered <ok/no>, read PROGRESS.md") and stop.
+**Waiting on yskills.** Before sending a brief, write the state to `PROGRESS.md`. A project
+conversation works from recent messages and memory, so it can simply continue. A plain chat
+idle for more than an hour hands off instead: a fresh session reads `PROGRESS.md`.
 
 The three briefs are in `briefs.md`. One message each, fixed template, ok/no answer.
 
 ## 5. Spend little
 
-- **Models.** Operator and evaluator: Opus (the evaluator's skepticism is the one judgment
-  Anthropic kept on its strongest model). Builder threads: Sonnet. Reviewer agents run on Sonnet.
+- **Models.** Coordinator and evaluator: Opus (the evaluator's skepticism is the one judgment
+  Anthropic kept on its strongest model; its agent file pins it). Threads: Sonnet at medium
+  effort via Project settings, not the default Opus/high. Reviewer agents run on Sonnet.
 - **Fresh context.** Reviewers and the evaluator get only the diff or the URL plus the criteria,
   never the chat. A thread lives for one job (one plan or one PR) and then closes.
-- **Never revive a thread idle for more than an hour**: its cache is gone and it re-reads
+- **Never revive a worker thread idle for more than an hour**: its cache is gone and it re-reads
   everything. Start a fresh one that reads `PROGRESS.md`.
 - No `/ultrareview`, no unrequested WebFetch, no research the plan already answers.
 - The evaluator runs once per gate round, never in a fix-until-pass loop of its own.
