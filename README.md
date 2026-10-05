@@ -13,7 +13,8 @@ Needs Node 20+ (24 recommended), Git and Claude Code.
 git clone https://github.com/yskills/claude-setup ~/claude-setup && node ~/claude-setup/install.mjs
 ```
 
-Windows (PowerShell) is the same command with `$HOME` instead of `~`.
+Windows: use PowerShell 7 with `$HOME` instead of `~`. In Windows PowerShell 5.1 (no `&&`), run
+`git clone ...` first, then `node ...install.mjs`, and split the update command below the same way.
 
 Update later:
 
@@ -82,8 +83,9 @@ project that uses this setup.
 
 On your PC, `global/settings.json` lets Claude read the official docs of your stack (Nuxt, Vue,
 Cloudflare, Stripe, GitHub, MDN, German law texts...) without asking each time. Cloud threads
-still ask before opening a link nobody posted in the chat. That check belongs to the cloud
-service, and whether these settings skip it there is untested.
+don't get these settings (the setup script installs plugins and one env key, not the permission
+list), so there a link nobody posted
+in the chat still asks before it opens; threads research with WebSearch instead.
 
 ## Using it
 
