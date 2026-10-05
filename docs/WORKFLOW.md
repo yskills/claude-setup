@@ -42,12 +42,12 @@ its plan or its PR.
 
 | Step | What happens | You do |
 |---|---|---|
-| 1. Plan thread | One thread runs research subagents (competitors, money, legal, tech) and the `planner` agent, instead of separate research and plan threads that would each re-read everything. It researches competitors, monetization (ads, premium, in-app), legal (DSGVO, cookie consent, licensing) and the tech risks. It writes `PLAN.md` in the repo: the PRD with locked decisions, the slices (step 4) and a one-page marketing plan (who buys, positioning, 90-day goal, channels, budget). The same batch lists every key the project needs, each with its deep link and exact GitHub secret name, so nothing stalls mid-build. | Answer **one** batch of questions; add the keys in GitHub |
+| 1. Plan thread | One thread runs research subagents (competitors, money, legal, tech) and the `planner` agent, instead of separate research and plan threads that would each re-read everything. It researches competitors, monetization (ads, premium, in-app), legal (DSGVO, cookie consent, licensing) and the tech risks. It writes `PLAN.md` in the repo: the PRD with locked decisions, the slices (step 4) and a one-page marketing plan (who buys, positioning, 90-day goal, channels, budget). The same batch lists every key the project needs, each with its deep link and exact secret name (`publish` skill), so nothing stalls mid-build. | Answer **one** batch of questions; add the keys in Cloudflare |
 | 2. Scaffold | The default stack from CLAUDE.md is scaffolded with Node pinned, a `verify` script, CI, CLAUDE.md, security headers and a deploy target. Toolchain problems are solved here once, not halfway through. | Nothing |
 | 3. Design first | 2 or 3 directions are shown as real screenshots at phone and desktop size. | Pick one |
 | 4. Slices | `PLAN.md` lists vertical slices, the riskiest first. Then the plan thread closes. | Approve the slice list |
 | 5. Each slice | One fresh thread per slice, reading only `PLAN.md` and its slice; independent slices run in parallel, three at most. Test first, then build. Screenshots are scored against the design by `design-critic`. Then `ship-check` (fresh reviewers until clean), a PR with screenshots and the preview link, and green CI. The project chat gets one line per merged slice or blocker. | Merge after launch (see below) |
-| 6. Launch | Deploy through GitHub Actions, analytics (PostHog), errors (Sentry), payments (`sell` skill's go-live list) and ads. Numbers report into Luna's cockpit. | Swap test keys for live ones and approve the go-live |
+| 6. Launch | Deploy through Cloudflare Workers Builds (`publish` skill), analytics (PostHog), errors (Sentry), payments (`sell` skill's go-live list) and ads. Numbers report into Luna's cockpit. | Swap test keys for live ones and approve the go-live |
 | 7. Market | The marketing plan from the PRD (`market` skill) runs: landing page and waitlist 4 weeks before launch, short videos and posts, launch day, then ads only on the message that sells. | Approve each week's batch of posts; connect accounts; pay for ads |
 | 8. Measure | A weekly routine reports which channel and post brought paying users, cost per sale, and next week's 3 actions; numbers go into Luna. | Read it, pick |
 | 9. Learn | Every correction you make becomes a rule, test or hook, so it doesn't come back. | Nothing |
@@ -78,18 +78,16 @@ Once, before your first real sale (the skill links each step):
 - Physical products: a Sendcloud account, plus LUCID and a packaging licence before the first
   parcel.
 
-Shop keys go into the repo's GitHub environment `production`, which only `main` can read, and
-the deploy copies them into Cloudflare. The deploy token sits there too; PR previews get a
-second token that can only touch the preview copy. Every deploy runs in GitHub, never from a
-thread. Test keys first, live keys at go-live.
-After adding or changing a key, press Run workflow on the repo's Actions page: Claude in cloud
-threads can't start a run (GitHub answers 403), so the key would otherwise wait for the next merge.
+Deploys run through Cloudflare Workers Builds (`publish` skill): `main` goes live, every other
+branch gets its own preview with its own data and keys, and GitHub holds no keys. Threads never
+deploy themselves. Test keys first, live keys at go-live, and branch builds go off before the
+first live key.
 
 ### Security, always on
 - `security-guidance` warns while code is being written.
 - ECC hooks block secrets and `--no-verify` at commit time (on your PC; cloud threads don't run them).
 - `security-reviewer` checks auth, payment and input changes.
-- GitHub secret scanning and `npm audit` are worth turning on per project; the `sell` CI template doesn't add them.
+- GitHub secret scanning and `npm audit` are worth turning on per project; the `verify` CI doesn't add them.
 
 ### What would have changed for TellMeY
 - **Toolchain:** the Node 20 / F5 hunt in phase 0 would already be solved by the template.

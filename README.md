@@ -70,14 +70,10 @@ project that uses this setup.
   - `*.yskills.workers.dev` (your own live sites and PR previews, so threads can open and
     screenshot what they deployed; blocked otherwise)
   - `*.youtube.com`, `*.googlevideo.com`, only if threads work on video
-- **Deploys run only in GitHub.** `CLOUDFLARE_API_TOKEN` in the main-only `production`
-  environment deploys the live site; `PREVIEW_CLOUDFLARE_API_TOKEN`, limited to the
-  `<name>-preview` Worker, gives every PR a preview link (the `sell` skill's `keys.md` and
-  `templates/ci.yml`), so PR code never reaches the live site. A Cloudflare
-  key in the cloud environment is only for threads to check the account: `wrangler deploy`
-  through the cloud proxy fails, because the proxy replaces Workers' asset-upload token (401).
-  A thread can't start an Actions run itself (GitHub answers 403), so after adding a key you
-  press Run workflow. Optional: a Stripe *test* key as an API credential
+- **No deploy keys here.** Cloudflare Workers Builds deploys `main` and gives every other branch
+  its own preview (the `publish` skill); GitHub only runs `verify` and holds no keys. Threads never
+  deploy themselves: `wrangler deploy` through the cloud proxy fails, because the proxy replaces
+  Workers' asset-upload token (401). Optional: a Stripe *test* key as an API credential
   for `api.stripe.com` (Pro/Max plans); the proxy adds it and Claude never sees it.
 
 On your PC, `global/settings.json` lets Claude read the official docs of your stack (Nuxt, Vue,

@@ -62,9 +62,8 @@ Stripe only takes the money. Stripe.js never loads on our pages either.
 | `server/api/checkout/confirm.post.ts` | same | Return page check |
 | `server/api/stripe/webhook.post.ts` | same | Paid, SEPA, failed, expired, refunded, disputed |
 | `server/migrations/0001_orders.sql` | the D1 `migrations_dir` | `orders` table |
-| `scripts/deploy.mjs` | `scripts/` | Token check (`--check`: can it create a Worker, not just read), D1, migrations, deploy, Worker secrets, a fresh Stripe webhook. `SITE_URL` for a custom domain. `--preview` updates the PR preview Worker |
-| `ci.yml` | `.github/workflows/` | Verify on PRs, a preview link per PR (`ci.yml` comments say how `env.preview` must look); deploy from `main` with the `production` environment |
-| `tests/wrangler-config.test.ts` | `tests/unit/` | `wrangler.jsonc` stays plain JSON, `env.preview` repeats the D1 and ratelimits bindings (wrangler envs inherit none), and no binding that names its resource in the config (KV, R2, queues, services) sneaks in |
+| `scripts/deploy.mjs` | `scripts/` | Token check (`--check`: can it create a Worker, not just read), D1, migrations, deploy, Worker secrets, a fresh Stripe webhook. `SITE_URL` for a custom domain |
+| `ci.yml` | `.github/workflows/` | Verify on PRs; deploy from `main` with the `production` environment |
 | `tests/shop.spec.ts` | `tests/e2e/` | Signed fake webhooks against `wrangler dev`, order validation, and real sessions against stripe-mock |
 | `playwright.config.ts` | project root | Starts `wrangler dev` with the test webhook secret, plus the stripe-mock vars when `STRIPE_MOCK` is set |
 
@@ -84,20 +83,12 @@ Before launch, add a Cloudflare rate-limiting rule on `/api/checkout*` in the zo
 Security → WAF settings. Without it, anyone can loop the endpoint, filling D1 and burning the
 Stripe API rate limit.
 
-On `*.workers.dev`, every Worker of the account is same-site (`workers.dev` is on the Public
-Suffix List, the account's subdomain is not; from duo-test's security review), so SameSite cookies don't stop a sibling Worker from posting to the shop.
-Add a check to every non-GET API route except the Stripe webhook (Stripe sends no `Origin`; its
-signature guards it): `Origin` (or `Sec-Fetch-Site: same-origin`) must match `SITE_URL`, else
-refuse. On a custom domain this is a backstop rather than the only guard.
-
 ## Wiring
 
 - `wrangler.jsonc` needs:
   - `"compatibility_flags": ["nodejs_compat"]`
   - a D1 binding `DB`
-  - `migrations_dir` pointing at the migrations
-  - an `env.preview` block for PR previews, repeating the D1 and ratelimits bindings (`ci.yml` comments show it and why others need care;
-    `tests/wrangler-config.test.ts` checks it). Keep the file plain JSON, no comments.
+  - `migrations_dir` pointing at the migrations.
 - `package.json` needs `"deploy": "node scripts/deploy.mjs"` and a `verify` script that runs
   typecheck, unit tests, build and the e2e tests.
 - `wrangler.jsonc` `vars`: `SITE_URL` is the canonical `https://` address. Links and email

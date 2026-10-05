@@ -4,7 +4,6 @@
 // in RUNTIME_KEYS is optional. Based on yskills/duo-test; set the names below to wrangler.jsonc's.
 // Before anything else it checks the token can create a Worker, not just read one: on 2026-10-03
 // a token that could list Workers and D1 got 403 on its first deploy.
-// `--preview` updates the Worker that PR previews are versions of (see deployPreviewWorker).
 import { spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
@@ -12,7 +11,6 @@ import Stripe from 'stripe'
 
 const WORKER = 'shop'
 const DB_NAME = 'shop'
-const PREVIEW = `${WORKER}-preview`
 const RUNTIME_KEYS = ['STRIPE_SECRET_KEY', 'SENDCLOUD_PUBLIC_KEY', 'SENDCLOUD_SECRET_KEY', 'RESEND_API_KEY']
 /** Random secrets made once and never shown, e.g. BETTER_AUTH_SECRET when the app has logins. */
 const GENERATED = []
@@ -112,14 +110,14 @@ async function registerSubdomain() {
  * work, with a message that names the permission. It also gives wrangler's pre-deploy secrets
  * check a Worker to read, which a first deploy otherwise dies on.
  */
-async function ensureWorker(name = WORKER) {
+async function ensureWorker() {
   const { body } = await cloudflare('workers/scripts')
-  if (body?.result?.some((script) => script.id === name)) return
+  if (body?.result?.some((script) => script.id === WORKER)) return
   const form = new FormData()
   form.append('metadata', JSON.stringify({ main_module: 'index.mjs', compatibility_date: '2026-01-01' }))
   const code = "export default { fetch: () => new Response('Deploying', { status: 503 }) }"
   form.append('index.mjs', new Blob([code], { type: 'application/javascript+module' }), 'index.mjs')
-  const { status, body: created } = await cloudflare(`workers/scripts/${name}`, { method: 'PUT', body: form })
+  const { status, body: created } = await cloudflare(`workers/scripts/${WORKER}`, { method: 'PUT', body: form })
   if (status !== 200) throw tokenError([`Account > Workers Scripts > Edit on all Workers (HTTP ${status} creating the Worker: ${created?.errors?.[0]?.message ?? 'no detail'})`])
 }
 
@@ -131,49 +129,37 @@ function ensureDatabase(name) {
   return db.uuid
 }
 
-/**
- * Points the DB binding of the top level (env undefined) or of an env at its database, in this
- * checkout only. The ids are never committed: a PR preview upload then inherits the binding from
- * the deployed Worker and needs no D1 permission. Committing `"database_id": ""` instead breaks
- * that upload ("DB bindings must have a database_id field"). wrangler.jsonc must stay plain JSON.
- */
-function writeDatabase(env, name, id) {
-  const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'))
-  const target = env ? config.env[env] : config
-  target.d1_databases = target.d1_databases.map((db) => (db.binding === 'DB' ? { ...db, database_name: name, database_id: id } : db))
-  writeFileSync('wrangler.jsonc', `${JSON.stringify(config, null, 2)}\n`)
+function writeDatabaseId(name, id) {
+  const config = readFileSync('wrangler.jsonc', 'utf8')
+  const pattern = new RegExp(`("database_name": "${name}",)(\\s*"database_id": "[^"]*",)?`)
+  if (!pattern.test(config)) throw new Error(`wrangler.jsonc needs "database_name": "${name}", followed by another property`)
+  writeFileSync('wrangler.jsonc', config.replace(pattern, `$1\n      "database_id": "${id}",`))
 }
 
 /**
- * The Worker that PR previews are versions of: `env.preview` in wrangler.jsonc, with its own
- * empty D1 and no shop keys, so PR code never touches live data. Every deploy from main brings it
- * up to date; CI's preview job uploads each PR as a version of it, with a token that can edit
- * this one Worker only. That token's scope can only be picked once the Worker exists, so the
- * first main deploy creates it.
+ * The PR previews' own Worker (`env.preview` in wrangler.jsonc) with its own empty D1 and no
+ * shop keys. CI's preview job uploads versions of it with a token limited to this one Worker,
+ * so code on a PR branch can never reach the live Worker, its data or its keys.
  */
-async function deployPreviewWorker() {
-  await ensureWorker(PREVIEW)
-  writeDatabase('preview', PREVIEW, ensureDatabase(PREVIEW))
+function deployPreviewWorker() {
+  const name = `${DB_NAME}-preview`
+  writeDatabaseId(name, ensureDatabase(name))
   wrangler(['d1', 'migrations', 'apply', 'DB', '--remote', '--env', 'preview'])
   wrangler(['deploy', '--env', 'preview'])
-  // Only after the deploy: Cloudflare refuses a secret edit while a PR version is the newest one.
-  const secrets = existingSecrets(PREVIEW)
-  for (const name of GENERATED) if (!secrets.includes(name)) putSecret(name, randomBytes(32).toString('hex'), PREVIEW)
-  console.log(`Updated the PR preview Worker ${PREVIEW}`)
 }
 
 /** Secret names already on the worker. Only "worker not found" (first deploy) counts as none. */
-function existingSecrets(worker = WORKER) {
+function existingSecrets() {
   try {
-    return JSON.parse(wrangler(['secret', 'list', '--name', worker, '--format', 'json'])).map((s) => s.name)
+    return JSON.parse(wrangler(['secret', 'list', '--name', WORKER, '--format', 'json'])).map((s) => s.name)
   } catch (error) {
     if (/10007|not found|does not exist/i.test(error.output ?? '')) return []
     throw error
   }
 }
 
-function putSecret(name, value, worker = WORKER) {
-  wrangler(['secret', 'put', name, '--name', worker], value)
+function putSecret(name, value) {
+  wrangler(['secret', 'put', name, '--name', WORKER], value)
 }
 
 async function stripe(path, method = 'GET', form) {
@@ -209,7 +195,7 @@ async function main() {
   await ensureWorker()
   // CI runs `deploy.mjs --check` before the build, so a bad token fails in seconds.
   if (process.argv.includes('--check')) return console.log('Cloudflare token can deploy.')
-  writeDatabase(undefined, DB_NAME, ensureDatabase(DB_NAME))
+  writeDatabaseId(DB_NAME, ensureDatabase(DB_NAME))
   wrangler(['d1', 'migrations', 'apply', 'DB', '--remote'])
   const deployOutput = wrangler(['deploy'])
   const siteUrl = process.env.SITE_URL
@@ -222,13 +208,13 @@ async function main() {
   for (const name of RUNTIME_KEYS) if (process.env[name]) putSecret(name, process.env[name])
   if (process.env.STRIPE_SECRET_KEY) await replaceStripeWebhook(siteUrl)
 
+  deployPreviewWorker()
   console.log(`Deployed: ${siteUrl}`)
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Live: ${siteUrl}\n`)
 }
 
 try {
-  if (process.argv.includes('--preview')) await deployPreviewWorker()
-  else await main()
+  await main()
 } catch (error) {
   // One readable line on the run page (::error::), then the full message.
   console.error(`::error::${error.message.split('\n').filter(Boolean).slice(0, 2).join(' ')}`)
