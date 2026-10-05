@@ -2,7 +2,7 @@ import type { H3Event } from 'h3'
 
 /** Shop name and sender; the domain must be verified in Resend. Replace before going live. */
 const SHOP = { name: 'Beispielshop', from: 'Beispielshop <bestellung@example.de>' }
-/** PDFs from the legal-text service in public/rechtliches/. Attached so the buyer keeps them (durable medium). */
+/** The legal texts as PDFs in public/rechtliches/ (Claude prints them from the legal pages, `legal-de.md`). Attached so the buyer keeps them (durable medium). */
 const LEGAL_PDFS = ['agb.pdf', 'widerrufsbelehrung.pdf', 'muster-widerrufsformular.pdf']
 
 const euro = (cents: number) => (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })

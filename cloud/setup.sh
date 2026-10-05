@@ -26,7 +26,7 @@ done
 # agents with their own `model:` keep it. Same key as global/settings.json.
 node -e '
 const fs = require("fs"), p = require("os").homedir() + "/.claude/settings.json"
-let s = {}; try { s = JSON.parse(fs.readFileSync(p, "utf8")) } catch {}
+let s = {}; if (fs.existsSync(p)) s = JSON.parse(fs.readFileSync(p, "utf8"))
 s.env = { ...(s.env || {}), CLAUDE_CODE_SUBAGENT_MODEL: "sonnet" }
 fs.mkdirSync(require("path").dirname(p), { recursive: true }); fs.writeFileSync(p, JSON.stringify(s, null, 2))
 ' || echo "claude-setup: could not set CLAUDE_CODE_SUBAGENT_MODEL"

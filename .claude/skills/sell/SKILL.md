@@ -11,8 +11,9 @@ What works, as of 2026-10-03:
 - **The shop templates** (`templates/`) are tested; `stripe-workers.md` (Verified) says how.
 - **The legal and tax facts** were researched and fact-checked.
 
-This is not legal or tax advice. The kit says what is required. The legal texts come from a
-legal-text service, and tax questions go to a Steuerberater.
+This is not legal or tax advice. The kit says what is required. Claude writes the legal texts
+in-house (the `legal` skill; official model texts word for word); a paid legal-text service comes
+in once sales do. Tax questions go to a Steuerberater.
 
 Files next to this one:
 
@@ -78,8 +79,7 @@ These go into the same batch as the PRD questions, as tap cards, and never mid-b
    - contains electronics
    - contains batteries
    - food or cosmetics (stop and research; extra law applies)
-6. Legal texts. IT-Recht Kanzlei (recommended), Händlerbund, Trusted Shops, eRecht24, or
-   already have one.
+6. Legal texts. Claude writes them (default), or a legal-text service yskills already has.
 
 In the same message, ask for this project's keys from `keys.md`:
 
