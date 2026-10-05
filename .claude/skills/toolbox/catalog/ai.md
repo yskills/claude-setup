@@ -4,7 +4,7 @@ Checked 2026-10-03. Plugins are `@claude-plugins-official` unless noted.
 
 | Need | Pick | Why / watch out | Add it |
 |---|---|---|---|
-| Chat, writing, extraction, vision, tool use in the app | **Claude API** (Anthropic SDK) | Current model ids, pricing, caching, streaming are in the skill; never answer those from memory | `claude-api@anthropic-agent-skills` (global) |
+| Chat, writing, extraction, vision, tool use in the app | **Claude API** (Anthropic SDK) | Current model ids, pricing, caching, streaming are in the skill; never answer those from memory | the `claude-api` skill (built into Claude Code) |
 | An agent that runs tools on its own | **Claude Agent SDK** | Same harness as Claude Code | `agent-sdk-dev` plugin |
 | Give Luna or another app new tools | Build an **MCP server** | One server, usable from Claude, Luna and Claude Code | `mcp-server-dev` plugin; ECC skill `mcp-server-patterns` |
 | Local / private model | **Ollama** (what Luna uses) | No per-token cost; slower, weaker | Docker service |

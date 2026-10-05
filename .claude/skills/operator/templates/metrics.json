@@ -1,0 +1,18 @@
+{
+  "$comment": "One file per week in metrics/<yyyy>-W<ww>.json, written by the project's weekly routine. Luna's cockpit reads these from every repo. Money in euro cents, null when unknown.",
+  "project": "example",
+  "week": "2026-W41",
+  "status": "building | live | paused",
+  "revenue_cents": 0,
+  "spend": { "claude_usd": 0, "hosting_cents": 0, "ads_cents": 0, "other_cents": 0 },
+  "users": { "visitors": null, "signups": null, "paying": null },
+  "targets": [
+    { "$comment": "Copied from PLAN.md at launch, never moved later. day = days since launch.", "day": 30, "metric": "users.signups", "min": 100, "met": null },
+    { "day": 60, "metric": "users.paying", "min": 10, "met": null },
+    { "day": 90, "metric": "revenue_cents", "min": 10000, "met": null }
+  ],
+  "verdict": "on track | behind | kill card sent",
+  "channels": [{ "name": "tiktok", "visits": null, "paying": null, "spend_cents": 0 }],
+  "own": { "$comment": "the app's own key numbers, named in PLAN.md" },
+  "next": ["the one to three actions the routine turned into slices"]
+}

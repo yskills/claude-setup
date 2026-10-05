@@ -1,13 +1,9 @@
 {
-  "$comment": "Token costs are what `claude plugin details` reported on 2026-10-03 (always-on tokens added to every session). 'global' plugins are on everywhere; 'project' plugins are installed but off, and a project turns one on in its .claude/settings.json (the toolbox and onboard-project skills do this with `claude plugin install <id> --scope project`). Anything else in the marketplaces is pulled in per project the same way.",
+  "$comment": "Token costs are what `claude plugin details` reported on 2026-10-03 (always-on tokens added to every session). 'global' plugins are on everywhere; 'project' plugins are installed but off, and a project turns one on in its .claude/settings.json (the toolbox and onboard-project skills do this with `claude plugin install <id> --scope project`). Anything else in the marketplaces is pulled in per project the same way. 'retired' plugins are turned off by the installer on machines that had them.",
   "marketplaces": [
     {
       "name": "claude-plugins-official",
       "source": "anthropics/claude-plugins-official"
-    },
-    {
-      "name": "anthropic-agent-skills",
-      "source": "anthropics/skills"
     }
   ],
   "global": [
@@ -20,11 +16,6 @@
       "id": "frontend-design@claude-plugins-official",
       "why": "distinctive UI instead of generic 'AI-looking' pages",
       "tokens": 80
-    },
-    {
-      "id": "code-review@claude-plugins-official",
-      "why": "multi-agent PR review",
-      "tokens": 22
     },
     {
       "id": "security-guidance@claude-plugins-official",
@@ -44,17 +35,13 @@
     {
       "id": "context7@claude-plugins-official",
       "why": "current library docs (Vue, Nuxt, Vite, Tailwind...) instead of stale memory",
-      "tokens": 0
+      "tokens": 0,
+      "cloud": false
     },
     {
       "id": "playwright@claude-plugins-official",
       "why": "headless browser: screenshots, e2e, checking pages",
       "tokens": 0
-    },
-    {
-      "id": "chrome-devtools-mcp@claude-plugins-official",
-      "why": "drive and inspect a live Chrome: console, network, performance",
-      "tokens": 806
     },
     {
       "id": "commit-commands@claude-plugins-official",
@@ -83,13 +70,9 @@
     },
     {
       "id": "skill-creator@claude-plugins-official",
-      "why": "build and test new skills",
-      "tokens": 114
-    },
-    {
-      "id": "claude-api@anthropic-agent-skills",
-      "why": "build AI features with current Claude models, SDKs, caching, tool use",
-      "tokens": 473
+      "why": "build and test new skills (PC only: cloud threads have Anthropic's skill-creator built in)",
+      "tokens": 114,
+      "cloud": false
     }
   ],
   "project": [
@@ -127,6 +110,20 @@
       "id": "vercel@claude-plugins-official",
       "when": "vercel.json",
       "tokens": null
+    }
+  ],
+  "retired": [
+    {
+      "id": "code-review@claude-plugins-official",
+      "why": "Claude Code bundles /code-review"
+    },
+    {
+      "id": "chrome-devtools-mcp@claude-plugins-official",
+      "why": "Playwright covers headless browsing; both loaded ~54 browser tools"
+    },
+    {
+      "id": "claude-api@anthropic-agent-skills",
+      "why": "Claude Code bundles the claude-api skill"
     }
   ]
 }

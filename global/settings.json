@@ -73,6 +73,7 @@
   "cleanupPeriodDays": 90,
   "env": {
     "ECC_CONTEXT_MONITOR_COST_WARNINGS": "off",
-    "ECC_SESSION_START_MAX_CHARS": "4000"
+    "ECC_SESSION_START_MAX_CHARS": "4000",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
   }
 }

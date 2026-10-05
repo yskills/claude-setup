@@ -13,7 +13,7 @@ tested templates and German law; this table is the overview.
 | Many products, variants, stock, or a non-developer runs the shop | **Shopify** | Monthly fee plus payment fees, but admin, stock and checkout included | Shopify admin |
 | Alternative merchant of record (digital only) | **Paddle** or **Polar** (5% + €0.50) | | API key |
 | PayPal, Klarna, SEPA, Apple Pay buyers | **Turn them on in Stripe** (Dashboard > Payment methods) | Checkout shows them with no code; PayPal adds its own fee | Stripe Dashboard |
-| In-app purchases (iOS / Android) | **RevenueCat** | One API over App Store and Play billing | `revenuecat` plugin |
+| In-app purchases (iOS / Android) | **RevenueCat** | One API over App Store and Play billing, plus Stripe on the web; paywall and review rules: the `store` skill | `revenuecat` plugin |
 | Ads on a website | **Google AdSense** | Needs cookie consent in the EU (TCF CMP) | script tag + consent banner |
 | Ads in a web game (interstitial, rewarded) | **AdSense H5 Games Ads** (beta) | Made for HTML5 games like TellMeY | AdSense sign-up, Ad Placement API |
 | Ads in a native app | **AdMob** | | SDK |
@@ -22,6 +22,9 @@ tested templates and German law; this table is the overview.
 | Pricing and market check | Competitor research | | ECC skills `market-research` (global), `product-lens` (global) |
 
 ## German / EU legal checklist (before going live)
+
+The `legal` skill is the full list for any app (plus its privacy scan and the `legal-reviewer`
+agent); the lines below are the money-related part.
 
 - Shops and paid apps: everything in the `sell` skill's `legal-de.md` (Impressum, Datenschutz,
   AGB, Widerruf with the 2026 Widerrufsbutton, order button, price notes, warranty notice).

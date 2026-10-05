@@ -9,7 +9,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const errors = []
 const json = (p) => { try { return JSON.parse(readFileSync(join(root, p), 'utf8')) } catch (e) { errors.push(`${p}: ${e.message}`); return null } }
 
-for (const p of ['config/ecc.json', 'config/plugins.json', 'global/settings.json', '.claude/settings.json', '.claude/skills/onboard-project/templates/settings.json']) json(p)
+for (const p of ['config/ecc.json', 'config/plugins.json', 'global/settings.json', '.claude/settings.json', '.claude/skills/onboard-project/templates/settings.json', '.claude/skills/operator/templates/features.json', '.claude/skills/operator/templates/metrics.json']) json(p)
 
 function frontmatter(file) {
   const m = readFileSync(file, 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)
@@ -51,11 +51,14 @@ if (plugins) {
   const ids = [...plugins.global, ...plugins.project].map((p) => p.id)
   for (const id of ids) if (!/^[a-z0-9-]+@[a-z0-9-]+$/.test(id)) errors.push(`config/plugins.json: bad plugin id ${id}`)
   if (new Set(ids).size !== ids.length) errors.push('config/plugins.json: duplicate plugin id')
-  // cloud/setup.sh installs the global plugins in cloud threads; it must list exactly the same ones.
+  // cloud/setup.sh installs the global plugins in cloud threads; it must list exactly the same ones,
+  // minus those marked "cloud": false (Context7 asks for a sign-in a thread can't do).
   const sh = readFileSync(join(root, 'cloud/setup.sh'), 'utf8')
   const shIds = [...sh.matchAll(/^\s+([a-z0-9-]+@[a-z0-9-]+)/gm)].map((m) => m[1])
-  const want = plugins.global.map((p) => p.id)
+  const want = plugins.global.filter((p) => p.cloud !== false).map((p) => p.id)
   if (shIds.join() !== want.join()) errors.push('cloud/setup.sh plugin list differs from config/plugins.json global')
+  // Plugins come from setup.sh at user scope; a second list in the repo's settings would drift.
+  if (json('.claude/settings.json')?.enabledPlugins) errors.push('.claude/settings.json must not list plugins; cloud/setup.sh installs them')
   for (const m of plugins.marketplaces) if (!sh.includes(`marketplace add ${m.source}`)) errors.push(`cloud/setup.sh does not add marketplace ${m.source}`)
 }
 
