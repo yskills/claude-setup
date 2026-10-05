@@ -39,7 +39,7 @@ PR.
 | Selling | Payments | VAT | Fulfilment |
 |---|---|---|---|
 | Digital, one-off (unlock, download, credits) | Stripe Checkout, hosted page, `mode: 'payment'` | Kleinunternehmer: none. Selling across the EU above the threshold: Stripe Managed Payments (Stripe is the seller and handles VAT; digital only, +3.5%) | Grant access from the webhook |
-| Subscription | Checkout `mode: 'subscription'`, Stripe Customer Portal, the Better Auth Stripe plugin | Same as above | Access while the subscription is active. Add a Kündigungsbutton |
+| Subscription (web only; an app also in the stores: `store` skill, RevenueCat Web Billing) | Checkout `mode: 'subscription'`, Stripe Customer Portal, the Better Auth Stripe plugin | Same as above | Access while the subscription is active. Add a Kündigungsbutton |
 | Physical goods | Our order page (address, shipping, the order button), then the Stripe-hosted page to pay | Kleinunternehmer: none. Otherwise Stripe Tax plus OSS. No merchant-of-record service takes physical goods | Order in D1, then Sendcloud, then yskills prints the label |
 | Many products, variants, stock, or someone else runs the shop | Shopify instead of building one | Shopify Tax | Shopify |
 

@@ -18,6 +18,17 @@ same Worker API, same `verify`, same gate.
 | Googling it, or a business pays | Web app or PWA (`toolbox` → `catalog/app-platform.md`) | `sell` (Stripe) |
 | Not sure yet | Web first: the `operator`'s probe is a web page either way | |
 
+**One code, three platforms.** The same Vue app runs on the web (Workers Builds, live on merge),
+Android and iOS (Capacitor). Changes to HTML, CSS and JS can reach the installed apps without a
+store review through a live-update service (Capgo) as long as the app's purpose stays as reviewed;
+anything native (a new plugin, permissions) needs a new store build and review [S].
+
+**Release order** (yskills, 2026-10-05): web first, then Google Play, then iOS. Start Google's
+14-day test as soon as the web version has users. Add iOS when Play shows people starting
+trials, not only after money: from download to paid, iOS converts 2.6% and Android 0.9%
+([RevenueCat](https://www.revenuecat.com/blog/engineering/android-paywall-gap)) [S], so most of the
+money is on iOS.
+
 Consumer subscriptions live in the stores: Health & Fitness apps convert trials best of all
 categories, and annual plans bring 60.6% of that category's revenue
 ([RevenueCat 2026](https://www.revenuecat.com/state-of-subscription-apps)) [S].
@@ -66,14 +77,17 @@ Claude can't sign contracts, pay fees or verify identity. Numbered steps for ysk
 - **Offline:** keep a local copy (`@capacitor-community/sqlite` or `@capacitor/preferences`),
   sync with the Worker by `updated_at` per record, last write wins; a journal entry written
   offline must never be lost.
-- **Money:** `@revenuecat/purchases-capacitor`. Call `Purchases.logIn(<our user id>)` after
+- **Money:** `@revenuecat/purchases-capacitor`; the web version sells the same `pro` through
+  RevenueCat Web Billing (Stripe underneath), so one subscription works on all three. Call `Purchases.logIn(<our user id>)` after
   login so RevenueCat's user is ours. The Worker learns about purchases from RevenueCat's webhook
   (shared secret in the `Authorization` header, a Worker secret), stores the entitlement in D1
   and unlocks `pro` features from there. Anything digital unlocked inside the app is an
   in-app purchase (3.1.1) [K]; the app shows no Stripe checkout and no links to one. One
   RevenueCat entitlement (e.g. `pro`) covers both stores and the web.
-- **Paywall defaults** (RevenueCat 2026 [S]): after onboarding, annual plan with a free trial
-  preselected, monthly next to it. Longer trials convert better (17-32 days: 45.7% vs 3-7 days:
+- **Paywall defaults** (RevenueCat 2026 [S]): 89.4% of trials start on install day, so "try it
+  first" means an onboarding that shows the value in the first minutes, then the paywall in the
+  same session, not days of free use. After that onboarding, annual plan with a free trial
+  preselected (default 14 days), monthly next to it. Longer trials convert better (17-32 days: 45.7% vs 3-7 days:
   26.8%). A hard paywall converts about 5x freemium (10.7% vs 2.1%) with the same first-year
   retention. Default: hard paywall with the trial; probe sign-ups get the same trial. A free
   tier only when PLAN.md says growth comes from free users sharing. People already paying
