@@ -68,7 +68,7 @@ Ask these with the PRD questions, as tap cards:
 
 | When | What |
 |---|---|
-| 4 weeks before | Landing page with a waitlist (double opt-in). Analytics and UTM tags work. Social profiles link to the Impressum. The first 3 posts are out |
+| 4 weeks before | Landing page with a waitlist (double opt-in). Analytics and UTM tags work. Social profiles link to the Impressum. The first 3 posts are out. For a project meant to earn this page is the `operator`'s probe slice, live before the rest is built |
 | 2 weeks before | 3 to 5 short videos a week. Early testers; ask them for honest feedback and real testimonials |
 | Launch day | Email the waitlist. Post in the chosen communities. Run a launch offer only if it follows § 11 PAngV (section 4) |
 | Weeks 1 to 4 | Weekly review: which post or page brought paying users. Do more of that. Start ads only on the winning message |

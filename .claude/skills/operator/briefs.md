@@ -1,6 +1,7 @@
 # The three briefs
 
-Besides the merge taps and the gate's summaries (2 failed rounds, or an important PR), yskills reads three
+Besides the merge taps, the gate's summaries (2 failed rounds, or an important PR) and a probe that
+misses its go number, yskills reads three
 messages per project and answers each with ok or no
 (or a tap on an option). Fixed templates, so they read the same every time. Short lines, no prose. German
 labels only if yskills writes German in that project.
@@ -12,6 +13,7 @@ Plan: <name>, <one line: what it does>
 Für wen: <who>, <how many like them, source>
 Geld: <how it earns, price>, <break-even: n paying users / month>
 Beweis: <3 signs people already pay for this, with sources | none → recommend no or smaller | not meant to earn>
+Probe: <landing page + waitlist | pre-order>, <channel>, <n> days; go at <go number>, else a kill/change card
 Größe: <small site: 1 build | app: n slices, riskiest first: <slice 1>>
 Slices: 1. <name> 2. <name> ...
 Rechtliches: <must-haves from the legal team, e.g. Impressum, Datenschutz, no cookie banner needed>

@@ -58,7 +58,8 @@ Research subagents use WebSearch, not WebFetch, and return at most one page each
 
 Templates in `templates/`.
 
-- `PLAN.md` (for yskills): the PRD with locked decisions, slices, marketing plan, keys, costs.
+- `PLAN.md` (for yskills): the PRD with locked decisions, slices, marketing plan, keys, costs,
+  and the probe: offer, price, channel, period, go number.
 - `features.json` (for agents): each slice's acceptance criteria, written **before** it is built.
   Builders never touch it; the gate thread records the evaluator's verdict (`passes`).
 - `PROGRESS.md`: the handoff. Done, next, broken, decisions and why, each thread's cost. Every
@@ -80,7 +81,8 @@ Templates in `templates/`.
      plugins...). Every pick from outside the official marketplace is read before it is used.
      Picks go into `PLAN.md`; the scaffold adds them to this project only.
    - **Money** (if it should earn): three pieces of evidence people already pay for this. None →
-     brief (a) recommends no or a smaller first version.
+     brief (a) recommends no or a smaller first version. This shows that others earn, not that
+     yskills can find buyers; the probe (step 5) tests that.
    - **Legal:** the `legal` skill's table for this idea.
 3. **Plan.** `planner` proposes; the operator writes `PLAN.md` and `features.json`. **Brief (a).**
    Its one task for yskills: create the private repo (threads get 403 on `create_repository`);
@@ -97,6 +99,17 @@ Templates in `templates/`.
    findings on the PR until it is merged." The first slice also commits the D1 ids from
    `PROGRESS.md`. The operator copies each note and the thread's cost (`get_session`,
    `external_metadata.usage.cost_usd`) into `PROGRESS.md`.
+
+   **Probe first** (anything meant to earn). Slice `probe` is built and merged alone, before
+   every other slice: a landing page that names the offer and the price, a waitlist (or a
+   refundable Stripe pre-order via `sell`, if PLAN.md picked one), Impressum and Datenschutz,
+   and UTM-tagged visits. Once it is live, the marketing team pushes it in the plan's channel
+   for the probe period (default 14 days). PLAN.md fixes the go number before the probe starts
+   (default: 100 waitlist signups or 10 pre-orders). Met: the other slices start, nothing to
+   ask. Missed: one tap card to yskills with the numbers: **kill** (archive, lessons into
+   claude-setup), **change** (one new offer or channel, one more probe) or **build anyway**.
+   Never move the go number after the probe started. A small site meant to earn is its own
+   probe; one not meant to earn skips it.
 6. **Gate.** A fresh gate thread per PR runs `gate.md` and either posts the 5/5 table (yskills
    taps **Merge it**) or one review with the blocking findings, which the builder fixes. Three
    failed rounds: stop and ask yskills with tap options.
