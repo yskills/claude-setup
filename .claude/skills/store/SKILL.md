@@ -14,20 +14,33 @@ same Worker API, same `verify`, same gate.
 
 | Buyers find it by | Ship as | Pay with |
 |---|---|---|
-| Searching the App Store (journal, habit, fitness, mood, kids) | Capacitor app, the web version stays as the probe and a sign-up path | RevenueCat (IAP in the app, its Web Billing on Stripe for the web) |
+| Searching the App Store (journal, habit, fitness, mood, kids) | Installable web app first (below), the Capacitor app once it earns | Stripe first (`sell`); RevenueCat from the first store app on |
 | Googling it, or a business pays | Web app or PWA (`toolbox` → `catalog/app-platform.md`) | `sell` (Stripe) |
 | Not sure yet | Web first: the `operator`'s probe is a web page either way | |
 
 **One code, three platforms.** The same Vue app runs on the web (Workers Builds, live on merge),
 Android and iOS (Capacitor). Changes to HTML, CSS and JS can reach the installed apps without a
-store review through a live-update service (Capgo) as long as the app's purpose stays as reviewed;
-anything native (a new plugin, permissions) needs a new store build and review [S].
+store review through a live-update service (Capgo, only once release reviews slow things down) as
+long as the app's purpose stays as reviewed; anything native (a new plugin, permissions) needs a new store build and review [S].
 
-**Release order** (yskills, 2026-10-05): web first, then Google Play, then iOS. Start Google's
-14-day test as soon as the web version has users. Add iOS when Play shows people starting
-trials, not only after money: from download to paid, iOS converts 2.6% and Android 0.9%
-([RevenueCat](https://www.revenuecat.com/blog/engineering/android-paywall-gap)) [S], so most of the
-money is on iOS.
+**Release order** (yskills, 2026-10-05): web, then the web app made installable, then Google
+Play, then iOS. Add iOS when Play shows people starting trials, not only after money: from
+download to paid, iOS converts 2.6% and Android 0.9%
+([RevenueCat](https://www.revenuecat.com/blog/engineering/android-paywall-gap)) [S].
+
+**Installable from the website first (PWA, not an APK).** `@vite-pwa/nuxt` makes the web app
+installable: Chrome on Android shows an install prompt; on iPhone it is Share → Add to Home
+Screen, which needs a short "how to install" sheet with two screenshots. It still works in the
+EU (Apple reversed its iOS 17.4 removal) and gets web push once installed on iOS 16.4+ [S]. Pay
+with Stripe Checkout (`sell`, proven in duo-test): about 1.5% + €0.25 instead of the stores'
+15%. Never offer a downloadable APK: Android warns against it and from 2026 Google requires
+identity-verified developers even for sideloaded apps [S]. What makes people trust it:
+- the project's own domain, not `*.workers.dev`;
+- Impressum, Datenschutz and real contact on every page;
+- Stripe's hosted checkout page, the price and trial end shown before paying, the
+  Kündigungsbutton (`sell`);
+- the app asks for no permission it doesn't need, and the install sheet says what it can do
+  offline.
 
 Consumer subscriptions live in the stores: Health & Fitness apps convert trials best of all
 categories, and annual plans bring 60.6% of that category's revenue
@@ -82,8 +95,7 @@ Claude can't sign contracts, pay fees or verify identity. Numbered steps for ysk
 - **Offline:** keep a local copy (`@capacitor-community/sqlite` or `@capacitor/preferences`),
   sync with the Worker by `updated_at` per record, last write wins; a journal entry written
   offline must never be lost.
-- **Money:** `@revenuecat/purchases-capacitor`; the web version sells the same `pro` through
-  RevenueCat Web Billing (Stripe underneath), so one subscription works on all three. Call `Purchases.logIn(<our user id>)` after
+- **Money:** `@revenuecat/purchases-capacitor`. Call `Purchases.logIn(<our user id>)` after
   login so RevenueCat's user is ours. The Worker learns about purchases from RevenueCat's webhook
   (shared secret in the `Authorization` header, a Worker secret), stores the entitlement in D1
   and unlocks `pro` features from there. Anything digital unlocked inside the app is an
