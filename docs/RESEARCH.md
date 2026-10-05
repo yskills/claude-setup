@@ -21,8 +21,8 @@ ECC's hook runtime through its own installer. Hook changes from ECC's defaults:
 
 ## Plugins
 
-All from the official marketplace `claude-plugins-official` (auto-added by Claude Code, ~315
-plugins). Always-on token costs were measured with `claude plugin details`; see
+From Anthropic's two marketplaces: `claude-plugins-official` (auto-added by Claude Code, ~315
+plugins) and `anthropics/skills` (`claude-api`). Always-on token costs were measured with `claude plugin details`; see
 `config/plugins.json`. Notable calls:
 
 - **superpowers** is the most broadly endorsed methodology plugin and the only community one in

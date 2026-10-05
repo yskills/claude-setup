@@ -30,6 +30,8 @@ yskills, once:
    - Project name: the `name` in `wrangler.jsonc`.
    - Build command: `npm run build`, or `npm run generate` for a static Nuxt site.
    - Deploy command: `npm run deploy` if the app has a D1 database, else `npx wrangler deploy`.
+   - Production branch: the repo's default branch (MyPage's is `origin`, not `main`).
+   - Leave non-production branch builds on: they are what makes the previews.
 3. Apps with D1:
    - Create the D1 databases `<name>` and `<name>-preview` on the
      [D1 page](https://dash.cloudflare.com/?to=/:account/workers/d1) and send Claude both ids. Ids aren't secrets.
@@ -44,10 +46,15 @@ yskills, once:
 
 Claude:
 
-- `wrangler.jsonc`:
+- `wrangler.jsonc` (wrangler 4.147 or newer, which is what knows the block):
   - a `previews` block, required even as `{}`
   - every binding repeated in `previews` with its own resource, because previews inherit none
   - D1 ids committed, and `preview_database_id` set to the preview database's id
+  - `"workers_dev": true` and `"preview_urls": true`, so each deploy switches the live address and
+    the preview links back on. Without `preview_urls` the PR comment says "No Preview URL", and
+    without `workers_dev` the live address answers Cloudflare's "error code: 1042". Only
+    `wrangler deploy` applies them, so a change reaches previews after the next deploy of the
+    production branch.
   - no `build.command`: the dashboard builds, so the build runs before any migration
 - `npm run deploy` (D1 apps):
 
@@ -55,12 +62,16 @@ Claude:
   wrangler d1 migrations apply DB --remote && wrangler deploy && (wrangler d1 migrations apply DB --remote --preview || echo "previews may miss the newest tables")
   ```
 
-  It migrates live, deploys, then migrates the preview database.
+  It migrates live, deploys, then migrates the preview database. So the preview database only
+  gets migrations from a deploy of the production branch: on a branch that adds one, the preview's
+  pages that use the new schema fail until it is merged.
 - A unit test that checks the `previews` block: same binding names, no live resource ids
   (duo-test `tests/unit/wrangler-config.test.ts`).
-- `.github/workflows/ci.yml` with the verify job only. Optional live smoke test on `check_run`
-  `completed`, filtered to `Workers Builds: <worker>`, `check_suite.head_branch == 'main'` and
-  `head_sha == github.sha` (duo-test `live.yml`).
+- `.github/workflows/ci.yml` with the verify job only (`sell` skill's `templates/ci.yml`).
+  Optional live smoke test on `check_run` `completed`, filtered to the exact name
+  `Workers Builds: <worker>`, `conclusion == 'success'`,
+  `check_suite.head_branch == '<production branch>'` and `head_sha == github.sha`
+  (duo-test `live.yml`). Without the conclusion filter it would smoke-test a failed build.
 
 ## The tradeoff, decided
 
@@ -82,10 +93,16 @@ Revisit when Workers Builds accepts account-owned tokens scoped to one Worker.
 
 ## Replaced
 
-These were replaced on 2026-10-05:
+Replaced on 2026-10-05, so that no project gets them again:
 
 - GitHub Actions deploys with `CLOUDFLARE_API_TOKEN` in a main-only environment.
 - PR previews uploaded to a separate `<name>-preview` Worker with `PREVIEW_CLOUDFLARE_API_TOKEN`.
+- `scripts/deploy.mjs`, which copied keys from CI into the Worker and recreated the Stripe webhook
+  on every deploy. Runtime keys are now dashboard secrets and the webhook is made once by hand
+  (`sell` skill's `keys.md`).
 
-The `sell` skill's `keys.md` and `templates/` still describe that setup until they move over.
-Until then, use this skill for deploys and the `sell` skill for everything else.
+Also looked at and dropped: Cloudflare's **Deploy to Cloudflare** button (it only copies a
+**public** repo, so a private project can't use it) and wrangler's resource auto-provisioning (it
+would create the live database on the first deploy, but `d1 migrations apply --remote` needs a
+`database_id`, and a preview database still has to exist with its id committed). Revisit either
+when that changes.

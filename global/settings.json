@@ -48,6 +48,8 @@
       "Bash(npm publish:*)",
       "Bash(wrangler deploy:*)",
       "Bash(npx wrangler deploy:*)",
+      "Bash(npm run deploy:*)",
+      "Bash(npm run ship:*)",
       "Bash(firebase deploy:*)",
       "Bash(vercel --prod:*)"
     ],
