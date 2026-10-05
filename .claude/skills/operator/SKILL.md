@@ -70,7 +70,10 @@ Templates in `templates/`.
 ## 4. The run
 
 1. **Brainstorm.** One batch of tap cards: the idea's open questions, `sell`'s money questions if
-   it sells, the Impressum data (name, postal address, email, second channel) if it is public.
+   it sells, the Impressum data (name, postal address, email, second channel) if it is public,
+   and a **design card**: "Send pictures, screenshots or links of apps and sites you like (or
+   hate) for this, one line each on why." Linked sites are shot with `ui-review` and saved with
+   the pictures in `design/refs/`; the lines go into `design/DESIGN.md`.
 2. **Research**, parallel subagents, one page each:
    - **Inside:** our skills and catalog, the lessons in claude-setup's `docs/TEST-PROJECTS.md`,
      yskills' repos with code to reuse.

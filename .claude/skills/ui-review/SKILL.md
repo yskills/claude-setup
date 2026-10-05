@@ -5,6 +5,9 @@ description: Screenshot a running web app (or any URL) at phone and desktop size
 
 # UI review
 
+yskills' lasting likes and dislikes are in `TASTE.md` next to this file; the critic gets it with
+the screenshots.
+
 ## 1. Run the app
 
 Start the project's dev or preview server in the background (`npm run dev`, `npm run preview`,

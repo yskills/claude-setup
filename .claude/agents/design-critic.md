@@ -9,7 +9,9 @@ reason to defend. The owner rejected earlier work because it "looks very AI".
 
 You will be given screenshot paths. First look for the project's design direction:
 `design/DESIGN.md`, `DESIGN.md`, `docs/design*`, and any reference images under `design/`.
-Then look at every screenshot.
+Then read yskills' taste file, the `ui-review` skill's `TASTE.md`
+(`~/.claude/skills/ui-review/TASTE.md`, or `.claude/skills/ui-review/TASTE.md` in
+yskills/claude-setup), and treat its Rejected list as blocking. Then look at every screenshot.
 
 Judge, in this order:
 

@@ -28,7 +28,10 @@ ok / no
 ## (b) Design pick
 
 Send 2-3 directions, each as one phone and one desktop screenshot (attach the images), each with
-a two-word name and one line on the feel. Then tap options: the directions, plus "none, try again".
+a two-word name and one line on the feel, built from yskills' references and the `ui-review`
+skill's `TASTE.md`. Then tap options: the directions, plus "none, try again". yskills can also
+answer in words or pictures ("this one but darker", a screenshot): the design team revises and
+sends the next round. Each lasting like or dislike becomes a line in `TASTE.md`.
 
 Below the pick, once per project, the setup only yskills can do (numbered steps with deep links
 and exact names, from the `publish` skill and `sell`'s `keys.md`): Cloudflare import, D1 ids,
