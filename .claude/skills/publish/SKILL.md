@@ -97,7 +97,7 @@ Claude:
   Its first test checks that the live site runs the commit just built: the app serves the
   `WORKERS_CI_COMMIT_SHA` that Workers Builds sets at build time (duo-test: `commit` in
   `/api/config`; a static site: a generated `version.txt`), and the test compares it with
-  `check_run.head_sha`. A green Workers Builds check and a 200 prove neither: on 2026-10-05
+  `check_run.head_sha` (`github.sha` on the weekly run). A green Workers Builds check and a 200 prove neither: on 2026-10-05
   duo-test's main builds passed for hours while a day-old version stayed live.
 
 ## The tradeoff, decided
