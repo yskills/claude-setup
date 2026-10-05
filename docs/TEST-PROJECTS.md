@@ -39,6 +39,9 @@ repo; then the next one starts.
 | 2 Three.js game | | | | | |
 | 3 Journal probe | | | | | |
 
+duo-test stays web-only in test 1; its App Store and Google Play release (`store` skill) is a
+slice after test 1, once test 3 has proven the store path or the web version earns.
+
 A Roblox game (Rojo, a build thread on yskills' PC) waits until after the first real project.
 
 ## Then
