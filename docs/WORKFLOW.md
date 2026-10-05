@@ -37,6 +37,13 @@ a rule, skill line, test or check in this repo. That is the memory: committed, r
 by every thread. No memory plugin or Obsidian: cloud threads run no hooks, and the repo already
 does the job.
 
+Claude Code's built-in auto-memory stays on as a scratchpad on your PC
+(`~/.claude/projects/*/memory/`). **Memory check**, first session of each month or when you say
+"memory check": read every memory file, move each lasting lesson into claude-setup (rule, skill
+line or check, in one PR), delete notes that are wrong, stale or now in the repo, and tell you in
+three lines what moved and what went. If the files keep holding things the repo should, it says
+so; if they stay empty or useless twice in a row, it suggests turning auto-memory off.
+
 Before the first real project, three test projects run this roadmap end to end
 (`docs/TEST-PROJECTS.md`).
 

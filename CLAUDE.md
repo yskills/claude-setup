@@ -11,7 +11,8 @@ revenue, analytics) instead of getting their own dashboard.
   the goal works, not that a step finished.
 - yskills should never have to say "do this again". When they correct something, fix it and
   record the lesson (project `CLAUDE.md`, or a test/lint rule/hook if it can be caught
-  automatically) so it doesn't repeat.
+  automatically) so it doesn't repeat. Auto-memory is only a scratchpad: the monthly memory
+  check (`docs/WORKFLOW.md`, Learning) moves lasting notes into the repo and deletes the rest.
 - New app idea or "continue the project": follow the `operator` skill. It sizes the job, writes
   acceptance criteria before building, and sends yskills exactly three ok/no briefs.
 - Merging: the operator merges an app PR when the `operator` skill's 5/5 gate passes (CI,
