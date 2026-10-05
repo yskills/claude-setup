@@ -59,7 +59,8 @@ Research subagents use WebSearch, not WebFetch, and return at most one page each
 Templates in `templates/`.
 
 - `PLAN.md` (for yskills): the PRD with locked decisions, slices, marketing plan, keys, costs,
-  and the probe: offer, price, channel, period, go number.
+  and, at the top, `Mode: probe` (meant to earn) or `Mode: product` (not meant to earn), the
+  probe (offer, price, channel, period, go number) and the 30/60/90-day targets.
 - `features.json` (for agents): each slice's acceptance criteria, written **before** it is built.
   Builders never touch it; the gate thread records the evaluator's verdict (`passes`).
 - `PROGRESS.md`: the handoff. Done, next, broken, decisions and why, each thread's cost. Every
@@ -101,11 +102,11 @@ Templates in `templates/`.
    `external_metadata.usage.cost_usd`) into `PROGRESS.md`.
 
    **Probe first** (anything meant to earn). Slice `probe` is built and merged alone, before
-   every other slice: a landing page that names the offer and the price, a waitlist (or a
-   refundable Stripe pre-order via `sell`, if PLAN.md picked one), Impressum and Datenschutz,
+   every other slice: a landing page that names the offer and the price, a waitlist with
+   double opt-in (no pre-orders: `sell` has no pre-order flow yet), Impressum and Datenschutz,
    and UTM-tagged visits. Once it is live, the marketing team pushes it in the plan's channel
    for the probe period (default 14 days). PLAN.md fixes the go number before the probe starts
-   (default: 100 waitlist signups or 10 pre-orders). Met: the other slices start, nothing to
+   (default: 100 confirmed waitlist signups). Met: the other slices start, nothing to
    ask. Missed: one tap card to yskills with the numbers: **kill** (archive, lessons into
    claude-setup), **change** (one new offer or channel, one more probe) or **build anyway**.
    Never move the go number after the probe started. A small site meant to earn is its own
@@ -119,7 +120,7 @@ Templates in `templates/`.
    collects the numbers (`market` §5) and opens one PR with the week's `metrics/` file and the best
    next step as a slice in `features.json`. That PR is the weekly report; it gets the gate with
    checks 2-5 n/a, and yskills' merge tap is the go for the next slice. `PLAN.md` fixes 30/60/90-day
-   targets before launch (defaults: 100 signups, 10 paying, €100 a month); the routine copies them
+   targets before launch (defaults: 100 signups, 10 paying, €100 revenue in total); the routine copies them
    into each `metrics/` file. A missed target sends one tap card: **kill** (stop the routine,
    archive, lessons into claude-setup), **change** (one new offer or channel, next target in 30
    days) or **keep** (one line why). Targets never move to make a miss pass.

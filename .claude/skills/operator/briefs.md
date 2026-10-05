@@ -13,7 +13,7 @@ Plan: <name>, <one line: what it does>
 Für wen: <who>, <how many like them, source>
 Geld: <how it earns, price>, <break-even: n paying users / month>
 Beweis: <3 signs people already pay for this, with sources | none → recommend no or smaller | not meant to earn>
-Probe: <landing page + waitlist | pre-order>, <channel>, <n> days; go at <go number>, else a kill/change card
+Probe: landing page + waitlist, <channel>, <n> days; go at <go number>, else a kill/change card
 Größe: <small site: 1 build | app: n slices, riskiest first: <slice 1>>
 Slices: 1. <name> 2. <name> ...
 Rechtliches: <must-haves from the legal team, e.g. Impressum, Datenschutz, no cookie banner needed>

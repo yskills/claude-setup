@@ -9,7 +9,7 @@ repo; then the next one starts.
 |---|---|---|---|
 | 1 | **duo-test**, the language-learning app (existing repo), finished end to end | the operator taking over an existing app, slices | Briefs, Workers Builds previews, the evaluator, the 5/5 gate ending in one merge tap, logins and D1 with `security-reviewer` and `red-team`, the `sell` kit in Stripe sandbox, the `legal` team, a migration PR flagged as important |
 | 2 | **A Three.js web game** (new repo) | small: one build thread | Design directions for a game, performance on a phone, portal monetization (Poki or CrazyGames SDK) or in-game purchases via `sell`, the weekly metrics PR |
-| 3 | **A journal app probe** (new repo) | the probe slice only, then build or kill | The probe step: offer, price, waitlist, one channel for 14 days against a go number fixed in advance, the kill/change card, probe-mode gate. On go: the `store` path up to a TestFlight build and Google's closed test, recruited from the waitlist |
+| 3 | **A journal app probe** (new repo) | the probe slice only, then build or kill | The probe step: offer, price, waitlist (no pre-orders yet), one channel for 14 days against a go number fixed in advance, the kill/change card, probe-mode gate. On go: the `store` path up to a TestFlight build and Google's closed test, recruited from the waitlist |
 
 ## Rules for a test run
 
@@ -19,8 +19,9 @@ repo; then the next one starts.
   failed.
 - Payments stay in sandbox or test mode until yskills decides a test project goes live for real.
   Forms store submissions instead of sending mail.
-- Every test sets its go number and its 30/60/90-day targets in `PLAN.md` before it starts, and
-  logs whether it hit them.
+- Every test meant to earn fixes its go number in `PLAN.md` before the probe starts and logs
+  whether it hit it. 30/60/90-day targets are set too, but only checked for a test that launches
+  and runs the weekly routine.
 - Only test 2 runs the weekly routine, for two weeks; every trigger a test created is deleted when
   it ends.
 

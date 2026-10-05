@@ -26,7 +26,7 @@ whichever sees that payment first) switches it to `Mode: product`. Until someone
 | 4 | `security-reviewer` whenever the PR touches logins, payments, secrets or stores anything a user typed (emails, notes, journal entries); `red-team` only on the last PR before launch |
 | 5 | `legal-reviewer` when public pages, forms, tracking or embeds change; `design-critic` only on the probe slice and the last PR before launch |
 
-Product mode is the full table above. The headline names the mode: `Gate 5/5 (probe, round <n>)`.
+No `Mode:` line in `PLAN.md` means product mode. Product mode is the full table above. The headline names the mode: `Gate 5/5 (probe, round <n>)`.
 
 **No preview yet or any more:** the scaffold PR (before Workers Builds is connected) needs CI
 only. Once branch builds are off (live payment keys, `publish` skill), check 1 is CI only and the
