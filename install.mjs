@@ -181,6 +181,7 @@ for (const m of plugins.marketplaces) {
 settings.enabledPlugins ??= {}
 for (const p of plugins.global) settings.enabledPlugins[p.id] = true
 for (const p of plugins.project) settings.enabledPlugins[p.id] = false
+for (const p of plugins.retired ?? []) if (settings.enabledPlugins[p.id]) settings.enabledPlugins[p.id] = false
 // The full ECC plugin would load ~45k tokens per session on top of the curated copy.
 if (settings.enabledPlugins['ecc@ecc']) { settings.enabledPlugins['ecc@ecc'] = false; warn('turned off the full ecc@ecc plugin: this setup installs a curated part of it instead') }
 write(settingsPath, JSON.stringify(settings, null, 2) + '\n')

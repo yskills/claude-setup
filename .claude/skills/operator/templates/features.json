@@ -1,0 +1,18 @@
+{
+  "$comment": "One entry per slice (a small site has one). Criteria are written before the slice is built and are testable by clicking through the preview. The gate thread sets passes from the evaluator's report only; nobody edits check or threshold after the build starts.",
+  "project": "example",
+  "slices": [
+    {
+      "id": "landing",
+      "goal": "A visitor understands the offer and can join the waitlist on a phone",
+      "risk": "low",
+      "criteria": [
+        { "id": "landing-1", "check": "The hero names the offer and the price in the first screen at 390px", "threshold": null, "passes": false },
+        { "id": "landing-2", "check": "Submitting a valid email shows a confirmation screen and the request returns 2xx; an invalid one shows an error", "threshold": null, "passes": false },
+        { "id": "landing-3", "check": "Impressum and Datenschutz are linked from every page and open a filled page, no placeholder text", "threshold": null, "passes": false },
+        { "id": "landing-4", "check": "Largest Contentful Paint on the phone profile", "threshold": "LCP < 2500ms", "passes": false },
+        { "id": "landing-5", "check": "No console errors or failed requests on any page", "threshold": "0", "passes": false }
+      ]
+    }
+  ]
+}

@@ -34,9 +34,19 @@ Then search live, because tools change faster than the catalog (dated at the top
 node <toolbox skill folder>/scripts/find.mjs video caption subtitle
 ```
 
-It searches every installed plugin marketplace and all 293 ECC skills and prints install
-commands. For anything still unclear, WebSearch "<capability> best API <current year>" and read
-the vendor's docs (Context7) before choosing.
+It searches every installed plugin marketplace, all 293 ECC skills, the catalog and
+[skills.sh](https://skills.sh) (the open community directory, through its CLI pinned at `skills@1.7.0`, which only
+searches; `--offline` skips it), and prints install commands. skills.sh hits are unvetted leads: step 3's read-first
+rule applies to every one.
+
+It can't see the claude.ai **Anthropic Directory** (official and partner plugins, skills and
+connectors such as Figma, Canva, Adobe, Anthropic's legal plugins). In cloud threads search it
+with the `SearchPlugins`, `SearchSkills` and `SearchMcpRegistry` tools; on the PC, in claude.ai
+under Customize. Blender's official connector runs only on yskills' PC with Blender open
+(`catalog/data-web.md`).
+
+For anything still unclear, WebSearch "<capability> best API <current year>" and read the
+vendor's docs (Context7 on the PC) before choosing.
 
 ## 3. Choose
 

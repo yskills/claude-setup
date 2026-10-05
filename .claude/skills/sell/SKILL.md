@@ -8,9 +8,7 @@ description: Take money in a project from Germany - pages that bill (one-off or 
 What works, as of 2026-10-03:
 
 - **Digital payments** were proven in yskills/duo-test.
-- **The shop templates** (`templates/`) pass `nuxt typecheck`, `nuxt build` and 9 e2e tests in
-  the real Workers runtime. Two of those tests run against Stripe's official mock. A security
-  review's fixes are in.
+- **The shop templates** (`templates/`) are tested; `stripe-workers.md` (Verified) says how.
 - **The legal and tax facts** were researched and fact-checked.
 
 This is not legal or tax advice. The kit says what is required. The legal texts come from a
@@ -22,7 +20,7 @@ Files next to this one:
 |---|---|
 | `recheck.md` | first, every new project: dated facts and where to confirm them |
 | `keys.md` | writing the first batch of questions, and at go-live |
-| `stripe-workers.md` | building checkout, webhook, deploy and tests; it lists `templates/` |
+| `stripe-workers.md` | building checkout, webhook and tests; it lists `templates/`. Deploys and previews: the `publish` skill |
 | `physical.md` | anything gets shipped |
 | `legal-de.md` | legal pages, checkout wording, registrations |
 
@@ -33,11 +31,8 @@ yskills' PC (`/mcp`), not in cloud threads; the skill works everywhere.
 
 ## 0. Re-check
 
-Open `recheck.md`. For each row checked more than 3 months ago:
-
-- Confirm the current value, with WebSearch in cloud threads (CLAUDE.md says why).
-- Update the value and the date in yskills/claude-setup. If a fact changed, fix this skill in
-  the same PR.
+Open `recheck.md` and follow its first paragraph. If a fact changed, fix this skill in the same
+PR.
 
 ## 1. What is sold decides the stack
 
@@ -86,8 +81,8 @@ These go into the same batch as the PRD questions, as tap cards, and never mid-b
 
 In the same message, ask for this project's keys from `keys.md`:
 
-- Use the manual-steps format: one line on why Claude can't, then numbered steps, each with
-  the deep link and the exact secret name.
+- Use the message template in `keys.md`. The Worker's secrets can only be set after the repo is
+  imported in Workers Builds, so that batch asks for the values and names the dashboard page.
 - Ask for test keys only now. Live keys come at go-live.
 - Building does not wait for keys. Until they arrive, payment slices are tested with signed fake
   webhooks.
@@ -149,38 +144,47 @@ Run `security-reviewer` on every slice that touches money or addresses.
 
 Claude prepares everything, then posts one manual-steps message.
 
+**Claude does, once the test key and the sandbox webhook secret are in Production:** one real
+sandbox checkout end to end on the live URL (previews have no Stripe key): order page, Stripe page
+with test card `4242 4242 4242 4242`, webhook, email. stripe-mock only checks parameter names.
+
+**Claude does before the live key** (with yskills' OK: it deletes rows):
+
+1. Checks that no placeholder is left (`example-mug`, `Beispielshop`, `example.de`) and that
+   checkout, confirm and withdrawal use the rate-limit binding.
+2. Adds a one-off migration `DELETE FROM orders WHERE livemode = 0 OR livemode IS NULL` in a PR;
+   after yskills' merge tap it reads the `Workers Builds: <worker>` check: `npm run deploy` applies it. This has to happen
+   before the live key, because a live order is also `livemode IS NULL` until it is paid.
+
 **yskills does** (deep links are in `keys.md` and `legal-de.md`):
 
 1. Gewerbe and the ELSTER questionnaire, if not done.
 2. Activate the Stripe account.
-3. Put the live restricted key into the GitHub environment `production`.
-4. Approve the legal texts.
-5. Physical goods: register in LUCID and license the packaging before the first parcel.
+3. Worker → Settings → Build → turn off non-production branch builds (`publish` skill), so only
+   merged code ever runs with the live key.
+4. In live mode, create the restricted key and the webhook endpoint (`keys.md`), and put
+   `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` into the Worker's Production secrets.
+5. Approve the legal texts.
+6. Physical goods: register in LUCID and license the packaging before the first parcel.
 
-**Claude does, as soon as the first test key arrives:** one real sandbox checkout end to end
-(order page, Stripe page with test card `4242 4242 4242 4242`, webhook, email). stripe-mock only
-checks parameter names.
+**Claude does after:**
 
-**Claude does at go-live:**
-
-1. Checks that no placeholder is left (`example-mug`, `Beispielshop`, `example.de`), that the
-   rate-limiting rule on `/api/checkout*` exists, and deletes the sandbox orders.
-2. Redeploys. The deploy script creates the live webhook by itself.
-3. Checks the live site:
+1. Checks the live site:
    - a Checkout Session opens in live mode;
    - the legal pages are linked from every page;
    - the order button, shipping costs and delivery time read right.
-4. Asks yskills to buy once with their own card. Then checks the order, the emails and the
-   Sendcloud entry, and refunds it.
-5. Turns on the weekly smoke test.
+2. Asks yskills to buy once with their own card and refund it in the Stripe Dashboard, then checks
+   that the orders view shows it paid and then refunded and that the emails arrived. yskills checks
+   the Sendcloud entry in the panel.
 
 ## 5. Keep it working
 
-- **Weekly smoke test.** A scheduled GitHub Actions run costs no Claude tokens. It:
-  - opens the shop;
-  - creates a Checkout Session (nothing is charged; it expires);
-  - sends an unsigned webhook and expects 400;
-  - checks that the legal pages answer 200.
+- **Live smoke test** (the `publish` skill's `live.yml` pattern: after every deploy of `main` and
+  every Monday, holding no keys). Once the test key is in, add checks that:
+  - open the shop;
+  - create a Checkout Session (nothing is charged; it expires);
+  - send an unsigned webhook and expect 400;
+  - get 200 from the legal pages.
   A failed run emails yskills.
 - Stripe emails yskills when a webhook endpoint keeps failing. Sentry alerts on errors.
 - When a rule or a price in this kit turns out wrong, fix it in yskills/claude-setup.

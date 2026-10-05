@@ -23,6 +23,9 @@ tested templates and German law; this table is the overview.
 
 ## German / EU legal checklist (before going live)
 
+The `legal` skill is the full list for any app (plus its privacy scan and the `legal-reviewer`
+agent); the lines below are the money-related part.
+
 - Shops and paid apps: everything in the `sell` skill's `legal-de.md` (Impressum, Datenschutz,
   AGB, Widerruf with the 2026 Widerrufsbutton, order button, price notes, warranty notice).
 - **Cookie consent** before any non-essential cookie or tracker (TDDDG + GDPR); cookieless

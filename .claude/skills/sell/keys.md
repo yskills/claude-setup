@@ -2,80 +2,59 @@
 
 ## Where keys live
 
-1. **GitHub environment `production`.** It holds every secret the deploy needs.
-   - Set its deployment-branch rule to `main` only. Then a workflow on a PR branch can never
-     read the live keys.
-   - Plain repository secrets would be readable from any branch's workflow.
-2. **Cloudflare Worker secrets.** The deploy job runs with `environment: production` and
-   copies the runtime keys there with `wrangler secret put`. The Worker reads them from `env`.
-   - Never in `wrangler.jsonc` `vars`.
+1. **On the Worker, set by yskills.** Cloudflare dashboard → Workers & Pages → the Worker →
+   Settings → Variables and secrets → **Production**, type Secret, then Deploy. The Worker reads
+   them from `env`.
+   - Never in `wrangler.jsonc` `vars`, never in GitHub, the cloud environment or chat.
    - Never `NUXT_PUBLIC_*`: those ship to the browser.
+   - They can only be set once the Worker exists, so after the Workers Builds import
+     (`publish` skill), not with the first batch of questions.
+2. **Previews get none of them.** Previews Base holds only preview-safe values (`publish` skill).
+   Without `STRIPE_SECRET_KEY` a preview's checkout answers 503, which is why the sandbox
+   checkout runs on the live URL and the e2e tests use signed fakes and stripe-mock.
 3. **Local development.** `.dev.vars` (gitignored) holds test keys. `.dev.vars.example` lists
    the names.
-4. **Stripe uses a restricted key** (`rk_test_…`, `rk_live_…`), not the full secret key.
-   Stripe no longer recommends secret keys for new integrations.
-   - The deploy script creates the webhook endpoint and stores its `whsec_…` straight in
-     Cloudflare, so that secret never passes through GitHub or chat.
-5. **Keys never go into chat, an issue, a commit or a screenshot.** yskills pastes them into
-   GitHub themselves.
-6. **Cloud threads can't reach the Stripe or Cloudflare APIs.** Everything that needs a key
-   runs in GitHub Actions.
+4. **Stripe uses a restricted key** (`rk_test_…` from a sandbox now, `rk_live_…` at go-live), not
+   the full secret key. Stripe no longer recommends secret keys for new integrations.
+5. **The webhook endpoint is made by hand**, once per mode, in the Stripe Dashboard. Its
+   `whsec_…` goes into Production as `STRIPE_WEBHOOK_SECRET`.
+6. **Cloud threads can't reach the Stripe or Cloudflare APIs**, so they never handle a key; a
+   deploy is yskills' merge tap (`publish` skill).
 
 ## The keys
 
-Use these secret names exactly. `deploy.mjs` and the Worker expect them.
+Use these secret names exactly; the Worker expects them (`server/utils/env.ts`).
 
 | Secret | For | Create it | Test / live |
 |---|---|---|---|
-| `CLOUDFLARE_API_TOKEN` | Deploy | [Cloudflare: API tokens](https://dash.cloudflare.com/profile/api-tokens) → Create Token → template "Edit Cloudflare Workers". Add Account · D1 · Edit if the app uses D1, and limit Account Resources to the one account (and Zone Resources to the shop's domain). Keep Workers on all Workers, not specific ones: a token limited to specific Workers can't create a new one. `deploy.mjs --check` proves the token can create a Worker before CI builds. Guide: [GitHub Actions deploys](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/) | One token per project |
-| `CLOUDFLARE_ACCOUNT_ID` | Deploy | [Cloudflare dashboard](https://dash.cloudflare.com) → Workers & Pages → Account ID in the right column | n/a |
-| `STRIPE_SECRET_KEY` | Checkout, refunds, creating the webhook | [Stripe: API keys](https://dashboard.stripe.com/apikeys) → Create restricted key. Permissions: Checkout Sessions **Write**, Webhook Endpoints **Write** (subscriptions: see `stripe-workers.md`). Add more only when a call fails with a permission error. Guide: [restricted keys](https://docs.stripe.com/keys/restricted-api-keys) | Test key from a sandbox now; live key at go-live. A live key is shown only once |
-| `STRIPE_WEBHOOK_SECRET` | Verifying webhooks | Nothing to do: `deploy.mjs` creates the endpoint and stores it | Separate per mode, handled automatically |
+| `STRIPE_SECRET_KEY` | Checkout | [Stripe: API keys](https://dashboard.stripe.com/apikeys) → Create restricted key. Permissions: Checkout Sessions **Write** (subscriptions: see `stripe-workers.md`). Add more only when a call fails with a permission error. Guide: [restricted keys](https://docs.stripe.com/keys/restricted-api-keys) | Test key from a sandbox now; live key at go-live. A live key is shown only once |
+| `STRIPE_WEBHOOK_SECRET` | Verifying webhooks | [Stripe: Webhooks](https://dashboard.stripe.com/webhooks) → Add destination → Webhook endpoint. URL `<live URL>/api/stripe/webhook`, API version = the SDK's (`recheck.md`), events `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`, `charge.dispute.created`. Copy its signing secret | One endpoint per mode: sandbox now, live at go-live |
 | `SENDCLOUD_PUBLIC_KEY`, `SENDCLOUD_SECRET_KEY` | Creating parcels | [Sendcloud: create API keys](https://sendcloud.dev/docs/getting-started/how-to-create-your-api-keys) (steps in the Sendcloud panel) | Sendcloud has no test mode: parcels are only charged once you create a label |
-| `RESEND_API_KEY` | Order confirmation emails | [Resend: API keys](https://resend.com/api-keys). Also verify the sending domain; Claude adds the DNS records in Cloudflare | One key, "sending access" only |
+| `RESEND_API_KEY` | Order confirmation emails | [Resend: API keys](https://resend.com/api-keys). Also verify the sending domain: yskills adds the records Resend shows under the domain → DNS → Records in Cloudflare | One key, "sending access" only |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google login, if the shop has accounts | [Google Auth Platform → Clients](https://console.cloud.google.com/auth/clients), after the first deploy (Google needs the live URL) | One client |
 
-`BETTER_AUTH_SECRET`, if the app has logins, is generated by `deploy.mjs`. Nobody types it.
-
-**One Stripe key or two.** The same restricted key creates Checkout Sessions in the Worker and
-the webhook endpoint in CI.
-
-- Stricter: a second key with only Webhook Endpoints Write, kept as a CI-only secret
-  (`STRIPE_DEPLOY_KEY`), and Checkout Sessions Write alone on the Worker.
-- One key is the default because it means one fewer thing for yskills to create.
-- Switch to two once a shop has real volume.
-
-`deploy.mjs` never hands the shop's keys to wrangler's process.
+`BETTER_AUTH_SECRET` (apps with logins): yskills sets 32+ random characters
+(`openssl rand -hex 32`) in Production, and a different one in Previews Base (`publish` skill).
 
 ## Message template for the first batch
 
-This is the manual-steps format from CLAUDE.md. Fill in the repo, and drop the rows this
-project doesn't need.
+Fill in the project, and drop the rows it doesn't need. Ask for test keys only; live keys come at
+go-live.
 
-> Claude can't create these: they need your logins, and cloud threads can't reach Stripe or
-> Cloudflare. Paste each value in GitHub only, never in chat.
+> Claude can't set these: they need your logins, and threads can't reach Stripe or Cloudflare.
+> Paste each value into Cloudflare only, never into chat or GitHub. This comes after the repo is
+> imported in Workers Builds, because the Worker has to exist first (`publish` skill).
 >
-> 1. In GitHub, open the repo's [Environments](https://github.com/OWNER/REPO/settings/environments)
->    page and click New environment. Name it `production`. Under Deployment branches, choose
->    Selected branches and add `main`.
->    Then make a second environment named `preview` (no branch rule) with
->    `CLOUDFLARE_ACCOUNT_ID` and its own `CLOUDFLARE_API_TOKEN`: a second token with only
->    Account · Workers Scripts · Edit, limited under Workers to `<name>-preview` (it exists after
->    the first deploy). PRs then get preview links without touching the live site.
-> 2. In the same environment, use Add environment secret for each of these:
->    - `CLOUDFLARE_API_TOKEN`: [create the token](https://dash.cloudflare.com/profile/api-tokens)
->      from the template "Edit Cloudflare Workers", and add Account · D1 · Edit. Leave it on
->      all Workers (not specific Workers) and your one account.
->    - `CLOUDFLARE_ACCOUNT_ID`: it's in the right column of
->      [Workers & Pages](https://dash.cloudflare.com).
->    - `STRIPE_SECRET_KEY`: in your Stripe sandbox, open
->      [API keys](https://dashboard.stripe.com/apikeys), choose Create restricted key, and set
->      Checkout Sessions and Webhook Endpoints to Write.
->    - …
-> 3. Open the repo's [Actions](https://github.com/OWNER/REPO/actions/workflows/ci.yml) page,
->    press Run workflow, keep `main`, and press the green Run workflow. Then reply "keys done";
->    Claude reads the run and tells you if anything is missing.
+> 1. Stripe sandbox: [API keys](https://dashboard.stripe.com/apikeys) → Create restricted key →
+>    Checkout Sessions: Write. Copy the `rk_test_…` key.
+> 2. Cloudflare: [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) →
+>    `<worker>` → Settings → Variables and secrets → Add → type **Secret**, name
+>    `STRIPE_SECRET_KEY`, paste the key, Deploy. Production only, never Previews Base.
+> 3. Stripe sandbox: [Webhooks](https://dashboard.stripe.com/webhooks) → Add destination, with the
+>    URL and events from the table in `keys.md`. Copy the signing secret and add it the same way
+>    as `STRIPE_WEBHOOK_SECRET`.
+> 4. …
+>
+> Then reply "keys done".
 
-Claude can't start that run itself: cloud threads get "403 Resource not accessible by
-integration" on `workflow_dispatch` and re-runs (duo-test, 2026-10-03). Without the button, a new
-key only reaches the site with the next merge to `main`.
+A dashboard secret takes effect when you press Deploy, so nothing has to be re-run afterwards.

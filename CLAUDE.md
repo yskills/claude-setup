@@ -11,7 +11,15 @@ revenue, analytics) instead of getting their own dashboard.
   the goal works, not that a step finished.
 - yskills should never have to say "do this again". When they correct something, fix it and
   record the lesson (project `CLAUDE.md`, or a test/lint rule/hook if it can be caught
-  automatically) so it doesn't repeat.
+  automatically) so it doesn't repeat. Auto-memory is only a scratchpad: the monthly memory
+  check (`docs/WORKFLOW.md`, Learning) moves lasting notes into the repo and deletes the rest.
+- New app idea or "continue the project": follow the `operator` skill. It sizes the job, writes
+  acceptance criteria before building, and sends yskills three ok/no briefs.
+- Merging: yskills taps Merge it once a fresh gate thread posts the `operator` skill's 5/5 table
+  (CI, evaluator, fresh code review, security and red team, design and legal where they apply).
+  Never merge a PR unless yskills tells you to. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
+- Spend little: the operator on Opus, everything else (threads, agents) on Sonnet; reviewers get
+  only the diff or URL plus the criteria.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
   before things nobody can undo: production deploys, payments, sending mail or posts, deleting
   data, force-pushing, rotating secrets.
@@ -26,13 +34,14 @@ revenue, analytics) instead of getting their own dashboard.
 - Before calling work done or pushing: run what CI runs (a `verify`/`ship` script, the repo's
   `verify` skill, or `.github/workflows`). Report failures honestly with the output.
 - Search before building: an existing library, MCP server or skill beats new code
-  (`search-first` skill). Use Context7 for current library docs instead of memory.
+  (`search-first` skill). Use Context7 (PC only) for current library docs instead of memory.
 - In cloud project threads every WebFetch of a page nobody posted in the chat makes yskills
-  press Allow. Research there with WebSearch (Context7 asks threads for a sign-in they can't
-  do), and tell subagents the same; fetch a
+  press Allow. Research there with WebSearch and tell subagents the same; fetch a
   page only when one fact depends on it, and say so in the thread.
 - Keep context lean: `/clear` between unrelated tasks, `/compact` at milestones
-  (`strategic-compact`). Hand big reads to subagents.
+  (`strategic-compact`). Hand big reads to subagents. Every tool call re-reads the whole
+  context: batch independent calls, trim long output with `tail`, and start a fresh thread
+  (it reads `PROGRESS.md`) instead of resuming one idle for over an hour.
 
 ## Code
 
@@ -61,7 +70,7 @@ yskills' verdict on early work was that it "looks very AI". For every UI change:
    animation: none` lands on the finished screen.
 2. Screenshot at phone (390px) and desktop (1440px) widths with Playwright, look at the images,
    and have the `design-critic` agent review them. Fix what it finds.
-3. Put the screenshots in the PR. yskills merges on screenshots plus green CI.
+3. Put the screenshots in the PR; the 5/5 gate's design check and yskills look at them.
 
 UI text is German first, English second, unless the project says otherwise.
 
@@ -73,11 +82,10 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 - Web: Nuxt 4 (SSR/static) or Vue 3 + Vite (SPA/PWA), Pinia, Tailwind v4, `@nuxtjs/i18n` (de, en).
 - API: Nuxt server routes or a small Express service. SQLite or Postgres with prepared statements.
 - Tests: Vitest, Playwright for e2e. Typecheck with `vue-tsc`.
-- Ship: keys live only in GitHub. GitHub Actions runs one `verify` script, posts a preview link
-  on every PR (`wrangler versions upload --preview-alias pr-<n>`) and deploys `main`; Cloudflare
-  Workers via wrangler for web apps (the `sell` skill's `templates/ci.yml` has all three jobs).
-  Put the preview link in the PR reply. Services that need a server
-  (like Luna): Docker + Caddy on a small VPS.
+- Ship: Cloudflare Workers Builds deploys the default branch and gives every other branch a
+  Worker Preview with its own data and keys; GitHub Actions runs one `verify` script and holds no
+  keys. The `publish` skill has the per-project setup and its rules. Put the preview link in the PR
+  reply. Services that need a server (like Luna): Docker + Caddy on a small VPS.
 - Anything beyond this (video, AI generation, payments, ads, analytics, email, mobile...) comes
   from the `toolbox` skill, added to that project only. Anything that takes money (checkout,
   shop, subscriptions, shipping) follows the `sell` skill; getting users or buyers (marketing
@@ -86,14 +94,17 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 ## Tools you have
 
 - Agents: `planner`, `architect`, `code-reviewer`, `typescript-reviewer`, `vue-reviewer`,
-  `security-reviewer`, `database-reviewer`, `build-error-resolver`,
-  `e2e-runner`, `refactor-cleaner`, `silent-failure-hunter`, `doc-updater`, `a11y-architect`,
-  `performance-optimizer`, `seo-specialist`, `design-critic`. Use reviewers proactively after
-  writing code; use `security-reviewer` on anything touching auth, payments or user input.
-- Skills to reach for: `toolbox` (which plugins, APIs and skills a project needs, and adds
-  them to that project only), `onboard-project` (set up a repo for Claude), `ship-check` (verify before
-  push), `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD,
-  debugging) and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
+  `security-reviewer`, `database-reviewer`, `build-error-resolver`, `e2e-runner`,
+  `refactor-cleaner`, `silent-failure-hunter`, `doc-updater`, `a11y-architect`,
+  `performance-optimizer`, `seo-specialist`, `design-critic`, `evaluator`, `legal-reviewer`,
+  `red-team`.
+  Use reviewers proactively after writing code; use `security-reviewer` on anything touching
+  auth, payments or user input.
+- Skills to reach for: `operator` (idea to live app), `legal` (German law for any app),
+  `toolbox` (which plugins, APIs and skills a project needs, and adds them to that project
+  only), `onboard-project` (set up a repo for Claude), `ship-check` (verify before push),
+  `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD, debugging)
+  and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
 - Browser: Playwright MCP for headless checks; `claude --chrome` to use yskills' own Chrome
   when a page needs their login. In cloud threads launch Playwright with
   `executablePath: '/opt/pw-browsers/chromium'`; that Chromium has no H.264, so test video as WebM. Stop a dev server by
