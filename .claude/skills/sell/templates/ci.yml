@@ -64,6 +64,8 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
     outputs:
       url: ${{ steps.upload.outputs.url }}
     env:
@@ -95,7 +97,7 @@ jobs:
         run: |
           # Catches an accidental config change; the token's scope is what actually limits this job.
           jq -e '.env.preview | (keys - ["name", "preview_urls", "ratelimits", "d1_databases"] | length == 0)
-            and (.d1_databases | all(keys - ["binding", "migrations_dir"] | length == 0))' wrangler.jsonc > /dev/null || {
+            and ((.d1_databases // []) | all(keys - ["binding", "migrations_dir"] | length == 0))' wrangler.jsonc > /dev/null || {
             echo "::error::env.preview in wrangler.jsonc may only hold name, preview_urls, ratelimits and a DB binding without a database name or id."
             exit 1
           }

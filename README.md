@@ -61,20 +61,23 @@ project that uses this setup.
 
 - **Setup script:** paste [`cloud/setup.sh`](cloud/setup.sh). Without it a thread reads this
   repo's plugins only when it runs inside this repo, and even then 3 of the 16 were missing. It
-  installs all 16 at user scope; the result is cached and rebuilt about weekly, so threads do
+  installs 15 of the 16 at user scope (Context7 stays PC-only: it asks for a sign-in a thread
+  can't do); the result is cached and rebuilt about weekly, so threads do
   not pay for it each time. Plugin tools connect a few seconds after a thread starts.
 - **Network access:** Custom, tick "Also include default list of common package managers", and
   add:
-  - `context7.com`, `mcp.context7.com` (live library docs; blocked otherwise). Even then the
-    plugin asks for a sign-in a thread can't do, so in threads Context7 is effectively PC-only.
   - `cdn.jsdelivr.net`, `unpkg.com` (CDN scripts, e.g. GSAP for HyperFrames)
   - `*.yskills.workers.dev` (your own live sites and PR previews, so threads can open and
     screenshot what they deployed; blocked otherwise)
   - `*.youtube.com`, `*.googlevideo.com`, only if threads work on video
-- **No deploy keys here.** Keys live only in GitHub. CI deploys `main` to the live site and
-  posts a preview link on every PR (the `sell` skill's `templates/ci.yml`), so a thread never
-  needs a Cloudflare token. A thread can't start an Actions run itself (GitHub answers 403), so
-  after adding a key you press Run workflow. Optional: a Stripe *test* key as an API credential
+- **Deploys run only in GitHub.** `CLOUDFLARE_API_TOKEN` in the main-only `production`
+  environment deploys the live site; `PREVIEW_CLOUDFLARE_API_TOKEN`, limited to the
+  `<name>-preview` Worker, gives every PR a preview link (the `sell` skill's `keys.md` and
+  `templates/ci.yml`), so PR code never reaches the live site. A Cloudflare
+  key in the cloud environment is only for threads to check the account: `wrangler deploy`
+  through the cloud proxy fails, because the proxy replaces Workers' asset-upload token (401).
+  A thread can't start an Actions run itself (GitHub answers 403), so after adding a key you
+  press Run workflow. Optional: a Stripe *test* key as an API credential
   for `api.stripe.com` (Pro/Max plans); the proxy adds it and Claude never sees it.
 
 On your PC, `global/settings.json` lets Claude read the official docs of your stack (Nuxt, Vue,

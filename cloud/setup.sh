@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Setup script for Claude cloud environments (project threads).
 # Paste it into Project settings > Cloud environment > Setup script. It installs the global
-# plugins from config/plugins.json at user scope, so they load in every thread, whichever
+# plugins from config/plugins.json at user scope (minus those marked "cloud": false), so they load in every thread, whichever
 # repo the thread runs in. scripts/check.mjs fails if this list drifts from config/plugins.json.
 set -u
 
@@ -14,7 +14,6 @@ for id in \
   security-guidance@claude-plugins-official \
   typescript-lsp@claude-plugins-official \
   pyright-lsp@claude-plugins-official \
-  context7@claude-plugins-official \
   playwright@claude-plugins-official \
   chrome-devtools-mcp@claude-plugins-official \
   commit-commands@claude-plugins-official \

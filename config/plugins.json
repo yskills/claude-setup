@@ -44,7 +44,8 @@
     {
       "id": "context7@claude-plugins-official",
       "why": "current library docs (Vue, Nuxt, Vite, Tailwind...) instead of stale memory",
-      "tokens": 0
+      "tokens": 0,
+      "cloud": false
     },
     {
       "id": "playwright@claude-plugins-official",

@@ -21,8 +21,10 @@
      Cloudflare, so that secret never passes through GitHub or chat.
 5. **Keys never go into chat, an issue, a commit or a screenshot.** yskills pastes them into
    GitHub themselves.
-6. **Cloud threads can't reach the Stripe or Cloudflare APIs.** Everything that needs a key
-   runs in GitHub Actions.
+6. **Every deploy runs in GitHub Actions, never from a thread.** A Cloudflare key in the cloud
+   environment lets threads read the account (check a Worker, a D1, a deploy), but `wrangler
+   deploy` through the cloud proxy fails: the proxy replaces Workers' asset-upload token and the
+   upload gets 401 (MyPage, 2026-10-04). Threads can't reach the Stripe API at all.
 
 ## The keys
 
@@ -55,16 +57,17 @@ the webhook endpoint in CI.
 This is the manual-steps format from CLAUDE.md. Fill in the repo, and drop the rows this
 project doesn't need.
 
-> Claude can't create these: they need your logins, and cloud threads can't reach Stripe or
-> Cloudflare. Paste each value in GitHub only, never in chat.
+> Claude can't create these: they need your logins, and deploys only run from GitHub. Paste each
+> value in GitHub only, never in chat.
 >
 > 1. In GitHub, open the repo's [Environments](https://github.com/OWNER/REPO/settings/environments)
 >    page and click New environment. Name it `production`. Under Deployment branches, choose
 >    Selected branches and add `main`.
 > 2. In the same environment, use Add environment secret for each of these:
->    - `CLOUDFLARE_API_TOKEN`: [create the token](https://dash.cloudflare.com/profile/api-tokens)
->      from the template "Edit Cloudflare Workers", and add Account · D1 · Edit. Leave it on
->      all Workers (not specific Workers) and your one account.
+>    - `CLOUDFLARE_API_TOKEN`: on [API tokens](https://dash.cloudflare.com/profile/api-tokens)
+>      click Create Token, then Use template next to "Edit Cloudflare Workers" (not Workers AI).
+>      Click + Add more and pick Account, D1, Edit. Leave the rest, then Continue to summary and
+>      Create Token.
 >    - `CLOUDFLARE_ACCOUNT_ID`: it's in the right column of
 >      [Workers & Pages](https://dash.cloudflare.com).
 >    - `STRIPE_SECRET_KEY`: in your Stripe sandbox, open

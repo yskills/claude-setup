@@ -78,8 +78,10 @@ Once, before your first real sale (the skill links each step):
 - Physical products: a Sendcloud account, plus LUCID and a packaging licence before the first
   parcel.
 
-Keys go into the repo's GitHub environment `production`, which only `main` can read, and the
-deploy copies them into Cloudflare. Test keys first, live keys at go-live.
+Shop keys go into the repo's GitHub environment `production`, which only `main` can read, and
+the deploy copies them into Cloudflare. The deploy token sits there too; PR previews get a
+second token that can only touch the preview copy. Every deploy runs in GitHub, never from a
+thread. Test keys first, live keys at go-live.
 After adding or changing a key, press Run workflow on the repo's Actions page: Claude in cloud
 threads can't start a run (GitHub answers 403), so the key would otherwise wait for the next merge.
 
