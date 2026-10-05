@@ -5,17 +5,27 @@ each check is a hard yes or no from someone who did not write the code.
 
 | # | Check | Who | Gets only | Applies |
 |---|---|---|---|---|
-| 1 | CI green on the PR's latest commit | GitHub | | always |
-| 2 | Every acceptance criterion of the slice passes on the preview | `evaluator` agent | preview URL, slice id, `features.json` | always |
-| 3 | Nothing blocking | a **fresh** `code-reviewer` | the diff + the slice goal in 2 sentences | always |
+| 1 | CI green **and** the `Workers Builds: <worker>` check green, both on the PR's head SHA | GitHub check runs | | always |
+| 2 | Every acceptance criterion of the slice passes on the preview | `evaluator` agent | the head SHA's preview URL, the slice's criteria | always |
+| 3 | Nothing blocking | a **fresh** `code-reviewer` (the builder's last `ship-check` pass counts if its report names this head SHA) | the diff + the slice goal in 2 sentences | always |
 | 4 | Nothing blocking, no CRITICAL or HIGH | `security-reviewer` on the diff, `red-team` attacking the preview | the diff; the preview URL and route list | auth, payments, user input, secrets touched; `red-team` always once before launch |
-| 5 | Nothing blocking | `design-critic` (and `legal-reviewer` on pages users see) | phone + desktop screenshots, the preview URL | UI changed |
+| 5 | Nothing blocking | `design-critic`; `legal-reviewer` too when pages, forms, tracking, embeds or AI output change | phone + desktop screenshots, the preview URL | UI changed |
 
 A check that doesn't apply counts as passed; say so in the table.
 
+**When there is no preview:**
+- The scaffold PR (before yskills connects Workers Builds in brief (b)) merges on CI alone,
+  checks 2-5 n/a.
+- Once branch builds are off (live payment keys, `publish` skill), check 1 is CI alone, and the
+  operator runs the PR's build locally (`wrangler dev` with the local preview D1) so the
+  evaluator, red team and legal reviewer use that URL instead.
+
 ## Rounds
 
-- **5/5:** the operator merges (squash) and closes the builder thread. GitHub doesn't let an
+- **5/5:** the operator commits the evaluator's verdict into `features.json` on the PR branch.
+  A commit that touches only `features.json` doesn't restart checks 2-5: wait for check 1 on
+  its SHA, then merge (squash) and archive the builder thread. Any other new commit restarts the
+  gate. GitHub doesn't let an
   author approve their own PR and threads push as yskills, so the merge is the approval.
 - **Less than 5/5:** the builder fixes every blocking finding, then the failed checks run
   again, each with a **fresh** agent. That is one round.
@@ -33,7 +43,7 @@ merged by yskills.
 
 ```
 Gate 5/5 (round <n>)
-1 CI ............ pass  <run link>
+1 CI + Workers Builds ... pass  <run links>
 2 Evaluator ..... pass  <n>/<n> criteria
 3 Code review ... pass  (fresh, round <n>)
 4 Security ...... pass | n/a

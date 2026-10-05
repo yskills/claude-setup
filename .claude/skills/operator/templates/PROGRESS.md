@@ -1,6 +1,6 @@
 # Progress
 
-Read this first; append one entry last. Under 100 lines: fold old entries into one line each.
+Every thread reads this first; only the operator writes it. Under 100 lines: fold old entries into one line each.
 
 ## Now
 - Phase: plan | scaffold | design | build | launch | grow

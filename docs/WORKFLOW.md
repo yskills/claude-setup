@@ -12,13 +12,13 @@ long threads re-read their whole history every turn.
 |---|---|---|---|---|
 | 0 | Idea | you | one message | Send it |
 | 1 | Brainstorm | operator | one batch of tap-card questions (incl. money questions from `sell`) | Answer once |
-| 2 | Research, in parallel | **Inside:** our skills, catalog, lessons from `docs/TEST-PROJECTS.md`, your other repos. **Outside:** competitors, prices, how the best similar products and open-source projects are built, tools (`toolbox`, Anthropic Directory). **Legal:** the `legal` skill's table | one page each | Nothing |
-| 3 | Plan | `planner` | `PLAN.md` (PRD, slices, marketing plan, keys, costs), `features.json` (acceptance criteria per slice, written before any code) | **Brief (a):** ok/no; add keys in Cloudflare |
-| 4 | Scaffold + design | one scaffold thread; design team (`frontend-design`, `impeccable`, `design-critic`) | default stack, `verify`, CI, Workers Builds (`publish`); 2-3 directions as screenshots | **Brief (b):** pick one |
+| 2 | Research, in parallel | **Inside:** our skills, catalog, lessons from `docs/TEST-PROJECTS.md`, your other repos. **Outside:** competitors, how the best similar products and open-source projects are built, tools (`toolbox`, Anthropic Directory). **Money:** who pays, how much, 3 pieces of evidence; none → the plan says no. **Legal:** the `legal` skill's table | one page each | Nothing |
+| 3 | Plan | `planner` | `PLAN.md` (PRD, slices, marketing plan, keys, costs), `features.json` (acceptance criteria per slice, written before any code) | **Brief (a):** ok/no (it includes proof people pay) |
+| 4 | Scaffold + design | one scaffold thread; design team (`frontend-design`, `impeccable`, `design-critic`) | default stack, `verify`, CI, Workers Builds config (`publish`; you connect it); 2-3 directions as screenshots | **Brief (b):** pick one; do the one-time Cloudflare/keys steps it lists |
 | 5 | Build | builder threads (Sonnet), one per slice, at most 3 in parallel; a small site is one thread, no slices | PRs with tests, screenshots, preview link; `PROGRESS.md` updated | Nothing |
 | 6 | Gate each PR | QA: `evaluator` on the preview, fresh `code-reviewer`; security: `security-reviewer` + `red-team`; `design-critic` + `legal-reviewer` | 5/5 → the operator merges | Nothing, unless 3 rounds fail |
 | 7 | Launch | full `red-team` and `legal-reviewer` pass; `publish`, `sell` go-live; Sentry, PostHog | live site | **Brief (c):** ok/no; live keys |
-| 8 | Grow | marketing team (`market` skill, `seo-specialist`) | posts, launch, weekly numbers into Luna's cockpit | Approve post batches, pay for ads |
+| 8 | Grow | marketing team (`market` skill, `seo-specialist`); a weekly routine | posts, launch, a weekly `metrics/` file per repo that Luna's cockpit reads (revenue, spend, own numbers) and the next slices | Approve post batches, pay for ads |
 | 9 | Learn | operator | each lesson becomes a rule, skill line, test or check in claude-setup | Merge that PR |
 
 After launch, phases 5-6 repeat for every improvement the weekly numbers suggest.

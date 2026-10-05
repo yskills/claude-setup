@@ -52,48 +52,79 @@ Threads forget; the repo doesn't. Templates in `templates/`.
 - `PLAN.md`: for yskills. The PRD with locked decisions, the slices, the marketing plan, the
   keys list, the cost estimate.
 - `features.json`: for agents. Every slice with its acceptance criteria, written **before** the
-  slice is built. Only the `evaluator` flips `passes`; builders never edit criteria. JSON
-  because agents edit it less casually than Markdown.
+  slice is built. Builders never touch it; the operator records the evaluator's verdict in it
+  (`passes`) on the PR branch. JSON because agents edit it less casually than Markdown.
 - `PROGRESS.md`: the handoff between threads. What is done, what is next, what broke, which
-  decision was made and why. Each thread reads it first and appends to it last. Keep it under
-  100 lines; fold old entries into one line each.
+  decision was made and why, and what each thread cost. Every thread reads it first; only
+  the operator writes it. Keep it under 100 lines; fold old entries into one line each.
+- `metrics/<yyyy>-W<ww>.json`: from launch on, one file a week with the numbers (template
+  `templates/metrics.json`). Luna reads these from the repos; no app needs its own dashboard.
 
 ## 4. The run
 
 1. **Brainstorm once.** One batch of questions as tap cards (`AskUserQuestion` or decision cards),
    including the `sell` skill's money questions when it sells. No more questions after this
    batch except the three briefs.
-2. **Research, in parallel, one page each:**
+2. **Research, in parallel subagents, one page each:**
    - **Inside:** what we already have. claude-setup's skills and catalog, the lessons table in
      its `docs/TEST-PROJECTS.md`, yskills' other repos with code to reuse (`list_repos`).
    - **Outside:** competitors and what they charge, how the best similar products and open-source
      projects are built, the tools (`toolbox`, Anthropic Directory).
+   - **Money** (if the idea is meant to earn): who pays, how much, and three pieces of
+     evidence that they already pay for something like it (competitor prices, reviews, search
+     volume). No evidence → brief (a) recommends **no** or a smaller first version.
    - **Legal:** the `legal` skill's table for this idea (plus `sell` or `market` parts).
-3. **Plan.** `planner` turns the three pages into `PLAN.md` and `features.json` (criteria per
-   slice, each testable on a preview by clicking). Send **brief (a)**.
+3. **Plan.** `planner` (read-only) proposes the plan; the operator writes `PLAN.md` and
+   `features.json` from it (criteria per slice, each testable on a preview by clicking). The
+   operator creates the private repo itself (`create_repository`, then `add_repo`). Send **brief (a)**.
 4. **Scaffold + design.** One thread scaffolds the default stack (CLAUDE.md) with `publish`'s
-   setup, `verify`, CI. The design team shoots 2-3 directions. Send **brief (b)**.
+   setup, `verify`, CI. The design team shoots 2-3 directions. Send **brief (b)**; it carries
+   yskills' one-time setup from the `publish` skill (Cloudflare import, D1, Previews Base) and
+   any test keys as numbered deep links, so nothing asks again later.
 5. **Build.** One fresh builder thread per slice (or one for a small site), at most three in
    parallel, each reading only `PLAN.md`, its slice in `features.json` and `PROGRESS.md`. Test
-   first, then build, `ship-check`, PR with screenshots and the preview link.
+   first, then build, `ship-check`, PR with screenshots and the preview link. Mechanics:
+   - start it with `create_session` (`source_url` = the project repo, `model` = Sonnet; effort
+     can't be set per session) and this prompt, filled in: "Build slice <id> of PLAN.md; its
+     criteria are in features.json (read only, never edit it). Read PLAN.md, PROGRESS.md and
+     CLAUDE.md first. Write the tests first, then the code. Run ship-check. Push branch
+     `slice/<id>` and open a PR with phone and desktop screenshots, the preview link and a
+     3-line progress note in its body. Then stop." The first slice's prompt also says "commit
+     the D1 ids from PROGRESS.md into wrangler.jsonc";
+   - one `send_later` check-in after about 50 minutes (a finished child session doesn't report
+     back): find the PR by branch `slice/<id>`, `subscribe_pr_activity` on it and gate it. No PR
+     yet: check again once; still none, ping yskills with the session link;
+   - only the operator writes `PROGRESS.md`: it copies the builder's progress note from the PR
+     and adds the session's cost (`get_session`, `usage.cost_usd`), so parallel builders never
+     conflict.
 6. **Gate each PR** with `gate.md`. 5/5 merges. Less fixes and re-checks; after 3 failed rounds,
    stop and ping yskills with the evaluator's report.
-7. **Launch.** A full `red-team` and `legal-reviewer` pass on the preview, then **brief (c)**. On ok, the go-live steps of `publish` (and `sell`).
-8. **Grow.** The `market` skill's weekly routine; numbers go into Luna's cockpit. Each week the
-   operator reads them and turns the best next step into a new slice with criteria.
+7. **Launch.** A full `red-team` and `legal-reviewer` pass on the preview, then **brief (c)**.
+   On ok, the go-live steps of `publish` (and `sell`).
+8. **Grow.** At launch, `create_trigger` a weekly routine (fresh session per run, jittered time).
+   It collects the numbers (`market` skill's section 5) and opens one PR with that week's
+   `metrics/` file and the best next step as a new slice with criteria in `features.json`; the
+   operator merges docs-only PRs on CI alone. If the step fits in one slice it starts a fresh
+   operator (`create_session`) to build it; anything bigger goes to yskills as tap options.
 9. **Learn.** Anything yskills corrects, any gate round that failed for a reason a rule could
    catch, and anything a test project taught goes into claude-setup (a rule in CLAUDE.md, a skill
-   line, a test or a check) in a small PR. That is how the setup learns; no memory plugin needed.
+   line, a test or a check) in a small PR.
+
+**Waiting on yskills.** Before sending a brief, write the state to `PROGRESS.md`. If the answer
+comes back after more than an hour, don't continue in the cold thread: start a fresh operator
+(`create_session`, "continue the project: brief <x> answered <ok/no>, read PROGRESS.md") and stop.
 
 The three briefs are in `briefs.md`. One message each, fixed template, ok/no answer.
 
 ## 5. Spend little
 
-- **Models.** Operator and evaluator: Opus. Builder threads: Sonnet at medium effort (pass
-  `model` when starting the thread). Reviewer agents already run on Sonnet.
+- **Models.** Operator and evaluator: Opus (the evaluator's skepticism is the one judgment
+  Anthropic kept on its strongest model). Builder threads: Sonnet. Reviewer agents run on Sonnet.
 - **Fresh context.** Reviewers and the evaluator get only the diff or the URL plus the criteria,
   never the chat. A thread lives for one job (one plan or one PR) and then closes.
 - **Never revive a thread idle for more than an hour**: its cache is gone and it re-reads
   everything. Start a fresh one that reads `PROGRESS.md`.
 - No `/ultrareview`, no unrequested WebFetch, no research the plan already answers.
 - The evaluator runs once per gate round, never in a fix-until-pass loop of its own.
+- Red team and legal run once before launch for a small site; per PR only when the gate's
+  table says they apply.
