@@ -5,7 +5,10 @@
 1. **GitHub environment `production`.** It holds every secret the deploy needs.
    - Set its deployment-branch rule to `main` only. Then a workflow on a PR branch can never
      read the live keys.
-   - Plain repository secrets would be readable from any branch's workflow.
+   - Plain repository secrets would be readable from any branch's workflow: a same-repo PR
+     that edits a workflow runs that edit with every repo-level secret. Put the live keys
+     (Cloudflare deploy token, Stripe, Resend, Google) in `production` from day one.
+   - Repo-level secrets are only `CLOUDFLARE_ACCOUNT_ID` and `PREVIEW_CLOUDFLARE_API_TOKEN`.
 2. **Cloudflare Worker secrets.** The deploy job runs with `environment: production` and
    copies the runtime keys there with `wrangler secret put`. The Worker reads them from `env`.
    - Never in `wrangler.jsonc` `vars`.
@@ -58,10 +61,6 @@ project doesn't need.
 > 1. In GitHub, open the repo's [Environments](https://github.com/OWNER/REPO/settings/environments)
 >    page and click New environment. Name it `production`. Under Deployment branches, choose
 >    Selected branches and add `main`.
->    Then make a second environment named `preview` (no branch rule) with
->    `CLOUDFLARE_ACCOUNT_ID` and its own `CLOUDFLARE_API_TOKEN`: a second token with only
->    Account · Workers Scripts · Edit, limited under Workers to `<name>-preview` (it exists after
->    the first deploy). PRs then get preview links without touching the live site.
 > 2. In the same environment, use Add environment secret for each of these:
 >    - `CLOUDFLARE_API_TOKEN`: [create the token](https://dash.cloudflare.com/profile/api-tokens)
 >      from the template "Edit Cloudflare Workers", and add Account · D1 · Edit. Leave it on
@@ -75,6 +74,13 @@ project doesn't need.
 > 3. Open the repo's [Actions](https://github.com/OWNER/REPO/actions/workflows/ci.yml) page,
 >    press Run workflow, keep `main`, and press the green Run workflow. Then reply "keys done";
 >    Claude reads the run and tells you if anything is missing.
+> 4. After that first deploy, for preview links on PRs: in the [Cloudflare dashboard](https://dash.cloudflare.com),
+>    open Manage account > Account API tokens
+>    ([guide](https://developers.cloudflare.com/fundamentals/api/get-started/account-owned-tokens))
+>    and create a token with the Workers role Editor, limited to the Worker `<name>-preview` (the deploy just
+>    created it; it can't be picked before). Add it as the **repository** secret
+>    `PREVIEW_CLOUDFLARE_API_TOKEN` on [Actions secrets](https://github.com/OWNER/REPO/settings/secrets/actions/new),
+>    and `CLOUDFLARE_ACCOUNT_ID` there too. Never reuse the deploy token for this.
 
 Claude can't start that run itself: cloud threads get "403 Resource not accessible by
 integration" on `workflow_dispatch` and re-runs (duo-test, 2026-10-03). Without the button, a new
