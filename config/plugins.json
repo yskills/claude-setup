@@ -4,10 +4,6 @@
     {
       "name": "claude-plugins-official",
       "source": "anthropics/claude-plugins-official"
-    },
-    {
-      "name": "anthropic-agent-skills",
-      "source": "anthropics/skills"
     }
   ],
   "global": [

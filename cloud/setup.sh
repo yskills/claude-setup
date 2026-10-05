@@ -6,7 +6,6 @@
 set -u
 
 claude plugin marketplace add anthropics/claude-plugins-official || echo "claude-setup: marketplace anthropics/claude-plugins-official failed"
-claude plugin marketplace add anthropics/skills || echo "claude-setup: marketplace anthropics/skills failed"
 for id in \
   superpowers@claude-plugins-official \
   frontend-design@claude-plugins-official \

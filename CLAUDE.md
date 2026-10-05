@@ -14,11 +14,10 @@ revenue, analytics) instead of getting their own dashboard.
   automatically) so it doesn't repeat. Auto-memory is only a scratchpad: the monthly memory
   check (`docs/WORKFLOW.md`, Learning) moves lasting notes into the repo and deletes the rest.
 - New app idea or "continue the project": follow the `operator` skill. It sizes the job, writes
-  acceptance criteria before building, and sends yskills exactly three ok/no briefs.
-- Merging: a fresh gate thread merges an app PR when the `operator` skill's 5/5 gate passes (CI,
-  evaluator, fresh code review, security and red team, design and legal where they apply).
-  After launch, diffs touching auth, payments, migrations or secrets wait for yskills.
-  claude-setup: always yskills. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
+  acceptance criteria before building, and sends yskills three ok/no briefs.
+- Merging: yskills taps Merge it once a fresh gate thread posts the `operator` skill's 5/5 table
+  (CI, evaluator, fresh code review, security and red team, design and legal where they apply).
+  Never merge a PR yourself. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
 - Spend little: the operator on Opus, everything else (threads, agents) on Sonnet; reviewers get
   only the diff or URL plus the criteria.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only

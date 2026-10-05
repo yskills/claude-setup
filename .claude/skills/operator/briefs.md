@@ -1,7 +1,7 @@
 # The three briefs
 
-yskills reads exactly three messages per project and answers each with ok or no (or a tap on an
-option). Fixed templates, so they read the same every time. Short lines, no prose. German
+Besides the merge taps, yskills reads three messages per project and answers each with ok or no
+(or a tap on an option). Fixed templates, so they read the same every time. Short lines, no prose. German
 labels only if yskills writes German in that project.
 
 ## (a) After the plan
@@ -36,12 +36,12 @@ Previews Base secrets, test keys. Building starts when yskills replies "done".
 ```
 Launch: <name>
 Preview: <url>
-Gate: 5/5 on every slice (<n> PRs) | open: <which>
+Gate: 5/5 on every PR so far (<n> merged); last PR <link> at 5/5, unmerged
 Screens: <phone + desktop images attached>
 Legal: <legal-reviewer result: pass, or what is open>
 Live keys needed: <list with deep links, or none>
 Branch builds off before live keys: <yes | not needed, no live keys>
 Offene Risiken: <max 3 lines>
 
-ok = go live / no
+ok = tap Merge it on <link>, which goes live / no
 ```

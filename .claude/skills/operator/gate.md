@@ -1,55 +1,41 @@
-# The 5/5 merge gate
+# The 5/5 gate
 
-Run by a fresh gate thread per PR (or, in a plain chat, by the operator with fresh subagents).
-
-Five pass/fail checks, never a star score: AI judges grade their own team's work too kindly, so
-each check is a hard yes or no from someone who did not write the code.
+A fresh gate thread runs this on one PR (in a plain chat: the operator, with fresh subagents).
+Five pass/fail checks, never a star score: judges grade their own team's work too kindly, so each
+check is a hard yes or no from someone who didn't write the code.
 
 | # | Check | Who | Gets only | Applies |
 |---|---|---|---|---|
-| 1 | CI green **and** the `Workers Builds: <worker>` check green, both on the PR's head SHA | GitHub check runs | | always |
-| 2 | Every acceptance criterion of the slice passes on the preview | `evaluator` agent | the head SHA's preview URL, the slice's criteria | always |
-| 3 | Nothing blocking | a **fresh** `code-reviewer` (the builder's last `ship-check` pass counts if its report names this head SHA) | the diff + the slice goal in 2 sentences | always |
-| 4 | Nothing blocking, no CRITICAL or HIGH | `security-reviewer` on the diff, `red-team` attacking the preview | the diff; the preview URL and route list | auth, payments, user input, secrets touched; `red-team` always once before launch |
-| 5 | Nothing blocking | `design-critic`; `legal-reviewer` too when pages, forms, tracking, embeds or AI output change | phone + desktop screenshots, the preview URL | UI changed |
+| 1 | CI and `Workers Builds: <worker>` green on the head SHA | check runs | | always |
+| 2 | Every acceptance criterion passes on the preview | `evaluator` | the head SHA's preview URL (from the Workers Builds check or Cloudflare's PR comment), the slice's criteria | always |
+| 3 | Nothing blocking | a **fresh** `code-reviewer` (the builder's last ship-check pass counts if its report names this head SHA) | the diff, the slice goal in 2 sentences | always |
+| 4 | Nothing blocking, no CRITICAL/HIGH | `security-reviewer` on the diff; `red-team` on the preview | the diff; the preview URL and routes | auth, payments, user input or secrets touched; red team always on the last PR before launch |
+| 5 | Nothing blocking | `design-critic`; `legal-reviewer` when pages, forms, tracking, embeds or AI output change | phone and desktop screenshots, the preview URL | UI changed |
 
-A check that doesn't apply counts as passed; say so in the table.
+A check that doesn't apply passes; say "n/a" in the table.
 
-**When there is no preview:**
-- The scaffold PR (before yskills connects Workers Builds in brief (b)) merges on CI alone,
-  checks 2-5 n/a.
-- Once branch builds are off (live payment keys, `publish` skill), check 1 is CI alone, and the
-  gate thread runs the PR's build locally (`wrangler dev` with the local preview D1) so the
-  evaluator, red team and legal reviewer use that URL instead.
+**No preview yet or any more:** the scaffold PR (before Workers Builds is connected) needs CI
+only. Once branch builds are off (live payment keys, `publish` skill), check 1 is CI only and the
+gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
 
 ## Rounds
 
-- **5/5:** the gate thread commits the evaluator's verdict into `features.json` on the PR branch.
-  A commit that touches only `features.json` doesn't restart checks 2-5: wait for check 1 on its
-  SHA, then merge (squash). Any other new commit restarts the gate. GitHub doesn't let an author
-  approve their own PR and threads push as yskills, so the merge is the approval.
-- **Last PR before launch:** don't merge at 5/5. Merging to `main` is going live, so it waits
-  for brief (c)'s ok.
-- **Less than 5/5:** post the blocking findings as one PR review and stop. The builder (still
-  watching its PR) fixes them; the next round runs the failed checks again on the new head, each
-  with a **fresh** agent.
-- **3 failed rounds:** stop. Send yskills one message: the PR link, which check keeps failing,
-  the evaluator's or reviewer's last report, and two or three ways forward as tap options.
+- **5/5:** commit the evaluator's verdict into `features.json` (`passes`) on the PR branch, wait
+  for check 1 on that commit (a commit touching only `features.json` doesn't restart checks 2-5),
+  then post the table below. yskills merges with one tap.
+- **Less:** post the blocking findings as one PR review and stop. The builder fixes them; the next
+  round re-runs the failed checks with fresh agents on the new head.
+- **3 failed rounds:** stop. One message to yskills: the PR, the check that keeps failing, its last
+  report, and two or three ways forward as tap options.
 
-## After launch
-
-Once the app has real users or real money, the gate still merges on 5/5 **except** diffs
-touching auth, payments, database migrations or secrets: those get the 5/5 table posted on the
-PR and wait for yskills' ok (confirmed by yskills 2026-10-05). claude-setup itself is always
-merged by yskills.
-
-## Post this on the PR before merging
+PRs touching auth, payments, database migrations or secrets say so on the table's first line, so
+yskills knows which taps deserve a look. claude-setup PRs always get yskills' full review.
 
 ```
-Gate 5/5 (round <n>)
-1 CI + Workers Builds ... pass  <run links>
-2 Evaluator ..... pass  <n>/<n> criteria
-3 Code review ... pass  (fresh, round <n>)
-4 Security ...... pass | n/a
-5 Design/legal .. pass | n/a
+Gate 5/5 (round <n>), ready to merge   [risky: auth | payments | migration | secrets]
+1 CI + Workers Builds .. pass  <run links>
+2 Evaluator ............ pass  <n>/<n> criteria
+3 Code review .......... pass
+4 Security / red team .. pass | n/a
+5 Design / legal ....... pass | n/a
 ```
