@@ -62,8 +62,8 @@ Stripe only takes the money. Stripe.js never loads on our pages either.
 | `server/api/checkout/confirm.post.ts` | same | Return page check |
 | `server/api/stripe/webhook.post.ts` | same | Paid, SEPA, failed, expired, refunded, disputed |
 | `server/migrations/0001_orders.sql` | the D1 `migrations_dir` | `orders` table |
-| `scripts/deploy.mjs` | `scripts/` | Token check (`--check`: can it create a Worker, not just read), D1, migrations, deploy, Worker secrets, a fresh Stripe webhook. `SITE_URL` for a custom domain |
-| `ci.yml` | `.github/workflows/` | Verify on PRs; deploy from `main` with the `production` environment |
+| `scripts/deploy.mjs` | `scripts/` | The Workers Builds deploy command for `main`: live D1 migrations, deploy, generated secrets (`BETTER_AUTH_SECRET`), preview D1 migrations |
+| `ci.yml` | `.github/workflows/` | Verify on PRs and `main`; no keys, no deploy (Workers Builds deploys) |
 | `tests/shop.spec.ts` | `tests/e2e/` | Signed fake webhooks against `wrangler dev`, order validation, and real sessions against stripe-mock |
 | `playwright.config.ts` | project root | Starts `wrangler dev` with the test webhook secret, plus the stripe-mock vars when `STRIPE_MOCK` is set |
 
@@ -89,8 +89,14 @@ Stripe API rate limit.
   - `"compatibility_flags": ["nodejs_compat"]`
   - a D1 binding `DB`
   - `migrations_dir` pointing at the migrations.
-- `package.json` needs `"deploy": "node scripts/deploy.mjs"` and a `verify` script that runs
-  typecheck, unit tests, build and the e2e tests.
+- `package.json` needs `"deploy": "node scripts/deploy.mjs"` (the Workers Builds deploy command,
+  `publish` skill) and a `verify` script that runs typecheck, unit tests, build and the e2e tests.
+- `wrangler.jsonc` needs the `previews` block from the `publish` skill, with its own D1
+  (`preview_database_id`) and no live resource ids.
+- The Stripe webhook endpoint (one per mode, made by yskills, `keys.md`) subscribes to:
+  `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+  `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`,
+  `charge.dispute.created`. Its API version is the SDK's `Stripe.API_VERSION`.
 - `wrangler.jsonc` `vars`: `SITE_URL` is the canonical `https://` address. Links and email
   attachments use it instead of whatever host a request came in on.
 - `playwright.config.ts` from the templates starts the real runtime with a test-only webhook
@@ -140,7 +146,7 @@ Not yet run on Workers; the first subscription project proves it and updates thi
 - **The [Better Auth Stripe plugin](https://www.better-auth.com/docs/plugins/stripe)** does the
   customer, checkout, portal and webhook parts when the app uses Better Auth. As of 1.7.7 its
   peer range is `stripe` ^18 to ^22, so pin `stripe@22` in that project (check `recheck.md`).
-- **Webhook events** (add to the deploy script's `WEBHOOK_EVENTS`): `checkout.session.completed`,
+- **Webhook events** (add them to the endpoint in the Stripe dashboard, both modes): `checkout.session.completed`,
   `customer.subscription.created`, `customer.subscription.updated`,
   `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`. They are not
   optional: renewals, failed payments and cancellations only arrive this way.
@@ -167,12 +173,10 @@ Stripe becomes the seller, so it works through Checkout only. Check `recheck.md`
   retries for up to 3 days.
 - **Stripe sends events more than once and out of order.** Every write is guarded by the state
   it expects.
-- **The webhook secret differs between sandbox and live.** `deploy.mjs` creates a fresh endpoint
-  on every deploy:
-  - first the new endpoint, then its secret, then the old endpoint is deleted;
-  - its `api_version` is pinned to the SDK's.
-
-  So switching keys, adding events or a disabled endpoint never needs a hand fix.
+- **The webhook secret differs between sandbox and live.** Each mode has its own endpoint and
+  its own `whsec_…`; swapping the key at go-live means swapping the webhook secret too. Adding an
+  event or upgrading the SDK means editing the endpoint in the dashboard (events, API version).
+  Stripe emails yskills when an endpoint keeps failing.
 - **One Stripe account serves several projects.**
   - Every endpoint gets every account event, so handlers ignore sessions and charges they
     don't know. `markOrderPaid` requires the order's own session id, because a Payment Link

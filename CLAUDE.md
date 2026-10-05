@@ -12,9 +12,15 @@ revenue, analytics) instead of getting their own dashboard.
 - yskills should never have to say "do this again". When they correct something, fix it and
   record the lesson (project `CLAUDE.md`, or a test/lint rule/hook if it can be caught
   automatically) so it doesn't repeat.
-- Merging: a thread merges its own app PR once CI is green on the latest commit and a fresh
-  review is clean, until the app launches (real users or money); after that, and always for
-  claude-setup, yskills merges. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
+- New app idea or "continue the project": follow the `operator` skill. It sizes the job, writes
+  acceptance criteria before building, and sends yskills exactly three ok/no briefs.
+- Merging: a thread merges its own app PR when the `operator` skill's 5/5 gate passes (CI,
+  evaluator, fresh code review, security and red team, design and legal where they apply).
+  After launch, diffs touching auth, payments, migrations or secrets wait for yskills.
+  claude-setup: always yskills. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
+- Spend little: operator and evaluator on Opus, builder threads on Sonnet; reviewers get only
+  the diff or URL plus the criteria; never revive a thread idle for over an hour, start a fresh
+  one that reads `PROGRESS.md`.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
   before things nobody can undo: production deploys, payments, sending mail or posts, deleting
   data, force-pushing, rotating secrets.
@@ -64,7 +70,7 @@ yskills' verdict on early work was that it "looks very AI". For every UI change:
    animation: none` lands on the finished screen.
 2. Screenshot at phone (390px) and desktop (1440px) widths with Playwright, look at the images,
    and have the `design-critic` agent review them. Fix what it finds.
-3. Put the screenshots in the PR; whoever merges (see Merging above) looks at them.
+3. Put the screenshots in the PR; the merge gate's design check and yskills look at them.
 
 UI text is German first, English second, unless the project says otherwise.
 
@@ -88,14 +94,17 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 ## Tools you have
 
 - Agents: `planner`, `architect`, `code-reviewer`, `typescript-reviewer`, `vue-reviewer`,
-  `security-reviewer`, `database-reviewer`, `build-error-resolver`,
-  `e2e-runner`, `refactor-cleaner`, `silent-failure-hunter`, `doc-updater`, `a11y-architect`,
-  `performance-optimizer`, `seo-specialist`, `design-critic`. Use reviewers proactively after
-  writing code; use `security-reviewer` on anything touching auth, payments or user input.
-- Skills to reach for: `toolbox` (which plugins, APIs and skills a project needs, and adds
-  them to that project only), `onboard-project` (set up a repo for Claude), `publish` (deploys and previews),
-  `ship-check` (verify before push), `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD,
-  debugging) and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
+  `security-reviewer`, `database-reviewer`, `build-error-resolver`, `e2e-runner`,
+  `refactor-cleaner`, `silent-failure-hunter`, `doc-updater`, `a11y-architect`,
+  `performance-optimizer`, `seo-specialist`, `design-critic`, `evaluator`, `legal-reviewer`,
+  `red-team`.
+  Use reviewers proactively after writing code; use `security-reviewer` on anything touching
+  auth, payments or user input.
+- Skills to reach for: `operator` (idea to live app), `legal` (German law for any app),
+  `toolbox` (which plugins, APIs and skills a project needs, and adds them to that project
+  only), `onboard-project` (set up a repo for Claude), `ship-check` (verify before push),
+  `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD, debugging)
+  and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
 - Browser: Playwright MCP for headless checks; `claude --chrome` to use yskills' own Chrome
   when a page needs their login. In cloud threads launch Playwright with
   `executablePath: '/opt/pw-browsers/chromium'`; that Chromium has no H.264, so test video as WebM. Stop a dev server by

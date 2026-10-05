@@ -9,7 +9,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const errors = []
 const json = (p) => { try { return JSON.parse(readFileSync(join(root, p), 'utf8')) } catch (e) { errors.push(`${p}: ${e.message}`); return null } }
 
-for (const p of ['config/ecc.json', 'config/plugins.json', 'global/settings.json', '.claude/settings.json', '.claude/skills/onboard-project/templates/settings.json']) json(p)
+for (const p of ['config/ecc.json', 'config/plugins.json', 'global/settings.json', '.claude/settings.json', '.claude/skills/onboard-project/templates/settings.json', '.claude/skills/operator/templates/features.json']) json(p)
 
 function frontmatter(file) {
   const m = readFileSync(file, 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)

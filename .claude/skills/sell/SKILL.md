@@ -153,7 +153,8 @@ Claude prepares everything, then posts one manual-steps message.
 
 1. Gewerbe and the ELSTER questionnaire, if not done.
 2. Activate the Stripe account.
-3. Put the live restricted key into the GitHub environment `production`.
+3. Turn off non-production branch builds (Worker → Settings → Build), then put the live
+   restricted key and the live webhook's secret into the Worker's **Production** secrets (`keys.md`).
 4. Approve the legal texts.
 5. Physical goods: register in LUCID and license the packaging before the first parcel.
 
@@ -165,7 +166,7 @@ checks parameter names.
 
 1. Checks that no placeholder is left (`example-mug`, `Beispielshop`, `example.de`), that the
    rate-limiting rule on `/api/checkout*` exists, and deletes the sandbox orders.
-2. Redeploys. The deploy script creates the live webhook by itself.
+2. Checks the live webhook endpoint exists in live mode with the events from `stripe-workers.md`.
 3. Checks the live site:
    - a Checkout Session opens in live mode;
    - the legal pages are linked from every page;
@@ -176,7 +177,7 @@ checks parameter names.
 
 ## 5. Keep it working
 
-- **Weekly smoke test.** A scheduled GitHub Actions run costs no Claude tokens. It:
+- **Weekly smoke test.** A scheduled GitHub Actions run costs no Claude tokens and needs no keys. It:
   - opens the shop;
   - creates a Checkout Session (nothing is charged; it expires);
   - sends an unsigned webhook and expects 400;

@@ -77,3 +77,43 @@ To 10x Your Claude Skills". One video ("Top 5 Claude Code Plugins", Nick Automat
 its [written version](https://justbeingresourceful.com/2026/08/21/5-claude-code-plugins-worth-installing-in-2026-and-the-fine-print-on-the-unlimited-tokens-claim/);
 its picks: claude-code-setup (included), claude-mem (ECC's session hooks cover this), Headroom,
 OmniRoute (its "unlimited tokens" claim is misleading).
+
+## Autonomous projects (2026-10-05)
+
+Verdict before this round: about 80% state of the art. Plan thread writing PLAN.md, vertical
+slices riskiest first, a fresh thread per job with handoffs through files, fresh reviewers until
+clean, design first with a critic, Workers Builds with a preview per branch and corrections
+becoming rules already matched the sources below. Added from them:
+
+- **A separate evaluator** that tests the running app against criteria written before the
+  build. Anthropic kept this piece even on newer models; self-grading agents score their own
+  work too generously, fixed with hard pass/fail thresholds. Hence the `evaluator` agent and
+  the 5/5 gate as five yes/no checks, not a star score.
+  [Harness design for long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps)
+- **Progress in files, a feature list with a `passes` flag per feature** that only the tester
+  flips (agents edit JSON less casually than Markdown), and a fresh context per job.
+  [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)
+- **Simplest shape that works:** Anthropic dropped sprint splitting with newer Opus models; a
+  small site gets one build thread, only real apps get slices. Earlier notes here found 98% of
+  tokens went to threads re-reading their own history, hence one thread per job and no revived
+  idle threads. [ECC long-form guide](https://github.com/affaan-m/ECC/blob/main/the-longform-guide.md)
+- **Worker Previews** per branch with their own bindings and secrets.
+  [Cloudflare blog](https://blog.cloudflare.com/worker-previews/)
+- **Project threads, routines, cloud environments:**
+  [Claude projects](https://code.claude.com/docs/en/claude-projects),
+  [routines](https://code.claude.com/docs/en/routines),
+  [Claude Code on the web](https://code.claude.com/docs/en/claude-code-on-the-web)
+- **Skill search:** [skills.sh](https://vercel.com/docs/agent-resources/skills) (`npx skills
+  find`, Vercel's `find-skills`; community and unvetted) and the claude.ai Anthropic Directory
+  (SearchPlugins, SearchSkills, SearchMcpRegistry in cloud threads). The Directory has
+  Anthropic's legal plugins (`privacy-legal`, `ip-legal`, `ai-governance-legal`, from
+  anthropics/claude-for-legal), the `Marketing` plugin, Figma, Canva and Adobe connectors;
+  `find.mjs` can't see those. Blender's official connector wasn't in the registry: PC only.
+- **Not worth adding:** Spec Kit, BMAD, OpenSpec (PLAN.md plus features.json cover them);
+  managed Claude Code Review (Team/Enterprise only, $15-25 per PR; `ship-check` covers it);
+  `/ultraplan` was removed in September 2026; memory plugins and Obsidian (the repo is the
+  memory, cloud threads run no hooks).
+- **For the later video project** (yskills/autocut):
+  [FireRed-OpenStoryline](https://github.com/FireRedTeam/FireRed-OpenStoryline) (Apache-2.0,
+  style skills) and [VideoDB Director](https://github.com/video-db/Director) (MIT, agent
+  structure; don't depend on its paid cloud).

@@ -87,5 +87,5 @@ These were replaced on 2026-10-05:
 - GitHub Actions deploys with `CLOUDFLARE_API_TOKEN` in a main-only environment.
 - PR previews uploaded to a separate `<name>-preview` Worker with `PREVIEW_CLOUDFLARE_API_TOKEN`.
 
-The `sell` skill's `keys.md` and `templates/` still describe that setup until they move over.
-Until then, use this skill for deploys and the `sell` skill for everything else.
+The `sell` skill's `keys.md` and `templates/` moved over on 2026-10-05: shop keys are Worker
+secrets, its `deploy.mjs` is the deploy command, and its `ci.yml` only verifies.

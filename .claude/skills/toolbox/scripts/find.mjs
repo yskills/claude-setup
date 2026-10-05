@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Search plugins (every installed marketplace) and all ECC skills for keywords.
-//   node find.mjs video caption [--all]
+// Search plugins (every installed marketplace), all ECC skills, the catalog and skills.sh
+// (the open community skill directory) for keywords.
+//   node find.mjs video caption [--all] [--offline]
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
@@ -10,9 +11,10 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 const args = process.argv.slice(2)
 const showAll = args.includes('--all')
+const offline = args.includes('--offline')
 const words = args.filter((a) => !a.startsWith('--')).map((w) => w.toLowerCase())
 if (!words.length) {
-  console.error('Usage: node find.mjs <keyword> [<keyword>...] [--all]')
+  console.error('Usage: node find.mjs <keyword> [<keyword>...] [--all] [--offline]')
   process.exit(1)
 }
 
@@ -78,3 +80,28 @@ for (const kind of ['plugin', 'ecc skill']) {
 }
 console.log(`\n## catalog lines`)
 for (const h of catHits.sort((a, b) => b.s - a.s).slice(0, limit)) console.log(`- ${h.line}`)
+
+// skills.sh via its CLI, pinned (read 2026-10-05; it only queries the directory, installs nothing).
+// skills.sh: hundreds of thousands of community skills, unvetted. Many are junk or unsafe, so
+// every hit is a lead to read before installing (toolbox SKILL.md, step 3), never an install.
+if (!offline) {
+  console.log(`\n## skills.sh (community, unvetted: read before installing)`)
+  try {
+    // One query per keyword (at most 4): skills.sh matches a whole phrase and sorts by installs.
+    const hits = new Map()
+    for (const word of words.slice(0, 4)) {
+      const raw = execFileSync('npx', ['-y', 'skills@1.7.0', 'find', word], { encoding: 'utf8', timeout: 90_000, stdio: ['ignore', 'pipe', 'ignore'] })
+      const lines = raw.replace(/\x1b\[[0-9;]*m/g, '').split('\n').map((l) => l.trim()).filter(Boolean)
+      for (let i = 0; i < lines.length; i++) {
+        const m = lines[i].match(/^(\S+@\S+)\s+(.*installs.*)$/)
+        if (m && !hits.has(m[1])) hits.set(m[1], { s: score(m[1]), line: `- ${m[1]} (${m[2]})${lines[i + 1]?.startsWith('└') ? `\n    ${lines[i + 1].slice(1).trim()}` : ''}` })
+      }
+    }
+    // Keep hits whose name carries a keyword; the directory's own order is by popularity.
+    const relevant = [...hits.values()].filter((h) => showAll || h.s).sort((a, b) => b.s - a.s)
+    console.log(relevant.slice(0, limit).map((h) => h.line).join('\n') || '(no hits)')
+  } catch {
+    console.log('(skills.sh unreachable; run `npx skills find <query>` by hand, or pass --offline)')
+  }
+}
+console.log(`\nAlso search the claude.ai Anthropic Directory (plugins, skills, connectors like Figma, Canva, Adobe): in cloud threads with the SearchPlugins, SearchSkills and SearchMcpRegistry tools; on the PC in claude.ai > Customize.`)
