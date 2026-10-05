@@ -138,3 +138,5 @@ conversation can continue later; a plain chat idle for over an hour hands off to
 - No `/ultrareview`, no unrequested WebFetch, no research the plan already answers.
 - The evaluator runs once per gate round. Red team and legal run per PR only when the gate's table
   says so, and once in full before launch.
+- Until the first paying user the gate runs in probe mode (`gate.md`): fewer reviewers, security
+  still on for anything a user typed.

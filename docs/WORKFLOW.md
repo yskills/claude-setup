@@ -30,7 +30,9 @@ After launch, phases 5-6 repeat for every improvement the weekly numbers suggest
 Five pass/fail checks by agents that didn't write the code: CI, evaluator on the preview, fresh
 code review, security + red team, design + legal. 5/5 → you tap **Merge it** (Claude's auto mode
 won't let a thread merge a PR no human approved; tested 2026-10-05). 2 failed rounds → you get a
-plain summary of what's wrong and tap options. Important PRs (auth, payments, migrations, secrets)
+plain summary of what's wrong and tap options. Until the first paying user the gate runs in
+probe mode: no fresh code reviewer (the builder's ship-check counts), design review only on the
+probe page and before launch, security whenever a PR stores what users type. Important PRs (auth, payments, migrations, secrets)
 come with three lines: what changes, what could break, how to undo it.
 claude-setup PRs always get your full review. Details: `operator` skill, `gate.md`.
 

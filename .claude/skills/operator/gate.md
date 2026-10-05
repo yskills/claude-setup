@@ -14,6 +14,20 @@ check is a hard yes or no from someone who didn't write the code.
 
 A check that doesn't apply passes; say "n/a" in the table.
 
+## Mode: probe or product
+
+`PLAN.md` says `Mode: probe` until the first paying user; the operator (or the weekly routine,
+whichever sees that payment first) switches it to `Mode: product`. Until someone pays, gate rounds go to finding out whether anyone will:
+
+| # | Probe mode |
+|---|---|
+| 1, 2 | as above |
+| 3 | the builder's ship-check report, when it names this head SHA; no fresh reviewer |
+| 4 | `security-reviewer` whenever the PR touches logins, payments, secrets or stores anything a user typed (emails, notes, journal entries); `red-team` only on the last PR before launch |
+| 5 | `legal-reviewer` when public pages, forms, tracking or embeds change; `design-critic` only on the probe slice and the last PR before launch |
+
+Product mode is the full table above. The headline names the mode: `Gate 5/5 (probe, round <n>)`.
+
 **No preview yet or any more:** the scaffold PR (before Workers Builds is connected) needs CI
 only. Once branch builds are off (live payment keys, `publish` skill), check 1 is CI only and the
 gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
