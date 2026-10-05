@@ -79,7 +79,12 @@ Claude:
 
   A branch that adds a migration applies it to the shared preview database before its Preview
   goes up, so its pages work on the preview. Migrations are forward-only: a dropped branch leaves
-  its tables in the preview database, which holds only test data.
+  its tables in the preview database, which holds only test data. Never edit or rename a
+  migration once its branch is pushed; add a new one. The preview database would skip an edited
+  one silently and fail on a renamed one (e.g. "already exists"), blocking that branch's previews,
+  and after the merge the live deploy too.
+  Exception: a migration that failed to apply was never recorded, so fix it in place; an applied
+  one that was already renamed gets its old file name back.
 - `npm run check`: lint, typecheck and unit tests, no browser tests (they need a browser and slow
   every build). `verify` in GitHub Actions still runs everything.
 - A unit test that checks the `previews` block: same binding names, no live resource ids

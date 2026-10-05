@@ -32,8 +32,9 @@ revenue, analytics) instead of getting their own dashboard.
   blog) and the exact names to use (secret names, field values), so they only follow it.
 - yskills writes short, informal messages. Answer the same way: lead with the result, then what
   they need to do (if anything). No walls of text.
-- Before calling work done or pushing: run what CI runs (a `verify`/`ship` script, the repo's
-  `verify` skill, or `.github/workflows`). Report failures honestly with the output.
+- Before calling work done or pushing: run what CI runs (the `verify` script, the repo's `verify`
+  skill, or `.github/workflows`), never a script that deploys (`ship`, `deploy`). Report failures
+  honestly with the output.
 - Search before building: an existing library, MCP server or skill beats new code
   (`search-first` skill). Use Context7 (PC only) for current library docs instead of memory.
 - In cloud project threads every WebFetch of a page nobody posted in the chat makes yskills

@@ -10,7 +10,9 @@ description: Run the checks CI runs, then have fresh code-reviewer agents review
 In order of preference:
 
 1. A repo skill named `verify` (`.claude/skills/verify/SKILL.md`): follow it and stop here.
-2. A `verify`, `check`, `ci` or `ship` script in `package.json` (skip the deploy part of `ship`).
+2. A `verify` (else `ci`) script in `package.json`. Never run `ship` or `deploy`; run the
+   non-deploy steps of `ship` by hand. A `check` script alone is not enough (lint, typecheck and
+   unit tests only, `publish` skill): also run the `.github/workflows` steps it leaves out (3).
 3. The steps in `.github/workflows/*.yml` that run on `pull_request`.
 4. Otherwise whatever exists of: lint, typecheck (`vue-tsc --noEmit`, `tsc --noEmit`,
    `nuxt typecheck`, `pyright`), tests (`vitest run`, `npm test`, `pytest`), build.
