@@ -17,7 +17,7 @@ one (auth, payments, migrations, secrets), reaches yskills with a plain summary 
 (`gate.md`). Claude's auto mode blocks a thread from merging a PR no human approved (tested
 2026-10-05), so the tap is the approval.
 
-**Starting threads.** In a Claude Project the project conversation starts threads itself; each
+**Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`); each
 reports back when it finishes and keeps fixing CI and review comments on its PR. From inside a
 thread, ask the coordinator (`get_channel_session_id`, then `send_message` with the task). In a
 plain claude.ai/code chat use `create_session` (`model: claude-sonnet-5-5`, `outcome_branch` = the

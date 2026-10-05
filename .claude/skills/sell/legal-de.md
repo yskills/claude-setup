@@ -65,7 +65,10 @@ Claude builds this; the law is specific.
 
 - **Confirmation email** (§ 312f BGB) [K]: the contract content plus the AGB,
   Widerrufsbelehrung and Muster-Widerrufsformular, on a durable medium. `fulfil.ts` attaches
-  them as PDFs; a link does not count.
+  them as PDFs from `public/rechtliches/` (`agb.pdf`, `widerrufsbelehrung.pdf`,
+  `muster-widerrufsformular.pdf`); a link does not count. Claude prints them from the project's
+  own legal pages with Playwright's `page.pdf()` and commits them, and reprints them whenever a
+  text changes (a missing PDF makes every confirmation email fail).
 - **Widerrufsbutton** (§ 356a BGB, since 2026-06-19) [S], for goods too:
   - Step 1 is a function labelled "Vertrag widerrufen", easy to find and available for the
     whole withdrawal period.
