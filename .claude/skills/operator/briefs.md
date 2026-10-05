@@ -32,7 +32,8 @@ a two-word name and one line on the feel. Then tap options: the directions, plus
 
 Below the pick, once per project, the setup only yskills can do (numbered steps with deep links
 and exact names, from the `publish` skill and `sell`'s `keys.md`): Cloudflare import, D1 ids,
-Previews Base secrets, test keys. Building starts when yskills replies "done".
+Previews Base secrets. Test keys come later by key card, when the slice that uses them
+starts. Building starts when yskills replies "done".
 
 ## (c) Before launch
 

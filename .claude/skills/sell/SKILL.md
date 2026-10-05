@@ -19,7 +19,7 @@ Files next to this one:
 | File | Read it when |
 |---|---|
 | `recheck.md` | first, every new project: dated facts and where to confirm them |
-| `keys.md` | writing the first batch of questions, and at go-live |
+| `keys.md` | writing the key card for the slice that takes money, and at go-live |
 | `stripe-workers.md` | building checkout, webhook and tests; it lists `templates/`. Deploys and previews: the `publish` skill |
 | `physical.md` | anything gets shipped |
 | `legal-de.md` | legal pages, checkout wording, registrations |
