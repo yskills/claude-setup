@@ -172,7 +172,8 @@ Stripe becomes the seller, so it works through Checkout only. Check `recheck.md`
   that too if the project offers such codes; otherwise leave promotion codes off.
 - **Never put a price in a request body or in metadata the client can influence.**
 - **Rate-limit checkout, confirm and withdrawal** with the Workers rate-limit binding
-  (`ratelimits` in `wrangler.jsonc`, keyed on `cf-connecting-ip`), with its own `namespace_id`
+  (`ratelimits` in `wrangler.jsonc`, keyed on `cf-connecting-ip`, an IPv6 address cut to its /64
+  because one user can rotate through the whole /64), with its own `namespace_id`
   under `previews` (`publish` skill). It works in `wrangler dev` too. Without it, anyone can loop
   the endpoint, filling D1 and burning the Stripe API rate limit.
 - **Legal texts live in one shared TS module**, so the pages and the confirmation email can't
