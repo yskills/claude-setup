@@ -15,12 +15,13 @@ The templates in `templates/` were checked on 2026-10-03:
   - binding each order to its session;
   - fulfilment retries;
   - weight limits;
-  - deploy webhook handling;
   - key scope.
 
   Its fixes are in.
 - stripe-mock checks parameter names, not every business rule. The first sandbox checkout with
   a real test key is the final check (SKILL.md, go-live).
+- `scripts/deploy.mjs` and `ci.yml` were rewritten for Workers Builds on 2026-10-05 and have not
+  run there yet; test project 3 (claude-setup `docs/TEST-PROJECTS.md`) proves them.
 
 The digital-product variant below ran green in yskills/duo-test.
 

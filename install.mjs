@@ -52,7 +52,7 @@ const write = (p, s) => { if (DRY) return; mkdirSync(dirname(p), { recursive: tr
 // ---------------------------------------------------------------- 0. prerequisites
 step('Checking prerequisites')
 const nodeMajor = Number(process.versions.node.split('.')[0])
-if (nodeMajor < 18) { console.error(`Node ${process.versions.node} is too old; install Node 20+ (24 recommended).`); process.exit(1) }
+if (nodeMajor < 20) { console.error(`Node ${process.versions.node} is too old; install Node 20+ (24 recommended).`); process.exit(1) }
 log(`  node ${process.versions.node}`)
 if (!has('git')) warn('git not found: install Git, then re-run.')
 const hasClaude = has('claude')

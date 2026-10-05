@@ -37,15 +37,15 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 | 7 plugins per project | Cloudflare, Firebase, Stripe, Sentry, PostHog, Supabase, Vercel: installed but off; a repo turns one on in its `.claude/settings.json` | same |
 | 17 ECC skills | Vue, Nuxt 4, Vite, API design, security review, e2e, SEO, i18n... | `.claude/skills`, list in `config/ecc.json` |
 | 15 ECC agents | planner, architect, code/TS/Vue/security/database reviewers, build-error-resolver, e2e-runner, a11y, performance, SEO... | `.claude/agents` |
-| ECC rules | common + TypeScript, Vue, Nuxt, web, Python (language rules load only for matching files) | `.claude/rules/ecc` |
+| ECC rules | common + TypeScript, Vue, Nuxt, web (language rules load only for matching files) | `.claude/rules/ecc` |
 | ECC hooks | session memory across restarts, quality gate after edits, design-quality warning, console.log and secret checks before commits, compaction hints (PC only: cloud threads don't run hooks) | `npx ecc-universal@2.2.3` |
 | Toolbox | Knows which plugins, APIs and skills any kind of app needs (video, AI, payments, ads, auth, email, analytics, mobile, scraping...), searches all ~315 plugins, 293 ECC skills and skills.sh live (and points cloud threads at the Anthropic Directory), and adds them to that one project | `.claude/skills/toolbox` |
-| Own skills | `operator` (idea to live app: sizes the job, staffs research/legal/design/build/QA/launch/marketing, acceptance criteria before building, the 5/5 merge gate, three ok/no briefs), `legal` (German law for any app, privacy scan of a preview, license and trademark checks), `onboard-project` (set a repo up for Claude in one PR), `publish` (deploys through Cloudflare Workers Builds with a preview per branch, no keys in GitHub), `ship-check` (run CI locally, then fresh `code-reviewer` passes until clean), `ui-review` (phone/desktop screenshots + critique), `sell` (checkout, shop and shipping from Germany: keys, tested Stripe-on-Workers code, German shop law, go-live), `market` (marketing plan in the PRD, launch, channels, German advertising law, weekly report), `watch` (watch a video or reel: frames plus transcript; vendored from claude-video, MIT) | `.claude/skills` |
+| Own skills | `operator` (idea to live app: sizes the job, staffs research/legal/design/build/QA/red team/launch/marketing, acceptance criteria before building, the 5/5 merge gate, three ok/no briefs), `legal` (German law for any app, privacy scan of a preview, license and trademark checks), `onboard-project` (set a repo up for Claude in one PR), `publish` (deploys through Cloudflare Workers Builds with a preview per branch, no keys in GitHub), `ship-check` (run CI locally, then fresh `code-reviewer` passes until clean), `ui-review` (phone/desktop screenshots + critique), `sell` (checkout, shop and shipping from Germany: keys, tested Stripe-on-Workers code, German shop law, go-live), `market` (marketing plan in the PRD, launch, channels, German advertising law, weekly report), `watch` (watch a video or reel: frames plus transcript; vendored from claude-video, MIT) | `.claude/skills` |
 | Own agents | `design-critic` (reviews screenshots for the "looks AI" problem), `evaluator` (clicks through a preview and grades a slice against its criteria), `legal-reviewer` (German must-haves on a preview), `red-team` (attacks your own preview like an outsider) | `.claude/agents` |
 | Design taste | `impeccable` (design skill plus a local `detect` linter for AI-look patterns) and `web-interface-guidelines` (Vercel's UI checklist); `ui-review` runs both | `.claude/skills` (Apache-2.0 and MIT, see `THIRD_PARTY.md`) |
 | Ponytail | Write the least code that works: reuse, standard library, platform, installed dependency, one line, then new code | `.claude/skills/ponytail` (MIT, see `THIRD_PARTY.md`) |
 
-Measured in a fresh session before the 2026-10-04 cleanup (10 skills cut since): about 37k tokens of a 500k window before you type anything
+Last measured before the 2026-10-04 cleanup (10 skills cut, 3 own skills and 3 agents added since; re-measure with `/context`): about 37k tokens of a 500k window before you type anything
 (skills 9.9k, CLAUDE.md + rules 7.6k, agents 1.9k; MCP tools are deferred). The full ECC plugin
 alone would add ~45k.
 
@@ -67,7 +67,7 @@ project that uses this setup.
 - **Network access:** Custom, tick "Also include default list of common package managers", and
   add:
   - `cdn.jsdelivr.net`, `unpkg.com` (CDN scripts, e.g. GSAP for HyperFrames)
-  - `*.yskills.workers.dev` (your own live sites and PR previews, so threads can open and
+  - `*.yskills.workers.dev` (your own live sites and branch previews, so threads can open and
     screenshot what they deployed; blocked otherwise)
   - `*.youtube.com`, `*.googlevideo.com`, only if threads work on video
 - **No deploy keys here.** Cloudflare Workers Builds deploys `main` and gives every other branch

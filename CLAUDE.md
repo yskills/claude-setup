@@ -14,7 +14,7 @@ revenue, analytics) instead of getting their own dashboard.
   automatically) so it doesn't repeat.
 - New app idea or "continue the project": follow the `operator` skill. It sizes the job, writes
   acceptance criteria before building, and sends yskills exactly three ok/no briefs.
-- Merging: a thread merges its own app PR when the `operator` skill's 5/5 gate passes (CI,
+- Merging: the operator merges an app PR when the `operator` skill's 5/5 gate passes (CI,
   evaluator, fresh code review, security and red team, design and legal where they apply).
   After launch, diffs touching auth, payments, migrations or secrets wait for yskills.
   claude-setup: always yskills. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
@@ -35,10 +35,9 @@ revenue, analytics) instead of getting their own dashboard.
 - Before calling work done or pushing: run what CI runs (a `verify`/`ship` script, the repo's
   `verify` skill, or `.github/workflows`). Report failures honestly with the output.
 - Search before building: an existing library, MCP server or skill beats new code
-  (`search-first` skill). Use Context7 for current library docs instead of memory.
+  (`search-first` skill). Use Context7 (PC only) for current library docs instead of memory.
 - In cloud project threads every WebFetch of a page nobody posted in the chat makes yskills
-  press Allow. Research there with WebSearch (Context7 asks threads for a sign-in they can't
-  do), and tell subagents the same; fetch a
+  press Allow. Research there with WebSearch and tell subagents the same; fetch a
   page only when one fact depends on it, and say so in the thread.
 - Keep context lean: `/clear` between unrelated tasks, `/compact` at milestones
   (`strategic-compact`). Hand big reads to subagents.

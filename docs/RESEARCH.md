@@ -80,10 +80,7 @@ OmniRoute (its "unlimited tokens" claim is misleading).
 
 ## Autonomous projects (2026-10-05)
 
-Verdict before this round: about 80% state of the art. Plan thread writing PLAN.md, vertical
-slices riskiest first, a fresh thread per job with handoffs through files, fresh reviewers until
-clean, design first with a critic, Workers Builds with a preview per branch and corrections
-becoming rules already matched the sources below. Added from them:
+Added from these sources:
 
 - **A separate evaluator** that tests the running app against criteria written before the
   build. Anthropic kept this piece even on newer models; self-grading agents score their own

@@ -3,8 +3,8 @@
 Every new project follows this. You send the idea; the plan thread becomes the **operator**
 (`operator` skill). It holds the goals, staffs the teams, pushes them until the goal is live,
 and asks you exactly three ok/no questions. Each other thread lives for one job, hands off
-through files and closes: long threads re-read their whole history every turn (98% of the
-tokens on 2026-10-04 went there).
+through files and closes:
+long threads re-read their whole history every turn.
 
 ## The phases
 
@@ -16,7 +16,7 @@ tokens on 2026-10-04 went there).
 | 3 | Plan | `planner` | `PLAN.md` (PRD, slices, marketing plan, keys, costs), `features.json` (acceptance criteria per slice, written before any code) | **Brief (a):** ok/no; add keys in Cloudflare |
 | 4 | Scaffold + design | one scaffold thread; design team (`frontend-design`, `impeccable`, `design-critic`) | default stack, `verify`, CI, Workers Builds (`publish`); 2-3 directions as screenshots | **Brief (b):** pick one |
 | 5 | Build | builder threads (Sonnet), one per slice, at most 3 in parallel; a small site is one thread, no slices | PRs with tests, screenshots, preview link; `PROGRESS.md` updated | Nothing |
-| 6 | Gate each PR | QA: `evaluator` on the preview, fresh `code-reviewer`; security: `security-reviewer` + `red-team`; `design-critic` + `legal-reviewer` | 5/5 → the thread merges | Nothing, unless 3 rounds fail |
+| 6 | Gate each PR | QA: `evaluator` on the preview, fresh `code-reviewer`; security: `security-reviewer` + `red-team`; `design-critic` + `legal-reviewer` | 5/5 → the operator merges | Nothing, unless 3 rounds fail |
 | 7 | Launch | full `red-team` and `legal-reviewer` pass; `publish`, `sell` go-live; Sentry, PostHog | live site | **Brief (c):** ok/no; live keys |
 | 8 | Grow | marketing team (`market` skill, `seo-specialist`) | posts, launch, weekly numbers into Luna's cockpit | Approve post batches, pay for ads |
 | 9 | Learn | operator | each lesson becomes a rule, skill line, test or check in claude-setup | Merge that PR |
@@ -25,35 +25,10 @@ After launch, phases 5-6 repeat for every improvement the weekly numbers suggest
 
 ## The 5/5 gate
 
-Five pass/fail checks, never a star score: AI judges grade their own team's work too kindly, so
-each check is a hard yes or no from someone who didn't write the code (`operator` skill,
-`gate.md`).
-
-1. CI green on the latest commit.
-2. The `evaluator` passes every acceptance criterion on the branch's preview.
-3. A fresh `code-reviewer` finds nothing blocking.
-4. `security-reviewer` and `red-team` find nothing blocking, when auth, payments or user input
-   are touched.
-5. `design-critic` and `legal-reviewer` find nothing blocking, for UI changes.
-
-- **5/5:** the thread merges. GitHub doesn't let an author approve their own PR and threads push
-  as you, so the merge is the approval.
-- **Less:** fix, re-check with fresh agents. **After 3 failed rounds** the thread stops and
-  pings you with tap options.
-- **After launch:** still merges on 5/5, except diffs touching auth, payments, DB migrations or
-  secrets: those wait for your ok.
-- **claude-setup:** always you.
-
-## Spending tokens
-
-- Operator and evaluator on Opus; builder threads on Sonnet at medium effort; reviewer agents
-  run on Sonnet.
-- Reviewers, the evaluator and the red team get only the diff or the URL plus the criteria,
-  never the chat.
-- Never revive a thread idle for more than an hour: its cache expired and it re-reads
-  everything. Start a fresh one; it reads `PROGRESS.md`.
-- No `/ultrareview`, no unrequested WebFetch. The always-on baseline is measured
-  (`config/plugins.json`, README).
+Five pass/fail checks by agents that didn't write the code: CI, evaluator on the preview, fresh
+code review, security + red team, design + legal. 5/5 → the operator merges; 3 failed rounds →
+you get pinged; after launch, auth/payments/migrations/secrets wait for you; claude-setup is
+always you. Details: `operator` skill, `gate.md`. Token rules: its section 5.
 
 ## Learning
 
@@ -77,10 +52,7 @@ Once, before your first real sale (the skill links each step):
 - Physical products: a Sendcloud account, plus LUCID and a packaging licence before the first
   parcel.
 
-Deploys run through Cloudflare Workers Builds (`publish` skill): `main` goes live, every other
-branch gets its own preview with its own data and keys, and GitHub holds no keys. Threads never
-deploy themselves. Test keys first, live keys at go-live, and branch builds go off before the
-first live key.
+Deploys and previews: the `publish` skill.
 
 ## Security, always on
 

@@ -34,5 +34,8 @@ jobs:
           grep -q '# my notes' "$HOME/.claude/CLAUDE.md"
           test -f "$HOME/.claude/skills/ship-check/SKILL.md"
           test -f "$HOME/.claude/agents/design-critic.md"
+          test -f "$HOME/.claude/agents/red-team.md"
+          test -f "$HOME/.claude/skills/operator/templates/features.json"
+          test -f "$HOME/.claude/skills/legal/scripts/privacy-scan.mjs"
           node -e "const s=require(process.env.HOME+'/.claude/settings.json'); if(!s.hooks||!s.statusLine||s.permissions.defaultMode!=='auto') process.exit(1)"
           echo '{"model":{"display_name":"Test"},"workspace":{"current_dir":"."},"context_window":{"remaining_percentage":70}}' | node "$HOME/.claude/claude-setup/statusline.mjs"

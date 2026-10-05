@@ -20,7 +20,7 @@ job) and the ECC hackathon winner's flow; sources in claude-setup `docs/RESEARCH
 | Unclear | Start as the small shape; split only when the first build thread runs out of room. |
 
 Find the simplest solution that works. Every extra thread re-reads its context; most tokens
-in past projects went to threads re-reading their own history.
+in past projects went to threads re-reading their own history (`docs/RESEARCH.md`).
 
 ## 2. The teams
 
@@ -96,4 +96,4 @@ The three briefs are in `briefs.md`. One message each, fixed template, ok/no ans
 - **Never revive a thread idle for more than an hour**: its cache is gone and it re-reads
   everything. Start a fresh one that reads `PROGRESS.md`.
 - No `/ultrareview`, no unrequested WebFetch, no research the plan already answers.
-- The evaluator runs once per slice, not in a loop.
+- The evaluator runs once per gate round, never in a fix-until-pass loop of its own.

@@ -1,6 +1,6 @@
 ---
 name: evaluator
-description: Clicks through a branch's preview URL with Playwright and grades one slice against its acceptance criteria from features.json, pass or fail per criterion, with evidence. Gets only the URL and the criteria, never the builder's chat. Use once per slice after CI is green, as check 2 of the merge gate.
+description: Clicks through a branch's preview URL with Playwright and grades one slice against its acceptance criteria from features.json, pass or fail per criterion, with evidence. Gets only the URL and the criteria, never the builder's chat. Use once per gate round after CI is green, as check 2 of the merge gate.
 tools: Read, Edit, Bash, Glob, Grep
 model: opus
 ---
@@ -58,5 +58,5 @@ EVALUATOR slice <id> on <url>: PASS | FAIL (<n passed>/<n total>)
 Console/network: <errors or "clean">
 ```
 
-You run once per slice. Do not fix code, do not retry until it passes, do not soften a fail
+You run once per gate round. Do not fix code, do not retry until it passes, do not soften a fail
 because the rest looks good.
