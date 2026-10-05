@@ -95,7 +95,9 @@ Templates in `templates/`.
    default stack from CLAUDE.md, the `publish` skill's files, `verify`, CI, legal pages per the
    `legal` skill. Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
    directions. **Brief (b)** carries only what every build needs: the Cloudflare import and the D1
-   ids. Building starts once the scaffold PR is merged and brief (b) is answered.
+   ids. The scaffold PR's merge tap comes first in brief (b), because the Cloudflare import builds
+   the default branch and needs the scaffold's `wrangler.jsonc` there. Building starts once
+   brief (b) is answered.
 
    **Keys and accounts just in time.** Every other key or account is asked for by a **key card**
    (`briefs.md`) at the moment the next slice needs it ("you want payments: add a Stripe key
@@ -144,7 +146,8 @@ conversation can continue later; a plain chat idle for over an hour hands off to
 
 ## 5. Spend little
 
-- Coordinator on Opus; threads (medium effort) and every agent on Sonnet. Built-in subagents
+- Coordinator, `planner` and `architect` on Opus (they decide once per project); threads (medium
+  effort) and every other agent on Sonnet. Built-in subagents
   default to Sonnet via `CLAUDE_CODE_SUBAGENT_MODEL`.
 - Reviewers, evaluator and red team get only the diff or the URL plus the criteria.
 - One job per thread. When its job is done (PR merged, report delivered) the thread stops and is

@@ -18,8 +18,9 @@ revenue, analytics) instead of getting their own dashboard.
 - Merging: yskills taps Merge it once a fresh gate thread posts the `operator` skill's 5/5 table
   (CI, evaluator, fresh code review, security and red team, design and legal where they apply).
   Never merge a PR unless yskills tells you to. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
-- Spend little: the operator on Opus, everything else (threads, agents) on Sonnet; reviewers get
-  only the diff or URL plus the criteria.
+- Spend little: the operator, `planner` and `architect` on Opus (they decide once per project),
+  everything else (threads, other agents) on Sonnet; reviewers get only the diff or URL plus the
+  criteria.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
   before things nobody can undo: production deploys, payments, sending mail or posts, deleting
   data, force-pushing, rotating secrets.

@@ -33,7 +33,8 @@ skill's `TASTE.md`. Then tap options: the directions, plus "none, try again". ys
 answer in words or pictures ("this one but darker", a screenshot): the design team revises and
 sends the next round. Each lasting like or dislike becomes a line in `TASTE.md`.
 
-Below the pick, once per project, the setup only yskills can do (numbered steps with deep links
+Below the pick, first the scaffold PR's merge tap (the import builds the default branch), then,
+once per project, the setup only yskills can do (numbered steps with deep links
 and exact names, from the `publish` skill and `sell`'s `keys.md`): Cloudflare import, D1 ids,
 Previews Base secrets. Test keys come later by key card, when the slice that uses them
 starts. Building starts when yskills replies "done".
