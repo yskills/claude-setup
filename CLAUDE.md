@@ -88,8 +88,9 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
   reply. Services that need a server (like Luna): Docker + Caddy on a small VPS.
 - Anything beyond this (video, AI generation, payments, ads, analytics, email, mobile...) comes
   from the `toolbox` skill, added to that project only. Anything that takes money (checkout,
-  shop, subscriptions, shipping) follows the `sell` skill; getting users or buyers (marketing
-  plan, launch, ads, social content) follows the `market` skill.
+  shop, subscriptions, shipping) follows the `sell` skill, an app for the App Store or Google
+  Play the `store` skill; getting users or buyers (marketing plan, launch, ads, social content)
+  follows the `market` skill.
 
 ## Tools you have
 

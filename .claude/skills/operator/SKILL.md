@@ -49,7 +49,7 @@ enterprise-flavoured: German law and this stack's rules win.
 | Build | builder threads; `architect`, `database-reviewer`, `build-error-resolver` | stack plugins via `toolbox` | a PR with green CI |
 | QA | `evaluator`, `code-reviewer`, `a11y-architect`, `performance-optimizer` | | gate checks 2-3 |
 | Security | `security-reviewer` (the diff), `red-team` (attacks the preview) | | gate check 4 |
-| Launch | `publish`, `sell`; Sentry and PostHog via `toolbox` | | live site, errors and analytics on |
+| Launch | `publish`, `sell`; Sentry and PostHog via `toolbox` | `store` when PLAN.md ships to the App Store or Google Play | live site, errors and analytics on |
 | Marketing | `market`, `seo-specialist` | `Marketing` plugin | the plan, launch posts, weekly numbers |
 
 Research subagents use WebSearch, not WebFetch, and return at most one page each.
