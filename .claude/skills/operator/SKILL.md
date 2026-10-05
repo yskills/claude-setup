@@ -118,7 +118,11 @@ Templates in `templates/`.
 8. **Grow.** At launch `create_trigger` a weekly routine (fresh session, jittered time): it
    collects the numbers (`market` §5) and opens one PR with the week's `metrics/` file and the best
    next step as a slice in `features.json`. That PR is the weekly report; it gets the gate with
-   checks 2-5 n/a, and yskills' merge tap is the go for the next slice.
+   checks 2-5 n/a, and yskills' merge tap is the go for the next slice. `PLAN.md` fixes 30/60/90-day
+   targets before launch (defaults: 100 signups, 10 paying, €100 a month); the routine copies them
+   into each `metrics/` file. A missed target sends one tap card: **kill** (stop the routine,
+   archive, lessons into claude-setup), **change** (one new offer or channel, next target in 30
+   days) or **keep** (one line why). Targets never move to make a miss pass.
 9. **Learn.** Every correction, every gate round that failed for a catchable reason, every test
    project lesson becomes a rule, skill line, test or check in claude-setup, in a small PR.
 
