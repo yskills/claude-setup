@@ -15,7 +15,8 @@ whole history every turn.
 | 1 | Brainstorm | operator | one batch of tap-card questions (incl. money questions from `sell`) | Answer once |
 | 2 | Research, in parallel | **Inside:** our skills, catalog, lessons from `docs/TEST-PROJECTS.md`, your other repos. **Outside:** competitors, how the best similar products and open-source projects are built, tools (`toolbox`, Anthropic Directory). **Money:** who pays, how much, 3 pieces of evidence; none → the plan says no. **Legal:** the `legal` skill's table | one page each | Nothing |
 | 3 | Plan | `planner` | `PLAN.md` (PRD, slices, marketing plan, keys, costs), `features.json` (acceptance criteria per slice, written before any code) | **Brief (a):** ok/no (it includes proof people pay) |
-| 4 | Scaffold + design | one scaffold thread; design team (`frontend-design`, `impeccable`, `design-critic`) | default stack, `verify`, CI, Workers Builds config (`publish`; you connect it); 2-3 directions as screenshots | **Brief (b):** pick one; do the one-time Cloudflare/keys steps it lists |
+| 4 | Scaffold + design | one scaffold thread; design team (`frontend-design`, `impeccable`, `design-critic`) | default stack, `verify`, CI, Workers Builds config (`publish`; you connect it); 2-3 directions as screenshots | **Brief (b):** pick one; do the Cloudflare import it lists. Later keys come one card at a time, when a slice needs them |
+| 5a | Probe (anything meant to earn) | one builder thread, then the marketing team | slice `probe` live: offer, price, waitlist; pushed in one channel for ~14 days against the go number from `PLAN.md` | Nothing if it hits the number; else one tap: kill, change or build anyway |
 | 5 | Build | builder threads (Sonnet), one per slice, at most 3 in parallel; a small site is one thread, no slices | PRs with tests, screenshots, preview link; `PROGRESS.md` updated | Nothing |
 | 6 | Gate each PR | QA: `evaluator` on the preview, fresh `code-reviewer`; security: `security-reviewer` + `red-team`; `design-critic` + `legal-reviewer` | a 5/5 table on the PR, or one review the builder fixes | Tap **Merge it** at 5/5 |
 | 7 | Launch | full `red-team` and `legal-reviewer` pass; `publish`, `sell` go-live; Sentry, PostHog | live site | **Brief (c):** ok = merge the last PR; live keys |
@@ -29,7 +30,9 @@ After launch, phases 5-6 repeat for every improvement the weekly numbers suggest
 Five pass/fail checks by agents that didn't write the code: CI, evaluator on the preview, fresh
 code review, security + red team, design + legal. 5/5 → you tap **Merge it** (Claude's auto mode
 won't let a thread merge a PR no human approved; tested 2026-10-05). 2 failed rounds → you get a
-plain summary of what's wrong and tap options. Important PRs (auth, payments, migrations, secrets)
+plain summary of what's wrong and tap options. Until the first paying user the gate runs in
+probe mode: no fresh code reviewer (the builder's ship-check counts), design review only on the
+probe page and before launch, security whenever a PR stores what users type. Important PRs (auth, payments, migrations, secrets)
 come with three lines: what changes, what could break, how to undo it.
 claude-setup PRs always get your full review. Details: `operator` skill, `gate.md`.
 

@@ -26,7 +26,7 @@ No deploy keys in GitHub, in the cloud environment or in chat.
 
 yskills creates the **private** repo at [github.com/new](https://github.com/new) in brief (a)
 (threads get 403 on `create_repository`); Claude adds it with `add_repo`. The steps below go into
-brief (b), after the scaffold, as numbered deep links, so yskills does them in one sitting.
+brief (b), after the scaffold, as numbered deep links, so yskills does them in one sitting. Keys a later slice needs come by key card (`operator`).
 
 yskills, once:
 

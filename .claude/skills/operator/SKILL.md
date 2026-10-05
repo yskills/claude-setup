@@ -49,7 +49,7 @@ enterprise-flavoured: German law and this stack's rules win.
 | Build | builder threads; `architect`, `database-reviewer`, `build-error-resolver` | stack plugins via `toolbox` | a PR with green CI |
 | QA | `evaluator`, `code-reviewer`, `a11y-architect`, `performance-optimizer` | | gate checks 2-3 |
 | Security | `security-reviewer` (the diff), `red-team` (attacks the preview) | | gate check 4 |
-| Launch | `publish`, `sell`; Sentry and PostHog via `toolbox` | | live site, errors and analytics on |
+| Launch | `publish`, `sell`; Sentry and PostHog via `toolbox` | `store` when PLAN.md ships to the App Store or Google Play | live site, errors and analytics on |
 | Marketing | `market`, `seo-specialist` | `Marketing` plugin | the plan, launch posts, weekly numbers |
 
 Research subagents use WebSearch, not WebFetch, and return at most one page each.
@@ -58,7 +58,9 @@ Research subagents use WebSearch, not WebFetch, and return at most one page each
 
 Templates in `templates/`.
 
-- `PLAN.md` (for yskills): the PRD with locked decisions, slices, marketing plan, keys, costs.
+- `PLAN.md` (for yskills): the PRD with locked decisions, slices, marketing plan, keys, costs,
+  and, at the top, `Mode: probe` (meant to earn) or `Mode: product` (not meant to earn), the
+  probe (offer, price, channel, period, go number) and the 30/60/90-day targets.
 - `features.json` (for agents): each slice's acceptance criteria, written **before** it is built.
   Builders never touch it; the gate thread records the evaluator's verdict (`passes`).
 - `PROGRESS.md`: the handoff. Done, next, broken, decisions and why, each thread's cost. Every
@@ -68,7 +70,10 @@ Templates in `templates/`.
 ## 4. The run
 
 1. **Brainstorm.** One batch of tap cards: the idea's open questions, `sell`'s money questions if
-   it sells, the Impressum data (name, postal address, email, second channel) if it is public.
+   it sells, the Impressum data (name, postal address, email, second channel) if it is public,
+   and a **design card**: "Send pictures, screenshots or links of apps and sites you like (or
+   hate) for this, one line each on why." Linked sites are shot with `ui-review` and saved with
+   the pictures in `design/refs/`; the lines go into `design/DESIGN.md`.
 2. **Research**, parallel subagents, one page each:
    - **Inside:** our skills and catalog, the lessons in claude-setup's `docs/TEST-PROJECTS.md`,
      yskills' repos with code to reuse.
@@ -80,7 +85,8 @@ Templates in `templates/`.
      plugins...). Every pick from outside the official marketplace is read before it is used.
      Picks go into `PLAN.md`; the scaffold adds them to this project only.
    - **Money** (if it should earn): three pieces of evidence people already pay for this. None →
-     brief (a) recommends no or a smaller first version.
+     brief (a) recommends no or a smaller first version. This shows that others earn, not that
+     yskills can find buyers; the probe (step 5) tests that.
    - **Legal:** the `legal` skill's table for this idea.
 3. **Plan.** `planner` proposes; the operator writes `PLAN.md` and `features.json`. **Brief (a).**
    Its one task for yskills: create the private repo (threads get 403 on `create_repository`);
@@ -88,8 +94,17 @@ Templates in `templates/`.
 4. **Scaffold + design.** Scaffold thread: "Scaffold PLAN.md's app on branch `scaffold`: the
    default stack from CLAUDE.md, the `publish` skill's files, `verify`, CI, legal pages per the
    `legal` skill. Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
-   directions. **Brief (b)** carries the one-time Cloudflare setup and test keys. Building starts
-   once the scaffold PR is merged and brief (b) is answered.
+   directions. **Brief (b)** carries only what every build needs: the Cloudflare import and the D1
+   ids. Building starts once the scaffold PR is merged and brief (b) is answered.
+
+   **Keys and accounts just in time.** Every other key or account is asked for by a **key card**
+   (`briefs.md`) at the moment the next slice needs it ("you want payments: add a Stripe key
+   here"), one card per slice, never a list up front. The slice builds what it can without the
+   key (tests use fakes) and waits only for the step that needs it. Exception, **lead time**:
+   anything with a wait (identity checks, Google's 14-day test, domain verification) gets its
+   card as soon as PLAN.md knows it is needed, so the clock runs during the build. The card's
+   steps come from the skill that owns the key (`sell` `keys.md`, `store` §1, `publish`,
+   `toolbox` picks). Keys go into the service's own settings page, never into chat or git.
 5. **Build.** One builder thread per slice, at most three at once: "Build slice <id> of PLAN.md;
    its criteria are in features.json (read only). Read PLAN.md, PROGRESS.md and CLAUDE.md first.
    Tests first, then code, then ship-check. Push branch `slice/<id>`, open a PR with phone and
@@ -97,6 +112,17 @@ Templates in `templates/`.
    findings on the PR until it is merged." The first slice also commits the D1 ids from
    `PROGRESS.md`. The operator copies each note and the thread's cost (`get_session`,
    `external_metadata.usage.cost_usd`) into `PROGRESS.md`.
+
+   **Probe first** (anything meant to earn). Slice `probe` is built and merged alone, before
+   every other slice: a landing page that names the offer and the price, a waitlist with
+   double opt-in (no pre-orders: `sell` has no pre-order flow yet), Impressum and Datenschutz,
+   and UTM-tagged visits. Once it is live, the marketing team pushes it in the plan's channel
+   for the probe period (default 14 days). PLAN.md fixes the go number before the probe starts
+   (default: 100 confirmed waitlist signups). Met: the other slices start, nothing to
+   ask. Missed: one tap card to yskills with the numbers: **kill** (archive, lessons into
+   claude-setup), **change** (one new offer or channel, one more probe) or **build anyway**.
+   Never move the go number after the probe started. A small site meant to earn is its own
+   probe; one not meant to earn skips it.
 6. **Gate.** A fresh gate thread per PR runs `gate.md` and either posts the 5/5 table (yskills
    taps **Merge it**) or one review with the blocking findings, which the builder fixes. Three
    failed rounds: stop and ask yskills with tap options.
@@ -105,7 +131,11 @@ Templates in `templates/`.
 8. **Grow.** At launch `create_trigger` a weekly routine (fresh session, jittered time): it
    collects the numbers (`market` §5) and opens one PR with the week's `metrics/` file and the best
    next step as a slice in `features.json`. That PR is the weekly report; it gets the gate with
-   checks 2-5 n/a, and yskills' merge tap is the go for the next slice.
+   checks 2-5 n/a, and yskills' merge tap is the go for the next slice. `PLAN.md` fixes 30/60/90-day
+   targets before launch (defaults: 100 signups, 10 paying, €100 revenue in total); the routine copies them
+   into each `metrics/` file. A missed target sends one tap card: **kill** (stop the routine,
+   archive, lessons into claude-setup), **change** (one new offer or channel, next target in 30
+   days) or **keep** (one line why). Targets never move to make a miss pass.
 9. **Learn.** Every correction, every gate round that failed for a catchable reason, every test
    project lesson becomes a rule, skill line, test or check in claude-setup, in a small PR.
 
@@ -125,3 +155,5 @@ conversation can continue later; a plain chat idle for over an hour hands off to
 - No `/ultrareview`, no unrequested WebFetch, no research the plan already answers.
 - The evaluator runs once per gate round. Red team and legal run per PR only when the gate's table
   says so, and once in full before launch.
+- Until the first paying user the gate runs in probe mode (`gate.md`): fewer reviewers, security
+  still on for anything a user typed.
