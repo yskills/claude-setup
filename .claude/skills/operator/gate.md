@@ -26,7 +26,8 @@ A check that doesn't apply counts as passed; say so in the table.
 
 Once the app has real users or real money, the gate still merges on 5/5 **except** diffs
 touching auth, payments, database migrations or secrets: those get the 5/5 table posted on the
-PR and wait for yskills' ok. claude-setup itself is always merged by yskills.
+PR and wait for yskills' ok (confirmed by yskills 2026-10-05). claude-setup itself is always
+merged by yskills.
 
 ## Post this on the PR before merging
 
