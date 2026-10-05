@@ -11,17 +11,10 @@ The templates in `templates/` were checked on 2026-10-03:
   Two of them create real Checkout Sessions against
   [stripe-mock](https://github.com/stripe/stripe-mock), Stripe's official mock, which rejects
   any parameter its API spec does not know.
-- A security review covered:
-  - binding each order to its session;
-  - fulfilment retries;
-  - weight limits;
-  - key scope.
-
-  Its fixes are in.
+- A security review covered binding each order to its session, fulfilment retries, weight limits
+  and key scope. Its fixes are in.
 - stripe-mock checks parameter names, not every business rule. The first sandbox checkout with
   a real test key is the final check (SKILL.md, go-live).
-- `scripts/deploy.mjs` and `ci.yml` were rewritten for Workers Builds on 2026-10-05 and have not
-  run there yet; test project 3 (claude-setup `docs/TEST-PROJECTS.md`) proves them.
 
 The digital-product variant below ran green in yskills/duo-test.
 
@@ -45,11 +38,6 @@ The digital-product variant below ran green in yskills/duo-test.
    - The admin view lists paid orders without it and has a button that runs `fulfilOrder`
      again. The email carries an idempotency key, so a retry never sends it twice.
 
-**Why the button is on our page:** German law wants the order button to say "zahlungspflichtig
-bestellen" or something just as clear (§ 312j BGB). Stripe's hosted button can only say "Pay"
-("Bezahlen"), and courts have rejected similar wording. So the contract is made on our page and
-Stripe only takes the money. Stripe.js never loads on our pages either.
-
 ## Templates
 
 | Template | Goes to | What it does |
@@ -63,8 +51,7 @@ Stripe only takes the money. Stripe.js never loads on our pages either.
 | `server/api/checkout/confirm.post.ts` | same | Return page check |
 | `server/api/stripe/webhook.post.ts` | same | Paid, SEPA, failed, expired, refunded, disputed |
 | `server/migrations/0001_orders.sql` | the D1 `migrations_dir` | `orders` table |
-| `scripts/deploy.mjs` | `scripts/` | The Workers Builds deploy command for `main`: live D1 migrations, deploy, generated secrets (`BETTER_AUTH_SECRET`), preview D1 migrations |
-| `ci.yml` | `.github/workflows/` | Verify on PRs and `main`; no keys, no deploy (Workers Builds deploys) |
+| `ci.yml` | `.github/workflows/` | Verify only, with stripe-mock as a service. No keys and no deploy: Workers Builds deploys (`publish` skill) |
 | `tests/shop.spec.ts` | `tests/e2e/` | Signed fake webhooks against `wrangler dev`, order validation, and real sessions against stripe-mock |
 | `playwright.config.ts` | project root | Starts `wrangler dev` with the test webhook secret, plus the stripe-mock vars when `STRIPE_MOCK` is set |
 
@@ -75,29 +62,20 @@ Stripe only takes the money. Stripe.js never loads on our pages either.
 - the legal pages and PDFs (`legal-de.md`);
 - the Widerrufsbutton flow;
 - the Sendcloud call;
-- an admin orders view, with the fulfilment retry button.
+- an admin orders view, with the fulfilment retry button;
+- the rate-limit binding on checkout, confirm and withdrawal.
 
 All of these are built in the project's design. Replace the placeholders `example-mug`,
 `Beispielshop` and `example.de` in the same PR.
 
-Before launch, add a Cloudflare rate-limiting rule on `/api/checkout*` in the zone's
-Security → WAF settings. Without it, anyone can loop the endpoint, filling D1 and burning the
-Stripe API rate limit.
-
 ## Wiring
 
-- `wrangler.jsonc` needs:
-  - `"compatibility_flags": ["nodejs_compat"]`
-  - a D1 binding `DB`
-  - `migrations_dir` pointing at the migrations.
-- `package.json` needs `"deploy": "node scripts/deploy.mjs"` (the Workers Builds deploy command,
-  `publish` skill) and a `verify` script that runs typecheck, unit tests, build and the e2e tests.
-- `wrangler.jsonc` needs the `previews` block from the `publish` skill, with its own D1
-  (`preview_database_id`) and no live resource ids.
-- The Stripe webhook endpoint (one per mode, made by yskills, `keys.md`) subscribes to:
-  `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
-  `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`,
-  `charge.dispute.created`. Its API version is the SDK's `Stripe.API_VERSION`.
+- `wrangler.jsonc` and `package.json` follow the `publish` skill: a `previews` block that repeats
+  every binding on its own resource (the D1 `<name>-preview` and a second rate-limit namespace),
+  committed D1 ids, and its `deploy` script. On top of that this kit needs
+  `"compatibility_flags": ["nodejs_compat"]`, a D1 binding `DB` and `migrations_dir` pointing at
+  the migrations.
+- `package.json` needs a `verify` script that runs typecheck, unit tests, build and the e2e tests.
 - `wrangler.jsonc` `vars`: `SITE_URL` is the canonical `https://` address. Links and email
   attachments use it instead of whatever host a request came in on.
 - `playwright.config.ts` from the templates starts the real runtime with a test-only webhook
@@ -108,8 +86,7 @@ Stripe API rate limit.
   STRIPE_MOCK=http://127.0.0.1:12111 npx playwright test
   ```
 
-- In cloud threads, launch Playwright's browser with `executablePath: '/opt/pw-browsers/chromium'`.
-  The webhook tests only use `request`, so they need no browser.
+- The webhook tests only use `request`, so they need no browser.
 - To try a real test payment locally, on yskills' PC: put test keys in `.dev.vars`, then run
   `stripe listen --forward-to 127.0.0.1:8787/api/stripe/webhook`. It prints a `whsec_…` for
   `.dev.vars`. Test card `4242 4242 4242 4242`; 3-D Secure `4000 0027 6000 3184`.
@@ -147,7 +124,8 @@ Not yet run on Workers; the first subscription project proves it and updates thi
 - **The [Better Auth Stripe plugin](https://www.better-auth.com/docs/plugins/stripe)** does the
   customer, checkout, portal and webhook parts when the app uses Better Auth. As of 1.7.7 its
   peer range is `stripe` ^18 to ^22, so pin `stripe@22` in that project (check `recheck.md`).
-- **Webhook events** (add them to the endpoint in the Stripe dashboard, both modes): `checkout.session.completed`,
+- **Webhook events** (select them on the endpoint in the Stripe Dashboard, see `keys.md`):
+  `checkout.session.completed`,
   `customer.subscription.created`, `customer.subscription.updated`,
   `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`. They are not
   optional: renewals, failed payments and cancellations only arrive this way.
@@ -174,10 +152,10 @@ Stripe becomes the seller, so it works through Checkout only. Check `recheck.md`
   retries for up to 3 days.
 - **Stripe sends events more than once and out of order.** Every write is guarded by the state
   it expects.
-- **The webhook secret differs between sandbox and live.** Each mode has its own endpoint and
-  its own `whsec_…`; swapping the key at go-live means swapping the webhook secret too. Adding an
-  event or upgrading the SDK means editing the endpoint in the dashboard (events, API version).
-  Stripe emails yskills when an endpoint keeps failing.
+- **The webhook secret differs between sandbox and live.** Each mode has its own endpoint, made
+  by hand in the Dashboard (`keys.md`), and its own `whsec_…` in the Worker's Production secrets.
+  So going live means a new endpoint and a new secret, a new event means editing the endpoint, and
+  a disabled endpoint has to be re-enabled there. Set the endpoint's API version to the SDK's.
 - **One Stripe account serves several projects.**
   - Every endpoint gets every account event, so handlers ignore sessions and charges they
     don't know. `markOrderPaid` requires the order's own session id, because a Payment Link
@@ -194,7 +172,8 @@ Stripe becomes the seller, so it works through Checkout only. Check `recheck.md`
   that too if the project offers such codes; otherwise leave promotion codes off.
 - **Never put a price in a request body or in metadata the client can influence.**
 - **Rate-limit checkout, confirm and withdrawal** with the Workers rate-limit binding
-  (`ratelimits` in `wrangler.jsonc`, keyed on `cf-connecting-ip`). It works in `wrangler dev`
-  too.
+  (`ratelimits` in `wrangler.jsonc`, keyed on `cf-connecting-ip`), with its own `namespace_id`
+  under `previews` (`publish` skill). It works in `wrangler dev` too. Without it, anyone can loop
+  the endpoint, filling D1 and burning the Stripe API rate limit.
 - **Legal texts live in one shared TS module**, so the pages and the confirmation email can't
   drift apart.

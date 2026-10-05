@@ -45,9 +45,6 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 | Design taste | `impeccable` (design skill plus a local `detect` linter for AI-look patterns) and `web-interface-guidelines` (Vercel's UI checklist); `ui-review` runs both | `.claude/skills` (Apache-2.0 and MIT, see `THIRD_PARTY.md`) |
 | Ponytail | Write the least code that works: reuse, standard library, platform, installed dependency, one line, then new code | `.claude/skills/ponytail` (MIT, see `THIRD_PARTY.md`) |
 
-Last measured before the 2026-10-04 cleanup (10 skills cut, 3 own skills and 3 agents added since; re-measure with `/context`): about 37k tokens of a 500k window before you type anything
-(skills 9.9k, CLAUDE.md + rules 7.6k, agents 1.9k; MCP tools are deferred). The full ECC plugin
-alone would add ~45k.
 
 ## Project threads (cloud)
 

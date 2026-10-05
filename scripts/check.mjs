@@ -57,10 +57,8 @@ if (plugins) {
   const shIds = [...sh.matchAll(/^\s+([a-z0-9-]+@[a-z0-9-]+)/gm)].map((m) => m[1])
   const want = plugins.global.filter((p) => p.cloud !== false).map((p) => p.id)
   if (shIds.join() !== want.join()) errors.push('cloud/setup.sh plugin list differs from config/plugins.json global')
-  // Cloud threads inside this repo also load .claude/settings.json: same list, same exceptions.
-  const proj = json('.claude/settings.json')
-  const projOn = Object.keys(proj?.enabledPlugins ?? {}).filter((k) => proj.enabledPlugins[k])
-  if (projOn.join() !== want.join()) errors.push('.claude/settings.json enabledPlugins differs from config/plugins.json global (cloud)')
+  // Plugins come from setup.sh at user scope; a second list in the repo's settings would drift.
+  if (json('.claude/settings.json')?.enabledPlugins) errors.push('.claude/settings.json must not list plugins; cloud/setup.sh installs them')
   for (const m of plugins.marketplaces) if (!sh.includes(`marketplace add ${m.source}`)) errors.push(`cloud/setup.sh does not add marketplace ${m.source}`)
 }
 

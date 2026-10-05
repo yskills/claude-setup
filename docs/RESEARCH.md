@@ -21,7 +21,7 @@ ECC's hook runtime through its own installer. Hook changes from ECC's defaults:
 
 ## Plugins
 
-All from the official marketplace `claude-plugins-official` (auto-added by Claude Code, ~315
+From Anthropic's marketplace `claude-plugins-official` (auto-added by Claude Code, ~315
 plugins). Always-on token costs were measured with `claude plugin details`; see
 `config/plugins.json`. Notable calls:
 

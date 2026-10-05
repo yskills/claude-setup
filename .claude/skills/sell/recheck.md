@@ -14,7 +14,7 @@ pre-allowed. "open" means it was never confirmed; confirm it before relying on i
 | Stripe Managed Payments | Merchant of record, +3.5%, digital goods only, German businesses supported, Checkout or Payment Links only | [eligibility](https://docs.stripe.com/payments/managed-payments/eligibility) | 2026-10-03 |
 | Merchant-of-record services for physical goods | None: Stripe Managed Payments, Paddle, Polar and Lemon Squeezy all exclude them | the providers' policy pages (`physical.md`) | 2026-10-03 |
 | Polar fees (digital alternative) | 5% + €0.50, +1.5% for non-EU cards | [polar.sh/docs](https://polar.sh/docs) | 2026-10-03 |
-| Stripe SDK on Workers | `stripe@23.0.0`, API `2026-09-30.endive`, fetch client and SubtleCrypto; the templates pass typecheck, build and 9 e2e tests (2 against stripe-mock) | [stripe-node](https://github.com/stripe/stripe-node), [stripe-mock](https://github.com/stripe/stripe-mock) | 2026-10-03 |
+| Stripe SDK on Workers | `stripe@23.0.0`, API `2026-09-30.endive`, fetch client and SubtleCrypto | [stripe-node](https://github.com/stripe/stripe-node), [stripe-mock](https://github.com/stripe/stripe-mock) | 2026-10-03 |
 | Stripe keys | Restricted keys recommended over secret keys; a live key is shown once | [restricted keys](https://docs.stripe.com/keys/restricted-api-keys) | 2026-10-03 |
 | Hosted Checkout button | `submit_type` sets "Pay"/"Book"/"Donate"/"Subscribe" only; `custom_text.submit` adds text but does not rename the button, so the order button stays on our page | [Checkout customization](https://docs.stripe.com/payments/checkout/customization/policies) | 2026-10-03 |
 | Sendcloud | Free €0 (label fee open); Lite €31/month or €24.80/month billed yearly (400 labels); Growth €87; returns portal from Lite | [sendcloud.com/de/preise](https://www.sendcloud.com/de/preise/) | 2026-10-03 |
@@ -31,8 +31,6 @@ pre-allowed. "open" means it was never confirmed; confirm it before relying on i
 | ODR link | Remove it: the platform closed on 2025-07-20 | [IHK](https://www.ihk.de/osnabrueck/recht-und-fair-play/recht/internetrecht/einstellung-os-plattform-6474562) | 2026-10-03 |
 | BFSG | Applies since 2025-06-28; micro-enterprises are exempt for services | [§ 2 BFSG](https://www.gesetze-im-internet.de/bfsg/__2.html) | 2026-10-03 |
 | Legal-text services | IT-Recht Kanzlei Unlimited €54.90/month; the others open | [IT-Recht Kanzlei](https://www.it-recht-kanzlei.de/unlimited-paket-rechtscheck-tiefenpruefung-rechtssicherheit.html) | 2026-10-03 |
-| Worker secrets per environment | Dashboard Variables and secrets has Production and Previews Base; a Base secret reaches only previews created after it | [Worker Previews](https://developers.cloudflare.com/workers/previews/) | 2026-10-05 |
-| Workers Builds token | One user token per Worker for main and branch builds; needs Account · D1 · Edit for migrations; can't be limited to one Worker (`publish` skill's tradeoff) | [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/) | 2026-10-05 |
 | Cloudflare Secrets Store | Beta since 2025-04-09; use Worker secrets until it is GA | [changelog](https://developers.cloudflare.com/changelog/product/secrets-store/) | 2026-10-03 |
 | Shopify (alternative) | From about €25/month; Shopify Payments EU cards 2.1% + €0.30 on Basic (third-party figures) | [shopify.com/de/preise](https://www.shopify.com/de/preise) | open |
 | App stores | Take 15 to 30% of digital sales; the exceptions keep changing | Apple and Google developer policies | when going to a store |

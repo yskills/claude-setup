@@ -8,7 +8,7 @@ into this repo; then the next one starts. Repos are private and get deleted or a
 |---|---|---|---|
 | 1 | One-page site: a fake café with menu, opening hours and a contact form | One build thread + evaluator | Brief (a)-(c) templates, Workers Builds import and previews, the evaluator on a preview, the 5/5 gate merging by itself, the `legal` team (Impressum, Datenschutz, privacy scan clean), zero touches from yskills outside the briefs |
 | 2 | Small app: a shared shopping list with email login and D1 | 3 slices, riskiest first | Slicing, `features.json` and `PROGRESS.md` handoffs across fresh threads, preview D1 and Previews Base secrets, `security-reviewer` in the gate, account deletion, the after-launch rule (a migration waits for yskills) |
-| 3 | Paid digital product in Stripe sandbox: a 2 € PDF download | 2 slices | The `sell` kit on Workers Builds (Worker secrets, sandbox webhook made by hand, `deploy.mjs` as deploy command), order button wording, `legal-reviewer` on shop pages, a real sandbox checkout, the weekly smoke test |
+| 3 | Paid digital product in Stripe sandbox: a 2 € PDF download | 2 slices | The `sell` kit on Workers Builds (Worker secrets, sandbox webhook made by hand), order button wording, `legal-reviewer` on shop pages, a real sandbox checkout, the weekly smoke test |
 
 ## Rules for a test run
 

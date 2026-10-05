@@ -1,9 +1,5 @@
-# Goes to .github/workflows/ci.yml. Verify on every PR and on main; it holds no keys.
-# Deploys and previews come from Cloudflare Workers Builds (publish skill): main goes live,
-# every other branch gets a Worker Preview linked on the PR.
-# Branch builds run with the same deploy token as main (publish skill, "The tradeoff, decided"):
-# turn them off (Worker > Settings > Build) before a live payment key goes in, and merge only
-# when this verify job is green, because a red verify doesn't stop Cloudflare's deploy.
+# Goes to .github/workflows/ci.yml. Tests only: Cloudflare Workers Builds deploys `main` and
+# gives every other branch its own preview (`publish` skill), so this workflow holds no keys.
 name: CI
 
 on:
