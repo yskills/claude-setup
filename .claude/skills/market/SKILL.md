@@ -30,7 +30,7 @@ events. So the plan is part of the PRD, not an afterthought.
    what we do differently.
 3. **Goal.** The 90-day goal in numbers, e.g. 300 on the waitlist and 50 paid. Pick one metric
    that matters most.
-4. **Channels.** One or two main channels plus one test, from the table below. Never all of
+4. **Channels.** yskills' own channel (§2a) first, then one or two more plus one test, from the table below. Never all of
    them.
 5. **Budget.**
    - Start organic, at €0.
@@ -44,13 +44,34 @@ events. So the plan is part of the PRD, not an afterthought.
 
 Ask these with the PRD questions, as tap cards:
 
-- **Market:** Germany first (recommended), German-speaking countries, or English worldwide.
+- **Market:** German and English speakers (yskills' default: English content, German and English
+  app text), Germany only, or English only.
 - **Monthly ad budget:** €0 (recommended at the start), up to €100, or up to €500.
 - **Accounts yskills will use or create** (multi-select): TikTok, Instagram, YouTube, LinkedIn,
   X, Reddit, none.
 - **Showing their face or voice in videos:** yes, hands and product only, or no (Claude makes
   motion-graphics videos).
 - **Hours per week for marketing:** 1, 3, or 5+.
+
+## 2a. yskills' own channel (decided 2026-10-05)
+
+One standing audience channel serves every project, so no launch starts from zero followers.
+
+- **Who and how:** yskills talks in English; the audience is English and German speakers.
+  Meme and joke content, free, building an audience first. Projects get promoted there once
+  people follow, and every probe uses it as its first channel.
+- **Ratio:** mostly entertainment; a project post at most every fourth post, and only as a joke
+  that stands on its own. The probe link goes in the bio with UTM tags (`utm_source=<platform>`,
+  `utm_campaign=<project>`).
+- **Claude does:** a weekly batch of meme and joke ideas, scripts and captions (hooks in the
+  first second, English on screen, German subtitles where it helps), tied to what the current
+  project is about, for yskills to approve.
+- **Rules that still apply** (§4): an Impressum link in the bio once it promotes products; the
+  platform's commercial sound library for anything promoting a product; meme templates and film
+  stills are someone else's images, so prefer self-made formats or the platform's own templates
+  for product posts [K].
+- **Weekly numbers** (followers, views, clicks to the bio link) go into each project's
+  `metrics/` file as channel `own`.
 
 ## 2. Channels for a solo developer
 
