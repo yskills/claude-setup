@@ -83,7 +83,7 @@ service, and whether these settings skip it there is untested.
 
 ## Using it
 
-- **New idea:** just describe it. Claude loads `toolbox` on its own, picks the tools, and adds them to that project only (tested: "video editor app that cuts my videos for social media" pulled in the video catalog, HyperFrames, fal.ai and the ECC video skills).
+- **New idea:** just describe it. The `operator` skill sizes it, researches, plans and builds it, and sends you three ok/no briefs; `toolbox` adds the tools to that project only.
 - **New to a repo:** "onboard this project" runs `onboard-project`: a short `CLAUDE.md`,
   `.claude/settings.json` with the right per-project plugins, and a `verify` skill matching CI.
 - **Before every push:** Claude runs `ship-check` on its own; ask for it any time.
