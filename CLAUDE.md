@@ -76,11 +76,10 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 - Web: Nuxt 4 (SSR/static) or Vue 3 + Vite (SPA/PWA), Pinia, Tailwind v4, `@nuxtjs/i18n` (de, en).
 - API: Nuxt server routes or a small Express service. SQLite or Postgres with prepared statements.
 - Tests: Vitest, Playwright for e2e. Typecheck with `vue-tsc`.
-- Ship: keys live only in GitHub. GitHub Actions runs one `verify` script, posts a preview link
-  on every PR (`wrangler versions upload --preview-alias pr-<n>`) and deploys `main`; Cloudflare
-  Workers via wrangler for web apps (the `sell` skill's `templates/ci.yml` has all three jobs).
-  Put the preview link in the PR reply. Services that need a server
-  (like Luna): Docker + Caddy on a small VPS.
+- Ship: Cloudflare Workers Builds deploys the default branch and gives every other branch a
+  Worker Preview with its own data and keys; GitHub Actions runs one `verify` script and holds no
+  keys. The `publish` skill has the per-project setup and its rules. Put the preview link in the PR
+  reply. Services that need a server (like Luna): Docker + Caddy on a small VPS.
 - Anything beyond this (video, AI generation, payments, ads, analytics, email, mobile...) comes
   from the `toolbox` skill, added to that project only. Anything that takes money (checkout,
   shop, subscriptions, shipping) follows the `sell` skill; getting users or buyers (marketing
@@ -94,8 +93,8 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
   `performance-optimizer`, `seo-specialist`, `design-critic`. Use reviewers proactively after
   writing code; use `security-reviewer` on anything touching auth, payments or user input.
 - Skills to reach for: `toolbox` (which plugins, APIs and skills a project needs, and adds
-  them to that project only), `onboard-project` (set up a repo for Claude), `ship-check` (verify before
-  push), `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD,
+  them to that project only), `onboard-project` (set up a repo for Claude), `publish` (deploys and previews),
+  `ship-check` (verify before push), `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD,
   debugging) and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
 - Browser: Playwright MCP for headless checks; `claude --chrome` to use yskills' own Chrome
   when a page needs their login. In cloud threads launch Playwright with
