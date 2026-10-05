@@ -73,7 +73,12 @@ Templates in `templates/`.
    - **Inside:** our skills and catalog, the lessons in claude-setup's `docs/TEST-PROJECTS.md`,
      yskills' repos with code to reuse.
    - **Outside:** competitors and prices, how the best similar products and open-source projects
-     are built, the tools.
+     are built.
+   - **Tools and skills:** the `toolbox` skill, per capability the idea needs. Its `find.mjs`
+     searches the installed plugin marketplaces, the ECC skills and skills.sh; `SearchPlugins`,
+     `SearchSkills` and `SearchMcpRegistry` search the Anthropic Directory (Figma, Canva, legal
+     plugins...). Every pick from outside the official marketplace is read before it is used.
+     Picks go into `PLAN.md`; the scaffold adds them to this project only.
    - **Money** (if it should earn): three pieces of evidence people already pay for this. None →
      brief (a) recommends no or a smaller first version.
    - **Legal:** the `legal` skill's table for this idea.
