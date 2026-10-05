@@ -56,6 +56,11 @@ Claude can't sign contracts, pay fees or verify identity. Numbered steps for ysk
 6. Once the build has a paywall: create the subscription products (annual with trial, monthly)
    in App Store Connect and Play Console, add them to RevenueCat's `pro` entitlement, and add an
    Apple sandbox tester. Claude writes the exact product ids and prices into the steps.
+   Play also needs: a payments profile (Play Console, Setup, Payments profile), a Google Cloud
+   service account with Play access for RevenueCat, its JSON key uploaded straight into
+   RevenueCat (never pasted into chat or git), the Data safety form and the content rating
+   questionnaire (Claude drafts the answers) [K]. Digital unlocks inside an Android app go
+   through Play Billing, like Apple's 3.1.1 [K].
 7. When the device pass (§4) is green and Google's 14 days are over: submit for App Review and
    apply for Play production access. Each is a button only yskills can press.
 
