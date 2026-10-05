@@ -32,8 +32,12 @@ yskills, once:
 
 1. Cloudflare dashboard: Workers & Pages → Create → **Import a repository** → pick the repo.
    - Project name: the `name` in `wrangler.jsonc`.
-   - Build command: `npm run build`, or `npm run generate` for a static Nuxt site.
+   - Build command: `npm run check && npm run build` (`npm run check && npm run generate` for a
+     static Nuxt site). Cloudflare doesn't wait for GitHub's checks, so this is what stops a
+     broken commit from deploying.
    - Deploy command: `npm run deploy` if the app has a D1 database, else `npx wrangler deploy`.
+   - Preview command (D1 apps): `npm run deploy:preview`; otherwise keep the default
+     `npx wrangler preview`.
    - Production branch: the repo's default branch (MyPage's is `origin`, not `main`).
    - Leave non-production branch builds on: they are what makes the previews.
 2. Apps with D1:
@@ -66,9 +70,18 @@ Claude:
   wrangler d1 migrations apply DB --remote && wrangler deploy && (wrangler d1 migrations apply DB --remote --preview || echo "previews may miss the newest tables")
   ```
 
-  It migrates live, deploys, then migrates the preview database. So the preview database only
-  gets migrations from a deploy of the production branch: on a branch that adds one, the preview's
-  pages that use the new schema fail until it is merged.
+  It migrates live, deploys, then migrates the preview database.
+- `npm run deploy:preview` (D1 apps), the Preview command:
+
+  ```
+  wrangler d1 migrations apply DB --remote --preview && wrangler preview
+  ```
+
+  A branch that adds a migration applies it to the shared preview database before its Preview
+  goes up, so its pages work on the preview. Migrations are forward-only: a dropped branch leaves
+  its tables in the preview database, which holds only test data.
+- `npm run check`: lint, typecheck and unit tests, no browser tests (they need a browser and slow
+  every build). `verify` in GitHub Actions still runs everything.
 - A unit test that checks the `previews` block: same binding names, no live resource ids
   (duo-test `tests/unit/wrangler-config.test.ts`).
 - `.github/workflows/ci.yml` with the verify job only (`sell` skill's `templates/ci.yml`).
@@ -79,9 +92,10 @@ Claude:
 
 ## The tradeoff, decided
 
-Workers Builds uses one API token per Worker for main and branch builds alike. It only accepts
-user tokens, and those can't be limited to one Worker. So code on any pushed branch runs with a
-key that could deploy the live site.
+Workers Builds runs main and branch builds with a user API token. The Builds API allows a
+separate token per trigger, but a preview token still needs Workers Scripts Edit on the same
+Worker, which can deploy production. So code on any pushed branch runs with a key that could
+deploy the live site.
 
 Accepted by yskills, knowing what it means: Claude can't merge without yskills' tap, but any
 branch a thread pushes builds with that token, so a thread misled by text from the web could still

@@ -1,8 +1,9 @@
 # German and EU law for a shop
 
 Checked 2026-10-03; re-check dates are in `recheck.md`. This is not legal advice. It says what
-must exist; the wording comes from a legal-text service, which also keeps the texts updated
-and helps with warning letters (Abmahnungen). Markers: **[F]** official page read, **[S]**
+must exist. Claude writes the texts in-house (official model texts word for word); once sales
+come in, a legal-text service takes them over, keeps them updated and helps with warning letters
+(Abmahnungen). Markers: **[F]** official page read, **[S]**
 search results and legal-publisher titles agree, **[K]** known but not re-read.
 
 ## Before the first sale (yskills does these)
@@ -13,7 +14,7 @@ search results and legal-publisher titles agree, **[K]** known but not re-read.
 | Tax registration | [ELSTER](https://www.elster.de): "Fragebogen zur steuerlichen Erfassung" | Choose Kleinunternehmer there or not. Free |
 | Kleinunternehmer (§ 19 UStG) | Same questionnaire | At most €25,000 last year and at most €100,000 this year. **In the founding year the limit is €25,000 for that year itself.** Crossing a limit ends the scheme at once [S]. Sources: [BMF letter, 18 Mar 2025](https://www.bundesfinanzministerium.de/Content/DE/Downloads/BMF_Schreiben/Steuerarten/Umsatzsteuer/Umsatzsteuer-Anwendungserlass/2025-03-18-sonderregelung-kleinunternehmer.pdf) |
 | Wirtschafts-Identifikationsnummer (W-IdNr) | Sent by the BZSt | Goes in the Impressum once issued, even without a USt-IdNr [S] |
-| Legal-text service | e.g. IT-Recht Kanzlei (Unlimited package €54.90/month [S]), Händlerbund, Trusted Shops, eRecht24 | It must cover AGB, Widerruf (the 2026 version), Datenschutz, Impressum, shipping and payment information, an update service and Abmahnung help |
+| Legal-text service (once sales come in) | e.g. IT-Recht Kanzlei (Unlimited package €54.90/month [S]), Händlerbund, Trusted Shops, eRecht24 | It must cover AGB, Widerruf (the 2026 version), Datenschutz, Impressum, shipping and payment information, an update service and Abmahnung help |
 | Physical goods | LUCID plus a dual system before the first parcel; GPSR; stiftung ear if you are the producer | Details in `physical.md` |
 
 ## Pages and texts
@@ -64,7 +65,10 @@ Claude builds this; the law is specific.
 
 - **Confirmation email** (§ 312f BGB) [K]: the contract content plus the AGB,
   Widerrufsbelehrung and Muster-Widerrufsformular, on a durable medium. `fulfil.ts` attaches
-  them as PDFs; a link does not count.
+  them as PDFs from `public/rechtliches/` (`agb.pdf`, `widerrufsbelehrung.pdf`,
+  `muster-widerrufsformular.pdf`); a link does not count. Claude prints them from the project's
+  own legal pages with Playwright's `page.pdf()` and commits them, and reprints them whenever a
+  text changes (a missing PDF makes every confirmation email fail).
 - **Widerrufsbutton** (§ 356a BGB, since 2026-06-19) [S], for goods too:
   - Step 1 is a function labelled "Vertrag widerrufen", easy to find and available for the
     whole withdrawal period.
