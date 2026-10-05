@@ -1,14 +1,14 @@
 # Test projects
 
-Three throwaway projects, each harder than the last, run before the first real one. Each runs
-the whole `operator` flow end to end and exists to find what breaks. What they teach goes back
-into this repo; then the next one starts. Repos are private and get deleted or archived after.
+Three test projects, each run through the whole `operator` flow end to end to find what breaks,
+and each built to earn so the money path gets tested too. What they teach goes back into this
+repo; then the next one starts.
 
 | # | Project | Shape | What it proves |
 |---|---|---|---|
-| 1 | One-page site: a fake café with menu, opening hours and a contact form | One build thread + evaluator | Brief (a)-(c) templates, Workers Builds import and previews, the evaluator on a preview, the 5/5 gate ending in one merge tap, the `legal` team (Impressum, Datenschutz, privacy scan clean), zero touches from yskills outside the briefs and merge taps |
-| 2 | Small app: a shared shopping list with email login and D1 | 3 slices, riskiest first | Slicing, `features.json` and `PROGRESS.md` handoffs across fresh threads, preview D1 and Previews Base secrets, `security-reviewer` in the gate, account deletion, a migration PR flagged as risky on its gate table |
-| 3 | Paid digital product in Stripe sandbox: a 2 € PDF download | 2 slices | The `sell` kit on Workers Builds (Worker secrets, sandbox webhook made by hand), order button wording, `legal-reviewer` on shop pages, a real sandbox checkout, the weekly smoke test |
+| 1 | **duo-test**, the language-learning app (existing repo), finished end to end | the operator taking over an existing app, slices | Briefs, Workers Builds previews, the evaluator, the 5/5 gate ending in one merge tap, logins and D1 with `security-reviewer` and `red-team`, the `sell` kit in Stripe sandbox, the `legal` team, a migration PR flagged as important |
+| 2 | **A Three.js web game** (new repo) | small: one build thread | Design directions for a game, performance on a phone, portal monetization (Poki or CrazyGames SDK) or in-game purchases via `sell`, the weekly metrics PR |
+| 3 | **A Roblox game** (new repo, Rojo) | slices | A build thread on yskills' PC (Studio), Luau code reviewed in the cloud, game passes and developer products, what the gate can and can't check outside the web |
 
 ## Rules for a test run
 
@@ -16,9 +16,10 @@ into this repo; then the next one starts. Repos are private and get deleted or a
   it at 5/5; every other touch is a finding.
 - The operator logs in `PROGRESS.md`: each thread, its model, its cost, gate rounds and why they
   failed.
-- Nothing goes live on a real domain and no real money moves. Legal pages carry clearly marked
-  test data, and `legal-reviewer` is told so. Forms store submissions instead of sending mail.
-- Stop after brief (c): no weekly routine; delete any trigger the run created at cleanup.
+- Payments stay in sandbox or test mode until yskills decides a test project goes live for real.
+  Forms store submissions instead of sending mail.
+- Only test 2 runs the weekly routine, for two weeks; every trigger a test created is deleted when
+  it ends.
 
 ## After each run
 
@@ -30,9 +31,9 @@ into this repo; then the next one starts. Repos are private and get deleted or a
 
 | # | Date | Touches outside briefs | Gate rounds | Tokens | Lessons PR |
 |---|---|---|---|---|---|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
+| 1 duo-test | | | | | |
+| 2 Three.js game | | | | | |
+| 3 Roblox game | | | | | |
 
 ## Then
 
