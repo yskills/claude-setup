@@ -60,7 +60,7 @@ criterion in `features.json`:
 ## 3. Before launch
 
 The `legal-reviewer` agent checks the preview against the plan's legal lines and the privacy
-scan; its result goes into brief (c) and check 5 of the merge gate (`operator` skill).
+scan; its result goes into brief (c) and check 5 of the 5/5 gate (`operator` skill).
 
 yskills does, once per project, inside brief (c): read the legal texts, and accept the AVV/DPA
 in each processor's settings (the agent lists the deep links).

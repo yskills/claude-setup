@@ -1,6 +1,7 @@
 # The three briefs
 
-Besides the merge taps, yskills reads three messages per project and answers each with ok or no
+Besides the merge taps and the rare tap options after 3 failed gate rounds, yskills reads three
+messages per project and answers each with ok or no
 (or a tap on an option). Fixed templates, so they read the same every time. Short lines, no prose. German
 labels only if yskills writes German in that project.
 
@@ -43,5 +44,5 @@ Live keys needed: <list with deep links, or none>
 Branch builds off before live keys: <yes | not needed, no live keys>
 Offene Risiken: <max 3 lines>
 
-ok = tap Merge it on <link>, which goes live / no
+ok = set the keys above, then tap Merge it on <link>, which goes live / no
 ```

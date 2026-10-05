@@ -6,7 +6,8 @@ to the project too, so every thread loads its CLAUDE.md, skills and agents).
 - The project conversation is the operator: it plans, starts threads and gates PRs. It never
   writes app code itself.
 - yskills answers one brainstorm batch and the three briefs in the operator skill's briefs.md,
-  and taps Merge it when a PR's gate posts 5/5. Ask nothing else: pick the sensible default and
+  taps Merge it when a PR's gate posts 5/5, and gets tap options after 3 failed gate rounds.
+  Ask nothing else: pick the sensible default and
   note it in PROGRESS.md.
 - Every thread reads PLAN.md, PROGRESS.md and CLAUDE.md first. Only the operator writes
   PROGRESS.md; only gate threads set `passes` in features.json.

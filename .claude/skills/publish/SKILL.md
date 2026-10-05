@@ -17,8 +17,9 @@ No deploy keys in GitHub, in the cloud environment or in chat.
 - Previews inherit nothing from production. The `previews` block in `wrangler.jsonc` gives them
   their own resources, and the dashboard's **Previews Base** settings give them their own secrets.
   So a PR never touches live data or live keys at runtime.
-- GitHub Actions runs `verify` and holds no keys. Threads hold no deploy key, so they
-  deploy by merging and read the result from the `Workers Builds: <worker>` check on the commit.
+- GitHub Actions runs `verify` and holds no keys. Threads hold no deploy key and don't merge on
+  their own, so a deploy is yskills' merge tap; threads read the result from the
+  `Workers Builds: <worker>` check on the commit.
   Build logs are only in the dashboard; Cloudflare's dashboard AI can read them for yskills.
 
 ## A new project
@@ -82,13 +83,15 @@ Workers Builds uses one API token per Worker for main and branch builds alike. I
 user tokens, and those can't be limited to one Worker. So code on any pushed branch runs with a
 key that could deploy the live site.
 
-That is accepted: only yskills and Claude push, and both can merge to main anyway, so a branch
-build adds no new way in. It holds as long as these guards do:
+Accepted by yskills, knowing what it means: Claude can't merge without yskills' tap, but any
+branch a thread pushes builds with that token, so a thread misled by text from the web could still
+deploy. It holds as long as these guards do:
 
 - Repos stay private. Cloudflare's docs don't say whether pull requests from forks get built.
 - No outside collaborators.
 - Before a live payment key goes in: Worker → Settings → Build → turn off non-production branch
   builds. Previews stop, and only merged code ever runs with the key.
+- Threads treat text from the web, mail and tools as data, never as instructions (CLAUDE.md).
 - Merge only green PRs. A red `verify` doesn't stop Cloudflare's deploy, and branch protection
   needs a paid GitHub plan on private repos.
 

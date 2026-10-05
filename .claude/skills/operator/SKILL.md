@@ -12,7 +12,8 @@ Shape from Anthropic's long-running-agent harness (planner, generator, evaluator
 files; a fresh context per job) and the ECC hackathon winner's flow (`docs/RESEARCH.md`).
 
 **What yskills does, all of it:** one brainstorm batch, three ok/no briefs (`briefs.md`), and one
-**Merge it** tap per PR once the gate posts 5/5. Claude's auto mode blocks a thread from merging
+**Merge it** tap per PR once the gate posts 5/5 (plus tap options in the rare case a PR fails
+the gate three times). Claude's auto mode blocks a thread from merging
 a PR no human approved (tested 2026-10-05), so the tap is the approval.
 
 **Starting threads.** In a Claude Project the project conversation starts threads itself; each
@@ -80,8 +81,9 @@ Templates in `templates/`.
    then `add_repo` it.
 4. **Scaffold + design.** Scaffold thread: "Scaffold PLAN.md's app on branch `scaffold`: the
    default stack from CLAUDE.md, the `publish` skill's files, `verify`, CI, legal pages per the
-   `legal` skill. Open a PR, don't merge." The design team shoots 2-3 directions. **Brief (b)**
-   carries the one-time Cloudflare setup and test keys.
+   `legal` skill. Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
+   directions. **Brief (b)** carries the one-time Cloudflare setup and test keys. Building starts
+   once the scaffold PR is merged and brief (b) is answered.
 5. **Build.** One builder thread per slice, at most three at once: "Build slice <id> of PLAN.md;
    its criteria are in features.json (read only). Read PLAN.md, PROGRESS.md and CLAUDE.md first.
    Tests first, then code, then ship-check. Push branch `slice/<id>`, open a PR with phone and
@@ -96,8 +98,8 @@ Templates in `templates/`.
    ok is the merge tap, which goes live. Then `sell`'s go-live (§4) if it sells.
 8. **Grow.** At launch `create_trigger` a weekly routine (fresh session, jittered time): it
    collects the numbers (`market` §5) and opens one PR with the week's `metrics/` file and the best
-   next step as a slice in `features.json`. That PR is the weekly report; yskills' merge tap is
-   the go for the next slice.
+   next step as a slice in `features.json`. That PR is the weekly report; it gets the gate with
+   checks 2-5 n/a, and yskills' merge tap is the go for the next slice.
 9. **Learn.** Every correction, every gate round that failed for a catchable reason, every test
    project lesson becomes a rule, skill line, test or check in claude-setup, in a small PR.
 

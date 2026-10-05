@@ -18,8 +18,8 @@
    the full secret key. Stripe no longer recommends secret keys for new integrations.
 5. **The webhook endpoint is made by hand**, once per mode, in the Stripe Dashboard. Its
    `whsec_…` goes into Production as `STRIPE_WEBHOOK_SECRET`.
-6. **Cloud threads can't reach the Stripe or Cloudflare APIs**, so they never handle a key and
-   deploy by merging (`publish` skill).
+6. **Cloud threads can't reach the Stripe or Cloudflare APIs**, so they never handle a key; a
+   deploy is yskills' merge tap (`publish` skill).
 
 ## The keys
 

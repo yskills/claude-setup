@@ -152,8 +152,8 @@ with test card `4242 4242 4242 4242`, webhook, email. stripe-mock only checks pa
 
 1. Checks that no placeholder is left (`example-mug`, `Beispielshop`, `example.de`) and that
    checkout, confirm and withdrawal use the rate-limit binding.
-2. Adds a one-off migration `DELETE FROM orders WHERE livemode = 0 OR livemode IS NULL`, merges,
-   and reads the `Workers Builds: <worker>` check: `npm run deploy` applies it. This has to happen
+2. Adds a one-off migration `DELETE FROM orders WHERE livemode = 0 OR livemode IS NULL` in a PR;
+   after yskills' merge tap it reads the `Workers Builds: <worker>` check: `npm run deploy` applies it. This has to happen
    before the live key, because a live order is also `livemode IS NULL` until it is paid.
 
 **yskills does** (deep links are in `keys.md` and `legal-de.md`):

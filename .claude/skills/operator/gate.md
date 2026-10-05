@@ -10,7 +10,7 @@ check is a hard yes or no from someone who didn't write the code.
 | 2 | Every acceptance criterion passes on the preview | `evaluator` | the head SHA's preview URL (from the Workers Builds check or Cloudflare's PR comment), the slice's criteria | always |
 | 3 | Nothing blocking | a **fresh** `code-reviewer` (the builder's last ship-check pass counts if its report names this head SHA) | the diff, the slice goal in 2 sentences | always |
 | 4 | Nothing blocking, no CRITICAL/HIGH | `security-reviewer` on the diff; `red-team` on the preview | the diff; the preview URL and routes | auth, payments, user input or secrets touched; red team always on the last PR before launch |
-| 5 | Nothing blocking | `design-critic`; `legal-reviewer` when pages, forms, tracking, embeds or AI output change | phone and desktop screenshots, the preview URL | UI changed |
+| 5 | Nothing blocking | `design-critic`; `legal-reviewer` when pages, forms, tracking, embeds or AI output change | phone and desktop screenshots, the preview URL | UI changed; `legal-reviewer` always on the last PR before launch |
 
 A check that doesn't apply passes; say "n/a" in the table.
 
@@ -22,7 +22,11 @@ gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
 
 - **5/5:** commit the evaluator's verdict into `features.json` (`passes`) on the PR branch, wait
   for check 1 on that commit (a commit touching only `features.json` doesn't restart checks 2-5),
-  then post the table below. yskills merges with one tap.
+  then post the table below as a PR comment. yskills merges (squash) with **Merge it** on the gate
+  thread's card, which tells the thread to merge, or with GitHub's own Merge button. The gate
+  thread never merges unless yskills says so.
+- **Last PR before launch:** head the table `hold: brief (c) first`; the operator sends brief (c),
+  and its ok is the merge.
 - **Less:** post the blocking findings as one PR review and stop. The builder fixes them; the next
   round re-runs the failed checks with fresh agents on the new head.
 - **3 failed rounds:** stop. One message to yskills: the PR, the check that keeps failing, its last
@@ -32,7 +36,7 @@ PRs touching auth, payments, database migrations or secrets say so on the table'
 yskills knows which taps deserve a look. claude-setup PRs always get yskills' full review.
 
 ```
-Gate 5/5 (round <n>), ready to merge   [risky: auth | payments | migration | secrets]
+Gate 5/5 (round <n>), ready to merge | hold: brief (c) first   [risky: auth | payments | migration | secrets]
 1 CI + Workers Builds .. pass  <run links>
 2 Evaluator ............ pass  <n>/<n> criteria
 3 Code review .......... pass

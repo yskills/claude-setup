@@ -17,7 +17,7 @@ revenue, analytics) instead of getting their own dashboard.
   acceptance criteria before building, and sends yskills three ok/no briefs.
 - Merging: yskills taps Merge it once a fresh gate thread posts the `operator` skill's 5/5 table
   (CI, evaluator, fresh code review, security and red team, design and legal where they apply).
-  Never merge a PR yourself. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
+  Never merge a PR unless yskills tells you to. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
 - Spend little: the operator on Opus, everything else (threads, agents) on Sonnet; reviewers get
   only the diff or URL plus the criteria.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
@@ -70,7 +70,7 @@ yskills' verdict on early work was that it "looks very AI". For every UI change:
    animation: none` lands on the finished screen.
 2. Screenshot at phone (390px) and desktop (1440px) widths with Playwright, look at the images,
    and have the `design-critic` agent review them. Fix what it finds.
-3. Put the screenshots in the PR; the merge gate's design check and yskills look at them.
+3. Put the screenshots in the PR; the 5/5 gate's design check and yskills look at them.
 
 UI text is German first, English second, unless the project says otherwise.
 

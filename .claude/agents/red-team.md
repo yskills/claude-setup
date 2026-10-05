@@ -48,4 +48,4 @@ RED TEAM on <url>: PASS | FAIL (<n> findings)
 Tried and held: <short list>
 ```
 
-CRITICAL and HIGH block the merge gate and launch. Do not fix code yourself.
+CRITICAL and HIGH fail the 5/5 gate and block launch. Do not fix code yourself.

@@ -6,7 +6,7 @@ into this repo; then the next one starts. Repos are private and get deleted or a
 
 | # | Project | Shape | What it proves |
 |---|---|---|---|
-| 1 | One-page site: a fake café with menu, opening hours and a contact form | One build thread + evaluator | Brief (a)-(c) templates, Workers Builds import and previews, the evaluator on a preview, the 5/5 gate ending in one merge tap, the `legal` team (Impressum, Datenschutz, privacy scan clean), zero touches from yskills outside the briefs |
+| 1 | One-page site: a fake café with menu, opening hours and a contact form | One build thread + evaluator | Brief (a)-(c) templates, Workers Builds import and previews, the evaluator on a preview, the 5/5 gate ending in one merge tap, the `legal` team (Impressum, Datenschutz, privacy scan clean), zero touches from yskills outside the briefs and merge taps |
 | 2 | Small app: a shared shopping list with email login and D1 | 3 slices, riskiest first | Slicing, `features.json` and `PROGRESS.md` handoffs across fresh threads, preview D1 and Previews Base secrets, `security-reviewer` in the gate, account deletion, a migration PR flagged as risky on its gate table |
 | 3 | Paid digital product in Stripe sandbox: a 2 € PDF download | 2 slices | The `sell` kit on Workers Builds (Worker secrets, sandbox webhook made by hand), order button wording, `legal-reviewer` on shop pages, a real sandbox checkout, the weekly smoke test |
 
