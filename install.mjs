@@ -101,6 +101,19 @@ else {
       if (!ok) warn(`plugin ${p.id}: ${r.out.split('\n').slice(-2).join(' ')}`)
     }
   }
+  // Our own mods (mods/), from this clone as a local marketplace; they show in the terminal and
+  // the desktop Code tab, not in cloud project threads.
+  const modsDir = join(ROOT, 'mods')
+  // shell: true on Windows splits an unquoted path with spaces.
+  const mods = run('claude', ['plugin', 'marketplace', 'add', IS_WIN ? `"${modsDir}"` : modsDir], { allowFail: true, quiet: true })
+  if (!mods.ok && !/already/i.test(mods.out)) warn(`marketplace mods: ${mods.out}`)
+  else run('claude', ['plugin', 'marketplace', 'update', 'claude-setup-mods'], { allowFail: true, quiet: true })
+  for (const m of readJson(join(ROOT, 'mods/.claude-plugin/marketplace.json')).plugins) {
+    const r = run('claude', ['plugin', 'install', `${m.name}@claude-setup-mods`, '--scope', 'user'], { allowFail: true, quiet: true })
+    const ok = r.ok || /already installed/i.test(r.out)
+    log(`  ${ok ? '+' : 'x'} mod ${m.name}`)
+    if (!ok) warn(`mod ${m.name}: ${r.out.split('\n').slice(-2).join(' ')}`)
+  }
 }
 
 // ---------------------------------------------------------------- 4. skills, agents, rules
@@ -116,6 +129,7 @@ for (const n of listMd(join(ROOT, '.claude/agents'))) items.push([join('.claude/
 for (const n of listDirs(join(ROOT, '.claude/rules/ecc'))) items.push([join('.claude/rules/ecc', n), join('rules', 'ecc', n)])
 items.push(['licenses/ECC-LICENSE', join('rules', 'ecc', 'LICENSE')])
 items.push(['global/statusline.mjs', join('claude-setup', 'statusline.mjs')])
+items.push(['global/context-guard.mjs', join('claude-setup', 'context-guard.mjs')])
 
 const now = new Set(items.map(([, dest]) => dest))
 for (const old of prev.files) {
@@ -167,6 +181,11 @@ merge(settings, ours)
 // A rule we deny must not also be allowed by an older entry.
 settings.permissions.allow = settings.permissions.allow.filter((r) => !settings.permissions.deny.includes(r))
 settings.statusLine = { type: 'command', command: `node "${join(CLAUDE_DIR, 'claude-setup', 'statusline.mjs')}"`, padding: 0 }
+// Context guard (global/context-guard.mjs): one entry, replaced on every install.
+settings.hooks ??= {}
+const guard = `node "${join(CLAUDE_DIR, 'claude-setup', 'context-guard.mjs')}"`
+settings.hooks.PostToolUse = (settings.hooks.PostToolUse ?? []).filter((h) => !JSON.stringify(h).includes('context-guard.mjs'))
+settings.hooks.PostToolUse.push({ matcher: '*', hooks: [{ type: 'command', command: guard, timeout: 5 }] })
 settings.env ??= {}
 if (!SKIP_HOOKS) {
   settings.env.ECC_HOOK_PROFILE = ecc.hooks.profile

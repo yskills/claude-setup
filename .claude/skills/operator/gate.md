@@ -28,6 +28,11 @@ whichever sees that payment first) switches it to `Mode: product`. Until someone
 
 No `Mode:` line in `PLAN.md` means product mode. Product mode is the full table above. The headline names the mode: `Gate 5/5 (probe, round <n>)`.
 
+**No preview URL is not a pass.** Check 2 runs on the branch's Worker Preview. A PR without one
+(the Deploy or Preview command isn't set up, `publish` §A new project) is not 5/5: the gate stops
+and the operator fixes the deploy first. A flow that depends on mail (a confirm link, a mailed
+cancel) passes check 4 only where mail is configured in that environment, else the flow is off.
+
 **No preview yet or any more:** the scaffold PR (before Workers Builds is connected) needs CI
 only. Once branch builds are off (live payment keys, `publish` skill), check 1 is CI only and the
 gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.

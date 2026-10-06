@@ -1,0 +1,13 @@
+{
+  "name": "claude-setup-mods",
+  "owner": {
+    "name": "yskills"
+  },
+  "plugins": [
+    {
+      "name": "team",
+      "source": "./team",
+      "description": "Your digital team inside Claude Code: who works on what (programmer, reviewer, security, legal, design, QA), a Watch link to what they build, and what each turn cost."
+    }
+  ]
+}

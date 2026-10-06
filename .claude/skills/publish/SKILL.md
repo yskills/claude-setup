@@ -40,6 +40,10 @@ yskills, once:
      `npx wrangler preview`.
    - Production branch: the repo's default branch (MyPage's is `origin`, not `main`).
    - Leave non-production branch builds on: they are what makes the previews.
+   - Ask for a screenshot of the Build settings and check all three commands: Cloudflare's
+     default Deploy command never ran our deploy, so live kept a day-old build while every check
+     was green. No slice starts until live serves main's commit (the live check) and a pushed
+     branch shows a Preview URL.
 2. Apps with D1:
    - Create the D1 databases `<name>` and `<name>-preview` on the
      [D1 page](https://dash.cloudflare.com/?to=/:account/workers/d1) and send Claude both ids. Ids aren't secrets.

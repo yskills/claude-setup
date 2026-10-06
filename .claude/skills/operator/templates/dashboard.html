@@ -1,0 +1,237 @@
+<title>Claude Setup HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a control room in three pages. Plan: the manager's update and the phases with each goal's bar. Team: one row per teammate. For you: what needs yskills, next steps, live links. */
+:root{
+  --bg:#f3f5f4;--panel:#ffffff;--fg:#17201d;--soft:#5d6a65;--line:#dbe1de;
+  --accent:#0d6e5b;--accent-soft:#e1f0ec;
+  --ok:#1f7a3f;--warn:#b26a00;--bad:#c0362c;--idle:#8b9792;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101614;--panel:#18201d;--fg:#e6ece9;--soft:#93a19b;--line:#2a3531;
+  --accent:#4fc2a6;--accent-soft:#16302a;--ok:#5cc489;--warn:#e9a640;--bad:#ff7a6e;--idle:#6d7a75;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101614;--panel:#18201d;--fg:#e6ece9;--soft:#93a19b;--line:#2a3531;
+  --accent:#4fc2a6;--accent-soft:#16302a;--ok:#5cc489;--warn:#e9a640;--bad:#ff7a6e;--idle:#6d7a75;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.stack{display:grid;gap:16px}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--sans)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px}
+h1{font-size:24px;font-weight:700;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.meta{font:12px/1.4 var(--mono);color:var(--soft)}
+.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--idle);margin-right:6px;vertical-align:1px}
+.live-dot.on{background:var(--ok)}
+h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:0 0 10px}
+.top{display:grid;gap:16px;grid-template-columns:1fr;align-items:start}
+@media (min-width:880px){.top{grid-template-columns:3fr 2fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;min-width:0}
+.pm p{margin:0;max-width:68ch}
+.progress{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.big{font:600 34px/1 var(--mono);font-variant-numeric:tabular-nums}
+.bar{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar>span{display:block;height:100%;background:var(--accent)}
+ol,ul{margin:0;padding:0;list-style:none}
+.next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
+.next li::before{content:"";position:absolute;left:2px;top:14px;width:7px;height:7px;border:1.5px solid var(--accent);border-radius:50%}
+.you{border-color:var(--warn)}
+.you h2{color:var(--warn)}
+.you li{padding:8px 0;border-top:1px solid var(--line);font-weight:500}
+.you li:first-child,.next li:first-child{border-top:0}
+.empty{color:var(--soft);margin:0}
+a{color:var(--accent);text-underline-offset:2px}
+/* Team board */
+.team{display:grid;gap:0}
+.row{display:grid;grid-template-columns:150px 92px minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.who{font-weight:600}
+.role{display:block;font:12px var(--mono);color:var(--soft);font-weight:400}
+.state{font:500 12px var(--mono);padding:2px 8px;border-radius:999px;justify-self:start;border:1px solid currentColor}
+.state.working{color:var(--accent);background:var(--accent-soft);border-color:transparent}
+.state.blocked{color:var(--bad)}
+.state.waiting{color:var(--warn)}
+.state.idle,.state.done{color:var(--idle)}
+.task{min-width:0}
+.task small{display:block;color:var(--soft);font-size:13px}
+.with{display:block;font:12px var(--mono);color:var(--soft)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{font:500 13px var(--sans);text-decoration:none;padding:6px 12px;border-radius:6px;border:1px solid var(--line);color:var(--fg);background:var(--panel);white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.watch{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+@media (max-width:720px){.row{grid-template-columns:1fr auto}.task,.acts{grid-column:1/-1}.acts{justify-content:flex-start}}
+.note{font-size:13px;color:var(--soft)}
+/* Tabs */
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+nav.tabs a{font-weight:600;text-decoration:none;color:var(--soft);padding:10px 14px;border-bottom:2px solid transparent;margin-bottom:-1px}
+nav.tabs a[aria-current="page"]{color:var(--fg);border-bottom-color:var(--accent)}
+nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{font:12px var(--mono);margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--warn);color:var(--panel)}
+/* Phases */
+.phases{display:grid;gap:0}
+.phase{display:grid;grid-template-columns:28px minmax(0,1fr);gap:0 12px;padding-bottom:18px;position:relative}
+.phase::before{content:"";position:absolute;left:13px;top:26px;bottom:0;width:2px;background:var(--line)}
+.phase:last-child::before{display:none}
+.mark{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:var(--panel);display:grid;place-items:center;font:600 12px var(--mono);color:var(--soft)}
+.phase.done .mark{background:var(--ok);border-color:var(--ok);color:var(--panel)}
+.phase.active .mark{border-color:var(--accent);color:var(--accent)}
+.ph-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding-top:3px}
+.ph-name{font-weight:700;font-size:17px}
+.phase.next .ph-name{color:var(--soft)}
+.goals{display:grid;gap:10px;margin-top:10px}
+.goal{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:4px 12px}
+.goal .num{font:12px var(--mono);color:var(--soft);text-align:right;font-variant-numeric:tabular-nums}
+.goal .bar{grid-column:1/-1;flex:none;height:6px}
+.phase.done .goal .bar>span{background:var(--ok)}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1 id="title">Claude Setup</h1>
+    <span class="meta"><span class="live-dot" id="dot"></span><span id="updated">Waiting for the project manager's first update</span></span>
+  </header>
+  <nav class="tabs" aria-label="Pages">
+    <a href="#plan" data-tab="plan">Plan</a>
+    <a href="#team" data-tab="team">Team</a>
+    <a href="#you" data-tab="you">For you<span class="count" id="you-count" hidden></span></a>
+  </nav>
+
+  <section data-page="plan" class="stack" aria-label="Plan">
+    <div class="panel pm">
+      <h2>Project manager</h2>
+      <div class="progress"><span class="big" id="pct">0%</span><div class="bar" aria-hidden="true"><span id="pct-bar" style="width:0%"></span></div></div>
+      <p id="summary">Claude writes here what the team is doing. It fills in as soon as the first update arrives.</p>
+    </div>
+    <div class="panel">
+      <h2>Phases</h2>
+      <div class="phases" id="phases"><p class="empty">The project manager's phases and their goals appear here.</p></div>
+    </div>
+  </section>
+
+  <section data-page="team" class="panel" aria-labelledby="team-h" hidden>
+    <h2 id="team-h">Who works on what</h2>
+    <div class="team" id="team"><p class="empty">The team appears here once Claude staffs the first task.</p></div>
+    <p class="note" style="margin:12px 0 0">Watch opens what that teammate is building. On your PC, Claude's test browser also opens as a visible Chrome window.</p>
+  </section>
+
+  <section data-page="you" class="top" aria-label="For you" hidden>
+    <div class="panel you">
+      <h2>Needs you</h2>
+      <ul id="you"><li class="empty" style="font-weight:400">Nothing right now.</li></ul>
+    </div>
+    <div class="panel">
+      <h2>Next steps</h2>
+      <ol class="next" id="next"><li class="empty">None yet.</li></ol>
+      <h2 style="margin-top:16px">Live links</h2>
+      <ul id="live"><li class="empty">Nothing deployed yet.</li></ul>
+    </div>
+  </section>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id)
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n }
+const safeUrl = (u) => { if (typeof u !== 'string' || !u) return null; try { const x = new URL(u, location.href); return /^https?:$/.test(x.protocol) ? x.href : null } catch { return null } }
+const link = (text, href, cls) => { const u = safeUrl(href); if (!u) return el('span', null, text); const a = el('a', cls, text); a.href = u; a.target = '_blank'; a.rel = 'noopener'; return a }
+const STATES = { working: 'working', blocked: 'blocked', waiting: 'waiting on you', idle: 'idle', done: 'done' }
+const list = (box, items, render, emptyText) => {
+  box.replaceChildren()
+  if (!items.length) { const li = el('li', 'empty', emptyText); box.append(li); return }
+  for (const it of items) box.append(render(it))
+}
+const ago = (iso) => {
+  const t = Date.parse(iso); if (!t) return ''
+  const m = Math.round((Date.now() - t) / 60000)
+  return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : new Date(t).toLocaleDateString()
+}
+
+function renderPm(d) {
+  if (!d) return
+  $('title').textContent = d.project || 'Project'
+  document.title = `${d.project || 'Project'} HQ`
+  $('updated').textContent = d.updated ? `Updated ${ago(d.updated)}` : 'Live'
+  const n = (d.you || []).length
+  $('you-count').hidden = n === 0
+  $('you-count').textContent = String(n)
+  $('summary').textContent = d.summary || ''
+  list($('next'), d.next || [], (s) => el('li', null, s), 'None yet.')
+  list($('you'), d.you || [], (y) => { const li = el('li'); li.append(link(y.what, y.link)); return li }, 'Nothing right now.')
+  list($('live'), d.live || [], (l) => { const li = el('li'); li.style.padding = '4px 0'; li.append(link(l.name, l.url)); if (l.note) li.append(el('span', 'note', ` · ${l.note}`)); return li }, 'Nothing deployed yet.')
+}
+
+function renderTeam(members) {
+  const box = $('team'); box.replaceChildren()
+  if (!members.length) { box.append(el('p', 'empty', 'The team appears here once Claude staffs the first task.')); return }
+  const names = Object.fromEntries(members.map((m) => [m.id, m.name]))
+  const rank = { working: 0, blocked: 1, waiting: 2, idle: 3, done: 4 }
+  members.sort((a, b) => (rank[a.state] ?? 5) - (rank[b.state] ?? 5) || (a.order ?? 99) - (b.order ?? 99))
+  for (const m of members) {
+    const row = el('div', 'row')
+    const who = el('div', 'who', m.name); who.append(el('span', 'role', m.role || ''))
+    const st = el('span', `state ${m.state in STATES ? m.state : 'idle'}`, STATES[m.state] || 'idle')
+    const task = el('div', 'task', m.task || 'No task')
+    if (m.next) task.append(el('small', null, `Next: ${m.next}`))
+    const w = (m.with || []).map((id) => names[id]).filter(Boolean)
+    if (w.length) task.append(el('span', 'with', `with ${w.join(', ')}`))
+    const acts = el('div', 'acts')
+    if (safeUrl(m.preview)) acts.append(link('Watch', m.preview, 'btn watch'))
+    if (safeUrl(m.link)) acts.append(link(m.linkLabel || 'Open', m.link, 'btn'))
+    row.append(who, st, task, acts)
+    box.append(row)
+  }
+}
+
+function renderPhases(phases) {
+  phases.sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+  const box = $('phases'); box.replaceChildren()
+  let done = 0, total = 0
+  if (!phases.length) box.append(el('p', 'empty', "The project manager's phases and their goals appear here."))
+  phases.forEach((p, i) => {
+    const state = ['done', 'active', 'next'].includes(p.state) ? p.state : 'next'
+    const ph = el('div', `phase ${state}`)
+    ph.append(el('div', 'mark', state === 'done' ? '✓' : String(i + 1)))
+    const body = el('div')
+    const head = el('div', 'ph-head'); head.append(el('span', 'ph-name', p.name), el('span', 'meta', { done: 'done', active: 'now', next: 'later' }[state]))
+    body.append(head)
+    if (p.why) body.append(el('div', 'note', p.why))
+    const goals = el('div', 'goals')
+    for (const g of p.goals || []) {
+      done += g.done || 0; total += g.total || 0
+      const row = el('div', 'goal')
+      row.append(link(g.name, g.link), el('span', 'num', `${g.done}/${g.total}`))
+      const bar = el('div', 'bar'); const s = el('span'); s.style.width = `${g.total > 0 ? Math.round((100 * g.done) / g.total) : 0}%`; bar.append(s); row.append(bar)
+      goals.append(row)
+    }
+    body.append(goals); ph.append(body); box.append(ph)
+  })
+  const pct = total > 0 ? Math.round((100 * done) / total) : 0
+  $('pct').textContent = `${pct}%`
+  $('pct-bar').style.width = `${pct}%`
+}
+
+function showTab() {
+  const tab = ['plan', 'team', 'you'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'plan'
+  for (const p of document.querySelectorAll('[data-page]')) p.hidden = p.dataset.page !== tab
+  for (const a of document.querySelectorAll('[data-tab]')) {
+    if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page')
+    else a.removeAttribute('aria-current')
+  }
+}
+window.addEventListener('hashchange', showTab)
+showTab()
+
+const rows = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+;(async () => {
+  const db = await window.claude?.use?.('db')
+  if (!db) { $('updated').textContent = 'Sign in to claude.ai to see live updates'; return }
+  $('dot').classList.add('on')
+  const fail = () => { $('dot').classList.remove('on'); $('updated').textContent = 'Live updates stopped; reload the page' }
+  db.doc('pm/now').onSnapshot((s) => renderPm(s.exists ? s.data() : null), fail)
+  db.collection('team').onSnapshot((s) => renderTeam(rows(s)), fail)
+  db.collection('phases').onSnapshot((s) => renderPhases(rows(s)), fail)
+})()
+</script>

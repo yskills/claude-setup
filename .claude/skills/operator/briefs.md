@@ -56,7 +56,9 @@ ok = set the keys above, then tap Merge it on <link>, which goes live / no
 
 ## Key card (any time a slice needs a key or account)
 
-Not a brief: no ok/no, just steps. One card per slice, all its keys together.
+Not a brief: no ok/no, just steps. One key per card, starting from the screen yskills is on now,
+naming the exact permissions (e.g. Checkout Sessions, Customers, Subscriptions: Write; Charges:
+Read), with no "if not done yet" branches. Test run 1's combined Stripe card took three rounds.
 
 ```
 Need: <what for, in user words, e.g. "so people can pay">

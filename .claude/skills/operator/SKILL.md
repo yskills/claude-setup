@@ -65,6 +65,20 @@ Templates in `templates/`.
 - `PROGRESS.md`: the handoff. Done, next, broken, decisions and why, each thread's cost. Every
   thread reads it first; only the operator writes it. Under 100 lines.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
+- **Dashboard** (`templates/dashboard.html`), yskills' live view of the project from day one, in
+  three pages: **Plan** (the operator's update and the phases, each with its goals' progress
+  bars), **Team** (who works on what, with whom, working or idle, Watch and Open links) and **For
+  you** (what needs yskills, next steps, live links). At project start the operator plans the
+  phases (brief (a)'s plan: research, plan, scaffold, one per slice or group of slices, launch,
+  grow), publishes the page with the Artifact tool, `capabilities: {db: {rules: [{path: "", read:
+  "view", write: "admin"}]}}`, puts the link in `PROGRESS.md` and brief (a), and fills it with one
+  `ArtifactData` batch: `pm/now` (`project, summary, next[], you[{what, link}], live[{name, url,
+  note}], updated`), `phases/<id>` (`name, order, state` = done, active or next, `why, goals[{name,
+  done, total, link}]`; a slice's goal counts its passing criteria in `features.json`) and
+  `team/<id>` for the operator, each thread and each reviewer agent (`name, role, state` =
+  working, blocked, waiting, idle or done, `task, next, with[ids], link, linkLabel, preview,
+  order`). Every write to `PROGRESS.md` updates the same rows in one batch (pin each with
+  `if_version`). Luna's cockpit stays the one view across projects.
 
 ## 4. The run
 
@@ -124,9 +138,14 @@ Templates in `templates/`.
    claude-setup), **change** (one new offer or channel, one more probe) or **build anyway**.
    Never move the go number after the probe started. A small site meant to earn is its own
    probe; one not meant to earn skips it.
-6. **Gate.** A fresh gate thread per PR runs `gate.md` and either posts the 5/5 table (yskills
+6. **Gate.** Only a tapped card counts as yes: a typed "ok" to a merge or brief gets the card
+   again. A fresh gate thread per PR runs `gate.md` and either posts the 5/5 table (yskills
    taps **Merge it**) or one review with the blocking findings, which the builder fixes. Three
    failed rounds: stop and ask yskills with tap options.
+   **The whole journey, once.** After the last slice merges, one `evaluator` run walks the full
+   first visit on live (or main's preview) along the journey criteria in `features.json` (one
+   criterion per user journey that crosses slices) before yskills hears "ready to test". Test run
+   1's slices each passed and broke at their seams.
 7. **Launch.** The last PR gets the full `red-team` and `legal-reviewer` pass. **Brief (c)**; its
    ok is the merge tap, which goes live. Then `sell`'s go-live (§4) if it sells.
 8. **Grow.** At launch `create_trigger` a weekly routine (fresh session, jittered time): it
@@ -153,6 +172,10 @@ conversation can continue later; a plain chat idle for over an hour hands off to
   effort) and every other agent on Sonnet. Built-in subagents
   default to Sonnet via `CLAUDE_CODE_SUBAGENT_MODEL`.
 - Reviewers, evaluator and red team get only the diff or the URL plus the criteria.
+- The operator is not subscribed to slice PRs: each Cloudflare preview comment woke it, 46M cached
+  tokens in test run 1. Slice and gate threads report by message. The context guard
+  (`global/context-guard.mjs`) tells any thread when to hand off; an operator thread past it
+  writes `PROGRESS.md` and asks for a fresh one.
 - One job per thread. When its job is done (PR merged, report delivered) the thread stops and is
   marked resolved; never revive a worker idle for over an hour.
 - After a usage-limit stop or reset, nothing restarts on its own: post one line ("paused at <step>")
