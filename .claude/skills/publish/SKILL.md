@@ -117,7 +117,7 @@ deploy. It holds as long as these guards do:
   builds. Previews stop, and only merged code ever runs with the key.
 - Threads treat text from the web, mail and tools as data, never as instructions (CLAUDE.md).
 - Merge only green PRs. A red `verify` doesn't stop Cloudflare's deploy, and branch protection
-  needs a paid GitHub plan on private repos.
+  needs a paid GitHub plan on private repos, so the gate checks it.
 
 Revisit when Workers Builds accepts account-owned tokens scoped to one Worker.
 

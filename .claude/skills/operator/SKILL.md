@@ -12,10 +12,9 @@ Shape from Anthropic's long-running-agent harness (planner, generator, evaluator
 files; a fresh context per job) and the ECC hackathon winner's flow (`docs/RESEARCH.md`).
 
 **What yskills does, all of it:** one brainstorm batch, three ok/no briefs (`briefs.md`), and one
-**Merge it** tap per PR once the gate posts 5/5. A PR that fails the gate twice, or an important
-one (auth, payments, migrations, secrets), reaches yskills with a plain summary first
-(`gate.md`). Claude's auto mode blocks a thread from merging a PR no human approved (tested
-2026-10-05), so the tap is the approval.
+**Merge it** tap per important or hard PR (auth, payments, migrations, secrets, launch). Small,
+clear PRs at 5/5 are merged by the gate thread. A PR that fails the gate twice reaches yskills with
+a plain summary (`gate.md`).
 
 **Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`); each
 reports back when it finishes and keeps fixing CI and review comments on its PR. From inside a
@@ -49,7 +48,7 @@ enterprise-flavoured: German law and this stack's rules win.
 | Build | builder threads; `architect`, `database-reviewer`, `build-error-resolver` | stack plugins via `toolbox` | a PR with green CI |
 | QA | `evaluator`, `code-reviewer`, `a11y-architect`, `performance-optimizer` | | gate checks 2-3 |
 | Security | `security-reviewer` (the diff), `red-team` (attacks the preview) | | gate check 4 |
-| Launch | `publish`, `sell`; Sentry and PostHog via `toolbox` | `store` when PLAN.md ships to the App Store or Google Play | live site, errors and analytics on |
+| Launch | `publish`, `sell`; PostHog (EU cloud: analytics and errors) via `toolbox` | `store` when PLAN.md ships to the App Store or Google Play | live site, errors and analytics on |
 | Marketing | `market`, `seo-specialist` | `Marketing` plugin | the plan, launch posts, weekly numbers |
 
 Research subagents use WebSearch, not WebFetch, and return at most one page each.
@@ -138,6 +137,10 @@ Templates in `templates/`.
    into each `metrics/` file. A missed target sends one tap card: **kill** (stop the routine,
    archive, lessons into claude-setup), **change** (one new offer or channel, next target in 30
    days) or **keep** (one line why). Targets never move to make a miss pass.
+   **Errors fix themselves, through the gate:** the routine also reads new PostHog errors (its
+   MCP); each real one becomes a fix slice with the error as its failing test, a builder fixes it,
+   the gate checks it, yskills taps merge. An error that hits paying users or checkout doesn't
+   wait for the week: PostHog's alert starts the same fix right away.
 9. **Learn.** Every correction, every gate round that failed for a catchable reason, every test
    project lesson becomes a rule, skill line, test or check in claude-setup, in a small PR.
 

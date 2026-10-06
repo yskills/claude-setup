@@ -5,10 +5,10 @@ launch sequence and German advertising law are in the `market` skill; this table
 
 | Need | Pick | Why / watch out | Add it |
 |---|---|---|---|
-| Product analytics, funnels, session replay, feature flags | **PostHog** (EU cloud) | Plugin is ~30k tokens: per project only | `posthog` plugin; MCP `https://mcp.posthog.com/mcp` |
+| Product analytics, error tracking, funnels, session replay, feature flags | **PostHog** (EU cloud; errors free up to 100k a month [S, 2026-10-06]) | Plugin is ~30k tokens: per project only | `posthog` plugin; MCP `https://mcp.posthog.com/mcp` |
 | Simple, cookieless page analytics | **Plausible** or **Umami** | No consent banner needed for analytics alone | script tag |
 | A/B tests | **GrowthBook** or PostHog experiments | | `growthbook` plugin |
-| Error tracking | **Sentry** | | `sentry` plugin |
+| Error tracking | **PostHog** error tracking (one tool, one AVV with analytics); **Sentry** only for deep performance tracing | | `posthog` / `sentry` plugin |
 | SEO (technical, content, structured data) | | | agent `seo-specialist` and ECC skill `seo` (both global) |
 | Social posting and scheduling | **Postiz** | 13+ platforms, analytics | `postiz` plugin; ECC skills `social-publisher`, `crosspost`, `x-api` |
 | Content plan, scripts, threads | | | ECC skills `content-engine`, `brand-voice` |

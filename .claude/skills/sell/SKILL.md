@@ -188,5 +188,5 @@ with test card `4242 4242 4242 4242`, webhook, email. stripe-mock only checks pa
   - send an unsigned webhook and expect 400;
   - get 200 from the legal pages.
   A failed run emails yskills.
-- Stripe emails yskills when a webhook endpoint keeps failing. Sentry alerts on errors.
+- Stripe emails yskills when a webhook endpoint keeps failing. PostHog alerts on errors.
 - When a rule or a price in this kit turns out wrong, fix it in yskills/claude-setup.

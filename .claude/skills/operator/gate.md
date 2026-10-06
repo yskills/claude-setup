@@ -36,9 +36,11 @@ gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
 
 - **5/5:** commit the evaluator's verdict into `features.json` (`passes`) on the PR branch, wait
   for check 1 on that commit (a commit touching only `features.json` doesn't restart checks 2-5),
-  then post the table below as a PR comment. yskills merges (squash) with **Merge it** on the gate
-  thread's card, which tells the thread to merge, or with GitHub's own Merge button. The gate
-  thread never merges unless yskills says so.
+  then post the table below as a PR comment. Then:
+  - **Small and clear** (not important, passed in round 1): the gate thread merges it (squash).
+    If Claude's auto mode refuses, it doesn't try another way: it asks yskills for the tap.
+  - **Important or hard:** yskills merges with **Merge it** on the gate thread's card or GitHub's
+    Merge button.
 - **Last PR before launch:** head the table `hold: brief (c) first`; the operator sends brief (c),
   and its ok is the merge.
 - **Less:** post the blocking findings as one PR review and stop. The builder fixes them; the next
@@ -46,9 +48,11 @@ gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
 - **2 failed rounds:** stop. Send one message to yskills: what the PR does, what is wrong in plain words (from
   the last reports), and two or three ways forward as tap options.
 
-**Important PRs** (auth, payments, database migrations, secrets, or anything that can lose data or
-money): even at 5/5, the table comes with three plain lines for yskills: what changes, what could
-break, how to undo it. claude-setup PRs always get yskills' full review.
+**Important or hard PRs** always wait for yskills: auth, payments, database migrations, secrets,
+anything that can lose data or money, the last PR before launch, and any PR that needed a second
+gate round. At
+5/5 their table comes with three plain lines for yskills: what changes, what could break, how to
+undo it. claude-setup PRs always get yskills' full review and merge.
 
 ```
 Gate 5/5 (round <n>), ready to merge | hold: brief (c) first   [risky: auth | payments | migration | secrets]

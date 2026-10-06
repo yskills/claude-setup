@@ -26,4 +26,4 @@ global CLAUDE.md (Nuxt 4 / Vue + Vite, Cloudflare Workers).
 | Online shop | **Shopify** | | `shopify-ai-toolkit` plugin |
 | SMS, WhatsApp, phone | **Twilio** | | `twilio-developer-kit` plugin |
 | PDF, Word, Excel, PowerPoint files | Anthropic document skills | | `claude plugin marketplace add anthropics/skills`, then `document-skills@anthropic-agent-skills` |
-| Error tracking | **Sentry** | | `sentry` plugin |
+| Error tracking | **PostHog** (with analytics, EU cloud); Sentry only for deep performance tracing | | `posthog` plugin (`growth.md`) |
