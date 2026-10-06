@@ -12,8 +12,8 @@ Shape from Anthropic's long-running-agent harness (planner, generator, evaluator
 files; a fresh context per job) and the ECC hackathon winner's flow (`docs/RESEARCH.md`).
 
 **What yskills does, all of it:** one brainstorm batch, three ok/no briefs (`briefs.md`), and one
-**Merge it** tap per important or hard PR (auth, payments, migrations, secrets, launch). Small,
-clear PRs at 5/5 are merged by the gate thread. A PR that fails the gate twice reaches yskills with
+**Merge it** tap per PR that touches live money (live keys, real payments), deletes data or
+launches. Every other PR at 5/5 is merged by the gate thread. A PR that fails the gate twice reaches yskills with
 a plain summary (`gate.md`).
 
 **Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`); each

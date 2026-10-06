@@ -28,7 +28,7 @@ After launch, phases 5-6 repeat for every improvement the weekly numbers suggest
 ## The 5/5 gate
 
 Five pass/fail checks by agents that didn't write the code: CI, evaluator on the preview, fresh
-code review, security + red team, design + legal. 5/5 → the gate thread merges small, clear PRs; important or hard ones wait for your **Merge it**
+code review, security + red team, design + legal. 5/5 → the gate thread merges it; only live money, deleting data and launch wait for your **Merge it**
 tap. 2 failed rounds → you get a
 plain summary of what's wrong and tap options. Until the first paying user the gate runs in
 probe mode: no fresh code reviewer (the builder's ship-check counts), design review only on the
