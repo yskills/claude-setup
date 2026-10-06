@@ -184,7 +184,7 @@ ol,ul{margin:0;padding:0;list-style:none}
     <div><h2 id="company-h">Company</h2><p class="lead">Every project, what it earns and what it needs from you.</p></div>
     <div class="totals">
       <div class="tot"><b id="t-month">0 €</b><span>This month</span></div>
-      <div class="tot"><b id="t-all">0 €</b><span>All time</span></div>
+      <div class="tot"><b id="t-all">0 €</b><span id="t-all-l">All time</span></div>
       <div class="tot need"><b id="t-need">0</b><span>Need you</span></div>
     </div>
     <h3>Projects</h3>
@@ -263,6 +263,7 @@ window.HQ = (() => {
       todos: Math.max(Number(you) || 0, needs),
       pct: total > 0 ? Math.round((100 * done) / total) : 0,
       working: projects.reduce((n, p) => n + Math.max(0, Number(p.working) || 0), 0),
+      test: projects.some((p) => p.testMoney),
     }
   }
   /* The team office: which animal plays which role, and which pose it shows for a team row's state at time t.
@@ -280,7 +281,13 @@ window.HQ = (() => {
     if (BETWEEN[clip] && t % GESTURE_EVERY > GESTURE_FOR) clip = BETWEEN[clip]
     return { clip, frame: Math.floor(Math.max(0, t) * FPS[clip]) % FRAMES[clip] }
   }
-  return { TABS, modeOf, pickTab, worldFor, deskNumbers, PET_OF, FRAMES, poseAt }
+  /* A project's own live figures (its stats route, cents) replace the saved ones; without a usable answer the row stays as saved. */
+  function withStats(project, stats) {
+    const ok = (v) => Number.isFinite(v) && v >= 0
+    if (!stats || !ok(stats.revenueTotalCents) || !ok(stats.revenueMonthCents)) return project
+    return { ...project, revenueTotal: stats.revenueTotalCents / 100, revenueMonth: stats.revenueMonthCents / 100, testMoney: stats.mode !== 'live' }
+  }
+  return { TABS, modeOf, pickTab, worldFor, deskNumbers, withStats, PET_OF, FRAMES, poseAt }
 })()
 </script>
 <script id="team-art">
@@ -571,7 +578,23 @@ function renderPhases(phases) {
 const EUR = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 const money = (v) => EUR.format(Math.max(0, Number(v) || 0))
 let hasProjects = false, projectsData = [], phasesData = []
-function renderProjects(projects) {
+const liveStats = {}, statsAsked = new Set()
+/* Real money: each project row may name a public stats route; ask it once when the page opens and redraw with the answer. */
+function askStats(projects) {
+  for (const p of projects) {
+    const url = safeUrl(p.statsUrl)
+    if (!url || statsAsked.has(p.id)) continue
+    statsAsked.add(p.id)
+    fetch(url, { credentials: 'omit' }).then((r) => (r.ok ? r.json() : null)).then((j) => { if (j) { liveStats[p.id] = j; renderProjects(lastRows) } }).catch(() => {})
+  }
+}
+let lastRows = []
+function renderProjects(rowsIn) {
+  lastRows = rowsIn
+  askStats(rowsIn)
+  const projects = rowsIn.map((p) => HQ.withStats(p, liveStats[p.id]))
+  const testMoney = projects.some((p) => p.testMoney)
+  $('t-all-l').textContent = testMoney ? 'All time, Testgeld' : 'All time'
   hasProjects = projects.length > 0
   $('company-tab').hidden = !hasProjects
   projects.sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
@@ -592,7 +615,7 @@ function renderProjects(projects) {
     const pb = el('div', 'pbar'), bar = el('div', 'bar'), fill = el('span'); fill.style.width = `${pct}%`; bar.append(fill)
     pb.append(bar, el('span', 'num', `${pct}%`)); row.append(pb)
     const stats = el('div', 'pstats')
-    stats.append(el('span', null, `${money(p.revenueMonth)} this month`), el('span', null, `${money(p.revenueTotal)} total`))
+    stats.append(el('span', null, `${money(p.revenueMonth)} this month`), el('span', null, `${money(p.revenueTotal)} total${p.testMoney ? ' (Testgeld)' : ''}`))
     const w = Math.max(0, Number(p.working) || 0); if (w) stats.append(el('span', null, `${w} working`))
     const n = Array.isArray(p.you) ? p.you.length : 0; if (n) stats.append(el('span', 'need', `${n} need you`))
     row.append(stats)
@@ -688,7 +711,7 @@ async function buildRoom() {
   const screen = face(512, 320, (g, w, h) => {
     g.fillStyle = '#1f3a31'; g.fillRect(0, 0, w, h)
     g.fillStyle = '#dcefe5'; g.font = FONT(900, 30); g.fillText('Projects', 26, 48)
-    g.font = FONT(700, 20); g.fillStyle = '#9fd6c2'; g.fillText(`${money(desk$.month)} this month`, 26, 80)
+    g.font = FONT(700, 20); g.fillStyle = '#9fd6c2'; g.fillText(`${money(desk$.month)} this month${desk$.test ? ', Testgeld' : ''}`, 26, 80)
     const ps = projectsData.slice(0, 4)
     if (!ps.length) { g.fillStyle = '#dcefe5'; g.font = FONT(700, 22); g.fillText('No projects yet', 26, 140) }
     ps.forEach((p, i) => {
@@ -741,7 +764,7 @@ async function buildRoom() {
     g.fillStyle = '#f6eedd'; g.fillRect(0, 0, w, h)
     g.fillStyle = ink; g.font = FONT(900, 34); g.fillText('Earned', 28, 54)
     g.fillStyle = '#8a5a00'; g.font = FONT(900, 58); g.fillText(money(desk$.total), 28, 122)
-    g.fillStyle = '#7a6a5b'; g.font = FONT(700, 20); g.fillText(`${money(desk$.month)} this month`, 28, 154)
+    g.fillStyle = '#7a6a5b'; g.font = FONT(700, 20); g.fillText(`${money(desk$.month)} this month${desk$.test ? ', Testgeld' : ''}`, 28, 154)
     const ps = projectsData.slice(0, 5), max = Math.max(1, ...ps.map((p) => Math.max(0, Number(p.revenueTotal) || 0))), bw = (w - 56) / Math.max(ps.length, 1)
     g.strokeStyle = ink; g.lineWidth = 3; g.beginPath(); g.moveTo(28, 480); g.lineTo(w - 28, 480); g.stroke()
     ps.forEach((p, i) => {

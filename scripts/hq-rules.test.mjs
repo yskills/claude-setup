@@ -39,8 +39,8 @@ test('desk numbers add up and ignore junk', () => {
     projects: [{ revenueMonth: 28, revenueTotal: 28, working: 2, you: [{}, {}] }, { revenueMonth: '-5', revenueTotal: 'x', you: 'no' }],
     you: 1, phases: [{ goals: [{ done: 1, total: 4 }] }, { goals: [{ done: 3, total: 4 }] }, {}],
   })
-  assert.deepEqual({ ...n }, { month: 28, total: 28, todos: 2, pct: 50, working: 2 })
-  assert.deepEqual({ ...HQ.deskNumbers({}) }, { month: 0, total: 0, todos: 0, pct: 0, working: 0 })
+  assert.deepEqual({ ...n }, { month: 28, total: 28, todos: 2, pct: 50, working: 2, test: false })
+  assert.deepEqual({ ...HQ.deskNumbers({}) }, { month: 0, total: 0, todos: 0, pct: 0, working: 0, test: false })
 })
 
 test('every role has its own animal, and each state its own pose', () => {
@@ -68,4 +68,15 @@ test('reduced motion shows a finished still pose for each state', () => {
   assert.equal(HQ.poseAt('done', true, 3, true).clip, 'dance')
   const shown = ['working', 'done', 'blocked', 'waiting', 'idle'].map((s) => HQ.poseAt(s, false, 0, true).clip)
   assert.equal(new Set(shown).size, 5)
+})
+
+test('a project\'s live stats replace the saved money and carry the Testgeld label', () => {
+  const row = { id: 'duo', revenueMonth: 1, revenueTotal: 2 }
+  const test = HQ.withStats(row, { revenueTotalCents: 2800, revenueMonthCents: 600, mode: 'test' })
+  assert.equal(test.revenueTotal, 28); assert.equal(test.revenueMonth, 6); assert.equal(test.testMoney, true)
+  assert.equal(HQ.withStats(row, { revenueTotalCents: 2800, revenueMonthCents: 600, mode: 'live' }).testMoney, false)
+  assert.equal(HQ.deskNumbers({ projects: [test] }).test, true)
+  assert.deepEqual(HQ.withStats(row, null), row)
+  assert.deepEqual(HQ.withStats(row, { revenueTotalCents: 'x', revenueMonthCents: 1 }), row)
+  assert.deepEqual(HQ.withStats(row, { revenueTotalCents: -5, revenueMonthCents: 0 }), row)
 })
