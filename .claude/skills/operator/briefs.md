@@ -1,6 +1,6 @@
 # The three briefs
 
-Besides the merge taps, the gate's summaries (2 failed rounds, or an important PR) and a probe that
+Besides the gate's summaries (2 failed rounds) and a probe that
 misses its go number, yskills reads three
 messages per project and answers each with ok or no
 (or a tap on an option). Fixed templates, so they read the same every time. Short lines, no prose. German
@@ -33,7 +33,7 @@ skill's `TASTE.md`. Then tap options: the directions, plus "none, try again". ys
 answer in words or pictures ("this one but darker", a screenshot): the design team revises and
 sends the next round. Each lasting like or dislike becomes a line in `TASTE.md`.
 
-Below the pick, first the scaffold PR's merge tap (the import builds the default branch), then,
+Below the pick (the gate has merged the scaffold PR, which the import builds), then,
 once per project, the setup only yskills can do (numbered steps with deep links
 and exact names, from the `publish` skill and `sell`'s `keys.md`): Cloudflare import, D1 ids,
 Previews Base secrets. Test keys come later by key card, when the slice that uses them
@@ -51,12 +51,14 @@ Live keys needed: <list with deep links, or none>
 Branch builds off before live keys: <yes | not needed, no live keys>
 Offene Risiken: <max 3 lines>
 
-ok = set the keys above, then tap Merge it on <link>, which goes live / no
+ok = set the keys above; the gate then merges <link>, which goes live / no
 ```
 
 ## Key card (any time a slice needs a key or account)
 
-Not a brief: no ok/no, just steps. One card per slice, all its keys together.
+Not a brief: no ok/no, just steps. One key per card, starting from the screen yskills is on now,
+naming the exact permissions (e.g. Checkout Sessions, Customers, Subscriptions: Write; Charges:
+Read), with no "if not done yet" branches. Test run 1's combined Stripe card took three rounds.
 
 ```
 Need: <what for, in user words, e.g. "so people can pay">

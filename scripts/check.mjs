@@ -60,6 +60,8 @@ if (plugins) {
   // Plugins come from setup.sh at user scope; a second list in the repo's settings would drift.
   if (json('.claude/settings.json')?.enabledPlugins) errors.push('.claude/settings.json must not list plugins; cloud/setup.sh installs them')
   for (const m of plugins.marketplaces) if (!sh.includes(`marketplace add ${m.source}`)) errors.push(`cloud/setup.sh does not add marketplace ${m.source}`)
+  const inlined = sh.match(/<<'GUARD'\r?\n([\s\S]*?)\r?\nGUARD\r?\n/)?.[1]
+  if (inlined?.replace(/\r/g, '').trim() !== readFileSync(join(root, 'global/context-guard.mjs'), 'utf8').replace(/\r/g, '').trim()) errors.push('cloud/setup.sh context guard differs from global/context-guard.mjs')
 }
 
 // Every ECC skill a toolbox catalog names must exist in the ECC index.
@@ -70,6 +72,16 @@ if (index) {
     for (const m of readFileSync(join(root, '.claude/skills/toolbox/catalog', f), 'utf8').matchAll(/ECC skills? ([^|\n]*)/g)) {
       for (const n of m[1].matchAll(/`([a-z0-9-]+)`/g)) if (!names.has(n[1])) errors.push(`catalog/${f}: unknown ECC skill ${n[1]}`)
     }
+  }
+}
+
+// Every mod the local marketplace lists is a plugin folder with the same name and a hooks module.
+const mods = json('mods/.claude-plugin/marketplace.json')
+for (const m of mods?.plugins ?? []) {
+  const manifest = json(join('mods', m.source, '.claude-plugin/plugin.json'))
+  if (manifest && manifest.name !== m.name) errors.push(`mods/${m.source}: plugin.json name "${manifest.name}" does not match "${m.name}"`)
+  for (const mod of json(join('mods', m.source, 'hooks/hooks.json'))?.modules ?? []) {
+    if (!existsSync(join(root, 'mods', m.source, 'hooks', mod))) errors.push(`mods/${m.source}: hooks module ${mod} is missing`)
   }
 }
 

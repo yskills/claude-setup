@@ -39,3 +39,8 @@ jobs:
           test -f "$HOME/.claude/skills/legal/scripts/privacy-scan.mjs"
           node -e "const s=require(process.env.HOME+'/.claude/settings.json'); if(!s.hooks||!s.statusLine||s.permissions.defaultMode!=='auto') process.exit(1)"
           echo '{"model":{"display_name":"Test"},"workspace":{"current_dir":"."},"context_window":{"remaining_percentage":70}}' | node "$HOME/.claude/claude-setup/statusline.mjs"
+          node -e "const s=require(process.env.HOME+'/.claude/settings.json'); if(!JSON.stringify(s.hooks.PostToolUse).includes('context-guard.mjs')) process.exit(1)"
+          export T="$RUNNER_TEMP/t.jsonl"
+          echo '{"message":{"usage":{"input_tokens":1,"cache_read_input_tokens":40000}}}' > "$T"
+          echo '{"message":{"usage":{"input_tokens":1,"cache_read_input_tokens":130000}}}' >> "$T"
+          node -e "process.stdout.write(JSON.stringify({session_id:'ci',transcript_path:process.env.T}))" | node "$HOME/.claude/claude-setup/context-guard.mjs" | grep -q 'Context guard'

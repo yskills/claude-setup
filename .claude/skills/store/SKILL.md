@@ -30,7 +30,8 @@ download to paid, iOS converts 2.6% and Android 0.9%
 
 **Installable from the website first (PWA, not an APK).** `@vite-pwa/nuxt` makes the web app
 installable: Chrome on Android shows an install prompt; on iPhone it is Share → Add to Home
-Screen, which needs a short "how to install" sheet with two screenshots. It still works in the
+Screen, which needs a short "how to install" sheet with two screenshots. An e2e test asserts
+`<link rel="manifest">` is in the page: duo-test shipped without it until its install slice. It still works in the
 EU (Apple reversed its iOS 17.4 removal) and gets web push once installed on iOS 16.4+ [S]. Pay
 with Stripe Checkout (`sell`, proven in duo-test): about 1.5% + €0.25 instead of the stores'
 15%. Never offer a downloadable APK: Android warns against it and from 2026 Google requires

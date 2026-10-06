@@ -1,0 +1,9 @@
+{
+  "name": "team",
+  "version": "0.2.0",
+  "description": "Your digital team inside Claude Code: who works on what (programmer, reviewer, security, legal, design, QA), a Watch link to what they build, and what each turn cost.",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "yskills"
+  }
+}

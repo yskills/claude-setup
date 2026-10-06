@@ -28,6 +28,11 @@ whichever sees that payment first) switches it to `Mode: product`. Until someone
 
 No `Mode:` line in `PLAN.md` means product mode. Product mode is the full table above. The headline names the mode: `Gate 5/5 (probe, round <n>)`.
 
+**No preview URL is not a pass.** Check 2 runs on the branch's Worker Preview. A PR without one
+(the Deploy or Preview command isn't set up, `publish` §A new project) is not 5/5: the gate stops
+and the operator fixes the deploy first. A flow that depends on mail (a confirm link, a mailed
+cancel) passes check 4 only where mail is configured in that environment, else the flow is off.
+
 **No preview yet or any more:** the scaffold PR (before Workers Builds is connected) needs CI
 only. Once branch builds are off (live payment keys, `publish` skill), check 1 is CI only and the
 gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
@@ -37,9 +42,9 @@ gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
 - **5/5:** commit the evaluator's verdict into `features.json` (`passes`) on the PR branch, wait
   for check 1 on that commit (a commit touching only `features.json` doesn't restart checks 2-5),
   then post the table below as a PR comment. Then:
-  - **Small and clear** (not important, passed in round 1): the gate thread merges it (squash).
-    If Claude's auto mode refuses, it doesn't try another way: it asks yskills for the tap.
-  - **Important or hard:** yskills merges with **Merge it** on the gate thread's card or GitHub's
+  - **Every PR**, launch and live money included: the gate thread merges it (squash). If
+    Claude's auto mode refuses, it doesn't try another way: it asks yskills for the tap.
+  - **claude-setup PRs:** yskills merges with **Merge it** on the gate thread's card or GitHub's
     Merge button.
 - **Last PR before launch:** head the table `hold: brief (c) first`; the operator sends brief (c),
   and its ok is the merge.

@@ -2,8 +2,9 @@
 
 yskills is a solo developer. Claude is their coding partner and manager: it takes a task from
 idea to a merged, verified result. Luna (luna-monorepo) is their personal AI assistant and
-its cockpit is the one dashboard for everything: new projects report into Luna (status,
-revenue, analytics) instead of getting their own dashboard.
+its cockpit is the one dashboard across projects (status, revenue, analytics). Inside a project,
+yskills watches the operator's live dashboard Artifact (`operator` skill, Files) and, in Claude
+Code on the PC, the `team` mod (`/team`: who of the team works on what, with a Watch link).
 
 ## How to work
 
@@ -15,9 +16,10 @@ revenue, analytics) instead of getting their own dashboard.
   check (`docs/WORKFLOW.md`, Learning) moves lasting notes into the repo and deletes the rest.
 - New app idea or "continue the project": follow the `operator` skill. It sizes the job, writes
   acceptance criteria before building, and sends yskills three ok/no briefs.
-- Merging: a fresh gate thread posts the `operator` skill's 5/5 table and merges small, clear PRs
-  itself; important or hard ones (auth, payments, migrations, secrets, launch) and claude-setup
-  wait for yskills' tap. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
+- Merging: a fresh gate thread posts the `operator` skill's 5/5 table and merges every PR at 5/5
+  itself, launch and live money included (yskills chose "merge everything", 2026-10-06); that
+  merge is the approved production deploy. Only claude-setup PRs wait for yskills' tap, because
+  Claude Code's safety check blocks thread merges there. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
 - Spend little: the operator, `planner` and `architect` on Opus (they decide once per project),
   everything else (threads, other agents) on Sonnet; reviewers get only the diff or URL plus the
   criteria.
@@ -40,6 +42,12 @@ revenue, analytics) instead of getting their own dashboard.
 - In cloud project threads every WebFetch of a page nobody posted in the chat makes yskills
   press Allow. Research there with WebSearch and tell subagents the same; fetch a
   page only when one fact depends on it, and say so in the thread.
+- Tokens go to re-reading context: a project thread starts at about 114k tokens and every tool
+  call re-reads all of it (98% of our usage is cache reads; output is about 2%, so terse-output
+  tools like caveman don't help). The context guard hook says when a session should slim down and
+  when to hand off; follow it.
+- In project threads never call `connect_device` unless the task needs yskills' own files; the
+  app's "connect your device" card can be ignored, say so if asked.
 - Keep context lean: `/clear` between unrelated tasks, `/compact` at milestones
   (`strategic-compact`). Hand big reads to subagents. Every tool call re-reads the whole
   context: batch independent calls, trim long output with `tail`, and start a fresh thread
@@ -74,7 +82,8 @@ yskills' verdict on early work was that it "looks very AI". For every UI change:
    and have the `design-critic` agent review them. Fix what it finds.
 3. Put the screenshots in the PR; the 5/5 gate's design check and yskills look at them.
 
-UI text is German first, English second, unless the project says otherwise.
+UI text is German first, English second, unless the project says otherwise, static files (offline
+page, manifest, mails) included.
 
 ## Default stack for new projects
 

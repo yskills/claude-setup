@@ -1,6 +1,6 @@
 ---
 name: operator
-description: Run a project from idea to live app with the least of yskills' time and tokens - the operator holds the goals, sizes the job, staffs the teams (research inside and outside, legal, design, build, QA, red team, launch, marketing), keeps PLAN.md, features.json and PROGRESS.md, runs the 5/5 gate on every PR and sends yskills three ok/no briefs plus one merge tap per PR. Use when yskills brings a new app idea, says "build", "go", "continue the project", or a project thread starts or resumes.
+description: Run a project from idea to live app with the least of yskills' time and tokens - the operator holds the goals, sizes the job, staffs the teams (research inside and outside, legal, design, build, QA, red team, launch, marketing), keeps PLAN.md, features.json and PROGRESS.md, runs the 5/5 gate on every PR and sends yskills three ok/no briefs; the gate merges every 5/5 PR itself. Use when yskills brings a new app idea, says "build", "go", "continue the project", or a project thread starts or resumes.
 ---
 
 # Operator
@@ -12,9 +12,30 @@ Shape from Anthropic's long-running-agent harness (planner, generator, evaluator
 files; a fresh context per job) and the ECC hackathon winner's flow (`docs/RESEARCH.md`).
 
 **What yskills does, all of it:** one brainstorm batch, three ok/no briefs (`briefs.md`), and one
-**Merge it** tap per important or hard PR (auth, payments, migrations, secrets, launch). Small,
-clear PRs at 5/5 are merged by the gate thread. A PR that fails the gate twice reaches yskills with
+no merge taps: every PR at 5/5 is merged by the gate thread, launch included (yskills' choice,
+2026-10-06). A PR that fails the gate twice reaches yskills with
 a plain summary (`gate.md`).
+
+**Plan first.** Nothing is built before yskills agrees: the brainstorm and research turn into
+`PLAN.md`, and brief (a) is the start gate. Until its **ok** is tapped there is no repo, no scaffold
+and no builder thread; "no" or a change sends the operator back to the brainstorm with the
+change, and it re-sends brief (a). yskills can brainstorm in plain chat as long as they like; the
+operator answers with the next version of the plan, not with code.
+
+**One role per thread, named by it.** Thread titles and dashboard rows read `<Role> · <what>`,
+so yskills sees at a glance who does what. Roles (the shape Anthropic recommends for long-running
+agents: one planner, workers with a fresh context per job, an evaluator that never built what it
+grades):
+
+| Role | Is | Example title |
+|---|---|---|
+| Manager | the operator: plans, starts threads, keeps PROGRESS.md and the dashboard | Manager · duo-test |
+| Researcher | one research page (step 2), a subagent or a thread | Researcher · competitors |
+| Programmer | builds one slice or one fix, opens the PR, keeps it green | Programmer · subscription |
+| Tester | the gate: evaluator, fresh reviewers, security, design, legal on one PR | Tester · PR 23 |
+| Marketer | the launch and weekly growth routine | Marketer · launch |
+
+Reviewers (code, security, design, legal) are subagents the Tester starts, not threads.
 
 **Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`); each
 reports back when it finishes and keeps fixing CI and review comments on its PR. From inside a
@@ -65,6 +86,20 @@ Templates in `templates/`.
 - `PROGRESS.md`: the handoff. Done, next, broken, decisions and why, each thread's cost. Every
   thread reads it first; only the operator writes it. Under 100 lines.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
+- **Dashboard** (`templates/dashboard.html`), yskills' live view of the project from day one, in
+  three pages: **Plan** (the operator's update and the phases, each with its goals' progress
+  bars), **Team** (who works on what, with whom, working or idle, Watch and Open links) and **For
+  you** (what needs yskills, next steps, live links). At project start the operator plans the
+  phases (brief (a)'s plan: research, plan, scaffold, one per slice or group of slices, launch,
+  grow), publishes the page with the Artifact tool, `capabilities: {db: {rules: [{path: "", read:
+  "view", write: "admin"}]}}`, puts the link in `PROGRESS.md` and brief (a), and fills it with one
+  `ArtifactData` batch: `pm/now` (`project, summary, next[], you[{what, link}], live[{name, url,
+  note}], updated`), `phases/<id>` (`name, order, state` = done, active or next, `why, goals[{name,
+  done, total, link}]`; a slice's goal counts its passing criteria in `features.json`) and
+  `team/<id>` for the operator, each thread and each reviewer agent (`name, role, state` =
+  working, blocked, waiting, idle or done, `task, next, with[ids], link, linkLabel, preview,
+  order`). Every write to `PROGRESS.md` updates the same rows in one batch (pin each with
+  `if_version`). Luna's cockpit stays the one view across projects.
 
 ## 4. The run
 
@@ -94,8 +129,8 @@ Templates in `templates/`.
    default stack from CLAUDE.md, the `publish` skill's files, `verify`, CI, legal pages per the
    `legal` skill. Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
    directions. **Brief (b)** carries only what every build needs: the Cloudflare import and the D1
-   ids. The scaffold PR's merge tap comes first in brief (b), because the Cloudflare import builds
-   the default branch and needs the scaffold's `wrangler.jsonc` there. Building starts once
+   ids. The gate merges the scaffold PR once CI is green, before brief (b), because the Cloudflare
+   import builds the default branch and needs the scaffold's `wrangler.jsonc` there. Building starts once
    brief (b) is answered.
 
    **Keys and accounts just in time.** Every other key or account is asked for by a **key card**
@@ -124,15 +159,20 @@ Templates in `templates/`.
    claude-setup), **change** (one new offer or channel, one more probe) or **build anyway**.
    Never move the go number after the probe started. A small site meant to earn is its own
    probe; one not meant to earn skips it.
-6. **Gate.** A fresh gate thread per PR runs `gate.md` and either posts the 5/5 table (yskills
-   taps **Merge it**) or one review with the blocking findings, which the builder fixes. Three
+6. **Gate.** Only a tapped card counts as yes: a typed "ok" to a merge or brief gets the card
+   again. A fresh gate thread per PR runs `gate.md` and either posts the 5/5 table and merges
+   the PR or one review with the blocking findings, which the builder fixes. Three
    failed rounds: stop and ask yskills with tap options.
-7. **Launch.** The last PR gets the full `red-team` and `legal-reviewer` pass. **Brief (c)**; its
-   ok is the merge tap, which goes live. Then `sell`'s go-live (§4) if it sells.
+   **The whole journey, once.** After the last slice merges, one `evaluator` run walks the full
+   first visit on live (or main's preview) along the journey criteria in `features.json` (one
+   criterion per user journey that crosses slices) before yskills hears "ready to test". Test run
+   1's slices each passed and broke at their seams.
+7. **Launch.** The last PR gets the full `red-team` and `legal-reviewer` pass. **Brief (c)**; on its ok
+   the gate merges, which goes live. Then `sell`'s go-live (§4) if it sells.
 8. **Grow.** At launch `create_trigger` a weekly routine (fresh session, jittered time): it
    collects the numbers (`market` §5) and opens one PR with the week's `metrics/` file and the best
    next step as a slice in `features.json`. That PR is the weekly report; it gets the gate with
-   checks 2-5 n/a, and yskills' merge tap is the go for the next slice. `PLAN.md` fixes 30/60/90-day
+   checks 2-5 n/a, and its merge is the go for the next slice. `PLAN.md` fixes 30/60/90-day
    targets before launch (defaults: 100 signups, 10 paying, €100 revenue in total); the routine copies them
    into each `metrics/` file. A missed target sends one tap card: **kill** (stop the routine,
    archive, lessons into claude-setup), **change** (one new offer or channel, next target in 30
@@ -153,6 +193,10 @@ conversation can continue later; a plain chat idle for over an hour hands off to
   effort) and every other agent on Sonnet. Built-in subagents
   default to Sonnet via `CLAUDE_CODE_SUBAGENT_MODEL`.
 - Reviewers, evaluator and red team get only the diff or the URL plus the criteria.
+- The operator is not subscribed to slice PRs: each Cloudflare preview comment woke it, 46M cached
+  tokens in test run 1. Slice and gate threads report by message. The context guard
+  (`global/context-guard.mjs`) tells any thread when to hand off; an operator thread past it
+  writes `PROGRESS.md` and asks for a fresh one.
 - One job per thread. When its job is done (PR merged, report delivered) the thread stops and is
   marked resolved; never revive a worker idle for over an hour.
 - After a usage-limit stop or reset, nothing restarts on its own: post one line ("paused at <step>")

@@ -17,7 +17,10 @@ Judge, in this order:
 
 1. Direction: does it follow the design doc and its tokens? Name each deviation. With no design
    doc, does it commit to one clear, intentional direction at all?
-2. References: next to any reference images, where does it fall short? Be concrete: "card padding
+2. References: next to any reference images, where does it fall short? With none in the
+   project, compare against the 2-3 leading products of the category (for a language app,
+   Duolingo) and say where this one looks weaker. The 1440px screenshot must pass as much as the
+   390px one: a phone column floating on a wide screen is blocking. Be concrete: "card padding
    16px vs ~24px in the reference", "body 15px regular, reference uses 14px with more leading".
 3. AI tells: purple/blue default gradients, glassmorphism everywhere, emoji as icons, identical
    rounded cards in a grid, centered hero with generic headline, every section the same rhythm,
