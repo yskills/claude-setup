@@ -142,7 +142,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .scrim{position:fixed;inset:0;background:rgba(20,14,10,.4);z-index:10}
 .sheet{position:fixed;z-index:11;display:grid;gap:14px;align-content:start;overflow-y:auto;
   left:10px;right:10px;bottom:10px;max-height:85%;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px))}
-@media (min-width:760px){.sheet{left:auto;right:16px;top:16px;bottom:16px;width:400px;max-height:none;padding:20px 22px}}
+@media (min-width:760px){.sheet{left:auto;right:16px;top:16px;bottom:auto;width:400px;max-height:calc(100% - 32px);padding:20px 22px}}
 .sheet h3{margin:0;font:900 21px/1.25 var(--sans)}
 .sheet .what{margin:2px 0 0;color:var(--soft);font-size:14px}
 .member{border-top:2px dashed var(--line);padding-top:12px;display:grid;gap:8px}
@@ -152,6 +152,24 @@ ol,ul{margin:0;padding:0;list-style:none}
 .member dd{margin:2px 0 0}
 .close{justify-self:end}
 .stack{display:grid;gap:12px}
+/* New project notepad: a sheet of the yellow pad on the desk */
+.idea{display:grid;gap:10px}
+.idea label{font:800 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.idea textarea{font:600 16px/1.5 var(--sans);color:#2b2420;resize:vertical;min-height:7.5em;padding:10px 12px 10px 44px;border:2.5px solid var(--ink);border-radius:12px;
+  background:linear-gradient(90deg,transparent 30px,#e0645a 30px,#e0645a 32px,transparent 32px),repeating-linear-gradient(#fff3b8 0 23px,#c9d6ea 23px 24px) #fff3b8;background-attachment:local}
+.idea textarea::placeholder{color:#6f5f30}
+.idea .btn{min-height:44px}
+.idea .said.warn{color:var(--bad)}
+.idea textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.idea .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.idea .btn[disabled]{opacity:.55;cursor:default}
+.idea .said{font-weight:700;margin:0}
+.reqs li{display:grid;gap:2px;padding:9px 0;border-top:2px dashed var(--line)}
+.reqs li:first-child{border-top:0}
+.reqs .rt{font-weight:700;overflow-wrap:anywhere}
+.reqs .rs{font:600 12px var(--mono);color:var(--soft)}
+.reqs .rs.started{color:var(--accent)}
+.reqs .btn{justify-self:start;margin-top:4px}
 </style>
 
 <div class="app">
@@ -187,6 +205,7 @@ ol,ul{margin:0;padding:0;list-style:none}
   <section class="card page" data-page="company" aria-labelledby="company-h" hidden>
     <div><h2 id="company-h">Company</h2><p class="lead">Every project, what it earns and what it needs from you.</p></div>
     <p class="lead" id="game-line">Level 1 · 0 XP · 0 coins</p>
+    <div class="acts"><button class="btn go" type="button" id="new-idea">Neues Projekt</button></div>
     <div class="totals">
       <div class="tot"><b id="t-month">0 €</b><span>This month</span></div>
       <div class="tot"><b id="t-all">0 €</b><span id="t-all-l">All time</span></div>
@@ -319,7 +338,30 @@ window.HQ = (() => {
   const visitEvent = (now = new Date()) => ({
     id: `visit-${new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin' }).format(now)}`, kind: 'visit', project: 'hq', at: now.toISOString(),
   })
-  return { TABS, modeOf, pickTab, worldFor, deskNumbers, withStats, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent }
+  /* New project tap: the notepad saves requests/<id> { text, at, status: 'new' }, then messages the coordinator session named in
+     config/coordinator (pm/now.session as a fallback). new = saved only, sent = the page reached the coordinator,
+     relayed = a thread passed it on, started = the brainstorm thread runs (link). */
+  const IDEA_MAX = 600
+  const SESSION_ID = /^(cse|session)_[A-Za-z0-9]{8,80}$/
+  const REQUEST_LINE = { new: 'gespeichert, Claude meldet sich', sent: 'an Claude geschickt', relayed: 'Claude hat es', started: 'Brainstorm läuft' }
+  function requestDoc(text, now = new Date(), rand = Math.random) {
+    const idea = String(text ?? '').replace(/\s+/g, ' ').trim().slice(0, IDEA_MAX)
+    if (!idea) return null
+    const tag = Math.floor(rand() * 36 ** 6).toString(36).padStart(6, '0')
+    return { id: `req-${now.toISOString().slice(0, 10)}-${tag}`, data: { text: idea, at: now.toISOString(), status: 'new' } }
+  }
+  const coordinatorOf = (config, pm) => [config?.session, pm?.session].find((s) => typeof s === 'string' && SESSION_ID.test(s)) || null
+  const requestMessage = (id, text) => `HQ request ${id}: ${text}\n\nFrom yskills' HQ New project tap. Start a brainstorm thread for this idea and put request id ${id} in its brief; that thread sets HQ's requests/${id} to started with its link. If a thread for ${id} already exists, ignore this.`
+  const toResend = (rows) => (Array.isArray(rows) ? rows : []).filter((r) => r && r.status === 'new' && typeof r.text === 'string' && r.text)
+  const requestLine = (r) => REQUEST_LINE[r?.status] || REQUEST_LINE.new
+  /* What the page tells yskills when the message could not go out; the request is saved either way */
+  function sendTrouble(code) {
+    if (code === 'no_session') return 'Gespeichert. Der nächste Thread gibt es weiter.'
+    if (code === 'not_in_manifest' || code === 'consent_required' || code === 'not_granted') return 'Gespeichert. Ohne Erlaubnis gibt der nächste Thread es weiter.'
+    if (code === 'needs_reauth' || code === 'server_not_connected' || code === 'selection_required') return 'Gespeichert. Claude Code Remote unter Einstellungen → Connectors verbinden.'
+    return 'Gespeichert, Claude meldet sich.'
+  }
+  return { TABS, modeOf, pickTab, worldFor, deskNumbers, withStats, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble }
 })()
 </script>
 <script id="team-art">
@@ -546,12 +588,81 @@ function openSheet(key, from) {
 }
 function closeSheet() {
   if ($('sheet').hidden) return
-  sheetFor = null; $('sheet').hidden = true; $('scrim').hidden = true
+  sheetFor = null; ideaOpen = false; $('sheet').hidden = true; $('scrim').hidden = true
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus()
 }
 $('sheet-close').addEventListener('click', closeSheet)
 $('scrim').addEventListener('click', closeSheet)
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet() })
+
+/* ---------- New project: one line on the notepad, one tap. The row is saved first, then the coordinator gets a message. ---------- */
+const CCR = 'Claude Code Remote'
+let hqDb = null, coordCfg = null, pmNow = null, requests = [], ideaOpen = false
+const sending = new Set()
+async function sendRequest(r) {
+  const to = HQ.coordinatorOf(coordCfg, pmNow)
+  if (!to) return 'no_session'
+  if (sending.has(r.id)) return 'ok'
+  sending.add(r.id)
+  try {
+    const mcp = await window.claude?.use?.('mcp')
+    if (!mcp) return 'not_granted'
+    await mcp.callTool(CCR, 'send_message', { session_id: to, message: HQ.requestMessage(r.id, r.text) })
+  } catch (e) { sending.delete(r.id); return e?.code || 'upstream_error' }
+  /* A thread may already have relayed or started it; only a row still 'new' becomes 'sent' */
+  const ref = hqDb.doc(`requests/${r.id}`)
+  await ref.get().then((d) => (d.exists && d.data().status === 'new' ? ref.update({ status: 'sent', sentAt: new Date().toISOString() }) : null)).catch(() => {})
+  return 'ok'
+}
+const agoDe = (iso) => {
+  const t = Date.parse(iso); if (!t) return ''
+  const m = Math.round((Date.now() - t) / 60000)
+  return m < 1 ? 'gerade eben' : m < 60 ? `vor ${m} Min.` : m < 1440 ? `vor ${Math.round(m / 60)} Std.` : new Date(t).toLocaleDateString('de-DE')
+}
+function renderRequests() {
+  room?.update()
+  if (!ideaOpen) return
+  const box = $('reqs'); if (!box) return
+  const shown = [...requests].sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 5)
+  list(box, shown, (r) => {
+    const li = el('li'); li.append(el('span', 'rt', r.text))
+    const st = el('span', `rs ${r.status === 'started' ? 'started' : ''}`, `${HQ.requestLine(r)} · ${agoDe(r.at)}`)
+    li.append(st)
+    if (r.status === 'started' && safeUrl(r.link)) li.append(link('Thread öffnen', r.link, 'btn'))
+    return li
+  }, 'Noch keine Ideen.')
+}
+function openIdea(from) {
+  sheetFor = null; lastFocus = from || document.activeElement; ideaOpen = true
+  $('sheet-name').textContent = 'Neues Projekt'
+  $('sheet-what').textContent = 'Eine Zeile reicht. Claude startet dazu ein Brainstorming im Projekt-Chat.'
+  const body = $('sheet-body'); body.replaceChildren()
+  const form = el('form', 'idea'); form.method = 'post'
+  const lab = el('label', null, 'Deine Idee'); lab.htmlFor = 'idea-text'
+  const ta = el('textarea'); ta.id = 'idea-text'; ta.maxLength = 600; ta.rows = 4; ta.placeholder = 'z. B. ein gemütliches Bauernhof-Spiel fürs Handy'
+  const row = el('div', 'row'), go = el('button', 'btn go', 'Abschicken'); go.type = 'submit'
+  const said = el('p', 'said'); said.setAttribute('role', 'status')
+  row.append(go); form.append(lab, ta, row, said)
+  if (!hqDb) { go.disabled = true; said.textContent = 'Bei claude.ai anmelden, dann geht es los.' }
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const r = HQ.requestDoc(ta.value); if (!r || !hqDb || go.disabled) return
+    go.disabled = true; said.classList.remove('warn'); said.textContent = 'Wird gespeichert…'
+    sending.add(r.id)
+    try { await hqDb.doc(`requests/${r.id}`).set(r.data) } catch { sending.delete(r.id); go.disabled = false; said.textContent = 'Konnte nicht speichern. Bitte nochmal tippen.'; return }
+    ta.value = ''; said.textContent = 'Gespeichert. Geht an Claude…'
+    sending.delete(r.id)
+    const res = await sendRequest({ id: r.id, ...r.data })
+    said.textContent = res === 'ok' ? 'Ist bei Claude. Das Brainstorming erscheint im Projekt-Chat.' : HQ.sendTrouble(res)
+    said.classList.toggle('warn', res !== 'ok')
+    go.disabled = false
+  })
+  const h = el('h3', null, 'Letzte Ideen'), reqs = el('ul', 'reqs'); reqs.id = 'reqs'
+  body.append(form, h, reqs)
+  $('sheet').hidden = false; $('scrim').hidden = false; ta.focus()
+  renderRequests()
+}
+$('new-idea').addEventListener('click', (e) => openIdea(e.currentTarget))
 
 let youCount = 0, level = { label: 'PLAN', name: 'No phases yet', pct: 0 }
 let updated = ''
@@ -784,6 +895,22 @@ async function buildRoom() {
   const glass = plane(0.088, 0.17, lock.t, true); glass.rotation.x = -Math.PI / 2; glass.position.y = 0.0075; phone.add(glass)
   scene.add(phone); spot(phone, 'todo', 'To-dos', new T.Vector3(0.42, dt + 0.1, 1.3))
 
+  /* The yellow notepad: tap it to start a new project. Its page shows the newest request's state. */
+  const pad = new T.Group(); pad.position.set(-0.4, dt + 0.006, 0.98); pad.rotation.y = 0.22; pad.scale.setScalar(1.4)
+  const padBack = new T.Mesh(new T.BoxGeometry(0.17, 0.012, 0.23), new T.MeshStandardMaterial({ color: '#7a5636', roughness: 0.8 })); padBack.castShadow = true; pad.add(padBack)
+  const padFace = face(256, 346, (g, w, h) => {
+    g.fillStyle = '#fff3b8'; g.fillRect(0, 0, w, h)
+    g.strokeStyle = '#c9d6ea'; g.lineWidth = 2; for (let y = 96; y < h; y += 34) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke() }
+    g.strokeStyle = '#e0645a'; g.lineWidth = 3; g.beginPath(); g.moveTo(38, 0); g.lineTo(38, h); g.stroke()
+    g.fillStyle = '#c8402f'; g.fillRect(0, 0, w, 30)
+    g.fillStyle = ink; g.font = FONT(900, 30); g.fillText('Neues', 50, 86); g.fillText('Projekt', 50, 120)
+    g.fillStyle = teal; g.font = FONT(900, 40); g.fillText('+', 50, 186); g.font = FONT(800, 24); g.fillText('Idee', 80, 184)
+    const last = [...requests].sort((a, b) => String(b.at).localeCompare(String(a.at)))[0]
+    if (last) { g.fillStyle = '#7a6a5b'; g.font = FONT(800, 19); g.fillText(fit(g, HQ.requestLine(last), w - 60), 50, 254); g.fillStyle = ink; g.font = FONT(700, 18); g.fillText(fit(g, last.text, w - 60), 50, 288) }
+  })
+  const sheetP = plane(0.15, 0.21, padFace.t); sheetP.rotation.x = -Math.PI / 2; sheetP.position.y = 0.0065; pad.add(sheetP)
+  scene.add(pad); spot(pad, 'new', 'Neues Projekt', new T.Vector3(-0.4, dt + 0.12, 0.98))
+
   const frame = (w, h, x, y, z, tex) => {
     const g = new T.Group(); g.position.set(x, y, z)
     const back = new T.Mesh(new T.BoxGeometry(w + 0.08, h + 0.08, 0.04), new T.MeshStandardMaterial({ color: '#c9b79c', roughness: 0.8 })); back.castShadow = true; g.add(back)
@@ -861,10 +988,10 @@ async function buildRoom() {
   new ResizeObserver(layout).observe(stage); layout()
 
   /* Tags float over what you can tap; tapping a tag or the thing itself opens its page */
-  const tags = $('room-tags'), goTo = (go) => { location.hash = go === 'company' && !hasProjects ? 'plan' : go }
+  const tags = $('room-tags'), goTo = (go, from) => { if (go === 'new') return openIdea(from); location.hash = go === 'company' && !hasProjects ? 'plan' : go }
   for (const h of hot.filter((x) => x.tag)) {
     const b = el('button', 'tag'); b.type = 'button'; b.append(el('span', 'nm', h.tag))
-    b.addEventListener('click', () => goTo(h.go)); tags.append(b); h.el = b
+    b.addEventListener('click', () => goTo(h.go, b)); tags.append(b); h.el = b
   }
   const v = new T.Vector3()
   function placeTags() {
@@ -906,7 +1033,7 @@ async function buildRoom() {
     hotspots: () => hot.filter((x) => x.el).map((x) => ({ go: x.go, shown: !x.el.hidden })),
     update() {
       desk$ = HQ.deskNumbers({ projects: projectsData, you: youCount, phases: phasesData })
-      screen.redraw(); lock.redraw(); board.redraw(); chart.redraw(); sign.redraw()
+      screen.redraw(); lock.redraw(); board.redraw(); chart.redraw(); sign.redraw(); padFace.redraw()
     },
   }
 }
@@ -1385,7 +1512,20 @@ renderTeam([])
   if (!db) { $('greet').textContent = 'Sign in to claude.ai to see live updates'; return }
   $('dot').classList.add('on')
   const fail = () => { $('dot').classList.remove('on'); $('greet').textContent = 'Live updates stopped; reload the page' }
-  db.doc('pm/now').onSnapshot((s) => renderPm(s.exists ? s.data() : null), fail)
+  hqDb = db
+  db.doc('pm/now').onSnapshot((s) => { pmNow = s.exists ? s.data() : null; renderPm(pmNow) }, fail)
+  /* New project requests: rows still 'new' are resent once per open, only when the viewer already allowed the connector (no prompt on load) */
+  let resent = false, reqsIn = false
+  const resend = async () => {
+    if (resent || !reqsIn || !HQ.coordinatorOf(coordCfg, pmNow)) return
+    resent = true
+    const perms = await window.claude?.use?.('permissions')
+    const ok = await perms?.state(`mcp:${CCR}`).catch(() => 'unavailable')
+    if (ok !== 'granted') return
+    for (const r of HQ.toResend(requests)) await sendRequest(r)
+  }
+  db.doc('config/coordinator').onSnapshot((s) => { coordCfg = s.exists ? s.data() : null; resend() }, () => {})
+  db.collection('requests').onSnapshot((s) => { requests = rows(s); renderRequests(); if (!reqsIn) { reqsIn = true; resend() } }, () => {})
   db.collection('team').onSnapshot((s) => renderTeam(rows(s)), fail)
   db.collection('phases').onSnapshot((s) => renderPhases(rows(s)), fail)
   db.collection('projects').onSnapshot((s) => renderProjects(rows(s)), fail)

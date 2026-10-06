@@ -106,7 +106,8 @@ Templates in `templates/`.
   (what needs yskills, live links) and **Company** (shown only with `projects` rows: totals, every project, all its needs-you). At project start the operator plans the
   phases (brief (a)'s plan: research, plan, scaffold, one per slice or group of slices, launch,
   grow), publishes the page with the Artifact tool, `capabilities: {db: {rules: [{path: "", read:
-  "view", write: "admin"}]}}`, puts the link in `PROGRESS.md` and brief (a), and fills it with one
+  "view", write: "admin"}]}, mcp: {servers: [{server: "Claude Code Remote", tools: ["send_message"]}]}}`
+  (the notepad's message to the coordinator), puts the link in `PROGRESS.md` and brief (a), and fills it with one
   `ArtifactData` batch: `pm/now` (`project, summary, next[], you[{what, link}], live[{name, url,
   note}], updated`), `phases/<id>` (`name, order, state` = done, active or next, `why, goals[{name,
   done, total, link}]`; a slice's goal counts its passing criteria in `features.json`) and
@@ -129,6 +130,17 @@ Templates in `templates/`.
   `amount` = euros newly earned since the last event, from Stripe or `/api/stats`, 10 XP and 1 coin
   each; test money counts as it shows as Testgeld). The page writes `visit-<day>` itself. The rule is
   `HQ.scoreFrom` in the template's `hq-rules` block, tested by `scripts/hq-rules.test.mjs`.
+  **New project tap:** HQ's yellow notepad saves `requests/<id>` (`{text, at, status}`: `new` saved,
+  `sent` the page reached the coordinator, `relayed` a thread passed it on, `started` the brainstorm
+  thread runs, with `link`) and messages the coordinator with the Claude Code Remote connector's
+  `send_message` ("HQ request <id>: <idea> ..."). The coordinator has no db tools, so threads keep
+  the address and the queue: **every project thread, at start and when it finishes,** calls
+  `get_channel_session_id` and writes its project's office (HQ in Claude Setup) `config/coordinator` (`{session, at}`,
+  pinned with `if_version`); **at start** it also lists `requests` and, for each row that is `new`
+  or `sent` with no `link`, sends the same "HQ request <id>: <text>" line to the coordinator with
+  `send_message` and sets the row to `relayed`. The coordinator answers each such message with one
+  `Researcher · <idea>` brainstorm thread whose brief names the request id, unless a thread for that
+  id already runs (a resend repeats it); that thread sets the row to `started` with its thread link.
 
 ## 4. The run
 
