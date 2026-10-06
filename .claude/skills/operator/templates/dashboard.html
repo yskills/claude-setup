@@ -1067,7 +1067,9 @@ if (roomOk) buildRoom().then((r) => { room = r; room.update() }).catch((e) => { 
 async function buildRoom() {
   const T = THREE, stage = $('room'), canvas = $('rc'), S = 2.2, R = 3.3
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches
-  let desk$ = HQ.deskNumbers({}), mode = HQ.modeOf(new Date().getHours())
+  /* yskills picked the lamp-lit evening desk (2026-10-06): the room stays in that mood at every hour. Set DESK_MOOD to null to follow the clock again. */
+  const DESK_MOOD = 'night', moodNow = () => DESK_MOOD || HQ.modeOf(new Date().getHours())
+  let desk$ = HQ.deskNumbers({}), mode = moodNow()
   const SKY = { day: ['#7fc8ef', '#fde9c2'], dusk: ['#f39c6b', '#f7d29a'], night: ['#1c2350', '#3d3f6e'] }
   const renderer = new T.WebGLRenderer({ canvas, antialias: true })
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2))
@@ -1269,7 +1271,7 @@ async function buildRoom() {
   const ceiling = new T.PointLight(0xffd9a0, 0, 9, 2); ceiling.position.set(0.8, 2.1, -0.4); scene.add(ceiling)
   const LIGHT = { day: [0.72, 0.75, 0, 0.05], dusk: [0.5, 0.5, 1.1, 0.7], night: [0.1, 0.04, 1.9, 1.5] }
   function tick() {
-    mode = HQ.modeOf(new Date().getHours()); const [h, s, l, c] = LIGHT[mode]
+    mode = moodNow(); const [h, s, l, c] = LIGHT[mode]
     hemi.intensity = h; hemi.color.set(mode === 'night' ? 0x9aa2dc : 0xfff1d6); sun.intensity = s; sun.color.set(mode === 'dusk' ? 0xffa66b : mode === 'night' ? 0xa9b8ff : 0xffd29a); lamp.intensity = l; ceiling.intensity = c; bulbGlow.color.set(c > 0.3 ? '#ffe2a0' : '#8a8070')
     const dark = mode === 'night', lit = mode !== 'day'
     amb.intensity = dark ? 0.03 : mode === 'dusk' ? 0.15 : 0.22; amb.color.set(dark ? 0x8a90c8 : 0xffe6c8); lid0.material.color.copy(dark ? lidNight : lidDay)
