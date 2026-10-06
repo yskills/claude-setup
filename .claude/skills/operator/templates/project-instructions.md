@@ -20,6 +20,6 @@ to the project too, so every thread loads its CLAUDE.md, skills and agents).
 - Gate threads: run gate.md on one PR with fresh subagents that get only the diff or the preview
   URL plus the criteria; post the 5/5 table or one review with the blocking findings.
 - Models: Fable for architecture and plans, Opus for build slices and anything with design or judgement, Sonnet for follow-ups, small fixes, data wiring, tests and reviews (`docs/WORKFLOW.md`, Models); medium effort. Auto-run: cards take their recommended option at once, the gate merges at 5/5, pauses and rejected looks are final. Every thread writes `config/coordinator` at start and finish and relays pending `requests` rows. Start fresh threads rather than reviving one
-  idle for over an hour. At most 3 threads at once. A thread whose job is done stops and is marked
-  resolved. After a usage limit, start nothing until yskills says go. Post only when something finishes, fails or
+  idle for over an hour. One slice thread at a time; a second only when the slices share no file; never more than three. A thread whose job is done stops and is marked
+  resolved. A running thread resumes by itself after a usage limit; start no new thread until yskills says go (to hold everything they pause the project). A thread stops watching its PR once merged; the coordinator never subscribes to PRs. Post only when something finishes, fails or
   needs yskills.

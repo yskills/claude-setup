@@ -30,6 +30,9 @@ const MANIFEST = join(STATE_DIR, 'manifest.json')
 const START = '<!-- claude-setup:start (managed by yskills/claude-setup; edits inside are overwritten) -->'
 const END = '<!-- claude-setup:end -->'
 
+// A folder literally named "~" happens when a shell passes the ~ through (PowerShell did).
+const HAS_TILDE_DIR = ROOT.split(/[\\/]/).includes('~')
+
 const readJson = (p, fallback) => (existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : fallback)
 const ecc = readJson(join(ROOT, 'config/ecc.json'))
 const plugins = readJson(join(ROOT, 'config/plugins.json'))
@@ -227,6 +230,13 @@ if (missingTools.length) log(`  Install the missing ones with:\n    ${missingToo
 
 // ---------------------------------------------------------------- done
 step(DRY ? 'Dry run finished' : 'Done')
+if (HAS_TILDE_DIR) {
+  const fix = IS_WIN ? '$HOME' : '~'
+  log(`WARNING: this clone sits in a folder literally named "~" (${ROOT}).
+Move it and update with the real home folder:
+  ${IS_WIN ? 'Move-Item' : 'mv'} "${ROOT}" "${join(homedir(), 'claude-setup')}"
+  git -C ${fix}/claude-setup pull; node ${fix}/claude-setup/install.mjs`)
+}
 if (warnings.length) { log(`${warnings.length} warning(s):`); for (const w of warnings) log(`  - ${w.split('\n')[0]}`) }
 log(`Start a new Claude Code session (or run /reload-plugins) to load everything.
 Backup of your previous config: ${existsSync(backupDir) ? backupDir : '(nothing to back up)'}

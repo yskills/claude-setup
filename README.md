@@ -9,15 +9,20 @@ setup), curated to this stack so it costs about a fifth of the context the full 
 
 Needs Node 20+ (24 recommended), Git and Claude Code.
 
+Windows (PowerShell; use `$HOME`, never `~`, which PowerShell passes through as a folder named "~"):
+
+```powershell
+git clone https://github.com/yskills/claude-setup $HOME/claude-setup
+node $HOME/claude-setup/install.mjs
+```
+
+Mac or Linux:
+
 ```bash
 git clone https://github.com/yskills/claude-setup ~/claude-setup && node ~/claude-setup/install.mjs
 ```
 
-Windows: use PowerShell 7 with `$HOME` instead of `~`. Windows PowerShell 5.1 has no `&&`, so run
-`git clone https://github.com/yskills/claude-setup $HOME/claude-setup`, then
-`node $HOME/claude-setup/install.mjs`, and split the update command below the same way.
-
-Update later:
+Update later (Windows: run the two commands one after the other, with `$HOME` instead of `~`):
 
 ```bash
 git -C ~/claude-setup pull && node ~/claude-setup/install.mjs
@@ -42,11 +47,11 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 | ECC rules | common + TypeScript, Vue, Nuxt, web (language rules load only for matching files) | `.claude/rules/ecc` |
 | ECC hooks | session memory across restarts, quality gate after edits, design-quality warning, console.log and secret checks before commits, compaction hints (PC only) | `npx ecc-universal@2.2.3` |
 | Toolbox | Knows which plugins, APIs and skills any kind of app needs (video, AI, payments, ads, auth, email, analytics, mobile, scraping...), searches all ~315 plugins, 293 ECC skills and skills.sh live (and points cloud threads at the Anthropic Directory), and adds them to that one project | `.claude/skills/toolbox` |
-| Own skills | `operator` (idea to live app: sizes the job, staffs research/legal/design/build/QA/red team/launch/marketing, acceptance criteria before building, a 5/5 gate on every PR, three ok/no briefs, the gate merges every 5/5 PR), `legal` (German law for any app, privacy scan of a preview, license and trademark checks), `onboard-project` (set a repo up for Claude in one PR), `publish` (deploys through Cloudflare Workers Builds with a preview per branch, no keys in GitHub), `ship-check` (run CI locally, then fresh `code-reviewer` passes until clean), `ui-review` (phone/desktop screenshots + critique), `sell` (checkout, shop and shipping from Germany: keys, tested Stripe-on-Workers code, German shop law, go-live), `market` (marketing plan in the PRD, launch, channels, German advertising law, weekly report), `store` (App Store and Google Play: Capacitor, RevenueCat, paywall defaults, review rules, keyless native builds), `watch` (watch a video or reel: frames plus transcript; vendored from claude-video, MIT) | `.claude/skills` |
+| Own skills | `operator` (idea to live app: sizes the job, staffs research/legal/design/build/QA/red team/launch/marketing, acceptance criteria before building, a 5/5 gate on every PR, three ok/no briefs, the gate merges every 5/5 PR), `legal` (German law for any app, privacy scan of a preview, license and trademark checks), `onboard-project` (set a repo up for Claude in one PR), `scaffold` (the exact file list of a new project's skeleton, in order), `publish` (deploys through Cloudflare Workers Builds with a preview per branch, no keys in GitHub), `ship-check` (run CI locally, then fresh `code-reviewer` passes until clean), `ui-review` (phone/desktop screenshots + critique), `sell` (checkout, shop and shipping from Germany: keys, tested Stripe-on-Workers code, German shop law, go-live), `market` (marketing plan in the PRD, launch, channels, German advertising law, weekly report), `store` (App Store and Google Play: Capacitor, RevenueCat, paywall defaults, review rules, keyless native builds), `watch` (watch a video or reel: frames plus transcript; vendored from claude-video, MIT) | `.claude/skills` |
 | Own agents | `design-critic` (reviews screenshots for the "looks AI" problem), `evaluator` (clicks through a preview and grades a slice against its criteria), `legal-reviewer` (German must-haves on a preview), `red-team` (attacks your own preview like an outsider) | `.claude/agents` |
 | Design taste | `impeccable` (design skill plus a local `detect` linter for AI-look patterns) and `web-interface-guidelines` (Vercel's UI checklist); `ui-review` runs both | `.claude/skills` (Apache-2.0 and MIT, see `THIRD_PARTY.md`) |
 | Context guard | A hook after every tool call: once a session's context has grown by 80k tokens it tells Claude to work leaner, at 150k to wrap up and hand off (re-reading long contexts is 98% of the token bill). Runs on the PC and in cloud threads | `global/context-guard.mjs`, `cloud/setup.sh` |
-| `team` mod | Your digital team inside Claude Code (terminal or desktop app, not cloud threads): a band above the prompt shows which roles are working (lead, programmer, reviewer, security, legal, design, QA, planning) and what the last turn cost; `/team` opens a pane with each role's task and a Watch link to the dev server or page being tested. Claude's test browser (Playwright) opens as a visible Chrome window on the PC | `mods/team` |
+| `team` mod | Your digital team inside Claude Code (terminal or desktop app, not cloud threads): a band above the prompt shows which roles are working (the nine roles: Project Manager, Researcher, Designer, Programmer, Tester, Reviewer, Security, Legal, Marketer) and what the last turn cost; `/team` opens a pane with each role's task and a Watch link to the dev server or page being tested. Claude's test browser (Playwright) opens as a visible Chrome window on the PC | `mods/team` |
 | HQ dashboard | One live page for all projects (Claude Setup HQ): level, money, what needs you, who works on what with whom, progress per part, Watch links. Each project's Project Manager writes its rows into it; no project has a page of its own | `.claude/skills/operator/templates/dashboard.html` |
 | Ponytail | Write the least code that works: reuse, standard library, platform, installed dependency, one line, then new code | `.claude/skills/ponytail` (MIT, see `THIRD_PARTY.md`) |
 

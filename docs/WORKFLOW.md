@@ -17,11 +17,11 @@ whole history every turn.
 | 3 | Plan | `planner` | `PLAN.md` (PRD, slices, marketing plan, keys, costs), `features.json` (acceptance criteria per slice, written before any code) | **Brief (a):** ok/no (it includes proof people pay) |
 | 4 | Scaffold + design | one scaffold thread; design team (`frontend-design`, `impeccable`, `design-critic`) | default stack, `verify`, CI, Workers Builds config (`publish`; you connect it); 2-3 directions as screenshots | **Brief (b):** pick one; do the Cloudflare import it lists. Later keys come one card at a time, when a slice needs them |
 | 5a | Probe (anything meant to earn) | one builder thread, then the marketing team | slice `probe` live: offer, price, waitlist; pushed in one channel for ~14 days against the go number from `PLAN.md` | Nothing if it hits the number; else one tap: kill, change or build anyway |
-| 5 | Build | builder threads (Opus), one per slice, the next in a fresh thread after a merge; a small site is one thread, no slices | PRs with tests, screenshots, preview link; `PROGRESS.md` updated | Nothing |
+| 5 | Build | builder threads (Opus), one per slice, the next in a fresh thread after a merge; a second only when the slices share no file, never more than three; a small site is one thread, no slices | PRs with tests, screenshots, preview link; `PROGRESS.md` updated | Nothing |
 | 6 | Gate each PR | QA: `evaluator` on the preview, fresh `code-reviewer`; security: `security-reviewer` + `red-team`; `design-critic` + `legal-reviewer` | a 5/5 table on the PR and the merge, or one review the builder fixes | nothing |
 | 7 | Launch | full `red-team` and `legal-reviewer` pass; `publish`, `sell` go-live; PostHog for analytics and errors | live site | **Brief (c)** to read; the gate merges (auto-run); live keys when you want real money |
-| 8 | Grow | marketing team (`market` skill, `seo-specialist`); a weekly routine | posts, launch, a weekly PR with the `metrics/` file Luna's cockpit reads and the next slice | Merge the weekly PR to go on; approve post batches, pay for ads |
-| 9 | Learn | operator | each lesson becomes a rule, skill line, test or check in claude-setup | Merge that PR |
+| 8 | Grow | marketing team (`market` skill, `seo-specialist`); a weekly routine | posts, launch, a weekly PR with the `metrics/` file Luna's cockpit reads and the next slice | The gate merges the weekly PR (you tap only if Claude Code's safety check blocks it); approve post batches, pay for ads |
+| 9 | Learn | operator | each lesson becomes a rule, skill line, test or check in claude-setup | Nothing; the gate merges it (you tap only if Claude Code's safety check blocks it) |
 
 After launch, phases 5-6 repeat for every improvement the weekly numbers suggest.
 
@@ -58,13 +58,13 @@ plain summary of what's wrong and tap options; the recommended one is taken at o
 probe mode: no fresh code reviewer (the builder's ship-check counts), design review only on the
 probe page and before launch, security whenever a PR stores what users type. Important PRs (auth, payments, migrations, secrets)
 come with three lines: what changes, what could break, how to undo it.
-claude-setup PRs always get your full review. Details: `operator` skill, `gate.md`.
+claude-setup PRs go through the same gate. Details: `operator` skill, `gate.md`.
 
 ## Learning
 
 Every correction, every failed gate round with a catchable cause and every test project ends as
 a rule, skill line, test or check in this repo. That is the memory: committed, reviewed, loaded
-by every thread. No memory plugin or Obsidian: cloud threads run no hooks, and the repo already
+by every thread. No memory plugin or Obsidian: ECC hooks from the PC install don't run in cloud threads (only the settings hooks `cloud/setup.sh` writes, like the context guard), and the repo already
 does the job.
 
 Claude Code's built-in auto-memory stays on as a scratchpad on your PC
@@ -95,8 +95,7 @@ Deploys and previews: the `publish` skill.
 ## Security, always on
 
 - `security-guidance` warns while code is being written.
-- ECC hooks block secrets and `--no-verify` at commit time (on your PC; cloud threads don't run
-  them).
+- ECC hooks block secrets and `--no-verify` at commit time (on your PC; the ECC hooks of the PC install don't run in cloud threads).
 - `security-reviewer` reads every risky diff; `red-team` attacks the preview before launch.
 - GitHub secret scanning and `npm audit` are worth turning on per project.
 

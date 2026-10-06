@@ -1,5 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "$comment": "These deny rules apply only in a one-repository session. A project thread with claude-setup plus the app repo ignores them (per the Projects docs); that is fine because the thread's own rules come from the cloud environment.",
   "permissions": {
     "deny": [
       "Read(**/.env)",
