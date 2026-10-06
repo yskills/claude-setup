@@ -54,6 +54,9 @@ button{font:inherit;color:inherit}
 .pill{display:inline-flex;align-items:center;gap:7px;height:42px;padding:0 14px 0 8px;border-radius:999px;cursor:pointer;text-decoration:none;color:var(--fg);font:900 15px var(--sans);font-variant-numeric:tabular-nums}
 .pill:active,.dock button:active,.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow)}
 .coin{width:24px;height:24px;flex:none}
+.toast{position:absolute;left:16px;top:94px;z-index:5;padding:6px 12px;border-radius:999px;font:900 15px var(--sans);background:var(--coin);color:var(--ink);border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--shadow);animation:toast-in .5s cubic-bezier(.2,1.4,.4,1) both;pointer-events:none}
+@keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.9)}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}
 .bell{position:relative;width:42px;padding:0;justify-content:center}
 .badge{position:absolute;top:-7px;right:-7px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fffaf0;border:2px solid var(--ink);font:900 12px/18px var(--sans);text-align:center}
 .bar{flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden;border:1.5px solid var(--ink)}
@@ -162,16 +165,17 @@ ol,ul{margin:0;padding:0;list-style:none}
     <div class="stage-msg" id="stage-msg" hidden>The 3D office didn't load here. Team, Plan and Company still work from the dock.</div>
   </div>
 
+  <div class="toast" id="toast" role="status" hidden></div>
   <div class="hud">
     <a class="card plate" href="#plan" style="text-decoration:none;color:inherit" aria-label="Open the plan">
       <h1 id="title">Claude Setup</h1>
-      <div class="lvl"><span id="lvl-label">Plan</span><div class="bar" aria-hidden="true"><span id="lvl-bar" style="width:0%"></span></div><span class="pct" id="lvl-pct">0%</span></div>
+      <div class="lvl"><span id="lvl-label">Lv 1</span><div class="bar" aria-hidden="true"><span id="lvl-bar" style="width:0%"></span></div><span class="pct" id="lvl-pct">0 XP</span></div>
       <p class="greet"><span class="live-dot" id="dot"></span><span id="greet">Your team is here.</span></p>
     </a>
     <div class="right">
-      <a class="card pill" href="#company" id="coins" aria-label="Money earned this month, all projects" hidden>
+      <a class="card pill" href="#company" id="coins" aria-label="Coins earned, one per euro" hidden>
         <svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="var(--coin)" stroke="var(--ink)" stroke-width="2.2"/><circle cx="12" cy="12" r="6" fill="none" stroke="var(--coin-ink)" stroke-width="1.6"/><path d="M14.2 9.6a3 3 0 1 0 0 4.8M8.6 11.2h4M8.6 12.9h4" fill="none" stroke="var(--coin-ink)" stroke-width="1.6" stroke-linecap="round"/></svg>
-        <span id="coin-val">0 €</span>
+        <span id="coin-val">0</span>
       </a>
       <a class="card pill bell" href="#todo" aria-label="Your to-dos">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
@@ -182,6 +186,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 
   <section class="card page" data-page="company" aria-labelledby="company-h" hidden>
     <div><h2 id="company-h">Company</h2><p class="lead">Every project, what it earns and what it needs from you.</p></div>
+    <p class="lead" id="game-line">Level 1 · 0 XP · 0 coins</p>
     <div class="totals">
       <div class="tot"><b id="t-month">0 €</b><span>This month</span></div>
       <div class="tot"><b id="t-all">0 €</b><span id="t-all-l">All time</span></div>
@@ -287,7 +292,34 @@ window.HQ = (() => {
     if (!stats || !ok(stats.revenueTotalCents) || !ok(stats.revenueMonthCents)) return project
     return { ...project, revenueTotal: stats.revenueTotalCents / 100, revenueMonth: stats.revenueMonthCents / 100, testMoney: stats.mode !== 'live' }
   }
-  return { TABS, modeOf, pickTab, worldFor, deskNumbers, withStats, PET_OF, FRAMES, poseAt }
+  /* The game loop: level, XP and coins come only from real events (events/<id> { kind, project, at, amount? }), never from clicks.
+     A PR merged 50 XP, the 5/5 gate passed 20, a project launched 100, each euro earned 10 XP and 1 coin, each day visited 5. */
+  const XP_OF = { pr_merged: 50, gate_passed: 20, launched: 100, visit: 5 }, XP_PER_EURO = 10, XP_PER_LEVEL = 100
+  const euros = (e) => (e?.kind === 'euro' && Number.isFinite(e.amount) && e.amount > 0 ? e.amount : 0)
+  const xpOf = (e) => XP_OF[e?.kind] || Math.round(euros(e) * XP_PER_EURO) || 0
+  const levelStart = (level) => (level - 1) ** 2 * XP_PER_LEVEL
+  function scoreFrom(events) {
+    const seen = new Set()
+    const real = (Array.isArray(events) ? events : []).filter((e) => {
+      if (!e || typeof e !== 'object') return false
+      if (e.id == null) return true
+      if (seen.has(e.id)) return false
+      seen.add(e.id); return true
+    })
+    const xp = real.reduce((n, e) => n + xpOf(e), 0)
+    const level = Math.floor(Math.sqrt(xp / XP_PER_LEVEL)) + 1, from = levelStart(level), to = levelStart(level + 1)
+    return { xp, coins: Math.floor(real.reduce((n, e) => n + euros(e), 0)), level, from, to, pct: Math.round((100 * (xp - from)) / (to - from)) }
+  }
+  /* The small "+50 XP" toast for events that arrived while the page was open */
+  function toastFor(events) {
+    const xp = events.reduce((n, e) => n + xpOf(e), 0), coins = Math.floor(events.reduce((n, e) => n + euros(e), 0))
+    return xp ? `+${xp} XP${coins ? ` · +${coins} coin${coins === 1 ? '' : 's'}` : ''}` : ''
+  }
+  /* One visit event per Europe/Berlin day; the fixed id makes a second write the same row */
+  const visitEvent = (now = new Date()) => ({
+    id: `visit-${new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin' }).format(now)}`, kind: 'visit', project: 'hq', at: now.toISOString(),
+  })
+  return { TABS, modeOf, pickTab, worldFor, deskNumbers, withStats, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent }
 })()
 </script>
 <script id="team-art">
@@ -564,15 +596,29 @@ function renderPhases(phases) {
   })
   const pct = total > 0 ? Math.round((100 * done) / total) : 0
   $('pct').textContent = `${pct}%`; $('pct-bar').style.width = `${pct}%`
-  $('lvl-pct').textContent = `${pct}%`; $('lvl-bar').style.width = `${pct}%`
   const cur = phases.findIndex((p) => p.state === 'active')
   const at = cur >= 0 ? cur : phases.findIndex((p) => p.state !== 'done')
   level = {
     label: phases.length ? `LEVEL ${at >= 0 ? at + 1 : phases.length} OF ${phases.length}` : 'PLAN',
     name: phases.length ? (at >= 0 ? phases[at].name : 'All levels cleared') : 'No phases yet', pct,
   }
-  $('lvl-label').textContent = phases.length ? `Lv ${at >= 0 ? at + 1 : phases.length}/${phases.length}` : 'Plan'
   office?.setWall(level, youCount); room?.update()
+}
+
+/* Game: level, XP and coins from the events collection only */
+let game = HQ.scoreFrom([])
+function renderGame(g) {
+  game = g
+  $('lvl-label').textContent = `Lv ${g.level}`; $('lvl-bar').style.width = `${g.pct}%`; $('lvl-pct').textContent = `${g.xp - g.from}/${g.to - g.from} XP`
+  $('coins').hidden = false; $('coin-val').textContent = String(g.coins)
+  $('game-line').textContent = `Level ${g.level} · ${g.xp} XP · ${g.coins} coin${g.coins === 1 ? '' : 's'}`
+  room?.update()
+}
+let toastTimer
+function showToast(text) {
+  const t = $('toast'); if (!text) return
+  t.textContent = text; t.hidden = false; t.style.animation = 'none'; void t.offsetWidth; t.style.animation = ''
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true }, 3200)
 }
 
 const EUR = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
@@ -602,7 +648,6 @@ function renderProjects(rowsIn) {
   const needs = projects.flatMap((p) => (Array.isArray(p.you) ? p.you : []).map((y) => ({ ...y, from: p.name || p.id })))
   $('t-month').textContent = money(sum('revenueMonth')); $('t-all').textContent = money(sum('revenueTotal'))
   $('t-need').textContent = String(needs.length)
-  $('coins').hidden = !hasProjects; $('coin-val').textContent = money(sum('revenueMonth'))
   list($('all-you'), needs, (y) => { const li = el('li'), d = el('div'); d.append(el('span', 'from', y.from), link(y.what, y.link)); li.append(d); return li }, 'Nothing right now.')
   const box = $('projects'); box.replaceChildren()
   if (!hasProjects) box.append(el('p', 'empty', "Each project's manager adds its row here on day one."))
@@ -749,6 +794,7 @@ async function buildRoom() {
     g.fillStyle = ink; g.font = FONT(900, 40); g.fillText('Plan', 30, 58)
     g.fillStyle = teal; g.font = FONT(800, 28); g.textAlign = 'right'; g.fillText(`${desk$.pct}%`, w - 30, 58); g.textAlign = 'left'
     g.fillStyle = '#e4d4bb'; g.fillRect(30, 76, w - 60, 14); g.fillStyle = teal; g.fillRect(30, 76, ((w - 60) * desk$.pct) / 100, 14)
+    g.fillStyle = '#7a6a5b'; g.font = FONT(900, 30); g.fillText(`Lv ${game.level} · ${game.xp} XP · ${game.coins} coins`, 30, 420)
     const ph = phasesData.slice(0, 6)
     if (!ph.length) { g.fillStyle = '#7a6a5b'; g.font = FONT(700, 24); g.fillText('No phases yet', 30, 140) }
     ph.forEach((p, i) => {
@@ -1343,5 +1389,15 @@ renderTeam([])
   db.collection('team').onSnapshot((s) => renderTeam(rows(s)), fail)
   db.collection('phases').onSnapshot((s) => renderPhases(rows(s)), fail)
   db.collection('projects').onSnapshot((s) => renderProjects(rows(s)), fail)
+  /* Events: the first answer sets the score quietly (and writes today's visit once); later ones toast what they earned */
+  let known = null
+  db.collection('events').onSnapshot((s) => {
+    const all = rows(s)
+    if (known) showToast(HQ.toastFor(all.filter((e) => !known.has(e.id))))
+    known = new Set(all.map((e) => e.id))
+    renderGame(HQ.scoreFrom(all))
+    const visit = HQ.visitEvent()
+    if (!known.has(visit.id)) { known.add(visit.id); const { id, ...data } = visit; db.collection('events').doc(id).set(data).catch(() => known.delete(id)) }
+  }, fail)
 })()
 </script>

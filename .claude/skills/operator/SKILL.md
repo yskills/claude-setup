@@ -121,6 +121,14 @@ Templates in `templates/`.
   dashboard (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT), and keeps it current with every
   `pm/now` write. HQ's Company view is yskills' one home for all projects and their money; Luna's
   cockpit links to it.
+  **Game events:** HQ's level, XP and coins come only from `events/<id>` rows in HQ's db
+  (`{kind, project, at, amount?}`), nothing else counts. At each milestone, in the same batch as the
+  `PROGRESS.md` rows, the operator or gate thread writes one with a fixed id so a retry does not
+  count twice: `pr_merged` (id `pr-<repo>-<number>`, 50 XP), `gate_passed` (`gate-<repo>-<number>`,
+  20 XP, only at 5/5), `launched` (`launch-<project>`, 100 XP), `euro` (`euro-<project>-<yyyy-mm-dd>`,
+  `amount` = euros newly earned since the last event, from Stripe or `/api/stats`, 10 XP and 1 coin
+  each; test money counts as it shows as Testgeld). The page writes `visit-<day>` itself. The rule is
+  `HQ.scoreFrom` in the template's `hq-rules` block, tested by `scripts/hq-rules.test.mjs`.
 
 ## 4. The run
 
