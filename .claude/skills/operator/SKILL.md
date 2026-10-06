@@ -27,15 +27,22 @@ so yskills sees at a glance who does what. Roles (the shape Anthropic recommends
 agents: one planner, workers with a fresh context per job, an evaluator that never built what it
 grades):
 
-| Role | Is | Example title |
-|---|---|---|
-| Manager | the operator: plans, starts threads, keeps PROGRESS.md and the dashboard | Manager · duo-test |
-| Researcher | one research page (step 2), a subagent or a thread | Researcher · competitors |
-| Programmer | builds one slice or one fix, opens the PR, keeps it green | Programmer · subscription |
-| Tester | the gate: evaluator, fresh reviewers, security, design, legal on one PR | Tester · PR 23 |
-| Marketer | the launch and weekly growth routine | Marketer · launch |
+| Role | Does | Runs as | Example title |
+|---|---|---|---|
+| Project Manager | the operator: plans with yskills, starts the others, keeps PROGRESS.md and the office | the project chat | Project Manager · duo-test |
+| Researcher | competitors, prices, tools and skills, proof people pay (step 2) | subagents; a thread when big | Researcher · competitors |
+| Designer | the look, then every UI screenshot | subagent; a thread for a redesign | Designer · directions |
+| Programmer | one slice or fix, the PR, green CI | a thread each, at most 3 at once | Programmer · subscription |
+| Tester | the gate: grades the preview against the criteria | a fresh thread per PR | Tester · PR 23 |
+| Reviewer | reads the diff | subagent the Tester starts | Reviewer · PR 23 |
+| Security | `security-reviewer` on the diff, `red-team` on the preview | subagents the Tester starts | Security · PR 23 |
+| Legal | the law must-haves, then pass/fail on the preview | subagent; a thread to write legal texts | Legal · launch |
+| Marketer | probe, launch posts, weekly growth | a thread for the launch, then the weekly routine | Marketer · launch |
 
-Reviewers (code, security, design, legal) are subagents the Tester starts, not threads.
+Any role becomes its own thread when its job is big; short checks stay subagents because every
+thread re-reads its context. **Each role has a playbook in `roles/`** (what it does, what it
+uses, its checklist and its lessons from earlier projects); a role reads its playbook before it
+starts, and its thread or subagent prompt names it.
 
 **Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`); each
 reports back when it finishes and keeps fixing CI and review comments on its PR. From inside a
@@ -87,10 +94,10 @@ Templates in `templates/`.
   thread reads it first; only the operator writes it. Under 100 lines.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
 - **Dashboard** (`templates/dashboard.html`), yskills' live view of the project from day one, in
-  four pages: **Office** (each teammate is a mascot at a desk dressed for its role, typing when
-  working, asleep when idle, ! when blocked, ? when it waits on yskills; tap one for task, next,
-  with whom, Watch and Open; a whiteboard shows the current level and a sticky note what needs
-  yskills), **Plan** (the operator's update and the phases as levels with goal bars), **For you**
+  four pages: **Office** (a 3D office yskills can turn and tap: one desk per role above, each
+  teammate dressed for it, typing when working, asleep when idle, ! when blocked, ? when it waits
+  on yskills; tap one for task, next, with whom, Watch and Open; the whiteboard shows the current
+  level, the sticky note what needs yskills), **Plan** (the operator's update and the phases as levels with goal bars), **For you**
   (what needs yskills, next steps, live links) and **Projects** (shown only with `projects` rows). At project start the operator plans the
   phases (brief (a)'s plan: research, plan, scaffold, one per slice or group of slices, launch,
   grow), publishes the page with the Artifact tool, `capabilities: {db: {rules: [{path: "", read:
@@ -100,8 +107,9 @@ Templates in `templates/`.
   done, total, link}]`; a slice's goal counts its passing criteria in `features.json`) and
   `team/<id>` for the operator, each thread and each reviewer agent (`name, role, state` =
   working, blocked, waiting, idle or done, `task, next, with[ids], link, linkLabel, preview,
-  order`; the mascot follows the role word: Manager, Programmer, Tester, Researcher, Marketer,
-  Security, Legal, Designer). Every write to `PROGRESS.md` updates the same rows in one batch (pin
+  order`; the desk follows the role word in `role` or the name: Project Manager, Researcher,
+  Designer, Programmer, Tester, Reviewer, Security, Legal, Marketer). Viewing costs no tokens;
+  only these writes do. Every write to `PROGRESS.md` updates the same rows in one batch (pin
   each with `if_version`). The new project also gets a row `projects/<id>` (`name, state` = active,
   paused or done, `progress` 0-100, `note, dashboard, live, order`) in the Claude Setup HQ
   dashboard (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT), so yskills can tap from there into
@@ -188,7 +196,10 @@ Templates in `templates/`.
    the gate checks it, yskills taps merge. An error that hits paying users or checkout doesn't
    wait for the week: PostHog's alert starts the same fix right away.
 9. **Learn.** Every correction, every gate round that failed for a catchable reason, every test
-   project lesson becomes a rule, skill line, test or check in claude-setup, in a small PR.
+   project lesson becomes a rule, skill line, test or check in claude-setup, in a small PR. At the
+   project's end (or a kill), each role that worked adds one dated line per lesson to its
+   `roles/<role>.md` (project, type, what to do differently, which tools it needed), so the next
+   project of the same kind starts with them.
 
 **Waiting on yskills:** write the state to `PROGRESS.md` before each brief. A project
 conversation can continue later; a plain chat idle for over an hour hands off to a fresh session.
