@@ -11,6 +11,11 @@ Sets the look before the first screen and checks every UI change so nothing look
 - Start from yskills' reference pictures in `design/refs/`, then `design/DESIGN.md`.
 - Compare against the category leader at 1440px and 390px.
 - No default gradients, emoji icons, card grids or stock heroes.
+- Copy real life first, then make it better for yskills (yskills, 2026-10-06): model rooms, objects and
+  characters on how the real thing looks and behaves, then improve on it. The finished result is
+  high quality, Blender-level or the current state of the art: before picking art, do one quick search
+  for the best licence-clean option today (CC0/CC-BY packs, AI 3D generation with commercial rights,
+  Mixamo-style animation) and say in the PR what was picked and why.
 
 ## Lessons
 
