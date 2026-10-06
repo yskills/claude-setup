@@ -156,3 +156,82 @@ test('only unsent requests are resent, and every state reads in German', () => {
   assert.match(HQ.sendTrouble('not_in_manifest'), /nächste Thread/)
   assert.equal(HQ.sendTrouble('upstream_error'), 'Gespeichert, Claude meldet sich.')
 })
+
+/* The cash book: finance/<project> as duo-test's stats route returns it (docs/STATS-API.md), integer cents */
+/* Plain copies: objects made in the vm's realm fail deepStrictEqual on their prototype */
+const report = (r, now) => JSON.parse(JSON.stringify(HQ.moneyReport(r, now)))
+const NOW = new Date('2026-10-06T22:00:00Z')
+const row = {
+  total: { grossCents: 2999, feeCents: 80, netCents: 2919, complete: true },
+  month: { grossCents: 2999, feeCents: 80, netCents: 2919, complete: true },
+  months: [{ month: '2026-10', grossCents: 2999, feeCents: 80, netCents: 2919, complete: true, payments: 1 }],
+  payments: [
+    { at: '2026-09-02T10:00:00Z', plan: 'monthly', grossCents: 499, feeCents: null, netCents: null, discountCents: 0 },
+    { at: '2026-10-06T21:00:00Z', plan: 'yearly', grossCents: 2999, feeCents: 80, netCents: 2919, discountCents: 0 },
+  ],
+  subscriptions: { active: 1, trialing: 2, endingAtPeriodEnd: 0 },
+  refunds: { count: 0, cents: 0 }, discounts: { count: 1, cents: 500 },
+  nextPayout: { amountCents: 2919, arrivesAt: '2026-10-09T00:00:00Z', status: 'pending' },
+  mode: 'test', asOf: '2026-10-06T21:50:00Z', savedAt: '2026-10-06T21:55:00Z', sync: 'ok', feeSync: 'ok', payoutSync: 'ok',
+}
+
+test('the cash book leads with net once every fee is known', () => {
+  const r = report(row, NOW)
+  assert.equal(r.has, true); assert.equal(r.test, true)
+  assert.deepEqual(r.headline, { label: 'Netto', cents: 2919 })
+  assert.deepEqual(r.total, { gross: 2999, fee: 80, net: 2919, complete: true })
+  assert.equal(r.at, '2026-10-06T21:50:00Z')
+  assert.deepEqual(r.trouble, [])
+})
+
+test('without every fee the big number is gross, with a plain note, never a too-high net', () => {
+  const r = report({ ...row, total: { grossCents: 3498, feeCents: 80, netCents: 2919, complete: false } }, NOW)
+  assert.equal(r.headline.label, 'Brutto'); assert.equal(r.headline.cents, 3498); assert.match(r.headline.note, /Netto folgt/)
+})
+
+test('no finance row, or junk, means no data rather than a made-up number', () => {
+  assert.deepEqual(report(null), { has: false })
+  assert.deepEqual(report('x'), { has: false })
+  const r = report({ total: { grossCents: -5 }, month: { grossCents: 12.5 }, payments: [{ at: 'never', grossCents: 100 }, { at: '2026-10-01T00:00:00Z', grossCents: '100' }], refunds: { count: 1 }, nextPayout: { amountCents: 100 } }, NOW)
+  assert.equal(r.has, false); assert.equal(r.total, null); assert.equal(r.month, null); assert.equal(r.headline, null)
+  assert.deepEqual(r.payments, []); assert.equal(r.refunds, null); assert.equal(r.payout, null); assert.deepEqual(r.months, [])
+})
+
+test('only mode live is real money; anything else stays Testgeld', () => {
+  assert.equal(report({ ...row, mode: 'live' }, NOW).test, false)
+  assert.equal(report({ ...row, mode: undefined }, NOW).test, true)
+})
+
+test('the graph shows the last six Berlin months, quiet months at 0', () => {
+  const m = report({ ...row, months: [...row.months, { month: '2026-07', grossCents: 499, feeCents: 32, netCents: 467, complete: true, payments: 1 }, { month: 'bad', grossCents: 1 }] }, NOW).months
+  assert.deepEqual(m.map((x) => x.month), ['2026-05', '2026-06', '2026-07', '2026-08', '2026-09', '2026-10'])
+  assert.deepEqual(m.map((x) => x.label), ['Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt'])
+  assert.equal(m[2].net, 467); assert.equal(m[3].gross, 0); assert.equal(m[5].payments, 1)
+  const jan = report(row, new Date('2027-01-10T12:00:00Z')).months
+  assert.equal(jan[0].label, 'Aug 26'); assert.equal(jan[5].label, 'Jan')
+})
+
+test('payments read newest first with their plan in German; unknown fees stay unknown', () => {
+  const p = report(row, NOW).payments
+  assert.deepEqual(p.map((x) => x.plan), ['Jahres-Abo', 'Monats-Abo'])
+  assert.equal(p[1].fee, null); assert.equal(p[1].net, null)
+  assert.equal(report({ ...row, payments: [{ at: row.payments[0].at, plan: 'weird', grossCents: 1 }] }, NOW).payments[0].plan, 'Sonstiges')
+})
+
+test('subscriptions, refunds, coupons and the payout come through as counted', () => {
+  const r = report(row, NOW)
+  assert.deepEqual(r.subs, { active: 1, trialing: 2, ending: 0 })
+  assert.deepEqual(r.discounts, { count: 1, cents: 500 })
+  assert.deepEqual(r.payout, { cents: 2919, at: '2026-10-09T00:00:00Z', status: 'pending' })
+})
+
+test('a failed Stripe sync is said plainly, with what Stripe answered', () => {
+  const r = report({ ...row, feeSync: 'failed:403 The provided key does not have the required permissions', payoutSync: 'off' }, NOW)
+  assert.deepEqual(r.trouble, ['Gebühren hakt: 403 The provided key does not have the required permissions', 'Auszahlung: kein Stripe-Schlüssel am Worker.'])
+})
+
+test('the money page opens from #money and its German names', () => {
+  assert.equal(HQ.pickTab('#money', { hasProjects: false, room: true }), 'money')
+  assert.equal(HQ.pickTab('#kassenbuch', { hasProjects: true, room: false }), 'money')
+  assert.equal(HQ.worldFor('money', 'office'), 'office')
+})
