@@ -78,3 +78,81 @@ test('a project row in test mode is tagged Testgeld; live money is not', () => {
   assert.equal(HQ.deskNumbers({ projects: [HQ.tagMoney({ ...row, revenueMode: 'test' })] }).test, true)
   assert.equal(HQ.tagMoney({ ...row, revenueMode: 'test' }).revenueTotal, 28)
 })
+
+test('score comes only from real events', () => {
+  const s = (events) => ({ ...HQ.scoreFrom(events) })
+  assert.deepEqual(s([]), { xp: 0, coins: 0, level: 1, from: 0, to: 100, pct: 0 })
+  assert.deepEqual(s(undefined), s([]))
+  assert.equal(s([{ kind: 'pr_merged' }]).xp, 50)
+  assert.equal(s([{ kind: 'gate_passed' }]).xp, 20)
+  assert.equal(s([{ kind: 'visit' }]).xp, 5)
+  assert.equal(s([{ kind: 'launched' }]).xp, 100)
+  const euros = s([{ kind: 'euro', amount: 12 }])
+  assert.equal(euros.xp, 120); assert.equal(euros.coins, 12)
+  assert.equal(s([{ kind: 'euro', amount: 0.6 }, { kind: 'euro', amount: 0.6 }]).coins, 1)
+  assert.equal(s([{ kind: 'euro', amount: 0.6 }, { kind: 'euro', amount: 0.6 }]).xp, 12)
+})
+
+test('score ignores junk, repeats and fake money', () => {
+  const xp = (events) => HQ.scoreFrom(events).xp
+  assert.equal(xp([{ kind: 'nope' }, null, 'x', {}, { kind: 'euro' }, { kind: 'euro', amount: -5 }, { kind: 'euro', amount: 'NaN' }]), 0)
+  assert.equal(xp([{ id: 'a', kind: 'pr_merged' }, { id: 'a', kind: 'pr_merged' }, { id: 'b', kind: 'pr_merged' }]), 100)
+})
+
+test('levels follow floor(sqrt(xp/100)) + 1 and the bar fills toward the next', () => {
+  const at = (xp) => HQ.scoreFrom(Array.from({ length: xp / 50 }, () => ({ kind: 'pr_merged' })))
+  assert.equal(at(50).level, 1); assert.equal(at(50).pct, 50)
+  assert.equal(at(100).level, 2); assert.deepEqual([at(100).from, at(100).to], [100, 400])
+  assert.equal(at(350).level, 2); assert.equal(at(400).level, 3); assert.equal(at(850).level, 3); assert.equal(at(900).level, 4)
+  assert.equal(at(250).pct, 50)
+})
+
+test('a toast names what the new events earned', () => {
+  assert.equal(HQ.toastFor([{ kind: 'pr_merged' }]), '+50 XP')
+  assert.equal(HQ.toastFor([{ kind: 'euro', amount: 3 }]), '+30 XP · +3 coins')
+  assert.equal(HQ.toastFor([{ kind: 'pr_merged' }, { kind: 'gate_passed' }]), '+70 XP')
+  assert.equal(HQ.toastFor([{ kind: 'nope' }]), '')
+  assert.equal(HQ.toastFor([{ kind: 'euro', amount: 1 }]), '+10 XP · +1 coin')
+})
+
+test('a visit is one event per day', () => {
+  assert.deepEqual({ ...HQ.visitEvent(new Date('2026-10-06T09:00:00Z')) }, { id: 'visit-2026-10-06', kind: 'visit', project: 'hq', at: '2026-10-06T09:00:00.000Z' })
+  assert.equal(HQ.visitEvent(new Date('2026-10-06T23:30:00Z')).id, 'visit-2026-10-07')
+})
+
+test('a New project tap saves one tidy request row', () => {
+  const now = new Date('2026-10-06T18:30:00Z')
+  const r = HQ.requestDoc('  a   cozy\nfarming game  ', now, () => 0.5)
+  assert.match(r.id, /^req-2026-10-06-[0-9a-z]{6}$/)
+  assert.deepEqual({ ...r.data }, { text: 'a cozy farming game', at: '2026-10-06T18:30:00.000Z', status: 'new' })
+  assert.equal(HQ.requestDoc('   '), null)
+  assert.equal(HQ.requestDoc(null), null)
+  assert.equal(HQ.requestDoc('x'.repeat(2000)).data.text.length, 600)
+  assert.notEqual(HQ.requestDoc('a', now, () => 0.1).id, HQ.requestDoc('a', now, () => 0.2).id)
+})
+
+test('the request goes to a real coordinator address only', () => {
+  assert.equal(HQ.coordinatorOf({ session: 'cse_0126AwHPE3P6rdJkJm3vkNzs' }, null), 'cse_0126AwHPE3P6rdJkJm3vkNzs')
+  assert.equal(HQ.coordinatorOf(null, { session: 'session_0126AwHPE3P6rdJkJm3vkNzs' }), 'session_0126AwHPE3P6rdJkJm3vkNzs')
+  assert.equal(HQ.coordinatorOf({ session: 'cse_bad id"; drop' }, { session: 'cse_0126AwHPE3P6rdJkJm3vkNzs' }), 'cse_0126AwHPE3P6rdJkJm3vkNzs')
+  assert.equal(HQ.coordinatorOf({}, {}), null)
+  assert.equal(HQ.coordinatorOf({ session: 42 }, undefined), null)
+})
+
+test('the message explains itself to a coordinator that starts cold', () => {
+  const m = HQ.requestMessage('req-2026-10-06-abc123', 'a cozy farming game')
+  assert.ok(m.startsWith('HQ request req-2026-10-06-abc123: a cozy farming game'))
+  assert.match(m, /brainstorm thread/)
+  assert.match(m, /requests\/req-2026-10-06-abc123 to started/)
+})
+
+test('only unsent requests are resent, and every state reads in German', () => {
+  const rows = [{ id: 'a', text: 'x', status: 'new' }, { id: 'b', text: 'y', status: 'sent' }, { id: 'c', status: 'new' }, null, { id: 'd', text: 'z', status: 'started' }]
+  assert.deepEqual(HQ.toResend(rows).map((r) => r.id), ['a'])
+  assert.equal(HQ.toResend(undefined).length, 0)
+  assert.equal(HQ.requestLine({ status: 'started' }), 'Brainstorm läuft')
+  assert.equal(HQ.requestLine({ status: 'weird' }), 'gespeichert, Claude meldet sich')
+  assert.match(HQ.sendTrouble('needs_reauth'), /Connectors/)
+  assert.match(HQ.sendTrouble('not_in_manifest'), /nächste Thread/)
+  assert.equal(HQ.sendTrouble('upstream_error'), 'Gespeichert, Claude meldet sich.')
+})

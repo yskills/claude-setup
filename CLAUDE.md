@@ -19,11 +19,15 @@ Code on the PC, the `team` mod (`/team`: who of the team works on what, with a W
   acceptance criteria before building, and sends yskills three ok/no briefs.
 - Merging: a fresh gate thread posts the `operator` skill's 5/5 table and merges every PR at 5/5
   itself, launch and live money included (yskills chose "merge everything", 2026-10-06); that
-  merge is the approved production deploy. Only claude-setup PRs wait for yskills' tap, because
-  Claude Code's safety check blocks thread merges there. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
-- Spend little: the operator, `planner` and `architect` on Opus (they decide once per project),
-  everything else (threads, other agents) on Sonnet; reviewers get only the diff or URL plus the
-  criteria.
+  merge is the approved production deploy, claude-setup PRs included; yskills taps only when
+  Claude Code's safety check blocks a thread's merge. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
+- Models (`docs/WORKFLOW.md`, Models): Fable for architecture and plans, Opus for build slices
+  and anything with design or judgement, Sonnet for follow-ups, small fixes, data wiring, tests
+  and reviews; reviewers get only the diff or URL plus the criteria.
+- Auto-run (yskills, 2026-10-06): no taps. A card still shows the options, but work continues on
+  the recommended one at once; the gate merges at 5/5 after a real preview test and review; the
+  coordinator reports results and real blockers only. yskills' pauses ("stop", "pause") and
+  taste calls (an asset or look they rejected) are final: stop at once, never argue for them.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
   before things nobody can undo: production deploys, payments, sending mail or posts, deleting
   data, force-pushing, rotating secrets.
@@ -74,7 +78,9 @@ Code on the PC, the `team` mod (`/team`: who of the team works on what, with a W
 yskills' verdict on early work was that it "looks very AI". For every UI change:
 
 1. Read the project's design doc if it has one (`design/DESIGN.md`, `DESIGN.md`); otherwise use
-   the `frontend-design` and `impeccable` skills and commit to a clear direction. Motion in Vue:
+   the `frontend-design` and `impeccable` skills and commit to a clear direction. Copy real life
+   first, then make it better for yskills; the result is state-of-the-art quality (one quick
+   search for the best licence-clean option before picking art), cute cartoon or pixel taste. Motion in Vue:
    `motion-v`. No default gradients, emoji icons, generic card grids, stock hero sections or
    SaaS keyboard-shortcut chips. Motion answers an action or plays once; nothing loops forever.
    Keyframes describe only the start state (`from {…}`), so `prefers-reduced-motion:

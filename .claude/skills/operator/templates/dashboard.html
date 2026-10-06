@@ -1,6 +1,6 @@
 <title>Claude Setup HQ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Nunito:wght@500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap">
 <style>
 /* A cozy office game. The office fills the screen; a HUD sits on top: level and coins up top, a dock below.
    Company: every project, its money and what it needs from yskills. Plan: levels. Team: the nine roles. To-dos: what needs yskills. */
@@ -10,7 +10,7 @@
   --ok:#3a8a55;--warn:#c97a00;--bad:#c8402f;--idle:#9a8c7e;--coin:#f2b630;--coin-ink:#8a5a00;
   --stage:#f1e3cf;--shadow:#2b2420;
   --sans:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --mono:"Nunito",ui-rounded,system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#1d1814;--panel:#2a221b;--fg:#f3e9dc;--soft:#b9aa98;--line:#463a2f;--ink:#0e0b09;
@@ -23,7 +23,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font:600 15px/1.45 var(--sans);overflow:hidden}
+body{font-variant-numeric:tabular-nums;margin:0;background:var(--bg);color:var(--fg);font:600 15px/1.45 var(--sans);overflow:hidden}
 a{color:var(--accent);text-underline-offset:2px}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
@@ -34,7 +34,7 @@ button{font:inherit;color:inherit}
 .stage canvas.point{cursor:pointer}
 .labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .tag{all:unset;position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;display:grid;justify-items:center;gap:2px;transform:translate(-50%,-100%);white-space:nowrap}
-.tag .nm{font:800 12px/1.2 var(--sans);color:#2b2420;background:#fffaf0;padding:3px 9px;border-radius:999px;border:2px solid #2b2420}
+.tag .nm{font:800 12px/1.2 var(--sans);color:#2b2420;background:#fffaf0;padding:3px 9px;border-radius:8px;border:2px solid #2b2420;box-shadow:0 2px 0 #2b2420}
 .tag .chip{font-size:11px;padding:0 6px}
 .tag:focus-visible .nm{outline:2px solid var(--accent)}
 .stage-msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--soft)}
@@ -42,18 +42,28 @@ button{font:inherit;color:inherit}
 .hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 16px;pointer-events:none}
 .hud>*{pointer-events:auto}
 .card{background:var(--panel);border:2.5px solid var(--ink);border-radius:16px;box-shadow:0 4px 0 var(--shadow)}
-.plate{padding:10px 14px;min-width:0;max-width:min(360px,58vw);display:grid;gap:6px}
-.plate h1{font:900 19px/1.15 var(--sans);margin:0;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lvl{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;font:800 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
-.lvl .bar{height:10px}
-.lvl .pct{font:600 12px var(--mono);color:var(--fg);font-variant-numeric:tabular-nums}
-.greet{font-size:13px;color:var(--soft);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plate{padding:8px 14px 8px 8px;min-width:0;max-width:min(380px,62vw);display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px}
+.plate .pm{display:grid;gap:4px;min-width:0}
+/* Level badge: a stitched merit badge, like the patches on a scout sash */
+.lv-badge{position:relative;width:54px;height:54px;border-radius:50%;background:var(--accent);border:2.5px solid var(--ink);box-shadow:inset 0 -4px 0 var(--accent-ink);display:grid;place-items:center;align-content:center;color:#fffaf0;line-height:1}
+.lv-badge::before{content:"";position:absolute;inset:4px;border-radius:50%;border:2px dashed rgba(255,250,240,.55)}
+.lv-badge small{font:900 10px var(--sans);letter-spacing:.02em}
+.lv-badge b{font:900 24px/1 var(--sans);margin-top:-1px}
+.plate h1{font:900 18px/1.15 var(--sans);margin:0;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvl{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+.lvl .bar{height:12px;background:var(--bg)}
+.lvl .bar>span{box-shadow:inset 0 3px 0 rgba(255,255,255,.3)}
+.lvl .pct{font:800 12px var(--sans);color:var(--soft)}
+.greet{font-size:12.5px;color:var(--soft);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--idle);margin-right:6px;vertical-align:1px}
 .live-dot.on{background:var(--ok)}
 .right{display:flex;gap:8px;align-items:center}
 .pill{display:inline-flex;align-items:center;gap:7px;height:42px;padding:0 14px 0 8px;border-radius:999px;cursor:pointer;text-decoration:none;color:var(--fg);font:900 15px var(--sans);font-variant-numeric:tabular-nums}
 .pill:active,.dock button:active,.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow)}
 .coin{width:24px;height:24px;flex:none}
+.toast{position:absolute;left:16px;top:94px;z-index:5;padding:6px 12px;border-radius:999px;font:900 15px var(--sans);background:var(--coin);color:var(--ink);border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--shadow);animation:toast-in .5s cubic-bezier(.2,1.4,.4,1) both;pointer-events:none}
+@keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.9)}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}
 .bell{position:relative;width:42px;padding:0;justify-content:center}
 .badge{position:absolute;top:-7px;right:-7px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fffaf0;border:2px solid var(--ink);font:900 12px/18px var(--sans);text-align:center}
 .bar{flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden;border:1.5px solid var(--ink)}
@@ -68,27 +78,33 @@ button{font:inherit;color:inherit}
 /* Pages slide over the office: a side panel on wide screens, a sheet on phones */
 .page{position:absolute;z-index:5;overflow-y:auto;overscroll-behavior:contain;display:grid;gap:14px;align-content:start;
   left:16px;top:122px;bottom:96px;width:min(460px,calc(100% - 32px));padding:18px 18px 22px}
-@media (max-width:640px){#labels .tag .chip{display:none}#labels .tag .nm{font-size:11px;padding:2px 7px}}
+#labels .tag .chip{display:none}#labels .tag:hover .chip,#labels .tag:focus-visible .chip{display:inline}
+@media (max-width:640px){#labels .tag .nm{font-size:11px;padding:2px 7px}}
+@media (max-width:440px){.greet{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2}}
 @media (max-width:440px){.dock{left:8px;right:8px;transform:none;gap:0}.dock button{flex:1;min-width:0;padding:6px 2px 5px;font-size:10.5px}}
 @media (max-width:640px){.page{left:10px;right:10px;width:auto;top:auto;max-height:calc(100% - 220px);bottom:86px;padding:16px}}
 .page h2{font:900 22px/1.2 var(--sans);margin:0;text-wrap:balance}
-.page h3{font:800 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:4px 0 0}
+.page h3{font:900 16px var(--sans);color:var(--fg);margin:6px 0 -4px}
 .lead{margin:0;color:var(--soft);font-weight:600}
 .empty{color:var(--soft);margin:0;font-weight:600}
 ol,ul{margin:0;padding:0;list-style:none}
 .note{font-size:13px;color:var(--soft)}
 .btn{display:inline-block;font:900 13px var(--sans);text-decoration:none;padding:7px 14px;border-radius:999px;border:2.5px solid var(--ink);color:var(--fg);background:var(--panel);white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
 .btn.go{background:var(--accent);color:#fffaf0}
-.chip{font:600 12px var(--mono);padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;background:var(--panel)}
+.chip{font:800 12px var(--sans);padding:1px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;background:var(--panel)}
 .chip.working,.chip.active{color:var(--accent);background:var(--accent-soft);border-color:transparent}
 .chip.blocked{color:var(--bad)}
 .chip.waiting{color:var(--warn)}
 .chip.idle,.chip.done,.chip.paused,.chip.off{color:var(--idle)}
 /* Company */
-.totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.tot{border:2px solid var(--line);border-radius:14px;padding:8px 10px;display:grid;gap:0}
-.tot b{font:800 20px/1.2 var(--mono);font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
-.tot span{font:800 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+/* Totals as a ledger: label, dotted leader, amount, like a page in a cash book */
+.totals{display:grid;gap:2px;padding:4px 14px;border-radius:12px;background:var(--bg);border:2px solid var(--line)}
+.tot{display:flex;align-items:baseline;gap:8px;padding:5px 0}
+.tot span{order:1}
+.tot::after{content:"";order:2;flex:1;border-bottom:2px dotted var(--line);transform:translateY(-4px)}
+.tot b{order:3}
+.tot b{font:900 19px/1.2 var(--sans);font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.tot span{font:700 15px var(--sans);color:var(--soft)}
 .tot.need b{color:var(--bad)}
 .projects{display:grid;gap:10px}
 .proj{border:2.5px solid var(--ink);border-radius:16px;padding:12px 14px;display:grid;gap:8px;background:var(--bg)}
@@ -103,6 +119,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .todo li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;padding:9px 0;border-top:2px dashed var(--line)}
 .todo li:first-child{border-top:0}
 .todo li::before{content:"";width:16px;height:16px;margin-top:2px;border:2.5px solid var(--ink);border-radius:5px;background:var(--panel)}
+.todo li.empty{display:block}
 .todo li.empty::before{display:none}
 .todo .from{font:600 11px var(--mono);color:var(--soft);display:block}
 .next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
@@ -139,16 +156,34 @@ ol,ul{margin:0;padding:0;list-style:none}
 .scrim{position:fixed;inset:0;background:rgba(20,14,10,.4);z-index:10}
 .sheet{position:fixed;z-index:11;display:grid;gap:14px;align-content:start;overflow-y:auto;
   left:10px;right:10px;bottom:10px;max-height:85%;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px))}
-@media (min-width:760px){.sheet{left:auto;right:16px;top:16px;bottom:16px;width:400px;max-height:none;padding:20px 22px}}
+@media (min-width:760px){.sheet{left:auto;right:16px;top:16px;bottom:auto;width:400px;max-height:calc(100% - 32px);padding:20px 22px}}
 .sheet h3{margin:0;font:900 21px/1.25 var(--sans)}
 .sheet .what{margin:2px 0 0;color:var(--soft);font-size:14px}
 .member{border-top:2px dashed var(--line);padding-top:12px;display:grid;gap:8px}
 .member .mh{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-weight:800}
 .member dl{margin:0;display:grid;gap:8px}
-.member dt{font:800 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.member dt{font:800 13px var(--sans);color:var(--soft)}
 .member dd{margin:2px 0 0}
 .close{justify-self:end}
 .stack{display:grid;gap:12px}
+/* New project notepad: a sheet of the yellow pad on the desk */
+.idea{display:grid;gap:10px}
+.idea label{font:800 14px var(--sans);color:var(--soft)}
+.idea textarea{font:600 16px/1.5 var(--sans);color:#2b2420;resize:vertical;min-height:7.5em;padding:10px 12px 10px 44px;border:2.5px solid var(--ink);border-radius:12px;
+  background:linear-gradient(90deg,transparent 30px,#e0645a 30px,#e0645a 32px,transparent 32px),repeating-linear-gradient(#fff3b8 0 23px,#c9d6ea 23px 24px) #fff3b8;background-attachment:local}
+.idea textarea::placeholder{color:#6f5f30}
+.idea .btn{min-height:44px}
+.idea .said.warn{color:var(--bad)}
+.idea textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.idea .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.idea .btn[disabled]{opacity:.55;cursor:default}
+.idea .said{font-weight:700;margin:0}
+.reqs li{display:grid;gap:2px;padding:9px 0;border-top:2px dashed var(--line)}
+.reqs li:first-child{border-top:0}
+.reqs .rt{font-weight:700;overflow-wrap:anywhere}
+.reqs .rs{font:600 12px var(--mono);color:var(--soft)}
+.reqs .rs.started{color:var(--accent)}
+.reqs .btn{justify-self:start;margin-top:4px}
 </style>
 
 <div class="app">
@@ -162,16 +197,20 @@ ol,ul{margin:0;padding:0;list-style:none}
     <div class="stage-msg" id="stage-msg" hidden>The 3D office didn't load here. Team, Plan and Company still work from the dock.</div>
   </div>
 
+  <div class="toast" id="toast" role="status" hidden></div>
   <div class="hud">
     <a class="card plate" href="#plan" style="text-decoration:none;color:inherit" aria-label="Open the plan">
-      <h1 id="title">Claude Setup</h1>
-      <div class="lvl"><span id="lvl-label">Plan</span><div class="bar" aria-hidden="true"><span id="lvl-bar" style="width:0%"></span></div><span class="pct" id="lvl-pct">0%</span></div>
-      <p class="greet"><span class="live-dot" id="dot"></span><span id="greet">Your team is here.</span></p>
+      <span class="lv-badge" id="lvl-label" aria-label="Level 1"><small aria-hidden="true">Lv</small><b id="lvl-num" aria-hidden="true">1</b></span>
+      <div class="pm">
+        <h1 id="title">Claude Setup</h1>
+        <div class="lvl"><div class="bar" aria-hidden="true"><span id="lvl-bar" style="width:0%"></span></div><span class="pct" id="lvl-pct">0 XP</span></div>
+        <p class="greet"><span class="live-dot" id="dot"></span><span id="greet">Your team is here.</span></p>
+      </div>
     </a>
     <div class="right">
-      <a class="card pill" href="#company" id="coins" aria-label="Money earned this month, all projects" hidden>
+      <a class="card pill" href="#company" id="coins" aria-label="Coins earned, one per euro" hidden>
         <svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="var(--coin)" stroke="var(--ink)" stroke-width="2.2"/><circle cx="12" cy="12" r="6" fill="none" stroke="var(--coin-ink)" stroke-width="1.6"/><path d="M14.2 9.6a3 3 0 1 0 0 4.8M8.6 11.2h4M8.6 12.9h4" fill="none" stroke="var(--coin-ink)" stroke-width="1.6" stroke-linecap="round"/></svg>
-        <span id="coin-val">0 €</span>
+        <span id="coin-val">0</span>
       </a>
       <a class="card pill bell" href="#todo" aria-label="Your to-dos">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
@@ -182,6 +221,8 @@ ol,ul{margin:0;padding:0;list-style:none}
 
   <section class="card page" data-page="company" aria-labelledby="company-h" hidden>
     <div><h2 id="company-h">Company</h2><p class="lead">Every project, what it earns and what it needs from you.</p></div>
+    <p class="lead" id="game-line">Level 1 · 0 XP · 0 coins</p>
+    <div class="acts"><button class="btn go" type="button" id="new-idea">Neues Projekt</button></div>
     <div class="totals">
       <div class="tot"><b id="t-month">0 €</b><span>This month</span></div>
       <div class="tot"><b id="t-all">0 €</b><span id="t-all-l">All time</span></div>
@@ -284,7 +325,57 @@ window.HQ = (() => {
   /* Artifact pages cannot fetch other sites (their network is blocked), so money is what each project's manager wrote into its row:
      revenueMonth and revenueTotal in euros, revenueMode 'test' while Stripe is in test mode, revenueAt when it was read. */
   const tagMoney = (project) => ({ ...project, testMoney: project.revenueMode === 'test' })
-  return { TABS, modeOf, pickTab, worldFor, deskNumbers, tagMoney, PET_OF, FRAMES, poseAt }
+  /* The game loop: level, XP and coins come only from real events (events/<id> { kind, project, at, amount? }), never from clicks.
+     A PR merged 50 XP, the 5/5 gate passed 20, a project launched 100, each euro earned 10 XP and 1 coin, each day visited 5. */
+  const XP_OF = { pr_merged: 50, gate_passed: 20, launched: 100, visit: 5 }, XP_PER_EURO = 10, XP_PER_LEVEL = 100
+  const euros = (e) => (e?.kind === 'euro' && Number.isFinite(e.amount) && e.amount > 0 ? e.amount : 0)
+  const xpOf = (e) => XP_OF[e?.kind] || Math.round(euros(e) * XP_PER_EURO) || 0
+  const levelStart = (level) => (level - 1) ** 2 * XP_PER_LEVEL
+  function scoreFrom(events) {
+    const seen = new Set()
+    const real = (Array.isArray(events) ? events : []).filter((e) => {
+      if (!e || typeof e !== 'object') return false
+      if (e.id == null) return true
+      if (seen.has(e.id)) return false
+      seen.add(e.id); return true
+    })
+    const xp = real.reduce((n, e) => n + xpOf(e), 0)
+    const level = Math.floor(Math.sqrt(xp / XP_PER_LEVEL)) + 1, from = levelStart(level), to = levelStart(level + 1)
+    return { xp, coins: Math.floor(real.reduce((n, e) => n + euros(e), 0)), level, from, to, pct: Math.round((100 * (xp - from)) / (to - from)) }
+  }
+  /* The small "+50 XP" toast for events that arrived while the page was open */
+  function toastFor(events) {
+    const xp = events.reduce((n, e) => n + xpOf(e), 0), coins = Math.floor(events.reduce((n, e) => n + euros(e), 0))
+    return xp ? `+${xp} XP${coins ? ` · +${coins} coin${coins === 1 ? '' : 's'}` : ''}` : ''
+  }
+  /* One visit event per Europe/Berlin day; the fixed id makes a second write the same row */
+  const visitEvent = (now = new Date()) => ({
+    id: `visit-${new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin' }).format(now)}`, kind: 'visit', project: 'hq', at: now.toISOString(),
+  })
+  /* New project tap: the notepad saves requests/<id> { text, at, status: 'new' }, then messages the coordinator session named in
+     config/coordinator (pm/now.session as a fallback). new = saved only, sent = the page reached the coordinator,
+     relayed = a thread passed it on, started = the brainstorm thread runs (link). */
+  const IDEA_MAX = 600
+  const SESSION_ID = /^(cse|session)_[A-Za-z0-9]{8,80}$/
+  const REQUEST_LINE = { new: 'gespeichert, Claude meldet sich', sent: 'an Claude geschickt', relayed: 'Claude hat es', started: 'Brainstorm läuft' }
+  function requestDoc(text, now = new Date(), rand = Math.random) {
+    const idea = String(text ?? '').replace(/\s+/g, ' ').trim().slice(0, IDEA_MAX)
+    if (!idea) return null
+    const tag = Math.floor(rand() * 36 ** 6).toString(36).padStart(6, '0')
+    return { id: `req-${now.toISOString().slice(0, 10)}-${tag}`, data: { text: idea, at: now.toISOString(), status: 'new' } }
+  }
+  const coordinatorOf = (config, pm) => [config?.session, pm?.session].find((s) => typeof s === 'string' && SESSION_ID.test(s)) || null
+  const requestMessage = (id, text) => `HQ request ${id}: ${text}\n\nFrom yskills' HQ New project tap. Start a brainstorm thread for this idea and put request id ${id} in its brief; that thread sets HQ's requests/${id} to started with its link. If a thread for ${id} already exists, ignore this.`
+  const toResend = (rows) => (Array.isArray(rows) ? rows : []).filter((r) => r && r.status === 'new' && typeof r.text === 'string' && r.text)
+  const requestLine = (r) => REQUEST_LINE[r?.status] || REQUEST_LINE.new
+  /* What the page tells yskills when the message could not go out; the request is saved either way */
+  function sendTrouble(code) {
+    if (code === 'no_session') return 'Gespeichert. Der nächste Thread gibt es weiter.'
+    if (code === 'not_in_manifest' || code === 'consent_required' || code === 'not_granted') return 'Gespeichert. Ohne Erlaubnis gibt der nächste Thread es weiter.'
+    if (code === 'needs_reauth' || code === 'server_not_connected' || code === 'selection_required') return 'Gespeichert. Claude Code Remote unter Einstellungen → Connectors verbinden.'
+    return 'Gespeichert, Claude meldet sich.'
+  }
+  return { TABS, modeOf, pickTab, worldFor, deskNumbers, tagMoney, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble }
 })()
 </script>
 <script id="team-art">
@@ -409,12 +500,22 @@ window.TEAM_ART = (() => {
       if (a === 'head') blob(HX + s * 7.5, HY - 6.5, 2.2, 2.2, armC, armS)
       if (L.armTip && a !== 'key' && a !== 'keyUp') { const y = a === 'side' ? BY + 2.6 : a === 'head' ? HY - 5 : BY - 5; rect(16 + s * (a === 'head' ? 7.5 : a === 'side' ? 6.4 : 8.6) - 0.5 + (a === 'head' ? P.hx : 0), y, 1, 1, L.armTip) }
     }
-    /* dark outline around the whole silhouette */
-    const sil = document.createElement('canvas'); sil.width = o.width; sil.height = o.height
-    const sc = sil.getContext('2d'); sc.drawImage(o, 0, 0); sc.globalCompositeOperation = 'source-in'; sc.fillStyle = INK; sc.fillRect(0, 0, sil.width, sil.height)
-    const k = cv.width / W
+    /* Selective outline, as hand-made pixel art does it: each outline pixel is a dark shade of the fur
+       it touches (lightest on top where the light comes from, darkest underneath), never flat black */
+    const img = c.getImageData(0, 0, o.width, o.height), px = img.data, out = new Uint8ClampedArray(px)
+    const at = (x, y) => (x < 0 || y < 0 || x >= o.width || y >= o.height ? -1 : (y * o.width + x) * 4)
+    for (let y = 0; y < o.height; y += S) for (let x = 0; x < o.width; x += S) {
+      if (px[at(x, y) + 3] > 40) continue
+      let best = null, k = 1
+      for (const [dx, dy, dk] of [[0, S, 0.62], [-S, 0, 0.5], [S, 0, 0.5], [0, -S, 0.34]]) {
+        const i = at(x + dx, y + dy); if (i >= 0 && px[i + 3] > 40 && (!best || dk < k)) { best = i; k = dk }
+      }
+      if (!best) continue
+      const ink = [43, 36, 32], mix = (ch) => Math.round(px[best + ch] * k * 0.55 + ink[ch] * (1 - k * 0.55))
+      for (let yy = y; yy < y + S; yy++) for (let xx = x; xx < x + S; xx++) { const j = at(xx, yy); out[j] = mix(0); out[j + 1] = mix(1); out[j + 2] = mix(2); out[j + 3] = 255 }
+    }
+    img.data.set(out); c.putImageData(img, 0, 0)
     g.imageSmoothingEnabled = false
-    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) g.drawImage(sil, dx * k, dy * k, cv.width, cv.height)
     g.drawImage(o, 0, 0, cv.width, cv.height)
   }
   return { W, H, LOOK, POSES, draw }
@@ -511,12 +612,81 @@ function openSheet(key, from) {
 }
 function closeSheet() {
   if ($('sheet').hidden) return
-  sheetFor = null; $('sheet').hidden = true; $('scrim').hidden = true
+  sheetFor = null; ideaOpen = false; $('sheet').hidden = true; $('scrim').hidden = true
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus()
 }
 $('sheet-close').addEventListener('click', closeSheet)
 $('scrim').addEventListener('click', closeSheet)
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet() })
+
+/* ---------- New project: one line on the notepad, one tap. The row is saved first, then the coordinator gets a message. ---------- */
+const CCR = 'Claude Code Remote'
+let hqDb = null, coordCfg = null, pmNow = null, requests = [], ideaOpen = false
+const sending = new Set()
+async function sendRequest(r) {
+  const to = HQ.coordinatorOf(coordCfg, pmNow)
+  if (!to) return 'no_session'
+  if (sending.has(r.id)) return 'ok'
+  sending.add(r.id)
+  try {
+    const mcp = await window.claude?.use?.('mcp')
+    if (!mcp) return 'not_granted'
+    await mcp.callTool(CCR, 'send_message', { session_id: to, message: HQ.requestMessage(r.id, r.text) })
+  } catch (e) { sending.delete(r.id); return e?.code || 'upstream_error' }
+  /* A thread may already have relayed or started it; only a row still 'new' becomes 'sent' */
+  const ref = hqDb.doc(`requests/${r.id}`)
+  await ref.get().then((d) => (d.exists && d.data().status === 'new' ? ref.update({ status: 'sent', sentAt: new Date().toISOString() }) : null)).catch(() => {})
+  return 'ok'
+}
+const agoDe = (iso) => {
+  const t = Date.parse(iso); if (!t) return ''
+  const m = Math.round((Date.now() - t) / 60000)
+  return m < 1 ? 'gerade eben' : m < 60 ? `vor ${m} Min.` : m < 1440 ? `vor ${Math.round(m / 60)} Std.` : new Date(t).toLocaleDateString('de-DE')
+}
+function renderRequests() {
+  room?.update()
+  if (!ideaOpen) return
+  const box = $('reqs'); if (!box) return
+  const shown = [...requests].sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 5)
+  list(box, shown, (r) => {
+    const li = el('li'); li.append(el('span', 'rt', r.text))
+    const st = el('span', `rs ${r.status === 'started' ? 'started' : ''}`, `${HQ.requestLine(r)} · ${agoDe(r.at)}`)
+    li.append(st)
+    if (r.status === 'started' && safeUrl(r.link)) li.append(link('Thread öffnen', r.link, 'btn'))
+    return li
+  }, 'Noch keine Ideen.')
+}
+function openIdea(from) {
+  sheetFor = null; lastFocus = from || document.activeElement; ideaOpen = true
+  $('sheet-name').textContent = 'Neues Projekt'
+  $('sheet-what').textContent = 'Eine Zeile reicht. Claude startet dazu ein Brainstorming im Projekt-Chat.'
+  const body = $('sheet-body'); body.replaceChildren()
+  const form = el('form', 'idea'); form.method = 'post'
+  const lab = el('label', null, 'Deine Idee'); lab.htmlFor = 'idea-text'
+  const ta = el('textarea'); ta.id = 'idea-text'; ta.maxLength = 600; ta.rows = 4; ta.placeholder = 'z. B. ein gemütliches Bauernhof-Spiel fürs Handy'
+  const row = el('div', 'row'), go = el('button', 'btn go', 'Abschicken'); go.type = 'submit'
+  const said = el('p', 'said'); said.setAttribute('role', 'status')
+  row.append(go); form.append(lab, ta, row, said)
+  if (!hqDb) { go.disabled = true; said.textContent = 'Bei claude.ai anmelden, dann geht es los.' }
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const r = HQ.requestDoc(ta.value); if (!r || !hqDb || go.disabled) return
+    go.disabled = true; said.classList.remove('warn'); said.textContent = 'Wird gespeichert…'
+    sending.add(r.id)
+    try { await hqDb.doc(`requests/${r.id}`).set(r.data) } catch { sending.delete(r.id); go.disabled = false; said.textContent = 'Konnte nicht speichern. Bitte nochmal tippen.'; return }
+    ta.value = ''; said.textContent = 'Gespeichert. Geht an Claude…'
+    sending.delete(r.id)
+    const res = await sendRequest({ id: r.id, ...r.data })
+    said.textContent = res === 'ok' ? 'Ist bei Claude. Das Brainstorming erscheint im Projekt-Chat.' : HQ.sendTrouble(res)
+    said.classList.toggle('warn', res !== 'ok')
+    go.disabled = false
+  })
+  const h = el('h3', null, 'Letzte Ideen'), reqs = el('ul', 'reqs'); reqs.id = 'reqs'
+  body.append(form, h, reqs)
+  $('sheet').hidden = false; $('scrim').hidden = false; ta.focus()
+  renderRequests()
+}
+$('new-idea').addEventListener('click', (e) => openIdea(e.currentTarget))
 
 let youCount = 0, level = { label: 'PLAN', name: 'No phases yet', pct: 0 }
 let updated = ''
@@ -561,15 +731,29 @@ function renderPhases(phases) {
   })
   const pct = total > 0 ? Math.round((100 * done) / total) : 0
   $('pct').textContent = `${pct}%`; $('pct-bar').style.width = `${pct}%`
-  $('lvl-pct').textContent = `${pct}%`; $('lvl-bar').style.width = `${pct}%`
   const cur = phases.findIndex((p) => p.state === 'active')
   const at = cur >= 0 ? cur : phases.findIndex((p) => p.state !== 'done')
   level = {
-    label: phases.length ? `LEVEL ${at >= 0 ? at + 1 : phases.length} OF ${phases.length}` : 'PLAN',
+    label: phases.length ? `Level ${at >= 0 ? at + 1 : phases.length} of ${phases.length}` : 'Plan',
     name: phases.length ? (at >= 0 ? phases[at].name : 'All levels cleared') : 'No phases yet', pct,
   }
-  $('lvl-label').textContent = phases.length ? `Lv ${at >= 0 ? at + 1 : phases.length}/${phases.length}` : 'Plan'
   office?.setWall(level, youCount); room?.update()
+}
+
+/* Game: level, XP and coins from the events collection only */
+let game = HQ.scoreFrom([])
+function renderGame(g) {
+  game = g
+  $('lvl-num').textContent = String(g.level); $('lvl-label').setAttribute('aria-label', `Level ${g.level}`); $('lvl-bar').style.width = `${g.pct}%`; $('lvl-pct').textContent = `${g.xp - g.from} / ${g.to - g.from} XP`
+  $('coins').hidden = false; $('coin-val').textContent = String(g.coins)
+  $('game-line').textContent = `Level ${g.level} · ${g.xp} XP · ${g.coins} coin${g.coins === 1 ? '' : 's'}`
+  room?.update()
+}
+let toastTimer
+function showToast(text) {
+  const t = $('toast'); if (!text) return
+  t.textContent = text; t.hidden = false; t.style.animation = 'none'; void t.offsetWidth; t.style.animation = ''
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true }, 3200)
 }
 
 const EUR = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
@@ -586,7 +770,6 @@ function renderProjects(rowsIn) {
   const needs = projects.flatMap((p) => (Array.isArray(p.you) ? p.you : []).map((y) => ({ ...y, from: p.name || p.id })))
   $('t-month').textContent = money(sum('revenueMonth')); $('t-all').textContent = money(sum('revenueTotal'))
   $('t-need').textContent = String(needs.length)
-  $('coins').hidden = !hasProjects; $('coin-val').textContent = money(sum('revenueMonth'))
   list($('all-you'), needs, (y) => { const li = el('li'), d = el('div'); d.append(el('span', 'from', y.from), link(y.what, y.link)); li.append(d); return li }, 'Nothing right now.')
   const box = $('projects'); box.replaceChildren()
   if (!hasProjects) box.append(el('p', 'empty', "Each project's manager adds its row here on day one."))
@@ -677,6 +860,7 @@ async function buildRoom() {
   put('plantSmall1', -0.6, 1.35, { s: 0.6, y: dt })
 
   put('rugRounded', -1.6, -0.9, { ry: Math.PI / 2 })
+  put('rugRounded', 0, 2.1, { s: 1.3 })
   put('loungeSofa', -2.75, -0.9, { ry: Math.PI / 2 })
   put('tableCoffee', -1.6, -0.9, { ry: Math.PI / 2, s: 0.9 })
   put('pottedPlant', -2.85, -2.85, { s: 1.2 }); put('pottedPlant', 2.85, -2.85, { s: 1.2 })
@@ -707,9 +891,9 @@ async function buildRoom() {
   })
   const lid = plane(ls.x * 0.84, ls.y * 0.78, screen.t, true)
   lid.position.set(0, dt + ls.y * 0.56, 1.1 - ls.z / 2 + 0.1); lid.rotation.x = -0.1; scene.add(lid)
-  spot(laptop, 'company', 'Projects & money', new T.Vector3(0, dt + ls.y + 0.08, 1.1 - ls.z / 2)); spot(lid, 'company')
+  spot(laptop, 'company', 'Projects & money', new T.Vector3(0, dt + ls.y * 0.92, 1.1 - ls.z / 2)); spot(lid, 'company')
 
-  const phone = new T.Group(); phone.position.set(0.42, dt + 0.008, 1.3); phone.rotation.y = -0.35
+  const phone = new T.Group(); phone.position.set(0.44, dt + 0.008, 1.14); phone.rotation.y = -0.35
   const body = new T.Mesh(new T.BoxGeometry(0.1, 0.014, 0.19), new T.MeshStandardMaterial({ color: '#2b2420', roughness: 0.4 })); body.castShadow = true; phone.add(body)
   const lock = face(160, 300, (g, w, h) => {
     g.fillStyle = '#16202e'; g.fillRect(0, 0, w, h)
@@ -721,7 +905,23 @@ async function buildRoom() {
     g.textAlign = 'left'
   })
   const glass = plane(0.088, 0.17, lock.t, true); glass.rotation.x = -Math.PI / 2; glass.position.y = 0.0075; phone.add(glass)
-  scene.add(phone); spot(phone, 'todo', 'To-dos', new T.Vector3(0.42, dt + 0.1, 1.3))
+  scene.add(phone); spot(phone, 'todo', 'To-dos', new T.Vector3(0.44, dt + 0.1, 1.14))
+
+  /* The yellow notepad: tap it to start a new project. Its page shows the newest request's state. */
+  const pad = new T.Group(); pad.position.set(-0.4, dt + 0.006, 0.98); pad.rotation.y = 0.22; pad.scale.setScalar(1.4)
+  const padBack = new T.Mesh(new T.BoxGeometry(0.17, 0.012, 0.23), new T.MeshStandardMaterial({ color: '#7a5636', roughness: 0.8 })); padBack.castShadow = true; pad.add(padBack)
+  const padFace = face(256, 346, (g, w, h) => {
+    g.fillStyle = '#fff3b8'; g.fillRect(0, 0, w, h)
+    g.strokeStyle = '#c9d6ea'; g.lineWidth = 2; for (let y = 96; y < h; y += 34) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke() }
+    g.strokeStyle = '#e0645a'; g.lineWidth = 3; g.beginPath(); g.moveTo(38, 0); g.lineTo(38, h); g.stroke()
+    g.fillStyle = '#c8402f'; g.fillRect(0, 0, w, 30)
+    g.fillStyle = ink; g.font = FONT(900, 30); g.fillText('Neues', 50, 86); g.fillText('Projekt', 50, 120)
+    g.fillStyle = teal; g.font = FONT(900, 40); g.fillText('+', 50, 186); g.font = FONT(800, 24); g.fillText('Idee', 80, 184)
+    const last = [...requests].sort((a, b) => String(b.at).localeCompare(String(a.at)))[0]
+    if (last) { g.fillStyle = '#7a6a5b'; g.font = FONT(800, 19); g.fillText(fit(g, HQ.requestLine(last), w - 60), 50, 254); g.fillStyle = ink; g.font = FONT(700, 18); g.fillText(fit(g, last.text, w - 60), 50, 288) }
+  })
+  const sheetP = plane(0.15, 0.21, padFace.t); sheetP.rotation.x = -Math.PI / 2; sheetP.position.y = 0.0065; pad.add(sheetP)
+  scene.add(pad); spot(pad, 'new', 'Neues Projekt', new T.Vector3(-0.4, dt + 0.12, 0.98))
 
   const frame = (w, h, x, y, z, tex) => {
     const g = new T.Group(); g.position.set(x, y, z)
@@ -733,6 +933,7 @@ async function buildRoom() {
     g.fillStyle = ink; g.font = FONT(900, 40); g.fillText('Plan', 30, 58)
     g.fillStyle = teal; g.font = FONT(800, 28); g.textAlign = 'right'; g.fillText(`${desk$.pct}%`, w - 30, 58); g.textAlign = 'left'
     g.fillStyle = '#e4d4bb'; g.fillRect(30, 76, w - 60, 14); g.fillStyle = teal; g.fillRect(30, 76, ((w - 60) * desk$.pct) / 100, 14)
+    g.fillStyle = '#7a6a5b'; g.font = FONT(900, 30); g.fillText(`Lv ${game.level} · ${game.xp} XP · ${game.coins} coins`, 30, 420)
     const ph = phasesData.slice(0, 6)
     if (!ph.length) { g.fillStyle = '#7a6a5b'; g.font = FONT(700, 24); g.fillText('No phases yet', 30, 140) }
     ph.forEach((p, i) => {
@@ -759,6 +960,22 @@ async function buildRoom() {
   })
   spot(frame(0.8, 1.02, 1.32, 1.6, -R + 0.07, chart.t), 'company', 'Money', new T.Vector3(1.32, 2.23, -R + 0.1))
 
+  /* What a real home office has above eye level: shelves with books and plants, a pendant lamp over the desk */
+  const solid = (geo, mat, x, y, z, parent = scene) => { const m = new T.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; parent.add(m); return m }
+  const wood = new T.MeshStandardMaterial({ color: '#c79a6b', roughness: 0.8 })
+  for (const x of [-1.38, 1.32]) {
+    const shelf = solid(new T.BoxGeometry(1.0, 0.05, 0.24), wood, x, 2.42, -R + 0.14)
+    for (const sx of [-0.3, 0.3]) solid(new T.BoxGeometry(0.04, 0.12, 0.2), wood, x + sx, 2.36, -R + 0.13)
+    put(x < 0 ? 'books' : 'plantSmall1', x - 0.24, -R + 0.15, { s: 0.75, y: 2.445 }); put(x < 0 ? 'plantSmall1' : 'books', x + 0.26, -R + 0.15, { s: 0.75, y: 2.445, ry: 0.4 })
+    shelf.receiveShadow = true
+  }
+  const shadeMat = new T.MeshStandardMaterial({ color: '#d9774b', roughness: 0.6, side: T.DoubleSide })
+  const pendant = new T.Group(); scene.add(pendant)
+  const cord = solid(new T.CylinderGeometry(0.008, 0.008, 0.46, 6), new T.MeshStandardMaterial({ color: '#2b2420' }), 0.8, 2.61, -0.4, pendant); cord.castShadow = false
+  const lampShade = solid(new T.CylinderGeometry(0.07, 0.24, 0.2, 24, 1, true), shadeMat, 0.8, 2.3, -0.4, pendant); lampShade.castShadow = false
+  const bulbGlow = new T.MeshBasicMaterial({ color: '#8a8070' })
+  solid(new T.SphereGeometry(0.055, 16, 12), bulbGlow, 0.8, 2.22, -0.4, pendant).castShadow = false
+
   const door = new T.Group(); door.position.set(0, 0, -R + 0.03)
   const slab = new T.Mesh(new T.BoxGeometry(0.98, 2.1, 0.06), new T.MeshStandardMaterial({ color: '#b07a4f', roughness: 0.7 })); slab.position.y = 1.05; slab.castShadow = true; door.add(slab)
   const knob = new T.Mesh(new T.SphereGeometry(0.04, 16, 12), new T.MeshStandardMaterial({ color: '#f2b630', metalness: 0.5, roughness: 0.3 })); knob.position.set(0.36, 1.0, 0.05); door.add(knob)
@@ -775,16 +992,17 @@ async function buildRoom() {
   const sun = new T.DirectionalLight(0xfff0dc, 0.8); sun.position.set(-9, 7, 1); sun.target.position.set(0, 0, 0); sun.castShadow = true
   sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006; Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 1, far: 25 }); scene.add(sun, sun.target)
   const lamp = new T.PointLight(0xffc27a, 0, 4, 2); lamp.position.set(-0.62, dt + 0.45, 0.86); scene.add(lamp)
-  const ceiling = new T.PointLight(0xffd9a0, 0, 9, 2); ceiling.position.set(0, 2.6, -0.5); scene.add(ceiling)
+  const ceiling = new T.PointLight(0xffd9a0, 0, 9, 2); ceiling.position.set(0.8, 2.1, -0.4); scene.add(ceiling)
   const LIGHT = { day: [0.7, 0.85, 0, 0.15], dusk: [0.5, 0.45, 0.9, 0.6], night: [0.22, 0.08, 1.3, 0.9] }
   function tick() {
     mode = HQ.modeOf(new Date().getHours()); const [h, s, l, c] = LIGHT[mode]
-    hemi.intensity = h; sun.intensity = s; sun.color.set(mode === 'dusk' ? 0xffa66b : 0xfff0dc); lamp.intensity = l; ceiling.intensity = c
+    hemi.intensity = h; sun.intensity = s; sun.color.set(mode === 'dusk' ? 0xffa66b : 0xfff0dc); lamp.intensity = l; ceiling.intensity = c; bulbGlow.color.set(c > 0.3 ? '#ffe2a0' : '#8a8070')
     sky.redraw(); lock.redraw()
   }
   tick(); setInterval(tick, 30000)
 
-  /* First person from the chair: wide screens see the whole wall, phones sit back a little and turn to look around */
+  /* First person from the chair: wide screens see the whole wall, phones sit back a little and turn to look around.
+     The pendant lamp hangs where each sees it: over the wall on wide screens, over the desk on phones. */
   function layout() {
     const w = stage.clientWidth, h = stage.clientHeight
     if (!w || !h) return
@@ -792,17 +1010,18 @@ async function buildRoom() {
     const tall = w / h < 0.8
     camera.fov = tall ? 74 : w / h < 1.3 ? 60 : 50
     camera.position.set(0, tall ? 1.75 : 1.5, tall ? 3.05 : 2.55)
-    const look = new T.Vector3(0, tall ? 0.75 : 1.15, -R).sub(camera.position).normalize().multiplyScalar(0.1)
+    const look = new T.Vector3(0, tall ? 1.05 : 1.0, -R).sub(camera.position).normalize().multiplyScalar(0.1)
     controls.target.copy(camera.position).add(look)
+    pendant.position.set(tall ? -0.8 : 0, 0, tall ? 1.3 : 0); ceiling.position.set(tall ? 0 : 0.8, 2.1, tall ? 0.9 : -0.4)
     camera.updateProjectionMatrix(); controls.update()
   }
   new ResizeObserver(layout).observe(stage); layout()
 
   /* Tags float over what you can tap; tapping a tag or the thing itself opens its page */
-  const tags = $('room-tags'), goTo = (go) => { location.hash = go === 'company' && !hasProjects ? 'plan' : go }
+  const tags = $('room-tags'), goTo = (go, from) => { if (go === 'new') return openIdea(from); location.hash = go === 'company' && !hasProjects ? 'plan' : go }
   for (const h of hot.filter((x) => x.tag)) {
     const b = el('button', 'tag'); b.type = 'button'; b.append(el('span', 'nm', h.tag))
-    b.addEventListener('click', () => goTo(h.go)); tags.append(b); h.el = b
+    b.addEventListener('click', () => goTo(h.go, b)); tags.append(b); h.el = b
   }
   const v = new T.Vector3()
   function placeTags() {
@@ -844,7 +1063,7 @@ async function buildRoom() {
     hotspots: () => hot.filter((x) => x.el).map((x) => ({ go: x.go, shown: !x.el.hidden })),
     update() {
       desk$ = HQ.deskNumbers({ projects: projectsData, you: youCount, phases: phasesData })
-      screen.redraw(); lock.redraw(); board.redraw(); chart.redraw(); sign.redraw()
+      screen.redraw(); lock.redraw(); board.redraw(); chart.redraw(); sign.redraw(); padFace.redraw()
     },
   }
 }
@@ -1042,14 +1261,14 @@ function buildOffice() {
   /* Whiteboard (level and progress), kanban board and the sticky note that counts what needs you */
   const board = canvasTex(1024, 512, (g, w, h, lv) => {
     g.fillStyle = '#fbfcfa'; g.fillRect(0, 0, w, h)
-    g.fillStyle = '#5d6a65'; g.font = '700 38px "IBM Plex Mono", monospace'; g.fillText(lv.label, 56, 92)
+    g.fillStyle = '#5d6a65'; g.font = '800 40px Nunito, ui-rounded, system-ui, sans-serif'; g.fillText(lv.label, 56, 92)
     g.fillStyle = '#17201d'; g.font = '900 66px "Nunito", sans-serif'
     const words = String(lv.name).split(' '); let line = '', y = 182
     for (const wd of words) { const t = line ? `${line} ${wd}` : wd; if (g.measureText(t).width > w - 112 && line) { g.fillText(line, 56, y); y += 76; line = wd } else line = t }
     g.fillText(line, 56, y)
     g.fillStyle = '#dbe1de'; g.fillRect(56, 400, w - 300, 34)
     g.fillStyle = '#0d6e5b'; g.fillRect(56, 400, (w - 300) * lv.pct / 100, 34)
-    g.fillStyle = '#17201d'; g.font = '700 64px "IBM Plex Mono", monospace'; g.fillText(`${lv.pct}%`, w - 220, 436)
+    g.fillStyle = '#17201d'; g.font = '800 64px Nunito, ui-rounded, system-ui, sans-serif'; g.fillText(`${lv.pct}%`, w - 220, 436)
   })
   box(4.4, 2.3, 0.08, '#8f9a96', 1.2, 3.0, BACK + 0.05)
   const wb = mesh(new T.PlaneGeometry(4.2, 2.1), new T.MeshBasicMaterial({ map: board.t }), 1.2, 3.0, BACK + 0.1)
@@ -1058,7 +1277,7 @@ function buildOffice() {
   for (let i = 0; i < 8; i++) { const n = box(0.28, 0.28, 0.02, ['#ffe58a', '#a8d8c8', '#f7b2a6', '#bcd2f2'][i % 4], -4.7 + (i % 4) * 0.62, 3.78 - Math.floor(i / 4) * 0.42, BACK + 0.08); n.rotation.z = ((i * 37) % 10 - 5) / 60 }
   const sticky = canvasTex(256, 256, (g, w, h, n) => {
     g.fillStyle = '#ffd84d'; g.fillRect(0, 0, w, h)
-    g.fillStyle = '#3d3200'; g.font = '700 120px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.fillText(String(n), w / 2, 140)
+    g.fillStyle = '#3d3200'; g.font = '800 120px Nunito, ui-rounded, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText(String(n), w / 2, 140)
     g.font = '800 34px "Nunito", sans-serif'; g.fillText(n === 1 ? 'needs you' : n ? 'need you' : 'all clear', w / 2, 206)
   })
   const note = mesh(new T.PlaneGeometry(1.0, 1.0), new T.MeshBasicMaterial({ map: sticky.t }), 4.1, 3.4, BACK + 0.1)
@@ -1073,7 +1292,7 @@ function buildOffice() {
   const TEX = {
     blocked: circle('#e0483c', '!'), waiting: circle('#f2b134', '?', '#2a1d00'), done: bubbleTex((g) => { g.fillStyle = '#2b2420'; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.fillStyle = '#3a9a5b'; g.beginPath(); g.arc(64, 64, 53, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 13; g.lineCap = g.lineJoin = 'round'; g.beginPath(); g.moveTo(38, 66); g.lineTo(56, 84); g.lineTo(90, 46); g.stroke() }),
     working: bubbleTex((g) => { g.fillStyle = '#fff'; g.strokeStyle = '#2b2420'; g.lineWidth = 7; g.beginPath(); if (g.roundRect) g.roundRect(8, 24, 112, 70, 26); else g.rect(8, 24, 112, 70); g.fill(); g.stroke(); g.fillStyle = '#0d6e5b'; for (const x of [36, 64, 92]) { g.beginPath(); g.arc(x, 59, 9, 0, 7); g.fill() } }),
-    z: bubbleTex((g) => { g.fillStyle = '#5a6a86'; g.font = '700 96px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('Z', 64, 68) }),
+    z: bubbleTex((g) => { g.fillStyle = '#5a6a86'; g.font = '800 96px Nunito, ui-rounded, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('Z', 64, 68) }),
   }
   const sprite = (tex, s) => { const sp = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })); sp.scale.set(s, s, s); return sp }
   const dogZ = sprite(TEX.z, 0.3); scene.add(dogZ)
@@ -1200,8 +1419,9 @@ function buildOffice() {
       const tg = tags[s.key], st = states[s.key] || 'off', n = counts[s.key] || 0
       const name = n > 1 ? `${s.name} ×${n}` : s.name
       if (tg.nm.textContent !== name) tg.nm.textContent = name
+      tg.t.setAttribute('aria-label', `${name}, ${st === 'off' ? 'off duty' : STATES[st]}`)
       const cls = `chip ${st}`; if (tg.chip.className !== cls) { tg.chip.className = cls; tg.chip.textContent = st === 'off' ? 'off duty' : STATES[st] }
-      seats[s.key].who.localToWorld(v.set(0, seats[s.key].h + 0.5, 0)).project(camera)
+      seats[s.key].who.localToWorld(v.set(0, seats[s.key].h - 0.05, 0)).project(camera)
       tg.t.style.left = `${((v.x + 1) / 2) * w}px`; tg.t.style.top = `${((1 - v.y) / 2) * h}px`
       tg.t.hidden = v.z > 1
     }
@@ -1233,12 +1453,16 @@ function buildOffice() {
     if (key !== hovered) { if (hovered) seats[hovered].ring.visible = false; hovered = key; if (key) seats[key].ring.visible = true }
   })
 
+  let wasTall = null
   function fit() {
     const w = stage.clientWidth, h = stage.clientHeight
     if (!w || !h) return
     renderer.setSize(w, h, false); camera.aspect = w / h
-    const dist = w / h < 0.8 ? 58 : w / h < 1.4 ? 40 : 30
-    const dir = camera.position.clone().sub(controls.target).normalize()
+    /* Phones look down the long side of the office, so the room fills the tall screen; turning is kept until the shape changes */
+    const tall = w / h < 0.8, dist = tall ? 47 : w / h < 1.4 ? 38 : 30
+    const dir = tall !== wasTall ? new T.Vector3().setFromSphericalCoords(1, 0.95, tall ? 0.95 : 0.58) : camera.position.clone().sub(controls.target).normalize()
+    if (tall !== wasTall) controls.target.set(tall ? 0.9 : -0.2, 0.6, tall ? 0.7 : 1.4)
+    wasTall = tall
     camera.position.copy(controls.target).addScaledVector(dir, dist)
     camera.updateProjectionMatrix(); controls.update()
   }
@@ -1301,7 +1525,7 @@ function buildOffice() {
         z.material.opacity = still ? 1 : Math.sin(k * Math.PI)
       })
       const bob = still ? 0 : s.state === 'blocked' || s.state === 'waiting' ? Math.abs(Math.sin(p * 2.4)) * 0.18 : Math.sin(p * 3) * 0.05
-      s.bubble.position.set(0.75, s.h + 0.35 + bob, 0)
+      s.bubble.position.set(0.3, s.h + 0.95 + bob, 0)
     }
     { const k = still ? 0.5 : (t * 0.3) % 1; dogZ.position.set(2.8 + k * 0.4, 0.75 + k * 0.7, 7.3); dogZ.material.opacity = still ? 1 : Math.sin(k * Math.PI) }
     if (!still && t - lastScreen > 0.45) { lastScreen = t; for (const s of Object.values(seats)) if (s.state === 'working') s.screenTex.redraw(1 + (Math.floor(t * 2) % 4)) }
@@ -1323,9 +1547,32 @@ renderTeam([])
   if (!db) { $('greet').textContent = 'Sign in to claude.ai to see live updates'; return }
   $('dot').classList.add('on')
   const fail = () => { $('dot').classList.remove('on'); $('greet').textContent = 'Live updates stopped; reload the page' }
-  db.doc('pm/now').onSnapshot((s) => renderPm(s.exists ? s.data() : null), fail)
+  hqDb = db
+  db.doc('pm/now').onSnapshot((s) => { pmNow = s.exists ? s.data() : null; renderPm(pmNow) }, fail)
+  /* New project requests: rows still 'new' are resent once per open, only when the viewer already allowed the connector (no prompt on load) */
+  let resent = false, reqsIn = false
+  const resend = async () => {
+    if (resent || !reqsIn || !HQ.coordinatorOf(coordCfg, pmNow)) return
+    resent = true
+    const perms = await window.claude?.use?.('permissions')
+    const ok = await perms?.state(`mcp:${CCR}`).catch(() => 'unavailable')
+    if (ok !== 'granted') return
+    for (const r of HQ.toResend(requests)) await sendRequest(r)
+  }
+  db.doc('config/coordinator').onSnapshot((s) => { coordCfg = s.exists ? s.data() : null; resend() }, () => {})
+  db.collection('requests').onSnapshot((s) => { requests = rows(s); renderRequests(); if (!reqsIn) { reqsIn = true; resend() } }, () => {})
   db.collection('team').onSnapshot((s) => renderTeam(rows(s)), fail)
   db.collection('phases').onSnapshot((s) => renderPhases(rows(s)), fail)
   db.collection('projects').onSnapshot((s) => renderProjects(rows(s)), fail)
+  /* Events: the first answer sets the score quietly (and writes today's visit once); later ones toast what they earned */
+  let known = null
+  db.collection('events').onSnapshot((s) => {
+    const all = rows(s)
+    if (known) showToast(HQ.toastFor(all.filter((e) => !known.has(e.id))))
+    known = new Set(all.map((e) => e.id))
+    renderGame(HQ.scoreFrom(all))
+    const visit = HQ.visitEvent()
+    if (!known.has(visit.id)) { known.add(visit.id); const { id, ...data } = visit; db.collection('events').doc(id).set(data).catch(() => known.delete(id)) }
+  }, fail)
 })()
 </script>

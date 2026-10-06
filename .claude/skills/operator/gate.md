@@ -42,25 +42,29 @@ gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
 - **5/5:** commit the evaluator's verdict into `features.json` (`passes`) on the PR branch, wait
   for check 1 on that commit (a commit touching only `features.json` doesn't restart checks 2-5),
   then post the table below as a PR comment. Then:
+  - **Pull main first.** If main moved since the branch was cut, merge main into the branch and
+    wait for CI again before merging: in the HQ run six slices edited one `dashboard.html`, and a
+    merge without the pull would have dropped the previous slice's work.
   - **Every PR**, launch and live money included: the gate thread merges it (squash). If
     Claude's auto mode refuses, it doesn't try another way: it asks yskills for the tap.
-  - **claude-setup PRs:** yskills merges with **Merge it** on the gate thread's card or GitHub's
-    Merge button.
-- **Last PR before launch:** head the table `hold: brief (c) first`; the operator sends brief (c),
-  and its ok is the merge.
+  - **claude-setup PRs:** the gate thread merges them too; only when Claude Code's safety check
+    blocks the merge does yskills tap **Merge it** on the card or GitHub's Merge button.
+- **Last PR before launch:** the operator posts brief (c) with the table; the gate merges at 5/5
+  (auto-run, launch included). Live keys yskills has not set yet stay a key card; the site goes
+  live without them.
 - **Less:** post the blocking findings as one PR review and stop. The builder fixes them; the next
   round re-runs the failed checks with fresh agents on the new head.
-- **2 failed rounds:** stop. Send one message to yskills: what the PR does, what is wrong in plain words (from
-  the last reports), and two or three ways forward as tap options.
+- **2 failed rounds:** send one message to yskills: what the PR does, what is wrong in plain words (from
+  the last reports), and two or three ways forward as tap options; under auto-run the recommended
+  option is taken at once and the card only lets yskills change course.
 
-**Important or hard PRs** always wait for yskills: auth, payments, database migrations, secrets,
-anything that can lose data or money, the last PR before launch, and any PR that needed a second
-gate round. At
-5/5 their table comes with three plain lines for yskills: what changes, what could break, how to
-undo it. claude-setup PRs always get yskills' full review and merge.
+**Important or hard PRs** (auth, payments, database migrations, secrets, anything that can lose
+data or money, the last PR before launch, any PR that needed a second gate round) merge at 5/5
+like every other under auto-run, but their table comes with three plain lines for yskills to read
+afterwards: what changed, what could break, how to undo it.
 
 ```
-Gate 5/5 (round <n>), ready to merge | hold: brief (c) first   [risky: auth | payments | migration | secrets]
+Gate 5/5 (round <n>), merging | launch: brief (c) below   [risky: auth | payments | migration | secrets]
 1 CI + Workers Builds .. pass  <run links>
 2 Evaluator ............ pass  <n>/<n> criteria
 3 Code review .......... pass

@@ -16,9 +16,19 @@ Sets the look before the first screen and checks every UI change so nothing look
   high quality, Blender-level or the current state of the art: before picking art, do one quick search
   for the best licence-clean option today (CC0/CC-BY packs, AI 3D generation with commercial rights,
   Mixamo-style animation) and say in the PR what was picked and why.
+- Game look, not dashboard (HQ polish, 2026-10-06): one rounded font, numbers in it too (no monospace),
+  sentence-case labels (no tracked uppercase micro-labels), status shown by things in the world (a
+  bubble, a pose, a badge) rather than text chips, totals as a ledger line rather than three stat tiles.
+- Pixel art: selective outlines (a dark shade of the fur each edge touches, lighter on top), never flat
+  black; nearest-neighbour scaling only.
+- Every view gets its own camera per screen shape: a tall phone looks down the room's long side and fills
+  the height; check with screenshots at a real 390 css px (`isMobile` without a viewport meta lays the page
+  out at 980 px and every phone finding is wrong).
 
 ## Lessons
 
 Added at the end of each project (operator step 9): date, project and its type, what to do differently. Newest last; merge duplicates.
 
 - 2026-10-06 (duo-test): yskills wanted it simple, Duolingo-like and good at full screen; the first pass was neither.
+- 2026-10-06 (Claude Setup HQ, game page): the first pass read as a dashboard (mono numbers, caps labels, status chips, stat tiles) and left phones half empty; a design-critic round on real 390 px shots caught it.
+- 2026-10-06 (Claude Setup HQ, team animals): yskills called the Kenney cube animals "not good" and the thread argued to keep them. A rejected look is final; the redo (hand-drawn pixel chibis) was what they wanted. Taste: cute cartoon or pixel, cozy, never a dashboard.

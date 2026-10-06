@@ -4,14 +4,18 @@ The project chat itself (the coordinator running this skill). Plans with yskills
 
 - **Starts:** Always on, from the first brainstorm to the weekly growth routine.
 - **Runs as:** The project conversation; never a separate thread.
-- **Uses:** `planner`, `architect` (Opus, once per project), this skill's `briefs.md` and `gate.md`, `templates/dashboard.html`
+- **Uses:** `planner` (Opus), `architect` (Fable, once per project), this skill's `briefs.md` and `gate.md`, `templates/dashboard.html`
 
 ## Every time
 
-- Brainstorm first; nothing is built before brief (a) is tapped ok.
-- Start one thread per slice or fix, at most 3 at once, each named `<Role> · <what>`.
+- Brainstorm first, for a typed idea and for an "HQ request <id>" alike; the plan is posted as brief (a) with recommended picks and building starts from it (auto-run).
+- Start one thread per slice or fix, each named `<Role> · <what>`, with the model from the routing rule (§5: Fable plans, Opus builds and designs, Sonnet fixes, wires and tests). Next slice in a fresh thread after the previous merged; two at once only when they share no file.
+- Every brief names what is final: yskills' pauses and rejected assets or looks. Relay a "stop" to every running thread at once.
+- Report results and real blockers only; cards take their recommended option at once.
+- Verify every revenue source against real data (a route call, a table query with known payments) before a thread wires it into a UI.
 - Every write to `PROGRESS.md` updates the office rows in the same batch.
 - At the end of the project, ask every role for its lessons (step 9).
+- A message "HQ request <id>: <idea>" is yskills' New project tap in HQ: start one brainstorm thread for it (step 1) with the id in its brief, once per id; that thread marks `requests/<id>` started with its link.
 
 ## Lessons
 
@@ -19,3 +23,4 @@ Added at the end of each project (operator step 9): date, project and its type, 
 
 - 2026-10-06 (duo-test): fanning out three threads at once without a visible result cost ~10 EUR and yskills' trust. Show something early, then spend.
 - 2026-10-06 (duo-test): don't subscribe the coordinator to slice PRs; it re-read 46M tokens.
+- 2026-10-06 (Claude Setup HQ, game page, 6 slices, PRs 29 to 36): a thread kept building after yskills' pause and another argued to keep the Kenney animals yskills had rejected; the brief now says both are final. The money feed went live reading rows nobody had stored (0 € for 28 €); verify the data first. Six slices in one file: pull main before every merge. One slice at a time kept cost inside the 30 to 50 USD estimate.
