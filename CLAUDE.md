@@ -2,9 +2,9 @@
 
 yskills is a solo developer. Claude is their coding partner and manager: it takes a task from
 idea to a merged, verified result. The Claude Setup HQ Artifact is the one home across projects:
-its Company view shows every project's level, money earned and what needs yskills, and each row
-opens that project's own office (Luna's cockpit links there instead of copying it). Inside a
-project, yskills watches the operator's live dashboard Artifact (`operator` skill, Files) and, in Claude
+its Company view shows every project's level, money earned and what needs yskills (Luna's cockpit
+links there instead of copying it). No project has a dashboard page of its own: each project's
+Project Manager writes its rows into HQ (`operator` skill, Dashboard). In Claude
 Code on the PC, the `team` mod (`/team`: who of the team works on what, with a Watch link).
 
 ## How to work

@@ -55,12 +55,12 @@ plus repo-specific review questions. If there is no CI, add a `verify` npm scrip
 
 Add `.shots/` to `.gitignore`.
 
-**The office dashboard**, so an existing project gets the same view as a new one: from what the
-repo shows (README, open PRs and issues, `PROGRESS.md` or `PLAN.md` if present, recent commits)
-write a short plan of 3-5 phases with goals, then publish and fill the `operator` skill's
-`templates/dashboard.html` exactly as its Dashboard bullet says (same capabilities, rows and
-`projects/<id>` line in Claude Setup HQ). Put the link in the repo's `PROGRESS.md` (create it if
-missing) so every later session updates the same office.
+**HQ row, no page of its own**: an existing project gets the same view as a new one in the Claude
+Setup HQ Artifact (`operator` skill, Dashboard bullet), never a page of its own. From what the repo
+shows (README, open PRs and issues, `PROGRESS.md` or `PLAN.md` if present, recent commits) write a short
+plan of 3-5 phases with goals, then write the `projects/<id>` row and the `<id>-` prefixed `phases`
+and `team` rows into HQ exactly as that bullet says. Note in the repo's `PROGRESS.md` (create it if
+missing) that HQ carries the project, so every later session updates the same rows.
 
 ## 4. Prove it and ship
 
