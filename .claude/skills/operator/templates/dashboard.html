@@ -2,184 +2,223 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Nunito:wght@500;600;700;800;900&display=swap">
 <style>
-/* Layout: a 3D office you can turn and tap. Nine desks, one per role; a teammate types while working and sleeps while idle. Plan: phases as levels. For you: what needs yskills. Projects: every project's own office. */
+/* A cozy office game. The office fills the screen; a HUD sits on top: level and coins up top, a dock below.
+   Company: every project, its money and what it needs from yskills. Plan: levels. Team: the nine roles. To-dos: what needs yskills. */
 :root{
-  --bg:#f5eee2;--panel:#fffaf1;--fg:#2b2420;--soft:#76685c;--line:#e6d9c5;
-  --accent:#2f7d6a;--accent-soft:#e0efe6;
-  --ok:#3a8a55;--warn:#b86e00;--bad:#c8402f;--idle:#9a8c7e;
-  --stage:#f1e3cf;--shadow:#e2d3bc;
+  --bg:#f3e8d6;--panel:#fffaf0;--fg:#2b2420;--soft:#7a6a5b;--line:#e4d4bb;--ink:#2b2420;
+  --accent:#2f7d6a;--accent-ink:#1d5a4b;--accent-soft:#dcefe5;
+  --ok:#3a8a55;--warn:#c97a00;--bad:#c8402f;--idle:#9a8c7e;--coin:#f2b630;--coin-ink:#8a5a00;
+  --stage:#f1e3cf;--shadow:#2b2420;
   --sans:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#1d1814;--panel:#28211b;--fg:#f3e9dc;--soft:#b3a493;--line:#3d3329;
-  --accent:#6cc4a6;--accent-soft:#1f3a31;--ok:#7bcf94;--warn:#f0b04a;--bad:#ff8a74;--idle:#8c7f71;
-  --stage:#2a2119;--shadow:#120e0b;color-scheme:dark}}
+  --bg:#1d1814;--panel:#2a221b;--fg:#f3e9dc;--soft:#b9aa98;--line:#463a2f;--ink:#0e0b09;
+  --accent:#6cc4a6;--accent-ink:#2e7a63;--accent-soft:#1f3a31;--ok:#7bcf94;--warn:#f0b04a;--bad:#ff8a74;--idle:#8c7f71;--coin:#f2b630;--coin-ink:#8a5a00;
+  --stage:#2a2119;--shadow:#0e0b09;color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#1d1814;--panel:#28211b;--fg:#f3e9dc;--soft:#b3a493;--line:#3d3329;
-  --accent:#6cc4a6;--accent-soft:#1f3a31;--ok:#7bcf94;--warn:#f0b04a;--bad:#ff8a74;--idle:#8c7f71;
-  --stage:#2a2119;--shadow:#120e0b;color-scheme:dark}
+  --bg:#1d1814;--panel:#2a221b;--fg:#f3e9dc;--soft:#b9aa98;--line:#463a2f;--ink:#0e0b09;
+  --accent:#6cc4a6;--accent-ink:#2e7a63;--accent-soft:#1f3a31;--ok:#7bcf94;--warn:#f0b04a;--bad:#ff8a74;--idle:#8c7f71;--coin:#f2b630;--coin-ink:#8a5a00;
+  --stage:#2a2119;--shadow:#0e0b09;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:var(--bg);color:var(--fg);font:500 15px/1.5 var(--sans)}
-.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:16px}
-header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px}
-h1{font-size:28px;font-weight:900;margin:0;letter-spacing:-.01em;text-wrap:balance}
-.greet{margin:2px 0 0;color:var(--soft);font-weight:600}
-h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:0 0 10px}
-.meta{font:12px/1.4 var(--mono);color:var(--soft)}
-.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--idle);margin-right:6px;vertical-align:1px}
-.live-dot.on{background:var(--ok)}
-.stack{display:grid;gap:12px}
-.top{display:grid;gap:16px;grid-template-columns:1fr;align-items:start}
-@media (min-width:880px){.top{grid-template-columns:3fr 2fr}}
-.panel{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:16px 18px;min-width:0;box-shadow:0 4px 0 var(--shadow)}
-.pm p{margin:0;max-width:68ch}
-.progress{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.big{font:600 34px/1 var(--mono);font-variant-numeric:tabular-nums}
-.bar{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
-.bar>span{display:block;height:100%;background:var(--accent)}
-ol,ul{margin:0;padding:0;list-style:none}
-.next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
-.next li::before{content:"";position:absolute;left:2px;top:14px;width:7px;height:7px;border:1.5px solid var(--accent);border-radius:50%}
-.you{border-color:var(--warn)}
-.you h2{color:var(--warn)}
-.you li{padding:8px 0;border-top:1px solid var(--line);font-weight:500}
-.you li:first-child,.next li:first-child{border-top:0}
-.empty{color:var(--soft);margin:0}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:600 15px/1.45 var(--sans);overflow:hidden}
 a{color:var(--accent);text-underline-offset:2px}
-.note{font-size:13px;color:var(--soft)}
-.btn{font:800 13px var(--sans);text-decoration:none;padding:7px 14px;border-radius:999px;border:2px solid var(--line);color:var(--fg);background:var(--panel);white-space:nowrap;cursor:pointer}
-.btn:hover{border-color:var(--accent)}
-.btn:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.btn.watch{background:var(--accent);border-color:var(--accent);color:var(--panel)}
-.chip{font:500 12px var(--mono);padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;background:var(--panel)}
-.chip.working,.chip.active{color:var(--accent);background:var(--accent-soft);border-color:transparent}
-.chip.blocked{color:var(--bad)}
-.chip.waiting{color:var(--warn)}
-.chip.idle,.chip.done,.chip.paused,.chip.off{color:var(--idle)}
-nav.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
-nav.tabs a{font-weight:800;text-decoration:none;color:var(--soft);padding:8px 16px;border-radius:999px;border:2px solid var(--line);background:var(--panel);box-shadow:0 3px 0 var(--shadow);white-space:nowrap}
-nav.tabs a:active{transform:translateY(2px);box-shadow:0 1px 0 var(--shadow)}
-nav.tabs a[aria-current="page"]{color:#fffaf1;background:var(--accent);border-color:var(--accent);box-shadow:0 3px 0 #1d5a4b}
-nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.count{font:12px var(--mono);margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--warn);color:var(--panel)}
-/* 3D office */
-.stage{position:relative;height:min(70vh,660px);min-height:400px;border-radius:20px;overflow:hidden;background:var(--stage);border:3px solid var(--line);box-shadow:0 6px 0 var(--shadow);touch-action:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.app{position:relative;height:100%}
+/* The office */
+.stage{position:absolute;inset:0;background:var(--stage);touch-action:none}
 .stage canvas{display:block;width:100%;height:100%;cursor:grab}
 .stage canvas.point{cursor:pointer}
 .labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .tag{all:unset;position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;display:grid;justify-items:center;gap:2px;transform:translate(-50%,-100%);white-space:nowrap}
-.tag .nm{font:800 12px/1.2 var(--sans);color:#2b2420;background:#fffaf1;padding:3px 9px;border-radius:999px;border:2px solid #2b2420}
+.tag .nm{font:800 12px/1.2 var(--sans);color:#2b2420;background:#fffaf0;padding:3px 9px;border-radius:999px;border:2px solid #2b2420}
 .tag .chip{font-size:11px;padding:0 6px}
 .tag:focus-visible .nm{outline:2px solid var(--accent)}
 .stage-msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--soft)}
-.hud{position:absolute;left:12px;top:12px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:none}
-.hud span{font:800 12px var(--sans);background:#fffaf1;color:#2b2420;padding:4px 10px;border-radius:999px;border:2px solid #2b2420}
-.roster{display:flex;flex-wrap:wrap;gap:6px}
-.seat{font:700 13px var(--sans);display:inline-flex;align-items:center;gap:8px;padding:5px 6px 5px 12px;border-radius:999px;border:2px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
-.seat .pet{font-weight:600;color:var(--soft)}
-.seat:hover{border-color:var(--accent)}
-.hint{font-size:13px;color:var(--soft);margin:0}
-/* Detail sheet */
-.scrim{position:fixed;inset:0;background:rgba(10,14,12,.45);z-index:10}
-.sheet{position:fixed;z-index:11;background:var(--panel);color:var(--fg);border:2px solid var(--line);display:grid;gap:14px;align-content:start;overflow-y:auto;
-  left:0;right:0;bottom:0;max-height:85%;border-radius:14px 14px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px))}
-@media (min-width:760px){.sheet{left:auto;top:0;width:410px;max-height:none;border-radius:0;padding:20px 22px}}
-.sheet h3{margin:0;font-size:20px;line-height:1.25}
-.sheet .what{margin:2px 0 0;color:var(--soft);font-size:14px}
-.member{border-top:1px solid var(--line);padding-top:12px;display:grid;gap:8px}
-.member .mh{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-weight:600}
-.member dl{margin:0;display:grid;gap:8px}
-.member dt{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
-.member dd{margin:2px 0 0}
+/* HUD: hard ink borders and offset shadows, like a sticker sheet */
+.hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 16px;pointer-events:none}
+.hud>*{pointer-events:auto}
+.card{background:var(--panel);border:2.5px solid var(--ink);border-radius:16px;box-shadow:0 4px 0 var(--shadow)}
+.plate{padding:10px 14px;min-width:0;max-width:min(360px,58vw);display:grid;gap:6px}
+.plate h1{font:900 19px/1.15 var(--sans);margin:0;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvl{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;font:800 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.lvl .bar{height:10px}
+.lvl .pct{font:600 12px var(--mono);color:var(--fg);font-variant-numeric:tabular-nums}
+.greet{font-size:13px;color:var(--soft);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--idle);margin-right:6px;vertical-align:1px}
+.live-dot.on{background:var(--ok)}
+.right{display:flex;gap:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:7px;height:42px;padding:0 14px 0 8px;border-radius:999px;cursor:pointer;text-decoration:none;color:var(--fg);font:900 15px var(--sans);font-variant-numeric:tabular-nums}
+.pill:active,.dock button:active,.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow)}
+.coin{width:24px;height:24px;flex:none}
+.bell{position:relative;width:42px;padding:0;justify-content:center}
+.badge{position:absolute;top:-7px;right:-7px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fffaf0;border:2px solid var(--ink);font:900 12px/18px var(--sans);text-align:center}
+.bar{flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden;border:1.5px solid var(--ink)}
+.bar>span{display:block;height:100%;background:var(--accent)}
+/* Dock */
+.dock{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:4px;padding:6px;border-radius:22px;z-index:6}
+.dock button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:1px;min-width:62px;padding:6px 8px 5px;border-radius:15px;font:800 11px var(--sans);color:var(--soft)}
+.dock svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dock button[aria-current="page"]{background:var(--accent);color:#fffaf0;box-shadow:inset 0 -3px 0 var(--accent-ink)}
+.dock button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.dock .dot{position:absolute;margin:-2px 0 0 18px;width:9px;height:9px;border-radius:50%;background:var(--bad);border:1.5px solid var(--ink)}
+/* Pages slide over the office: a side panel on wide screens, a sheet on phones */
+.page{position:absolute;z-index:5;overflow-y:auto;overscroll-behavior:contain;display:grid;gap:14px;align-content:start;
+  left:16px;top:122px;bottom:96px;width:min(460px,calc(100% - 32px));padding:18px 18px 22px}
+@media (max-width:640px){.page{left:10px;right:10px;width:auto;top:auto;max-height:calc(100% - 220px);bottom:86px;padding:16px}}
+.page h2{font:900 22px/1.2 var(--sans);margin:0;text-wrap:balance}
+.page h3{font:800 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:4px 0 0}
+.lead{margin:0;color:var(--soft);font-weight:600}
+.empty{color:var(--soft);margin:0;font-weight:600}
+ol,ul{margin:0;padding:0;list-style:none}
+.note{font-size:13px;color:var(--soft)}
+.btn{display:inline-block;font:900 13px var(--sans);text-decoration:none;padding:7px 14px;border-radius:999px;border:2.5px solid var(--ink);color:var(--fg);background:var(--panel);white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
+.btn.go{background:var(--accent);color:#fffaf0}
+.chip{font:600 12px var(--mono);padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;background:var(--panel)}
+.chip.working,.chip.active{color:var(--accent);background:var(--accent-soft);border-color:transparent}
+.chip.blocked{color:var(--bad)}
+.chip.waiting{color:var(--warn)}
+.chip.idle,.chip.done,.chip.paused,.chip.off{color:var(--idle)}
+/* Company */
+.totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tot{border:2px solid var(--line);border-radius:14px;padding:8px 10px;display:grid;gap:0}
+.tot b{font:800 20px/1.2 var(--mono);font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.tot span{font:800 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.tot.need b{color:var(--bad)}
+.projects{display:grid;gap:10px}
+.proj{border:2.5px solid var(--ink);border-radius:16px;padding:12px 14px;display:grid;gap:8px;background:var(--bg)}
+.proj.here{background:var(--accent-soft)}
+.pn{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.pn b{font:900 17px var(--sans)}
+.pstats{display:flex;flex-wrap:wrap;gap:4px 14px;font:600 12px var(--mono);color:var(--soft);font-variant-numeric:tabular-nums}
+.pstats .need{color:var(--bad)}
+.pbar{display:flex;align-items:center;gap:10px}
+.pbar .num{font:600 12px var(--mono);width:3.2em;text-align:right;font-variant-numeric:tabular-nums}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
-.close{justify-self:end;background:none;border:0;color:var(--soft);font:500 14px var(--sans);cursor:pointer;padding:4px 6px}
-/* Phases */
-.phases{display:grid;gap:0}
-.phase{display:grid;grid-template-columns:28px minmax(0,1fr);gap:0 12px;padding-bottom:18px;position:relative}
-.phase::before{content:"";position:absolute;left:13px;top:26px;bottom:0;width:2px;background:var(--line)}
+.todo li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;padding:9px 0;border-top:2px dashed var(--line)}
+.todo li:first-child{border-top:0}
+.todo li::before{content:"";width:16px;height:16px;margin-top:2px;border:2.5px solid var(--ink);border-radius:5px;background:var(--panel)}
+.todo li.empty::before{display:none}
+.todo .from{font:600 11px var(--mono);color:var(--soft);display:block}
+.next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
+.next li:first-child{border-top:0}
+.next li::before{content:"";position:absolute;left:2px;top:14px;width:7px;height:7px;border:2px solid var(--accent);border-radius:50%}
+/* Plan */
+.big{font:600 30px/1 var(--mono);font-variant-numeric:tabular-nums}
+.progress{display:flex;align-items:center;gap:12px}
+.phases{display:grid}
+.phase{display:grid;grid-template-columns:30px minmax(0,1fr);gap:0 12px;padding-bottom:16px;position:relative}
+.phase::before{content:"";position:absolute;left:14px;top:28px;bottom:0;width:2px;background:var(--line)}
 .phase:last-child::before{display:none}
-.mark{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:var(--panel);display:grid;place-items:center;font:600 12px var(--mono);color:var(--soft)}
-.phase.done .mark{background:var(--ok);border-color:var(--ok);color:var(--panel)}
-.phase.active .mark{border-color:var(--accent);color:var(--accent)}
-.ph-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding-top:3px}
-.ph-name{font-weight:700;font-size:17px}
+.mark{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--ink);background:var(--panel);display:grid;place-items:center;font:700 12px var(--mono);color:var(--soft)}
+.phase.done .mark{background:var(--ok);color:#fffaf0}
+.phase.active .mark{background:var(--coin);color:var(--ink)}
+.ph-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding-top:4px}
+.ph-name{font-weight:900;font-size:16px}
 .phase.next .ph-name{color:var(--soft)}
-.goals{display:grid;gap:10px;margin-top:10px}
-.goal{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:4px 12px}
+.meta{font:12px/1.4 var(--mono);color:var(--soft)}
+.goals{display:grid;gap:10px;margin-top:8px}
+.goal{display:grid;grid-template-columns:minmax(0,1fr) 54px;gap:4px 12px}
 .goal .num{font:12px var(--mono);color:var(--soft);text-align:right;font-variant-numeric:tabular-nums}
-.goal .bar{grid-column:1/-1;flex:none;height:6px}
+.goal .bar{grid-column:1/-1;flex:none;height:8px}
 .phase.done .goal .bar>span{background:var(--ok)}
-/* Projects */
-.projects{display:grid;gap:0}
-.proj{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
-.proj:first-child{border-top:0}
-.proj .pn{font-weight:700;font-size:17px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
-.proj .here{font:12px var(--mono);color:var(--accent)}
-.proj .pbar{display:flex;align-items:center;gap:10px;margin-top:6px;max-width:560px}
-.proj .pbar .num{font:12px var(--mono);color:var(--soft);font-variant-numeric:tabular-nums;width:3.5em;text-align:right}
-.proj .acts{justify-content:flex-end}
-@media (max-width:620px){.proj{grid-template-columns:1fr}.proj .acts{justify-content:flex-start}}
+/* Team */
+.roster{display:grid;gap:6px}
+.seat{all:unset;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 10px;padding:9px 12px;border-radius:14px;border:2px solid var(--line);background:var(--bg)}
+.seat:hover{border-color:var(--ink)}
+.seat:focus-visible{outline:3px solid var(--accent)}
+.seat b{font-weight:900}
+.seat .pet{grid-column:1;font-size:13px;color:var(--soft);font-weight:600}
+.seat .chip{grid-row:1/3;grid-column:2}
+/* Teammate sheet */
+.scrim{position:fixed;inset:0;background:rgba(20,14,10,.4);z-index:10}
+.sheet{position:fixed;z-index:11;display:grid;gap:14px;align-content:start;overflow-y:auto;
+  left:10px;right:10px;bottom:10px;max-height:85%;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:760px){.sheet{left:auto;right:16px;top:16px;bottom:16px;width:400px;max-height:none;padding:20px 22px}}
+.sheet h3{margin:0;font:900 21px/1.25 var(--sans)}
+.sheet .what{margin:2px 0 0;color:var(--soft);font-size:14px}
+.member{border-top:2px dashed var(--line);padding-top:12px;display:grid;gap:8px}
+.member .mh{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-weight:800}
+.member dl{margin:0;display:grid;gap:8px}
+.member dt{font:800 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.member dd{margin:2px 0 0}
+.close{justify-self:end}
+.stack{display:grid;gap:12px}
 </style>
 
-<div class="wrap">
-  <header>
-    <div><h1 id="title">Claude Setup</h1><p class="greet" id="greet">Your team is here.</p></div>
-    <span class="meta"><span class="live-dot" id="dot"></span><span id="updated">Waiting for the project manager's first update</span></span>
-  </header>
-  <nav class="tabs" aria-label="Pages">
-    <a href="#office" data-tab="office">Office</a>
-    <a href="#plan" data-tab="plan">Plan</a>
-    <a href="#you" data-tab="you">For you<span class="count" id="you-count" hidden></span></a>
-    <a href="#projects" data-tab="projects" id="projects-tab" hidden>Projects</a>
-  </nav>
+<div class="app">
+  <div class="stage" id="stage">
+    <canvas id="c" aria-label="3D office: the team at their desks"></canvas>
+    <div class="labels" id="labels"></div>
+    <div class="stage-msg" id="stage-msg" hidden>The 3D office didn't load here. Team, Plan and Company still work from the dock.</div>
+  </div>
 
-  <section data-page="office" class="stack" aria-label="Office">
-    <div class="stage" id="stage">
-      <canvas id="c" aria-label="3D office: the team at their desks"></canvas>
-      <div class="labels" id="labels"></div>
-      <div class="hud" id="hud"></div>
-      <div class="stage-msg" id="stage-msg" hidden>The 3D office didn't load here. The team list below still works.</div>
+  <div class="hud">
+    <a class="card plate" href="#plan" style="text-decoration:none;color:inherit" aria-label="Open the plan">
+      <h1 id="title">Claude Setup</h1>
+      <div class="lvl"><span id="lvl-label">Plan</span><div class="bar" aria-hidden="true"><span id="lvl-bar" style="width:0%"></span></div><span class="pct" id="lvl-pct">0%</span></div>
+      <p class="greet"><span class="live-dot" id="dot"></span><span id="greet">Your team is here.</span></p>
+    </a>
+    <div class="right">
+      <a class="card pill" href="#company" id="coins" aria-label="Money earned this month, all projects" hidden>
+        <svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="var(--coin)" stroke="var(--ink)" stroke-width="2.2"/><circle cx="12" cy="12" r="6" fill="none" stroke="var(--coin-ink)" stroke-width="1.6"/><path d="M14.2 9.6a3 3 0 1 0 0 4.8M8.6 11.2h4M8.6 12.9h4" fill="none" stroke="var(--coin-ink)" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span id="coin-val">0 €</span>
+      </a>
+      <a class="card pill bell" href="#todo" aria-label="Your to-dos">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
+        <span class="badge" id="you-count" hidden>0</span>
+      </a>
     </div>
+  </div>
+
+  <section class="card page" data-page="company" aria-labelledby="company-h" hidden>
+    <div><h2 id="company-h">Company</h2><p class="lead">Every project, what it earns and what it needs from you.</p></div>
+    <div class="totals">
+      <div class="tot"><b id="t-month">0 €</b><span>This month</span></div>
+      <div class="tot"><b id="t-all">0 €</b><span>All time</span></div>
+      <div class="tot need"><b id="t-need">0</b><span>Need you</span></div>
+    </div>
+    <h3>Projects</h3>
+    <div class="projects" id="projects"><p class="empty">Each project's manager adds its row here on day one.</p></div>
+    <h3>Needs you, all projects</h3>
+    <ul class="todo" id="all-you"><li class="empty">Nothing right now.</li></ul>
+  </section>
+
+  <section class="card page" data-page="plan" aria-labelledby="plan-h" hidden>
+    <div><h2 id="plan-h">Plan</h2><p class="lead" id="summary">The project manager writes here what the team is doing.</p></div>
+    <div class="progress"><span class="big" id="pct">0%</span><div class="bar" aria-hidden="true"><span id="pct-bar" style="width:0%"></span></div></div>
+    <div class="phases" id="phases"><p class="empty">The project manager's levels and their goals appear here.</p></div>
+    <h3>Next steps</h3>
+    <ol class="next" id="next"><li class="empty">None yet.</li></ol>
+  </section>
+
+  <section class="card page" data-page="team" aria-labelledby="team-h" hidden>
+    <div><h2 id="team-h">Team</h2><p class="lead">Typing means working, Z is asleep, a red ! is blocked, a ? waits on you. Tap anyone, in here or in the office.</p></div>
     <div class="roster" id="roster"></div>
-    <p class="hint">Drag to turn the office, pinch or scroll to zoom, tap someone to see their work. Typing means working, Z means asleep, a red ! is blocked, a ? waits on you. Tap the whiteboard for the plan, the sticky note for your to-dos.</p>
   </section>
 
-  <section data-page="plan" class="stack" aria-label="Plan" hidden>
-    <div class="panel pm">
-      <h2>Project manager</h2>
-      <div class="progress"><span class="big" id="pct">0%</span><div class="bar" aria-hidden="true"><span id="pct-bar" style="width:0%"></span></div></div>
-      <p id="summary">Claude writes here what the team is doing. It fills in as soon as the first update arrives.</p>
-    </div>
-    <div class="panel">
-      <h2>Levels</h2>
-      <div class="phases" id="phases"><p class="empty">The project manager's phases and their goals appear here.</p></div>
-    </div>
+  <section class="card page" data-page="todo" aria-labelledby="todo-h" hidden>
+    <div><h2 id="todo-h">Your to-dos</h2><p class="lead">Only the things the team can't do without you.</p></div>
+    <ul class="todo" id="you"><li class="empty">Nothing right now.</li></ul>
+    <h3>Live links</h3>
+    <ul id="live" class="stack" style="gap:6px"><li class="empty">Nothing deployed yet.</li></ul>
   </section>
 
-  <section data-page="you" class="top" aria-label="For you" hidden>
-    <div class="panel you">
-      <h2>Needs you</h2>
-      <ul id="you"><li class="empty" style="font-weight:400">Nothing right now.</li></ul>
-    </div>
-    <div class="panel">
-      <h2>Next steps</h2>
-      <ol class="next" id="next"><li class="empty">None yet.</li></ol>
-      <h2 style="margin-top:16px">Live links</h2>
-      <ul id="live"><li class="empty">Nothing deployed yet.</li></ul>
-    </div>
-  </section>
-
-  <section data-page="projects" class="panel" aria-labelledby="projects-h" hidden>
-    <h2 id="projects-h">All projects</h2>
-    <div class="projects" id="projects"></div>
-  </section>
+  <nav class="card dock" aria-label="Pages">
+    <button type="button" data-tab="company" id="company-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V8l5-3v16M10 21V5l9 4v12M13 11h3M13 15h3"/></svg>Company</button>
+    <button type="button" data-tab="office"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7M5 9.5V20h14V9.5M9.5 20v-5h5v5"/></svg>Office</button>
+    <button type="button" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Plan</button>
+    <button type="button" data-tab="team"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M15 14.6c2.6-.3 4.6 1.2 5.2 4.4"/></svg>Team</button>
+    <button type="button" data-tab="todo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3.5h6v3H9zM8.5 12l2 2 4-4"/></svg>To-dos<span class="dot" id="todo-dot" hidden></span></button>
+  </nav>
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
-<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-name" hidden>
-  <button class="close" id="sheet-close" type="button">Close</button>
+<aside class="card sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-name" hidden>
+  <button class="btn close" id="sheet-close" type="button">Close</button>
   <div><h3 id="sheet-name"></h3><p class="what" id="sheet-what"></p></div>
   <div id="sheet-body" class="stack"></div>
 </aside>
@@ -207,15 +246,15 @@ const ago = (iso) => {
 
 /* The nine roles, one desk each. A team row lands on the desk its role word names. */
 const SEATS = [
-  { key: 'researcher', name: 'Researcher', what: 'Market, competitors, tools and APIs, before the plan.', off: 'Starts with the brainstorm.', at: [-4.9, -0.9], re: /research/i },
-  { key: 'pm', name: 'Project Manager', what: 'The project chat: plans with you, starts the others, keeps this office current.', off: 'Waits for your next idea.', at: [-6.0, -5.0], re: /project.?manager|manager|coordinat|operator|\bpm\b|lead/i },
-  { key: 'designer', name: 'Designer', what: 'Sets the look and checks every screenshot so nothing looks AI-made.', off: 'Starts once you OK the plan.', at: [-1.6, -2.7], re: /design/i },
-  { key: 'programmer', name: 'Programmer', what: 'Builds one slice or fix, opens the PR, keeps CI green. Up to three at once.', off: 'Starts once you OK the plan.', at: [1.9, -2.5], re: /program|develop|builder|engineer/i },
-  { key: 'tester', name: 'Tester', what: 'Clicks the preview and grades it against the goals. Never built what it tests.', off: 'Starts when a PR is up.', at: [-5.6, 2.9], re: /test|evaluat|qa\b|gate/i },
-  { key: 'reviewer', name: 'Reviewer', what: 'Reads the code diff for bugs and mess.', off: 'Starts when a PR is up.', at: [-2.2, 1.0], re: /review/i },
-  { key: 'security', name: 'Security', what: 'Security review and red team on login, payments and user input.', off: 'Starts on PRs that touch login, money or input.', at: [1.4, 1.2], re: /secur|red.?team/i },
-  { key: 'legal', name: 'Legal', what: 'Impressum, DSGVO, shop wording, before launch.', off: 'Starts before launch.', at: [4.6, -0.6], re: /legal|law|recht/i },
-  { key: 'marketer', name: 'Marketer', what: 'Launch, posts and weekly growth.', off: 'Starts at launch.', at: [5.0, 2.4], re: /market|growth|social|launch/i },
+  { key: 'researcher', name: 'Researcher', what: 'Market, competitors, tools and APIs, before the plan.', off: 'Starts with the brainstorm.', at: [-3.8, -2.6], re: /research/i },
+  { key: 'pm', name: 'Project Manager', what: 'The project chat: plans with you, starts the others, keeps this office current.', off: 'Waits for your next idea.', at: [-8.5, -6.6], re: /project.?manager|manager|coordinat|operator|\bpm\b|lead/i },
+  { key: 'designer', name: 'Designer', what: 'Sets the look and checks every screenshot so nothing looks AI-made.', off: 'Starts once you OK the plan.', at: [-0.6, -3.4], re: /design/i },
+  { key: 'programmer', name: 'Programmer', what: 'Builds one slice or fix, opens the PR, keeps CI green. Up to three at once.', off: 'Starts once you OK the plan.', at: [2.8, -2.8], re: /program|develop|builder|engineer/i },
+  { key: 'tester', name: 'Tester', what: 'Clicks the preview and grades it against the goals. Never built what it tests.', off: 'Starts when a PR is up.', at: [-4.2, 1.2], re: /test|evaluat|qa\b|gate/i },
+  { key: 'reviewer', name: 'Reviewer', what: 'Reads the code diff for bugs and mess.', off: 'Starts when a PR is up.', at: [-1.0, 0.2], re: /review/i },
+  { key: 'security', name: 'Security', what: 'Security review and red team on login, payments and user input.', off: 'Starts on PRs that touch login, money or input.', at: [2.2, 0.6], re: /secur|red.?team/i },
+  { key: 'legal', name: 'Legal', what: 'Impressum, DSGVO, shop wording, before launch.', off: 'Starts before launch.', at: [5.6, -0.6], re: /legal|law|recht/i },
+  { key: 'marketer', name: 'Marketer', what: 'Launch, posts and weekly growth.', off: 'Starts at launch.', at: [5.0, 3.0], re: /market|growth|social|launch/i },
 ]
 const PET = { pm: 'Bear', researcher: 'Owl', designer: 'Cat', programmer: 'Raccoon', tester: 'Rabbit', reviewer: 'Penguin', security: 'Dog', legal: 'Fox', marketer: 'Panda' }
 const ORDER = ['security', 'legal', 'designer', 'researcher', 'reviewer', 'tester', 'marketer', 'pm', 'programmer']
@@ -238,12 +277,10 @@ function renderTeam(members) {
     const st = seatState(s.key), n = team.filter((m) => m.seat === s.key).length
     tally[st] = (tally[st] || 0) + 1
     const b = el('button', 'seat'); b.type = 'button'
-    b.append(el('span', null, n > 1 ? `${s.name} ×${n}` : s.name), el('span', 'pet', PET[s.key]), el('span', `chip ${st}`, st === 'off' ? 'off duty' : STATES[st]))
+    b.append(el('b', null, n > 1 ? `${s.name} ×${n}` : s.name), el('span', `chip ${st}`, st === 'off' ? 'off duty' : STATES[st]), el('span', 'pet', `${PET[s.key]} · ${s.what}`))
     b.addEventListener('click', () => openSheet(s.key, b))
     roster.append(b)
   }
-  const hud = $('hud'); hud.replaceChildren()
-  for (const [k, label] of [['working', 'working'], ['blocked', 'blocked'], ['waiting', 'wait on you']]) if (tally[k]) hud.append(el('span', null, `${tally[k]} ${label}`))
   office?.setStates(Object.fromEntries(SEATS.map((s) => [s.key, seatState(s.key)])), Object.fromEntries(SEATS.map((s) => [s.key, team.filter((m) => m.seat === s.key).length])))
   if (sheetFor) fillSheet(sheetFor)
   window.onDaytime?.(document.documentElement.dataset.daytime || 'day')
@@ -287,18 +324,20 @@ $('scrim').addEventListener('click', closeSheet)
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet() })
 
 let youCount = 0, level = { label: 'PLAN', name: 'No phases yet', pct: 0 }
+let updated = ''
 function renderPm(d) {
   if (!d) return
   $('title').textContent = d.project || 'Project'
   document.title = `${d.project || 'Project'} HQ`
-  $('updated').textContent = d.updated ? `Updated ${ago(d.updated)}` : 'Live'
+  updated = d.updated ? ago(d.updated) : ''
   youCount = (d.you || []).length
-  $('you-count').hidden = youCount === 0; $('you-count').textContent = String(youCount)
+  $('you-count').hidden = $('todo-dot').hidden = youCount === 0; $('you-count').textContent = String(youCount)
   $('summary').textContent = d.summary || ''
   list($('next'), d.next || [], (s) => el('li', null, s), 'None yet.')
   list($('you'), d.you || [], (y) => { const li = el('li'); li.append(link(y.what, y.link)); return li }, 'Nothing right now.')
-  list($('live'), d.live || [], (l) => { const li = el('li'); li.style.padding = '4px 0'; li.append(link(l.name, l.url)); if (l.note) li.append(el('span', 'note', ` · ${l.note}`)); return li }, 'Nothing deployed yet.')
+  list($('live'), d.live || [], (l) => { const li = el('li'); li.append(link(l.name, l.url)); if (l.note) li.append(el('span', 'note', ` · ${l.note}`)); return li }, 'Nothing deployed yet.')
   office?.setWall(level, youCount)
+  window.onDaytime?.(document.documentElement.dataset.daytime || 'day')
 }
 
 function renderPhases(phases) {
@@ -326,47 +365,65 @@ function renderPhases(phases) {
   })
   const pct = total > 0 ? Math.round((100 * done) / total) : 0
   $('pct').textContent = `${pct}%`; $('pct-bar').style.width = `${pct}%`
+  $('lvl-pct').textContent = `${pct}%`; $('lvl-bar').style.width = `${pct}%`
   const cur = phases.findIndex((p) => p.state === 'active')
   const at = cur >= 0 ? cur : phases.findIndex((p) => p.state !== 'done')
   level = {
     label: phases.length ? `LEVEL ${at >= 0 ? at + 1 : phases.length} OF ${phases.length}` : 'PLAN',
     name: phases.length ? (at >= 0 ? phases[at].name : 'All levels cleared') : 'No phases yet', pct,
   }
+  $('lvl-label').textContent = phases.length ? `Lv ${at >= 0 ? at + 1 : phases.length}/${phases.length}` : 'Plan'
   office?.setWall(level, youCount)
 }
 
+const EUR = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+const money = (v) => EUR.format(Math.max(0, Number(v) || 0))
+let hasProjects = false
 function renderProjects(projects) {
-  $('projects-tab').hidden = projects.length === 0
+  hasProjects = projects.length > 0
+  $('company-tab').hidden = !hasProjects
   projects.sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+  const sum = (k) => projects.reduce((n, p) => n + Math.max(0, Number(p[k]) || 0), 0)
+  const needs = projects.flatMap((p) => (Array.isArray(p.you) ? p.you : []).map((y) => ({ ...y, from: p.name || p.id })))
+  $('t-month').textContent = money(sum('revenueMonth')); $('t-all').textContent = money(sum('revenueTotal'))
+  $('t-need').textContent = String(needs.length)
+  $('coins').hidden = !hasProjects; $('coin-val').textContent = money(sum('revenueMonth'))
+  list($('all-you'), needs, (y) => { const li = el('li'), d = el('div'); d.append(el('span', 'from', y.from), link(y.what, y.link)); li.append(d); return li }, 'Nothing right now.')
   const box = $('projects'); box.replaceChildren()
+  if (!hasProjects) box.append(el('p', 'empty', "Each project's manager adds its row here on day one."))
   for (const p of projects) {
-    const row = el('div', 'proj'), info = el('div')
-    const pn = el('div', 'pn'); pn.append(el('span', null, p.name || p.id))
+    const row = el('div', p.here ? 'proj here' : 'proj')
     const st = ['active', 'paused', 'done'].includes(p.state) ? p.state : 'paused'
-    pn.append(el('span', `chip ${st}`, st))
-    if (p.here) pn.append(el('span', 'here', 'you are here'))
-    info.append(pn)
-    if (p.note) info.append(el('div', 'note', p.note))
+    const pn = el('div', 'pn'); pn.append(el('b', null, p.name || p.id), el('span', `chip ${st}`, st)); row.append(pn)
+    if (p.note) row.append(el('div', 'note', p.note))
     const pct = Math.max(0, Math.min(100, Math.round(Number(p.progress) || 0)))
     const pb = el('div', 'pbar'), bar = el('div', 'bar'), fill = el('span'); fill.style.width = `${pct}%`; bar.append(fill)
-    pb.append(bar, el('span', 'num', `${pct}%`)); info.append(pb)
+    pb.append(bar, el('span', 'num', `${pct}%`)); row.append(pb)
+    const stats = el('div', 'pstats')
+    stats.append(el('span', null, `${money(p.revenueMonth)} this month`), el('span', null, `${money(p.revenueTotal)} total`))
+    const w = Math.max(0, Number(p.working) || 0); if (w) stats.append(el('span', null, `${w} working`))
+    const n = Array.isArray(p.you) ? p.you.length : 0; if (n) stats.append(el('span', 'need', `${n} need you`))
+    row.append(stats)
     const acts = el('div', 'acts')
-    if (safeUrl(p.dashboard) && !p.here) acts.append(link('Open office', p.dashboard, 'btn watch'))
+    if (p.here) { const b = el('button', 'btn go', 'You are here'); b.type = 'button'; b.addEventListener('click', () => { location.hash = 'office' }); acts.append(b) }
+    else if (safeUrl(p.dashboard)) acts.append(link('Enter office', p.dashboard, 'btn go'))
     if (safeUrl(p.live)) acts.append(link('Live app', p.live, 'btn'))
-    row.append(info, acts); box.append(row)
+    row.append(acts); box.append(row)
   }
+  showTab()
 }
 
-const TABS = ['office', 'plan', 'you', 'projects']
+const TABS = ['company', 'office', 'plan', 'team', 'todo'], ALIAS = { you: 'todo', projects: 'company' }
 function showTab() {
-  const h = location.hash.slice(1)
-  const tab = TABS.includes(h) ? h : 'office'
+  const h = location.hash.slice(1), want = ALIAS[h] || h
+  const tab = TABS.includes(want) && (want !== 'company' || hasProjects) ? want : hasProjects ? 'company' : 'office'
   for (const p of document.querySelectorAll('[data-page]')) p.hidden = p.dataset.page !== tab
-  for (const a of document.querySelectorAll('[data-tab]')) {
-    if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page')
-    else a.removeAttribute('aria-current')
+  for (const b of document.querySelectorAll('[data-tab]')) {
+    if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page')
+    else b.removeAttribute('aria-current')
   }
 }
+for (const b of document.querySelectorAll('[data-tab]')) b.addEventListener('click', () => { location.hash = b.dataset.tab })
 window.addEventListener('hashchange', showTab)
 showTab()
 
@@ -387,8 +444,8 @@ function buildOffice() {
   const camera = new T.PerspectiveCamera(30, 1, 0.1, 200)
   camera.position.set(12, 16, 20)
   const controls = new T.OrbitControls(camera, canvas)
-  controls.target.set(-0.3, 0.6, 0)
-  Object.assign(controls, { enableDamping: true, dampingFactor: 0.08, enablePan: false, minDistance: 8, maxDistance: 48, minPolarAngle: 0.35, maxPolarAngle: 1.3, minAzimuthAngle: -0.25, maxAzimuthAngle: 1.35 })
+  controls.target.set(-0.6, 0.6, 0.4)
+  Object.assign(controls, { enableDamping: true, dampingFactor: 0.08, enablePan: false, minDistance: 8, maxDistance: 70, minPolarAngle: 0.35, maxPolarAngle: 1.3, minAzimuthAngle: -0.25, maxAzimuthAngle: 1.35 })
   const bg = () => { scene.background = new T.Color(getComputedStyle(document.documentElement).getPropertyValue('--stage').trim() || '#dfe7e3') }
   bg(); matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { if (!MODES[mode]?.bg) bg() })
 
@@ -396,7 +453,7 @@ function buildOffice() {
   const sun = new T.DirectionalLight(0xfff0dc, 0.75)
   sun.position.set(7, 16, 10); sun.castShadow = true
   sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0005
-  Object.assign(sun.shadow.camera, { left: -13, right: 13, top: 13, bottom: -13, near: 1, far: 50 })
+  Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 50 })
   scene.add(sun)
 
   /* Cartoon look: three-step toon shading and dark outlines on the team */
@@ -425,16 +482,16 @@ function buildOffice() {
   const canvasTex = (w, h, draw) => { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const t = new T.CanvasTexture(cv); t.encoding = T.sRGBEncoding; t.anisotropy = 4; const redraw = (...a) => { draw(cv.getContext('2d'), w, h, ...a); t.needsUpdate = true }; return { t, redraw } }
   const texMat = (tex) => new T.MeshToonMaterial({ map: tex, gradientMap: grad })
 
-  /* The room: oak floor, brick back wall, sage side wall with city windows */
-  const W = 17, D = 14, BACK = -D / 2, LEFT = -W / 2
+  /* The room: a bigger open-plan floor with oak boards, a brick back wall and a sage side wall with city windows */
+  const W = 22, D = 17, BACK = -D / 2, LEFT = -W / 2
   const planks = canvasTex(512, 512, (g, w) => { for (let i = 0; i < 16; i++) { g.fillStyle = ['#d8b88f', '#d2b085', '#dcbf98'][i % 3]; g.fillRect(0, i * 32, w, 31); g.fillStyle = '#b8936a'; g.fillRect((i * 157) % w, i * 32, 2, 32); g.fillRect(0, i * 32 + 31, w, 1) } })
-  planks.redraw(); planks.t.wrapS = planks.t.wrapT = T.RepeatWrapping; planks.t.repeat.set(3.5, 3)
+  planks.redraw(); planks.t.wrapS = planks.t.wrapT = T.RepeatWrapping; planks.t.repeat.set(4.5, 3.6)
   box(W, 0.3, D, texMat(planks.t), 0, -0.15, 0)
   const brick = canvasTex(512, 256, (g, w, h) => {
     g.fillStyle = '#e3d3c3'; g.fillRect(0, 0, w, h)
     for (let r = 0; r < 8; r++) for (let c = -1; c < 9; c++) { g.fillStyle = ['#b9644a', '#ad5a41', '#c26f52', '#a8553d'][(r * 7 + c * 3) & 3]; g.fillRect(c * 64 + (r % 2) * 32 + 3, r * 32 + 3, 58, 26) }
   })
-  brick.redraw(); brick.t.wrapS = brick.t.wrapT = T.RepeatWrapping; brick.t.repeat.set(4, 2.2)
+  brick.redraw(); brick.t.wrapS = brick.t.wrapT = T.RepeatWrapping; brick.t.repeat.set(5, 2.2)
   box(W, 4.8, 0.3, texMat(brick.t), 0, 2.4, BACK - 0.15)
   box(0.3, 4.8, D, '#cddccd', LEFT - 0.15, 2.4, 0)
   box(W, 0.22, 0.12, '#f4efe6', 0, 0.11, BACK + 0.05)
@@ -450,49 +507,63 @@ function buildOffice() {
     for (const [x, y, bw] of b) { g.fillStyle = bld; g.fillRect(x, y, bw, h - y); g.fillStyle = win; let n = 0; for (let yy = y + 10; yy < h - 8; yy += 16) for (let xx = x + 6; xx < x + bw - 6; xx += 10) if (mode !== 'night' || (n++ * 7 + x) % 3) g.fillRect(xx, yy, 4, 7) }
   })
   sky.redraw('day')
-  for (const z of [-4.4, -0.2, 4.0]) {
-    box(0.14, 2.8, 2.5, '#ffffff', LEFT + 0.02, 2.5, z)
-    const pane = mesh(new T.PlaneGeometry(2.25, 2.55), new T.MeshBasicMaterial({ map: sky.t }), LEFT + 0.1, 2.5, z); pane.rotation.y = Math.PI / 2; pane.castShadow = false
-    box(0.06, 0.07, 2.3, '#ffffff', LEFT + 0.12, 2.5, z); box(0.06, 2.6, 0.07, '#ffffff', LEFT + 0.12, 2.5, z)
+  for (const z of [-2.6, 1.4]) {
+    box(0.14, 3.0, 3.2, '#ffffff', LEFT + 0.02, 2.4, z)
+    const pane = mesh(new T.PlaneGeometry(2.95, 2.75), new T.MeshBasicMaterial({ map: sky.t }), LEFT + 0.1, 2.4, z); pane.rotation.y = Math.PI / 2; pane.castShadow = false
+    box(0.06, 0.07, 3.0, '#ffffff', LEFT + 0.12, 2.4, z); box(0.06, 2.8, 0.07, '#ffffff', LEFT + 0.12, 2.4, z)
   }
-  for (const [x, z, r, c] of [[-1.6, -0.4, 4.4, '#efe5d2'], [-1.6, 4.7, 1.9, '#d9c7a6']]) { const rr = cyl(r, r, 0.03, c, x, 0.015, z, scene, 48); rr.castShadow = false }
+  for (const [x, z, r, c] of [[0.6, -0.6, 6.2, '#efe5d2'], [7.4, 6.4, 2.4, '#7aa596']]) { const rr = cyl(r, r, 0.03, c, x, 0.015, z, scene, 56); rr.castShadow = false }
 
-  /* Project Manager's glass corner office */
-  const glass = new T.MeshBasicMaterial({ color: '#d6eef5', transparent: true, opacity: 0.22, depthWrite: false })
-  const gx0 = LEFT, gx1 = -3.4, gz1 = -3.1
-  for (const [w, x] of [[2.4, gx0 + 1.2], [1.9, gx1 - 0.95]]) { const p = mesh(new T.PlaneGeometry(w, 3.2), glass, x, 1.6, gz1); p.castShadow = false }
-  { const p = mesh(new T.PlaneGeometry(BACK - gz1 < 0 ? gz1 - BACK : 3.9, 3.2), glass, gx1, 1.6, (BACK + gz1) / 2); p.rotation.y = Math.PI / 2; p.castShadow = false }
-  box(gx1 - gx0, 0.08, 0.08, '#3a3f42', (gx0 + gx1) / 2, 3.2, gz1)
-  box(0.08, 0.08, gz1 - BACK, '#3a3f42', gx1, 3.2, (BACK + gz1) / 2)
-  for (const x of [gx0 + 2.4, gx1 - 1.9, gx1]) box(0.08, 3.2, 0.08, '#3a3f42', x, 1.6, gz1)
-  const plate = canvasTex(256, 64, (g, w, h) => { g.fillStyle = '#2b2420'; g.fillRect(0, 0, w, h); g.fillStyle = '#f4efe6'; g.font = '600 26px "IBM Plex Sans", sans-serif'; g.textAlign = 'center'; g.fillText('PROJECT MANAGER', w / 2, 42) })
-  plate.redraw(); mesh(new T.PlaneGeometry(1.5, 0.37), new T.MeshBasicMaterial({ map: plate.t }), gx1 - 0.95, 2.75, gz1 + 0.01)
+  /* Glass rooms: the Project Manager's corner office (back left) and the meeting room (front left) */
+  const glass = new T.MeshBasicMaterial({ color: '#d6eef5', transparent: true, opacity: 0.2, depthWrite: false, side: T.DoubleSide })
+  const steel = '#3a3f42'
+  const glassRoom = (x0, x1, zWall, zOpen, doorAt) => {
+    const zm = (zWall + zOpen) / 2, depth = Math.abs(zOpen - zWall)
+    const front = [[x0, doorAt - 0.6], [doorAt + 0.6, x1]]
+    for (const [a, b] of front) { const p = mesh(new T.PlaneGeometry(b - a, 3.0), glass, (a + b) / 2, 1.5, zOpen); p.castShadow = false; box(b - a, 0.08, 0.08, steel, (a + b) / 2, 3.0, zOpen); box(b - a, 0.06, 0.06, steel, (a + b) / 2, 0.03, zOpen) }
+    const side = mesh(new T.PlaneGeometry(depth, 3.0), glass, x1, 1.5, zm); side.rotation.y = Math.PI / 2; side.castShadow = false
+    box(0.08, 0.08, depth, steel, x1, 3.0, zm)
+    for (const x of [x0 + 0.04, doorAt - 0.6, doorAt + 0.6, x1]) box(0.08, 3.0, 0.08, steel, x, 1.5, zOpen)
+  }
+  glassRoom(LEFT, -6.0, BACK, -4.4, -7.6)
+  glassRoom(LEFT, -6.0, D / 2, 3.6, -7.6)
+  const plate = canvasTex(256, 64, (g, w, h) => { g.fillStyle = '#2b2420'; g.fillRect(0, 0, w, h); g.fillStyle = '#f4efe6'; g.font = '800 26px "Nunito", sans-serif'; g.textAlign = 'center'; g.fillText('PROJECT MANAGER', w / 2, 42) })
+  plate.redraw(); mesh(new T.PlaneGeometry(1.5, 0.37), new T.MeshBasicMaterial({ map: plate.t }), -9.1, 2.6, -4.39)
+  // meeting room: round table, stools, a screen on the side wall
+  cyl(1.2, 1.2, 0.08, '#f4efe6', -8.5, 0.8, 6.1, scene, 40); cyl(0.1, 0.1, 0.78, steel, -8.5, 0.39, 6.1, scene, 10); cyl(0.5, 0.5, 0.04, steel, -8.5, 0.02, 6.1, scene, 24)
+  for (let i = 0; i < 5; i++) { const a = i * Math.PI * 2 / 5 + 0.3; cyl(0.32, 0.28, 0.5, ['#e0a63a', '#7aa596', '#c0362c', '#5f7d8a', '#b8455f'][i], -8.5 + Math.sin(a) * 1.7, 0.25, 6.1 + Math.cos(a) * 1.7, scene, 24) }
+  box(0.08, 1.2, 2.0, '#2d3236', LEFT + 0.1, 2.0, 6.1)
+  cyl(0.12, 0.1, 0.18, '#f4efe6', -8.2, 0.93, 5.9); box(0.6, 0.02, 0.42, '#ffffff', -8.8, 0.85, 6.3)
 
-  /* Plants, bookshelf, lounge with sofa, the office dog, coffee bar */
+  /* Phone booths on the back wall */
+  for (const x of [-4.6, -2.8]) {
+    const pod = new T.Group(); pod.position.set(x, 0, BACK + 0.75); scene.add(pod)
+    box(1.5, 2.5, 1.3, '#5f7d8a', 0, 1.25, -0.05, pod)
+    const door = mesh(new T.PlaneGeometry(1.1, 2.0), glass, 0, 1.15, 0.61, pod); door.castShadow = false
+    cyl(0.3, 0.3, 0.45, '#e0a63a', 0, 0.23, -0.2, pod, 20)
+    box(1.6, 0.12, 1.4, '#3f5862', 0, 2.56, -0.05, pod)
+  }
+
+  /* Plants, bookshelf, lounge with sofa, the office dog, the kitchen */
   const plant = (x, z, s = 1) => {
     cyl(0.3 * s, 0.24 * s, 0.55 * s, '#e8e2d6', x, 0.28 * s, z)
     for (const [dx, dy, dz, r] of [[0, 0.95, 0, 0.42], [-0.25, 1.2, 0.1, 0.32], [0.24, 1.3, -0.08, 0.34], [0.02, 1.55, 0.05, 0.28]]) { const l = ball(r * s, '#4f8a55', x + dx * s, dy * s, z + dz * s); l.scale.y = 0.85 }
   }
-  plant(-7.9, -6.4); plant(-3.9, -6.5, 0.8); plant(7.9, 0.9, 1.1); plant(-7.9, 6.4, 1.2); plant(0.2, -4.6, 0.75); plant(-3.6, 2.3, 0.6); plant(3.2, 0.3, 0.6)
-  // round meeting table with stools
-  cyl(1.05, 1.05, 0.08, '#f4efe6', -1.6, 0.8, 4.7, scene, 40); cyl(0.09, 0.09, 0.78, '#3a3f42', -1.6, 0.39, 4.7, scene, 10); cyl(0.45, 0.45, 0.04, '#3a3f42', -1.6, 0.02, 4.7, scene, 24)
-  for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + 0.4; cyl(0.32, 0.28, 0.5, ['#e0a63a', '#7aa596', '#c0362c', '#5f7d8a'][i], -1.6 + Math.sin(a) * 1.55, 0.25, 4.7 + Math.cos(a) * 1.55, scene, 24) }
-  cyl(0.12, 0.1, 0.18, '#f4efe6', -1.3, 0.93, 4.5); box(0.6, 0.02, 0.42, '#ffffff', -1.9, 0.85, 4.9)
-  box(0.5, 2.6, 2.4, '#8a6a4c', LEFT + 0.3, 1.3, 1.9)
+  for (const [x, z, k] of [[-5.5, -7.8, 0.9], [-1.4, -7.9, 0.8], [10.4, -1.2, 1.1], [10.4, 3.4, 1.0], [-5.5, 8.0, 1.1], [-5.6, -3.6, 0.7], [1.0, 3.2, 0.6], [4.4, -3.0, 0.6], [-10.4, -0.6, 0.9]]) plant(x, z, k)
+  box(0.5, 2.6, 2.4, '#8a6a4c', LEFT + 0.3, 1.3, -0.6 + 3.3)
   for (let r = 0; r < 4; r++) {
-    box(0.48, 0.05, 2.3, '#a07d5b', LEFT + 0.32, 0.25 + r * 0.6, 1.9)
-    for (let i = 0; i < 9; i++) { const h = 0.32 + ((i * 7 + r) % 4) * 0.05; box(0.32, h, 0.18, ['#c0362c', '#1f5fa8', '#e3b341', '#3f7d4f', '#7a4a8a'][(i + r) % 5], LEFT + 0.36, 0.28 + r * 0.6 + h / 2, 1.0 + i * 0.22) }
+    box(0.48, 0.05, 2.3, '#a07d5b', LEFT + 0.32, 0.25 + r * 0.6, 2.7)
+    for (let i = 0; i < 9; i++) { const h = 0.32 + ((i * 7 + r) % 4) * 0.05; box(0.32, h, 0.18, ['#c0362c', '#1f5fa8', '#e3b341', '#3f7d4f', '#7a4a8a'][(i + r) % 5], LEFT + 0.36, 0.28 + r * 0.6 + h / 2, 1.8 + i * 0.22) }
   }
-  const lounge = cyl(1.9, 1.9, 0.03, '#7aa596', 5.4, 0.02, 5.6, scene, 40); lounge.castShadow = false
-  box(3.2, 0.5, 1.1, '#e0a63a', 5.4, 0.45, 4.7); box(3.2, 0.9, 0.35, '#d39a30', 5.4, 0.85, 4.25)
-  for (const x of [3.9, 6.9]) box(0.3, 0.75, 1.1, '#d39a30', x, 0.55, 4.7)
-  for (const x of [4.6, 5.4, 6.2]) { const c = box(0.65, 0.45, 0.18, ['#f4efe6', '#7aa596', '#c0362c'][Math.round(x) % 3], x, 1.0, 4.5); c.rotation.x = -0.2 }
-  cyl(0.6, 0.6, 0.08, '#8a6a4c', 5.4, 0.45, 6.0); cyl(0.06, 0.06, 0.42, '#3a3f42', 5.4, 0.22, 6.0, scene, 8)
-  cyl(0.12, 0.1, 0.18, '#f4efe6', 5.2, 0.58, 5.9); box(0.5, 0.05, 0.35, '#1f5fa8', 5.6, 0.51, 6.1)
-  const bean = ball(0.75, '#c0362c', 2.6, 0.45, 5.9); bean.scale.y = 0.6
-  cyl(0.04, 0.04, 2.4, '#2b2420', 7.6, 1.2, 5.6, scene, 8); const shade = cone(0.35, 0.4, '#f4efe6', 7.6, 2.5, 5.6); shade.rotation.x = Math.PI
+  box(3.4, 0.5, 1.1, '#e0a63a', 7.4, 0.45, 5.4); box(3.4, 0.9, 0.35, '#d39a30', 7.4, 0.85, 4.95)
+  for (const x of [5.8, 9.0]) box(0.3, 0.75, 1.1, '#d39a30', x, 0.55, 5.4)
+  for (const x of [6.5, 7.4, 8.3]) { const c = box(0.65, 0.45, 0.18, ['#f4efe6', '#7aa596', '#c0362c'][Math.round(x) % 3], x, 1.0, 5.2); c.rotation.x = -0.2 }
+  cyl(0.65, 0.65, 0.08, '#8a6a4c', 7.4, 0.45, 6.9); cyl(0.06, 0.06, 0.42, steel, 7.4, 0.22, 6.9, scene, 8)
+  cyl(0.12, 0.1, 0.18, '#f4efe6', 7.2, 0.58, 6.8); box(0.5, 0.05, 0.35, '#1f5fa8', 7.6, 0.51, 7.0)
+  for (const [x, z, c] of [[4.6, 7.4, '#c0362c'], [10.0, 7.2, '#5f7d8a']]) { const bean = ball(0.75, c, x, 0.45, z); bean.scale.y = 0.6 }
+  cyl(0.04, 0.04, 2.4, '#2b2420', 10.2, 1.2, 5.0, scene, 8); const shade = cone(0.35, 0.4, '#f4efe6', 10.2, 2.5, 5.0); shade.rotation.x = Math.PI
   // the office dog, always asleep in its bed
-  const dog = new T.Group(); dog.position.set(0.6, 0, 5.9); dog.rotation.y = 0.6; scene.add(dog)
+  const dog = new T.Group(); dog.position.set(2.4, 0, 7.2); dog.rotation.y = 0.6; scene.add(dog)
   mesh(new T.TorusGeometry(0.55, 0.18, 12, 28), '#5f7d8a', 0, 0.18, 0, dog).rotation.x = Math.PI / 2
   cyl(0.55, 0.55, 0.06, '#7f9aa6', 0, 0.05, 0, dog)
   const dogBody = ball(0.38, '#e39a4a', 0, 0.3, 0, dog); dogBody.scale.set(1.25, 0.7, 0.85)
@@ -500,45 +571,49 @@ function buildOffice() {
   for (const dz of [0.0, 0.24]) cone(0.08, 0.18, '#d4883a', 0.4, 0.55, dz, dog)
   ball(0.04, '#2b2420', 0.71, 0.33, 0.17, dog)
   outline(dog)
-  // coffee bar with a sign
-  const bx = 6.2, bz = BACK + 0.55
-  box(3.8, 1.0, 0.95, '#f4efe6', bx, 0.5, bz); box(3.9, 0.08, 1.05, '#8a6a4c', bx, 1.04, bz)
-  box(0.85, 0.75, 0.55, '#b9c0c6', bx - 0.9, 1.45, bz - 0.05); box(0.7, 0.1, 0.25, '#3a3f42', bx - 0.9, 1.25, bz + 0.25)
-  for (const dx of [-1.1, -0.7]) cyl(0.05, 0.05, 0.12, '#3a3f42', bx + dx, 1.38, bz + 0.25, scene, 8)
-  cyl(0.14, 0.18, 0.55, '#3a3f42', bx + 0.1, 1.35, bz - 0.1); cone(0.16, 0.25, '#7a4a2b', bx + 0.1, 1.75, bz - 0.1)
-  for (const [i, c] of [[0, '#c0362c'], [1, '#1f5fa8'], [2, '#e3b341'], [3, '#3f7d4f']]) cyl(0.09, 0.08, 0.17, c, bx + 0.65 + i * 0.25, 1.17, bz + 0.2)
-  const bowl = ball(0.28, '#f4efe6', bx + 1.55, 1.12, bz); bowl.scale.y = 0.45
-  for (const [dx, dz] of [[-0.08, 0], [0.1, 0.06], [0.02, -0.1]]) ball(0.11, '#f08a24', bx + 1.55 + dx, 1.25, bz + dz)
-  box(3.6, 0.06, 0.4, '#8a6a4c', bx, 2.45, BACK + 0.2)
-  for (let i = 0; i < 6; i++) cyl(0.13, 0.13, 0.32, ['#f4efe6', '#e8d9bf'][i % 2], bx - 1.4 + i * 0.55, 2.64, BACK + 0.2)
-  const sign = canvasTex(512, 128, (g, w, h) => { g.fillStyle = '#2b2420'; g.fillRect(0, 0, w, h); g.fillStyle = '#f4d58d'; g.font = '700 64px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.fillText('KAFFEE', w / 2, 86) })
-  sign.redraw(); mesh(new T.PlaneGeometry(2.0, 0.5), new T.MeshBasicMaterial({ map: sign.t }), bx, 3.25, BACK + 0.02)
-  const COFFEE = [[4.6, -5.05], [5.5, -5.15], [6.4, -5.05], [7.3, -5.15]]
+  // kitchen: counter on the back wall, an island with stools, a fridge, the sign
+  const bx = 7.6, bz = BACK + 0.55
+  box(5.6, 1.0, 0.95, '#f4efe6', bx, 0.5, bz); box(5.7, 0.08, 1.05, '#8a6a4c', bx, 1.04, bz)
+  box(1.1, 2.3, 0.9, '#d9e2e6', 10.4 - 0.1, 1.15, bz); box(0.05, 0.5, 0.05, steel, 9.95, 1.5, bz + 0.47)
+  box(0.85, 0.75, 0.55, '#b9c0c6', bx - 1.6, 1.45, bz - 0.05); box(0.7, 0.1, 0.25, steel, bx - 1.6, 1.25, bz + 0.25)
+  for (const dx of [-1.8, -1.4]) cyl(0.05, 0.05, 0.12, steel, bx + dx, 1.38, bz + 0.25, scene, 8)
+  cyl(0.14, 0.18, 0.55, steel, bx - 0.6, 1.35, bz - 0.1); cone(0.16, 0.25, '#7a4a2b', bx - 0.6, 1.75, bz - 0.1)
+  for (const [i, c] of [[0, '#c0362c'], [1, '#1f5fa8'], [2, '#e3b341'], [3, '#3f7d4f']]) cyl(0.09, 0.08, 0.17, c, bx + 0.0 + i * 0.25, 1.17, bz + 0.2)
+  const bowl = ball(0.28, '#f4efe6', bx + 1.3, 1.12, bz); bowl.scale.y = 0.45
+  for (const [dx, dz] of [[-0.08, 0], [0.1, 0.06], [0.02, -0.1]]) ball(0.11, '#f08a24', bx + 1.3 + dx, 1.25, bz + dz)
+  box(4.4, 0.06, 0.4, '#8a6a4c', bx - 0.6, 2.45, BACK + 0.2)
+  for (let i = 0; i < 7; i++) cyl(0.13, 0.13, 0.32, ['#f4efe6', '#e8d9bf'][i % 2], bx - 2.4 + i * 0.6, 2.64, BACK + 0.2)
+  const sign = canvasTex(512, 128, (g, w, h) => { g.fillStyle = '#2b2420'; g.fillRect(0, 0, w, h); g.fillStyle = '#f4d58d'; g.font = '800 64px "Nunito", sans-serif'; g.textAlign = 'center'; g.fillText('KAFFEE', w / 2, 86) })
+  sign.redraw(); mesh(new T.PlaneGeometry(2.0, 0.5), new T.MeshBasicMaterial({ map: sign.t }), bx - 0.6, 3.3, BACK + 0.02)
+  box(3.0, 0.95, 1.2, '#7aa596', 7.4, 0.48, -4.6); box(3.2, 0.08, 1.4, '#f4efe6', 7.4, 1.0, -4.6)
+  for (const x of [6.4, 7.4, 8.4]) { cyl(0.26, 0.22, 0.08, '#e0a63a', x, 0.72, -3.55, scene, 20); cyl(0.04, 0.04, 0.7, steel, x, 0.35, -3.55, scene, 8) }
+  cyl(0.12, 0.1, 0.18, '#f4efe6', 7.0, 1.13, -4.5); cyl(0.12, 0.1, 0.18, '#c0362c', 7.9, 1.13, -4.8)
+  const COFFEE = [[5.6, -3.4], [6.9, -3.0], [8.1, -3.0], [9.3, -3.4]]
 
   /* Whiteboard (level and progress), kanban board and the sticky note that counts what needs you */
   const board = canvasTex(1024, 512, (g, w, h, lv) => {
     g.fillStyle = '#fbfcfa'; g.fillRect(0, 0, w, h)
-    g.fillStyle = '#5d6a65'; g.font = '600 38px "IBM Plex Mono", monospace'; g.fillText(lv.label, 56, 92)
-    g.fillStyle = '#17201d'; g.font = '700 66px "IBM Plex Sans", sans-serif'
+    g.fillStyle = '#5d6a65'; g.font = '700 38px "IBM Plex Mono", monospace'; g.fillText(lv.label, 56, 92)
+    g.fillStyle = '#17201d'; g.font = '900 66px "Nunito", sans-serif'
     const words = String(lv.name).split(' '); let line = '', y = 182
     for (const wd of words) { const t = line ? `${line} ${wd}` : wd; if (g.measureText(t).width > w - 112 && line) { g.fillText(line, 56, y); y += 76; line = wd } else line = t }
     g.fillText(line, 56, y)
     g.fillStyle = '#dbe1de'; g.fillRect(56, 400, w - 300, 34)
     g.fillStyle = '#0d6e5b'; g.fillRect(56, 400, (w - 300) * lv.pct / 100, 34)
-    g.fillStyle = '#17201d'; g.font = '600 64px "IBM Plex Mono", monospace'; g.fillText(`${lv.pct}%`, w - 220, 436)
+    g.fillStyle = '#17201d'; g.font = '700 64px "IBM Plex Mono", monospace'; g.fillText(`${lv.pct}%`, w - 220, 436)
   })
-  box(4.4, 2.3, 0.08, '#8f9a96', -0.6, 3.2, BACK + 0.05)
-  const wb = mesh(new T.PlaneGeometry(4.2, 2.1), new T.MeshBasicMaterial({ map: board.t }), -0.6, 3.2, BACK + 0.1)
+  box(4.4, 2.3, 0.08, '#8f9a96', 1.2, 3.0, BACK + 0.05)
+  const wb = mesh(new T.PlaneGeometry(4.2, 2.1), new T.MeshBasicMaterial({ map: board.t }), 1.2, 3.0, BACK + 0.1)
   wb.userData.go = 'plan'
-  box(2.4, 1.8, 0.06, '#c9a26a', 2.7, 3.15, BACK + 0.04)
-  for (let i = 0; i < 9; i++) { const n = box(0.32, 0.32, 0.02, ['#ffe58a', '#a8d8c8', '#f7b2a6', '#bcd2f2'][i % 4], 2.0 + (i % 3) * 0.5 + 0.3, 3.65 - Math.floor(i / 3) * 0.45, BACK + 0.08); n.rotation.z = ((i * 37) % 10 - 5) / 60 }
+  box(2.6, 1.0, 0.06, '#c9a26a', -3.7, 3.55, BACK + 0.04)
+  for (let i = 0; i < 8; i++) { const n = box(0.28, 0.28, 0.02, ['#ffe58a', '#a8d8c8', '#f7b2a6', '#bcd2f2'][i % 4], -4.7 + (i % 4) * 0.62, 3.78 - Math.floor(i / 4) * 0.42, BACK + 0.08); n.rotation.z = ((i * 37) % 10 - 5) / 60 }
   const sticky = canvasTex(256, 256, (g, w, h, n) => {
     g.fillStyle = '#ffd84d'; g.fillRect(0, 0, w, h)
     g.fillStyle = '#3d3200'; g.font = '700 120px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.fillText(String(n), w / 2, 140)
-    g.font = '600 34px "IBM Plex Sans", sans-serif'; g.fillText(n === 1 ? 'needs you' : n ? 'need you' : 'all clear', w / 2, 206)
+    g.font = '800 34px "Nunito", sans-serif'; g.fillText(n === 1 ? 'needs you' : n ? 'need you' : 'all clear', w / 2, 206)
   })
-  const note = mesh(new T.PlaneGeometry(1.0, 1.0), new T.MeshBasicMaterial({ map: sticky.t }), 4.35, 3.4, BACK + 0.1)
-  note.rotation.z = -0.08; note.userData.go = 'you'
+  const note = mesh(new T.PlaneGeometry(1.0, 1.0), new T.MeshBasicMaterial({ map: sticky.t }), 4.1, 3.4, BACK + 0.1)
+  note.rotation.z = -0.08; note.userData.go = 'todo'
   const setWall = (lv, n) => { board.redraw(lv); sticky.redraw(n) }
   setWall(level, youCount)
   document.fonts?.ready?.then(() => { setWall(level, youCount); plate.redraw(); sign.redraw() })
@@ -611,7 +686,7 @@ function buildOffice() {
   for (const s of SEATS) {
     const a = ANIMAL[s.key], root = new T.Group(); root.position.set(s.at[0], 0, s.at[1]); scene.add(root)
     root.userData.seat = s.key
-    root.rotation.y = Math.atan2(6 - s.at[0], 12 - s.at[1]) * 0.85 + ((s.at[0] * 13 + s.at[1] * 7) % 5) * 0.03
+    root.rotation.y = Math.atan2(8 - s.at[0], 16 - s.at[1]) * 0.85 + ((s.at[0] * 13 + s.at[1] * 7) % 5) * 0.03
     mesh(deskGeo, '#efe3cf', 0, 0.94, 0.55, root)
     cyl(0.1, 0.1, 0.9, '#3a3f42', 0, 0.47, 0.55, root, 12); cyl(0.5, 0.55, 0.05, '#3a3f42', 0, 0.025, 0.55, root, 28)
     cyl(0.46, 0.44, 0.13, '#7aa596', 0, 0.55, -0.45, root, 28)
@@ -795,7 +870,7 @@ function buildOffice() {
     const w = stage.clientWidth, h = stage.clientHeight
     if (!w || !h) return
     renderer.setSize(w, h, false); camera.aspect = w / h
-    const dist = w / h < 0.8 ? 46 : w / h < 1.4 ? 34 : 27
+    const dist = w / h < 0.8 ? 62 : w / h < 1.4 ? 46 : 37
     const dir = camera.position.clone().sub(controls.target).normalize()
     camera.position.copy(controls.target).addScaledVector(dir, dist)
     camera.updateProjectionMatrix(); controls.update()
@@ -804,7 +879,7 @@ function buildOffice() {
 
   /* Day and night follow yskills' own clock: sky, sun, desk lamps, wall clock */
   const hemi = scene.children.find((o) => o.isHemisphereLight)
-  const lamps = [[-3.2, 3.2, 0.8], [3.2, 3.2, 0.8], [7.6, 2.4, 5.6], [6.2, 3.0, -5.4], [-5.8, 2.8, -5.0]].map(([x, y, z]) => { const l = new T.PointLight(0xffc27a, 0, 9, 2); l.position.set(x, y, z); scene.add(l); return l })
+  const lamps = [[-3.0, 3.2, -1.2], [3.6, 3.2, -1.2], [0.4, 3.2, 2.0], [7.4, 2.6, 5.8], [7.6, 3.0, -5.4], [-8.5, 2.8, -6.4], [-8.5, 2.8, 6.0]].map(([x, y, z]) => { const l = new T.PointLight(0xffc27a, 0, 9, 2); l.position.set(x, y, z); scene.add(l); return l })
   const clockTex = canvasTex(256, 256, (g, w, h) => {
     const now = new Date(), cx = w / 2
     g.fillStyle = '#2b2420'; g.beginPath(); g.arc(cx, cx, 124, 0, 7); g.fill(); g.fillStyle = '#fbf7f0'; g.beginPath(); g.arc(cx, cx, 112, 0, 7); g.fill()
@@ -812,7 +887,7 @@ function buildOffice() {
     const hand = (a, len, wd) => { g.lineWidth = wd; g.lineCap = 'round'; g.strokeStyle = '#2b2420'; g.beginPath(); g.moveTo(cx, cx); g.lineTo(cx + Math.sin(a) * len, cx - Math.cos(a) * len); g.stroke() }
     hand(((now.getHours() % 12) + now.getMinutes() / 60) * Math.PI / 6, 56, 12); hand(now.getMinutes() * Math.PI / 30, 84, 8)
   })
-  const clk = mesh(new T.CircleGeometry(0.55, 32), new T.MeshBasicMaterial({ map: clockTex.t }), -4.6, 3.6, BACK + 0.04); clk.castShadow = false
+  const clk = mesh(new T.CircleGeometry(0.55, 32), new T.MeshBasicMaterial({ map: clockTex.t }), -1.6, 3.9, BACK + 0.04); clk.castShadow = false
   const MODES = {
     day: { hemi: [0xfff8ee, 0.62], sun: [0xfff0dc, 0.62], bg: null, lamp: 0, bulb: '#8a8070' },
     dusk: { hemi: [0xffd9b8, 0.6], sun: [0xffa66b, 0.55], bg: '#e9c9b2', lamp: 0.55, bulb: '#ffd27a' },
@@ -872,7 +947,7 @@ function buildOffice() {
       const bob = still ? 0 : s.state === 'blocked' || s.state === 'waiting' ? Math.abs(Math.sin(p * 2.4)) * 0.18 : Math.sin(p * 3) * 0.05
       s.bubble.position.set(0.95, 2.45 + bob, -0.4)
     }
-    { const k = still ? 0.5 : (t * 0.3) % 1; dogZ.position.set(1.0 + k * 0.4, 0.75 + k * 0.7, 6.0); dogZ.material.opacity = still ? 1 : Math.sin(k * Math.PI) }
+    { const k = still ? 0.5 : (t * 0.3) % 1; dogZ.position.set(2.8 + k * 0.4, 0.75 + k * 0.7, 7.3); dogZ.material.opacity = still ? 1 : Math.sin(k * Math.PI) }
     if (!still && t - lastScreen > 0.45) { lastScreen = t; for (const s of Object.values(seats)) if (s.state === 'working') s.screenTex.redraw(1 + (Math.floor(t * 2) % 4)) }
     renderer.render(scene, camera)
     placeTags()
@@ -881,15 +956,15 @@ function buildOffice() {
   return { setStates, setWall }
 }
 
-const GREET = { day: 'Good day, yskills. The team is at their desks.', dusk: 'Good evening, yskills. The lamps are on.', night: 'Late shift, yskills. The office lights are on for you.' }
-window.onDaytime = (m) => { const w = team.filter((x) => stateOf(x.state) === 'working').length; $('greet').textContent = `${GREET[m]}${w ? ` ${w} working right now.` : ''}` }
+const GREET = { day: 'Good day, yskills.', dusk: 'Good evening, yskills.', night: 'Late shift, yskills.' }
+window.onDaytime = (m) => { const w = team.filter((x) => stateOf(x.state) === 'working').length; $('greet').textContent = `${GREET[m]}${w ? ` ${w} working.` : ''}${updated ? ` Updated ${updated}.` : ''}` }
 const rows = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }))
 renderTeam([])
 ;(async () => {
   const db = await window.claude?.use?.('db')
-  if (!db) { $('updated').textContent = 'Sign in to claude.ai to see live updates'; return }
+  if (!db) { $('greet').textContent = 'Sign in to claude.ai to see live updates'; return }
   $('dot').classList.add('on')
-  const fail = () => { $('dot').classList.remove('on'); $('updated').textContent = 'Live updates stopped; reload the page' }
+  const fail = () => { $('dot').classList.remove('on'); $('greet').textContent = 'Live updates stopped; reload the page' }
   db.doc('pm/now').onSnapshot((s) => renderPm(s.exists ? s.data() : null), fail)
   db.collection('team').onSnapshot((s) => renderTeam(rows(s)), fail)
   db.collection('phases').onSnapshot((s) => renderPhases(rows(s)), fail)

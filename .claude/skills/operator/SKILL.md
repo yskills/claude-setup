@@ -93,12 +93,13 @@ Templates in `templates/`.
 - `PROGRESS.md`: the handoff. Done, next, broken, decisions and why, each thread's cost. Every
   thread reads it first; only the operator writes it. Under 100 lines.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
-- **Dashboard** (`templates/dashboard.html`), yskills' live view of the project from day one, in
-  four pages: **Office** (a 3D office yskills can turn and tap: one desk per role above, each
+- **Dashboard** (`templates/dashboard.html`), yskills' live view of the project from day one: a
+  full-screen 3D office with a game HUD (project name and level bar, coins = € this month, a bell
+  with the to-do count) and a dock. **Office**: yskills turns and taps it; one desk per role, each
   teammate a cartoon animal dressed for it (bear, owl, cat, raccoon, rabbit, penguin, dog, fox, panda), typing when working, asleep when idle, ! when blocked, ? when it waits
   on yskills; tap one for task, next, with whom, Watch and Open; the whiteboard shows the current
-  level, the sticky note what needs yskills; done teammates take a coffee break, and day and night follow yskills' clock), **Plan** (the operator's update and the phases as levels with goal bars), **For you**
-  (what needs yskills, next steps, live links) and **Projects** (shown only with `projects` rows). At project start the operator plans the
+  level, the sticky note what needs yskills; done teammates take a coffee break, and day and night follow yskills' clock. **Plan**: the operator's update and the phases as levels with goal bars. **Team**: the nine roles. **To-dos**
+  (what needs yskills, live links) and **Company** (shown only with `projects` rows: totals, every project, all its needs-you). At project start the operator plans the
   phases (brief (a)'s plan: research, plan, scaffold, one per slice or group of slices, launch,
   grow), publishes the page with the Artifact tool, `capabilities: {db: {rules: [{path: "", read:
   "view", write: "admin"}]}}`, puts the link in `PROGRESS.md` and brief (a), and fills it with one
@@ -111,9 +112,11 @@ Templates in `templates/`.
   Designer, Programmer, Tester, Reviewer, Security, Legal, Marketer). Viewing costs no tokens;
   only these writes do. Every write to `PROGRESS.md` updates the same rows in one batch (pin
   each with `if_version`). The new project also gets a row `projects/<id>` (`name, state` = active,
-  paused or done, `progress` 0-100, `note, dashboard, live, order`) in the Claude Setup HQ
-  dashboard (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT), so yskills can tap from there into
-  each project's own dashboard. Luna's cockpit stays the one view of revenue and analytics.
+  paused or done, `progress` 0-100, `note, dashboard, live, order, revenueMonth, revenueTotal`
+  (EUR numbers, from Stripe), `working` (count), `you[{what, link}]`) in the Claude Setup HQ
+  dashboard (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT), and keeps it current with every
+  `pm/now` write. HQ's Company view is yskills' one home for all projects and their money; Luna's
+  cockpit links to it.
 
 ## 4. The run
 
