@@ -42,3 +42,13 @@ test('desk numbers add up and ignore junk', () => {
   assert.deepEqual({ ...n }, { month: 28, total: 28, todos: 2, pct: 50, working: 2 })
   assert.deepEqual({ ...HQ.deskNumbers({}) }, { month: 0, total: 0, todos: 0, pct: 0, working: 0 })
 })
+
+test('every role has its own pet, and each state its own clip', () => {
+  assert.equal(new Set(Object.values(HQ.PET_OF)).size, 9)
+  assert.equal(HQ.clipFor('working'), 'idle'); assert.equal(HQ.clipFor('done'), 'dance')
+  assert.equal(HQ.clipFor('blocked'), 'gesture-negative'); assert.equal(HQ.clipFor('waiting'), 'gesture-positive')
+  assert.equal(HQ.clipFor('idle'), 'static'); assert.equal(HQ.clipFor('off'), 'static'); assert.equal(HQ.clipFor('nope'), 'static')
+  assert.equal(HQ.clipFor('done', true), 'walk')
+  const shown = ['working', 'done', 'blocked', 'waiting', 'idle'].map((s) => HQ.clipFor(s))
+  assert.equal(new Set(shown).size, 5)
+})

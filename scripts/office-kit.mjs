@@ -6,7 +6,8 @@ import { join } from 'node:path'
 
 const PIECES = ['wall', 'wallWindow', 'wallDoorway', 'floorFull', 'desk', 'laptop', 'lampRoundTable',
   'lampRoundFloor', 'pottedPlant', 'plantSmall1', 'bookcaseOpen', 'books', 'loungeSofa', 'tableCoffee', 'rugRounded',
-  'sideTable', 'kitchenCoffeeMachine', 'coatRackStanding', 'radio']
+  'sideTable', 'kitchenCoffeeMachine', 'coatRackStanding', 'radio', 'chairDesk', 'computerScreen', 'computerKeyboard',
+  'kitchenBar', 'stoolBar', 'loungeChair']
 const dir = process.argv[2]
 if (!dir) { console.error('usage: node scripts/office-kit.mjs <Kenney Furniture Kit "GLTF format" folder>'); process.exit(1) }
 const kit = Object.fromEntries(PIECES.map((p) => [p, readFileSync(join(dir, `${p}.glb`)).toString('base64')]))
