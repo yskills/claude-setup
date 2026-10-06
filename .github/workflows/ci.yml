@@ -25,8 +25,8 @@ jobs:
       - name: team mod
         shell: bash
         run: |
-          npx -y @anthropic-ai/claude-code plugin validate mods/team
-          npx -y @anthropic-ai/claude-code plugin test mods/team
+          npx -y @anthropic-ai/claude-code@2.1.292 plugin validate mods/team
+          npx -y @anthropic-ai/claude-code@2.1.292 plugin test mods/team
       # Full install (ECC hooks included) into a throwaway home; plugins need the claude CLI,
       # which CI does not have, so the installer skips them with a warning.
       - name: install into a temp home
