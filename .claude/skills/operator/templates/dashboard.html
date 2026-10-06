@@ -2,31 +2,40 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: a control room in three pages. Plan: the manager's update and the phases with each goal's bar. Team: one row per teammate. For you: what needs yskills, next steps, live links. */
+/* Layout: a little office. Office: each teammate is a mascot at a desk, dressed for their role, typing when working and asleep when idle; tap one for details. Plan: phases as levels with goal bars. For you: what needs yskills. Projects: every project, tap to open its own HQ. */
 :root{
   --bg:#f3f5f4;--panel:#ffffff;--fg:#17201d;--soft:#5d6a65;--line:#dbe1de;
   --accent:#0d6e5b;--accent-soft:#e1f0ec;
   --ok:#1f7a3f;--warn:#b26a00;--bad:#c0362c;--idle:#8b9792;
+  --wall:#e6ebe4;--wall-line:#d6ddd4;--floor:#c9b79a;--floor-line:#b9a688;
+  --wood:#9a6b45;--wood-top:#b8835a;--chair:#3f4a52;--board:#fbfcfa;--note:#ffe58a;--note-fg:#3d3200;
+  --bubble:#ffffff;--ink:#1d2421;
   --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#101614;--panel:#18201d;--fg:#e6ece9;--soft:#93a19b;--line:#2a3531;
-  --accent:#4fc2a6;--accent-soft:#16302a;--ok:#5cc489;--warn:#e9a640;--bad:#ff7a6e;--idle:#6d7a75;color-scheme:dark}}
+  --accent:#4fc2a6;--accent-soft:#16302a;--ok:#5cc489;--warn:#e9a640;--bad:#ff7a6e;--idle:#6d7a75;
+  --wall:#1d2724;--wall-line:#24302c;--floor:#3a3128;--floor-line:#453a2f;
+  --wood:#6e4c33;--wood-top:#8a603f;--chair:#252c31;--board:#222b28;--note:#d9bf5a;--note-fg:#2a2300;
+  --bubble:#eef2f0;--ink:#1d2421;color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#101614;--panel:#18201d;--fg:#e6ece9;--soft:#93a19b;--line:#2a3531;
-  --accent:#4fc2a6;--accent-soft:#16302a;--ok:#5cc489;--warn:#e9a640;--bad:#ff7a6e;--idle:#6d7a75;color-scheme:dark}
+  --accent:#4fc2a6;--accent-soft:#16302a;--ok:#5cc489;--warn:#e9a640;--bad:#ff7a6e;--idle:#6d7a75;
+  --wall:#1d2724;--wall-line:#24302c;--floor:#3a3128;--floor-line:#453a2f;
+  --wood:#6e4c33;--wood-top:#8a603f;--chair:#252c31;--board:#222b28;--note:#d9bf5a;--note-fg:#2a2300;
+  --bubble:#eef2f0;--ink:#1d2421;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-.stack{display:grid;gap:16px}
 body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--sans)}
 .wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:16px}
 header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px}
 h1{font-size:24px;font-weight:700;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:0 0 10px}
 .meta{font:12px/1.4 var(--mono);color:var(--soft)}
 .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--idle);margin-right:6px;vertical-align:1px}
 .live-dot.on{background:var(--ok)}
-h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:0 0 10px}
+.stack{display:grid;gap:16px}
 .top{display:grid;gap:16px;grid-template-columns:1fr;align-items:start}
 @media (min-width:880px){.top{grid-template-columns:3fr 2fr}}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;min-width:0}
@@ -44,33 +53,94 @@ ol,ul{margin:0;padding:0;list-style:none}
 .you li:first-child,.next li:first-child{border-top:0}
 .empty{color:var(--soft);margin:0}
 a{color:var(--accent);text-underline-offset:2px}
-/* Team board */
-.team{display:grid;gap:0}
-.row{display:grid;grid-template-columns:150px 92px minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
-.row:first-child{border-top:0}
-.who{font-weight:600}
-.role{display:block;font:12px var(--mono);color:var(--soft);font-weight:400}
-.state{font:500 12px var(--mono);padding:2px 8px;border-radius:999px;justify-self:start;border:1px solid currentColor}
-.state.working{color:var(--accent);background:var(--accent-soft);border-color:transparent}
-.state.blocked{color:var(--bad)}
-.state.waiting{color:var(--warn)}
-.state.idle,.state.done{color:var(--idle)}
-.task{min-width:0}
-.task small{display:block;color:var(--soft);font-size:13px}
-.with{display:block;font:12px var(--mono);color:var(--soft)}
-.acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.btn{font:500 13px var(--sans);text-decoration:none;padding:6px 12px;border-radius:6px;border:1px solid var(--line);color:var(--fg);background:var(--panel);white-space:nowrap}
-.btn:hover{border-color:var(--accent)}
-.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.btn.watch{background:var(--accent);border-color:var(--accent);color:var(--panel)}
-@media (max-width:720px){.row{grid-template-columns:1fr auto}.task,.acts{grid-column:1/-1}.acts{justify-content:flex-start}}
 .note{font-size:13px;color:var(--soft)}
+.btn{font:500 13px var(--sans);text-decoration:none;padding:7px 14px;border-radius:6px;border:1px solid var(--line);color:var(--fg);background:var(--panel);white-space:nowrap;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.watch{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.chip{font:500 12px var(--mono);padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.chip.working,.chip.active{color:var(--accent);background:var(--accent-soft);border-color:transparent}
+.chip.blocked{color:var(--bad)}
+.chip.waiting{color:var(--warn)}
+.chip.idle,.chip.done,.chip.paused{color:var(--idle)}
 /* Tabs */
-nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
-nav.tabs a{font-weight:600;text-decoration:none;color:var(--soft);padding:10px 14px;border-bottom:2px solid transparent;margin-bottom:-1px}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+nav.tabs a{font-weight:600;text-decoration:none;color:var(--soft);padding:10px 14px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
 nav.tabs a[aria-current="page"]{color:var(--fg);border-bottom-color:var(--accent)}
 nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .count{font:12px var(--mono);margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--warn);color:var(--panel)}
+/* Office: wall with a whiteboard and a sticky note, wooden floor with one desk per teammate */
+.office{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--floor)}
+.wall{background:var(--wall);border-bottom:6px solid var(--wood);padding:18px 16px 16px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
+.board{flex:1 1 260px;min-width:0;background:var(--board);border:5px solid #8f9a96;border-radius:4px;padding:10px 14px;color:var(--fg);text-decoration:none;display:grid;gap:6px}
+.board:hover{border-color:var(--accent)}
+.board .lvl{font:600 12px var(--mono);color:var(--soft);letter-spacing:.06em;text-transform:uppercase}
+.board .ph{font-weight:700;font-size:17px;line-height:1.25}
+.board .row{display:flex;align-items:center;gap:10px}
+.board .big{font-size:22px}
+.sticky{flex:0 0 auto;width:150px;background:var(--note);color:var(--note-fg);padding:10px 12px 14px;transform:rotate(2deg);text-decoration:none;font-weight:600;line-height:1.3;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.sticky b{display:block;font:700 28px/1 var(--mono)}
+.sticky.calm{opacity:.75}
+.headcount{flex:1 1 100%;font:12px var(--mono);color:var(--soft)}
+.floor{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px 10px;padding:14px 12px 18px;
+  background-image:repeating-linear-gradient(90deg,transparent 0 79px,var(--floor-line) 79px 80px)}
+@media (max-width:420px){.floor{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.desk{all:unset;box-sizing:border-box;display:grid;justify-items:center;gap:2px;padding:6px 4px 8px;border-radius:10px;cursor:pointer;min-width:0;text-align:center}
+.desk:hover,.desk:focus-visible{background:rgba(255,255,255,.18)}
+.desk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.desk svg{width:100%;max-width:180px;height:auto;overflow:visible}
+.plate{display:grid;gap:3px;justify-items:center;min-width:0;max-width:100%}
+.plate .nm{font-weight:700;font-size:14px;line-height:1.25;color:var(--fg);background:var(--panel);padding:2px 8px;border-radius:4px;max-width:100%;overflow-wrap:anywhere;text-wrap:balance}
+.plate .chip{background:var(--panel)}
+.plate .chip.working{background:var(--accent-soft)}
+.hint{font-size:13px;color:var(--soft);margin:0}
+/* Mascot art */
+.m .skin{fill:#f1c7a1}.m .ln{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round}
+.m .eye{fill:var(--ink)}.m .cheek{fill:#f19c8f;opacity:.55}
+.m .chairb{fill:var(--chair)}.m .dtop{fill:var(--wood-top)}.m .dfront{fill:var(--wood)}
+.m .lid{fill:#c3cad0}.m .logo{fill:#eef2f4}
+.m .bub{fill:var(--bubble);stroke:var(--ink);stroke-width:1.5}
+.m .z{font:700 15px var(--mono);fill:var(--soft)}
+.m .eyes-closed,.m .laptop-shut,.m .zz,.m .b-work,.m .b-block,.m .b-wait,.m .b-done,.m .mug{display:none}
+.m.s-idle .eyes-open,.m.s-idle .lid,.m.s-idle .logo,.m.s-idle .hands{display:none}
+.m.s-idle .eyes-closed,.m.s-idle .laptop-shut,.m.s-idle .zz{display:inline}
+.m.s-idle .head{transform:rotate(9deg) translateY(3px);transform-origin:80px 80px}
+.m.s-working .b-work,.m.s-blocked .b-block,.m.s-waiting .b-wait,.m.s-done .b-done,.m.s-done .mug{display:inline}
+.m.s-done .lid,.m.s-done .logo{display:none}.m.s-done .laptop-shut{display:inline}
+.m.s-working .logo{fill:#8fe3cf}
+@media (prefers-reduced-motion:no-preference){
+  .m.s-working .hand-l{animation:tap .32s ease-in-out infinite alternate}
+  .m.s-working .hand-r{animation:tap .32s ease-in-out .16s infinite alternate}
+  .m.s-working .dot{animation:blink 1.2s infinite}
+  .m.s-working .dot:nth-child(3){animation-delay:.2s}.m.s-working .dot:nth-child(4){animation-delay:.4s}
+  .m.s-working .logo{animation:glow 1.6s ease-in-out infinite alternate}
+  .m.s-idle .body{animation:breathe 3.6s ease-in-out infinite;transform-origin:80px 112px}
+  .m.s-idle .z{animation:float 3s linear infinite;opacity:0}
+  .m.s-idle .z:nth-child(2){animation-delay:1s}.m.s-idle .z:nth-child(3){animation-delay:2s}
+  .m.s-blocked .b-block,.m.s-waiting .b-wait{animation:nudge 2.4s ease-in-out infinite;transform-origin:126px 30px}
+  .desk:hover .body,.desk:focus-visible .body{animation:hop .35s ease-out}
+  @keyframes tap{to{transform:translateY(-4px)}}
+  @keyframes blink{0%,100%{opacity:.25}40%{opacity:1}}
+  @keyframes glow{to{fill:#d8fff4}}
+  @keyframes breathe{50%{transform:scale(1.02,1.03)}}
+  @keyframes float{0%{opacity:0;transform:translate(0,6px)}25%{opacity:1}100%{opacity:0;transform:translate(10px,-18px)}}
+  @keyframes nudge{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-8deg)}90%{transform:rotate(8deg)}95%{transform:rotate(-4deg)}}
+  @keyframes hop{from{transform:translateY(-6px)}}
+}
+/* Detail sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,14,12,.45);z-index:10}
+.sheet{position:fixed;z-index:11;background:var(--panel);color:var(--fg);border:1px solid var(--line);display:grid;gap:12px;align-content:start;overflow-y:auto;
+  left:0;right:0;bottom:0;max-height:85%;border-radius:14px 14px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:760px){.sheet{left:auto;top:0;width:400px;max-height:none;border-radius:0;padding:20px 22px}}
+.sheet .hd{display:flex;align-items:center;gap:14px}
+.sheet .hd svg{width:110px;flex:none}
+.sheet h3{margin:0;font-size:19px;line-height:1.25}
+.sheet .role{font:12px var(--mono);color:var(--soft)}
+.sheet dl{margin:0;display:grid;gap:10px}
+.sheet dt{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.sheet dd{margin:2px 0 0}
+.sheet .acts{display:flex;gap:8px;flex-wrap:wrap}
+.close{justify-self:end;background:none;border:0;color:var(--soft);font:500 14px var(--sans);cursor:pointer;padding:4px 6px}
 /* Phases */
 .phases{display:grid;gap:0}
 .phase{display:grid;grid-template-columns:28px minmax(0,1fr);gap:0 12px;padding-bottom:18px;position:relative}
@@ -87,6 +157,16 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .goal .num{font:12px var(--mono);color:var(--soft);text-align:right;font-variant-numeric:tabular-nums}
 .goal .bar{grid-column:1/-1;flex:none;height:6px}
 .phase.done .goal .bar>span{background:var(--ok)}
+/* Projects */
+.projects{display:grid;gap:0}
+.proj{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+.proj:first-child{border-top:0}
+.proj .pn{font-weight:700;font-size:17px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.proj .here{font:12px var(--mono);color:var(--accent)}
+.proj .pbar{display:flex;align-items:center;gap:10px;margin-top:6px;max-width:560px}
+.proj .pbar .num{font:12px var(--mono);color:var(--soft);font-variant-numeric:tabular-nums;width:3.5em;text-align:right}
+.proj .acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:620px){.proj{grid-template-columns:1fr}.proj .acts{justify-content:flex-start}}
 </style>
 
 <div class="wrap">
@@ -95,27 +175,38 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <span class="meta"><span class="live-dot" id="dot"></span><span id="updated">Waiting for the project manager's first update</span></span>
   </header>
   <nav class="tabs" aria-label="Pages">
+    <a href="#office" data-tab="office">Office</a>
     <a href="#plan" data-tab="plan">Plan</a>
-    <a href="#team" data-tab="team">Team</a>
     <a href="#you" data-tab="you">For you<span class="count" id="you-count" hidden></span></a>
+    <a href="#projects" data-tab="projects" id="projects-tab" hidden>Projects</a>
   </nav>
 
-  <section data-page="plan" class="stack" aria-label="Plan">
+  <section data-page="office" class="stack" aria-label="Office">
+    <div class="office">
+      <div class="wall">
+        <a class="board" href="#plan" id="board">
+          <span class="lvl" id="board-lvl">Plan</span>
+          <span class="ph" id="board-ph">No phases yet</span>
+          <span class="row"><span class="big" id="board-pct">0%</span><span class="bar" aria-hidden="true"><span id="board-bar" style="width:0%"></span></span></span>
+        </a>
+        <a class="sticky calm" href="#you" id="sticky"><b id="sticky-n">0</b><span id="sticky-t">things need you</span></a>
+        <span class="headcount" id="headcount"></span>
+      </div>
+      <div class="floor" id="floor"><p class="empty" style="padding:24px 8px">The team moves in once Claude staffs the first task.</p></div>
+    </div>
+    <p class="hint">Tap a teammate to see what they do. Typing means working, asleep means idle, a red ! means blocked, a ? means they wait on you.</p>
+  </section>
+
+  <section data-page="plan" class="stack" aria-label="Plan" hidden>
     <div class="panel pm">
       <h2>Project manager</h2>
       <div class="progress"><span class="big" id="pct">0%</span><div class="bar" aria-hidden="true"><span id="pct-bar" style="width:0%"></span></div></div>
       <p id="summary">Claude writes here what the team is doing. It fills in as soon as the first update arrives.</p>
     </div>
     <div class="panel">
-      <h2>Phases</h2>
+      <h2>Levels</h2>
       <div class="phases" id="phases"><p class="empty">The project manager's phases and their goals appear here.</p></div>
     </div>
-  </section>
-
-  <section data-page="team" class="panel" aria-labelledby="team-h" hidden>
-    <h2 id="team-h">Who works on what</h2>
-    <div class="team" id="team"><p class="empty">The team appears here once Claude staffs the first task.</p></div>
-    <p class="note" style="margin:12px 0 0">Watch opens what that teammate is building. On your PC, Claude's test browser also opens as a visible Chrome window.</p>
   </section>
 
   <section data-page="you" class="top" aria-label="For you" hidden>
@@ -130,17 +221,35 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       <ul id="live"><li class="empty">Nothing deployed yet.</li></ul>
     </div>
   </section>
+
+  <section data-page="projects" class="panel" aria-labelledby="projects-h" hidden>
+    <h2 id="projects-h">All projects</h2>
+    <div class="projects" id="projects"></div>
+  </section>
 </div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-name" hidden>
+  <button class="close" id="sheet-close" type="button">Close</button>
+  <div class="hd"><span id="sheet-art"></span><div><h3 id="sheet-name"></h3><div class="role" id="sheet-role"></div><span class="chip" id="sheet-state"></span></div></div>
+  <dl>
+    <div><dt>Working on</dt><dd id="sheet-task"></dd></div>
+    <div id="sheet-next-w"><dt>Next</dt><dd id="sheet-next"></dd></div>
+    <div id="sheet-with-w"><dt>Works with</dt><dd id="sheet-with"></dd></div>
+  </dl>
+  <div class="acts" id="sheet-acts"></div>
+</aside>
 
 <script>
 const $ = (id) => document.getElementById(id)
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n }
 const safeUrl = (u) => { if (typeof u !== 'string' || !u) return null; try { const x = new URL(u, location.href); return /^https?:$/.test(x.protocol) ? x.href : null } catch { return null } }
 const link = (text, href, cls) => { const u = safeUrl(href); if (!u) return el('span', null, text); const a = el('a', cls, text); a.href = u; a.target = '_blank'; a.rel = 'noopener'; return a }
-const STATES = { working: 'working', blocked: 'blocked', waiting: 'waiting on you', idle: 'idle', done: 'done' }
+const STATES = { working: 'working', blocked: 'blocked', waiting: 'waiting on you', idle: 'asleep', done: 'done' }
+const stateOf = (s) => (s in STATES ? s : 'idle')
 const list = (box, items, render, emptyText) => {
   box.replaceChildren()
-  if (!items.length) { const li = el('li', 'empty', emptyText); box.append(li); return }
+  if (!items.length) { box.append(el('li', 'empty', emptyText)); return }
   for (const it of items) box.append(render(it))
 }
 const ago = (iso) => {
@@ -149,40 +258,149 @@ const ago = (iso) => {
   return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : new Date(t).toLocaleDateString()
 }
 
+/* Mascots: static SVG pieces picked by whitelisted role and state keys; no stored text ever goes into this markup. */
+const ROLES = [
+  ['security', /secur|red.?team/i], ['legal', /legal|law|recht/i], ['design', /design|ui\b/i],
+  ['tester', /test|review|qa|gate/i], ['researcher', /research|plan|architect/i],
+  ['marketer', /market|growth|social/i], ['manager', /manag|lead|operator|coordinat/i], ['programmer', /program|dev|code|build/i],
+]
+const roleIn = (t) => (ROLES.find(([, re]) => re.test(t || '')) || [null])[0]
+const roleKey = (m) => roleIn(m.role) || roleIn(String(m.name || '').split('·')[0]) || 'other'
+const ROLE_NAMES = { manager: 'Manager', programmer: 'Programmer', tester: 'Tester', researcher: 'Researcher', marketer: 'Marketer', security: 'Security', legal: 'Legal', design: 'Designer', other: 'Teammate' }
+const LOOK = {
+  manager: { body: '#2f3e5c', hair: '#3b2a20',
+    chest: '<path d="M72 92 L80 104 L88 92 Z" fill="#f4f4f2"/><path d="M78 94 h4 l2 12 l-4 4 l-4 -4 Z" fill="#c0362c"/>',
+    head: '', desk: '<rect x="32" y="98" width="16" height="11" rx="1" fill="#e9e3d0" stroke="#7a6a4a"/><rect x="37" y="96" width="6" height="3" fill="#7a6a4a"/>' },
+  programmer: { body: '#4a6b5d', hair: '#1f1a17',
+    back: '<path d="M57 70 a23 25 0 0 1 46 0 v8 h-46 Z" fill="#4a6b5d"/>',
+    chest: '<path d="M74 92 v8 M86 92 v8" class="ln" stroke="#e6ece9"/>',
+    head: '<path d="M60 58 a20 20 0 0 1 40 0" fill="none" stroke="#22272b" stroke-width="4"/><rect x="56" y="55" width="7" height="12" rx="3" fill="#22272b"/><rect x="97" y="55" width="7" height="12" rx="3" fill="#22272b"/>',
+    desk: '<rect x="118" y="98" width="8" height="11" rx="1" fill="#3d7bd9"/>' },
+  tester: { body: '#f2f2ee', hair: '#7a4a2b',
+    chest: '<path d="M74 90 L80 100 L86 90 Z" fill="#2c8c7a"/><path d="M80 100 V112" class="ln" stroke="#b9bdb8"/>',
+    head: '<rect x="64" y="44" width="32" height="8" rx="4" fill="#2c8c7a"/><circle cx="72" cy="48" r="4" fill="#bfe8df"/><circle cx="88" cy="48" r="4" fill="#bfe8df"/>',
+    desk: '<circle cx="122" cy="100" r="6" fill="none" stroke="#3a3f42" stroke-width="2.5"/><path d="M126 104 l6 5" stroke="#3a3f42" stroke-width="3" stroke-linecap="round"/>' },
+  researcher: { body: '#8a5a3c', hair: '#b08a5a',
+    chest: '<path d="M74 90 L80 98 L86 90 Z" fill="#efe6d6"/>',
+    head: '<circle cx="73" cy="62" r="5.5" fill="none" stroke="#2b2b2b" stroke-width="1.8"/><circle cx="87" cy="62" r="5.5" fill="none" stroke="#2b2b2b" stroke-width="1.8"/><path d="M78.5 62 h3" stroke="#2b2b2b" stroke-width="1.8"/>',
+    desk: '<rect x="30" y="102" width="22" height="6" fill="#c0362c"/><rect x="32" y="97" width="19" height="5" fill="#1f5fa8"/><rect x="31" y="93" width="20" height="4" fill="#e3b341"/>' },
+  marketer: { body: '#d2672a', hair: '#2e1d14',
+    chest: '<circle cx="80" cy="98" r="3" fill="#fff3e6"/>',
+    head: '<path d="M60 52 a20 14 0 0 1 40 0 Z" fill="#1f5fa8"/><path d="M98 51 h12 a3 3 0 0 1 0 4 h-12 Z" fill="#1f5fa8"/>',
+    desk: '<path d="M30 104 l14 -6 v14 l-14 -6 Z" fill="#e9e3d0" stroke="#7a6a4a"/><rect x="26" y="102" width="5" height="5" fill="#7a6a4a"/>' },
+  security: { body: '#26323a', hair: '#151515',
+    chest: '<path d="M80 90 l7 3 v5 c0 5 -3 8 -7 10 c-4 -2 -7 -5 -7 -10 v-5 Z" fill="#e3b341"/>',
+    head: '<path d="M60 54 a20 16 0 0 1 40 0 Z" fill="#151a1e"/><rect x="58" y="52" width="44" height="4" rx="2" fill="#151a1e"/>',
+    desk: '' },
+  legal: { body: '#5a4a6b', hair: '#d7d2c8',
+    chest: '<path d="M74 92 l6 3 l-6 3 Z M86 92 l-6 3 l6 3 Z" fill="#c0362c"/><circle cx="80" cy="95" r="1.6" fill="#c0362c"/>',
+    head: '<rect x="68" y="59" width="10" height="6" rx="2" fill="none" stroke="#2b2b2b" stroke-width="1.6"/><rect x="82" y="59" width="10" height="6" rx="2" fill="none" stroke="#2b2b2b" stroke-width="1.6"/>',
+    desk: '<path d="M124 92 v16 M114 96 h20 M114 96 l-4 8 h8 Z M134 96 l-4 8 h8 Z" stroke="#7a6a4a" stroke-width="1.6" fill="#e3b341"/>' },
+  design: { body: '#b8455f', hair: '#2b1b1b',
+    chest: '<path d="M70 96 h20" class="ln" stroke="#f3d1d9"/>',
+    head: '<ellipse cx="76" cy="43" rx="17" ry="6" fill="#26323a"/><circle cx="76" cy="37" r="2" fill="#26323a"/>',
+    desk: '<rect x="118" y="98" width="10" height="11" rx="2" fill="#3a3f42"/><path d="M120 98 l-2 -10 M124 98 l1 -11 M127 98 l3 -8" stroke-width="2.2" stroke="#e3b341"/>' },
+  other: { body: '#6b7a86', hair: '#4a3a2e', chest: '', head: '', desk: '' },
+}
+function mascot(role, state) {
+  const k = LOOK[role] ? role : 'other', L = LOOK[k], s = stateOf(state)
+  return `<svg class="m s-${s}" viewBox="0 0 160 150" role="img" aria-label="${ROLE_NAMES[k]}, ${STATES[s]}">
+  <rect class="chairb" x="54" y="64" width="52" height="50" rx="10"/>
+  <g class="body">
+    ${L.back || ''}
+    <path d="M56 114 V96 a24 22 0 0 1 48 0 V114 Z" fill="${L.body}"/>
+    ${L.chest}
+    <g class="head">
+      <circle class="skin" cx="80" cy="62" r="19"/>
+      <path d="M61 60 a19 19 0 0 1 38 0 q-9 -9 -19 -7 q-10 -2 -19 7 Z" fill="${L.hair}"/>
+      <g class="eyes-open"><circle class="eye" cx="73" cy="63" r="2.3"/><circle class="eye" cx="87" cy="63" r="2.3"/></g>
+      <g class="eyes-closed"><path class="ln" d="M70 64 q3 2 6 0 M84 64 q3 2 6 0"/></g>
+      <circle class="cheek" cx="68" cy="69" r="3"/><circle class="cheek" cx="92" cy="69" r="3"/>
+      <path class="ln" d="M76 72 q4 3 8 0"/>
+      ${L.head}
+    </g>
+  </g>
+  <rect class="dtop" x="18" y="108" width="124" height="8" rx="2"/>
+  <rect class="dfront" x="24" y="116" width="112" height="30"/>
+  <path class="lid" d="M63 108 L66 88 H94 L97 108 Z"/><circle class="logo" cx="80" cy="98" r="3"/>
+  <rect class="laptop-shut" x="64" y="104" width="32" height="4" rx="1" fill="#c3cad0"/>
+  <g class="hands"><circle class="skin hand-l" cx="60" cy="106" r="5"/><circle class="skin hand-r" cx="100" cy="106" r="5"/></g>
+  ${L.desk}
+  <g class="mug"><rect x="112" y="97" width="10" height="11" rx="2" fill="#f2f2ee" stroke="#3a3f42"/><path d="M122 100 h3 v5 h-3" fill="none" stroke="#3a3f42"/></g>
+  <g class="zz"><text class="z" x="104" y="42">z</text><text class="z" x="112" y="32">z</text><text class="z" x="120" y="22">Z</text></g>
+  <g class="b-work"><path class="bub" d="M108 16 h36 a6 6 0 0 1 6 6 v12 a6 6 0 0 1 -6 6 h-24 l-8 6 v-6 h-4 a6 6 0 0 1 -6 -6 v-12 a6 6 0 0 1 6 -6 Z"/><circle class="dot" cx="116" cy="28" r="3" fill="#0d6e5b"/><circle class="dot" cx="126" cy="28" r="3" fill="#0d6e5b"/><circle class="dot" cx="136" cy="28" r="3" fill="#0d6e5b"/></g>
+  <g class="b-block"><circle cx="126" cy="30" r="14" fill="#c0362c"/><rect x="124" y="20" width="4" height="12" rx="2" fill="#fff"/><circle cx="126" cy="37" r="2.4" fill="#fff"/></g>
+  <g class="b-wait"><circle cx="126" cy="30" r="14" fill="#e3a12b"/><text x="126" y="36" text-anchor="middle" style="font:700 18px var(--mono)" fill="#2a1d00">?</text></g>
+  <g class="b-done"><circle cx="126" cy="30" r="13" fill="#1f7a3f"/><path d="M119 30 l5 5 l9 -10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>`
+}
+
+let team = []
+const names = () => Object.fromEntries(team.map((m) => [m.id, m.name]))
+
+function renderTeam(members) {
+  team = members
+  const rank = { working: 0, blocked: 1, waiting: 2, idle: 3, done: 4 }
+  members.sort((a, b) => (rank[stateOf(a.state)] - rank[stateOf(b.state)]) || (a.order ?? 99) - (b.order ?? 99))
+  const floor = $('floor'); floor.replaceChildren()
+  if (!members.length) { const p = el('p', 'empty', 'The team moves in once Claude staffs the first task.'); p.style.padding = '24px 8px'; floor.append(p) }
+  const tally = {}
+  for (const m of members) {
+    const s = stateOf(m.state); tally[s] = (tally[s] || 0) + 1
+    const desk = el('button', 'desk'); desk.type = 'button'
+    desk.innerHTML = mascot(roleKey(m), s)
+    const plate = el('span', 'plate')
+    plate.append(el('span', 'nm', m.name || 'Teammate'), el('span', `chip ${s}`, STATES[s]))
+    desk.append(plate)
+    desk.addEventListener('click', () => openSheet(m, desk))
+    floor.append(desk)
+  }
+  $('headcount').textContent = Object.keys(STATES).filter((s) => tally[s]).map((s) => `${tally[s]} ${STATES[s]}`).join(' · ')
+  if (sheetFor) { const m = members.find((x) => x.id === sheetFor); if (m) fillSheet(m) }
+}
+
+let sheetFor = null, lastFocus = null
+function fillSheet(m) {
+  const s = stateOf(m.state), k = roleKey(m)
+  $('sheet-art').innerHTML = mascot(k, s)
+  $('sheet-name').textContent = m.name || 'Teammate'
+  $('sheet-role').textContent = ROLE_NAMES[k]
+  $('sheet-state').className = `chip ${s}`; $('sheet-state').textContent = STATES[s]
+  $('sheet-task').textContent = m.task || 'No task right now'
+  $('sheet-next-w').hidden = !m.next; $('sheet-next').textContent = m.next || ''
+  const w = (m.with || []).map((id) => names()[id]).filter(Boolean)
+  $('sheet-with-w').hidden = !w.length; $('sheet-with').textContent = w.join(', ')
+  const acts = $('sheet-acts'); acts.replaceChildren()
+  if (safeUrl(m.preview)) acts.append(link('Watch live', m.preview, 'btn watch'))
+  if (safeUrl(m.link)) acts.append(link(m.linkLabel || 'Open', m.link, 'btn'))
+}
+function openSheet(m, from) {
+  sheetFor = m.id; lastFocus = from; fillSheet(m)
+  $('sheet').hidden = false; $('scrim').hidden = false; $('sheet-close').focus()
+}
+function closeSheet() {
+  if ($('sheet').hidden) return
+  sheetFor = null; $('sheet').hidden = true; $('scrim').hidden = true
+  if (lastFocus && document.contains(lastFocus)) lastFocus.focus()
+}
+$('sheet-close').addEventListener('click', closeSheet)
+$('scrim').addEventListener('click', closeSheet)
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet() })
+
 function renderPm(d) {
   if (!d) return
   $('title').textContent = d.project || 'Project'
   document.title = `${d.project || 'Project'} HQ`
   $('updated').textContent = d.updated ? `Updated ${ago(d.updated)}` : 'Live'
   const n = (d.you || []).length
-  $('you-count').hidden = n === 0
-  $('you-count').textContent = String(n)
+  $('you-count').hidden = n === 0; $('you-count').textContent = String(n)
+  $('sticky-n').textContent = String(n)
+  $('sticky-t').textContent = n === 1 ? 'thing needs you' : n ? 'things need you' : 'Nothing needs you'
+  $('sticky').classList.toggle('calm', n === 0)
   $('summary').textContent = d.summary || ''
   list($('next'), d.next || [], (s) => el('li', null, s), 'None yet.')
   list($('you'), d.you || [], (y) => { const li = el('li'); li.append(link(y.what, y.link)); return li }, 'Nothing right now.')
   list($('live'), d.live || [], (l) => { const li = el('li'); li.style.padding = '4px 0'; li.append(link(l.name, l.url)); if (l.note) li.append(el('span', 'note', ` · ${l.note}`)); return li }, 'Nothing deployed yet.')
-}
-
-function renderTeam(members) {
-  const box = $('team'); box.replaceChildren()
-  if (!members.length) { box.append(el('p', 'empty', 'The team appears here once Claude staffs the first task.')); return }
-  const names = Object.fromEntries(members.map((m) => [m.id, m.name]))
-  const rank = { working: 0, blocked: 1, waiting: 2, idle: 3, done: 4 }
-  members.sort((a, b) => (rank[a.state] ?? 5) - (rank[b.state] ?? 5) || (a.order ?? 99) - (b.order ?? 99))
-  for (const m of members) {
-    const row = el('div', 'row')
-    const who = el('div', 'who', m.name); who.append(el('span', 'role', m.role || ''))
-    const st = el('span', `state ${m.state in STATES ? m.state : 'idle'}`, STATES[m.state] || 'idle')
-    const task = el('div', 'task', m.task || 'No task')
-    if (m.next) task.append(el('small', null, `Next: ${m.next}`))
-    const w = (m.with || []).map((id) => names[id]).filter(Boolean)
-    if (w.length) task.append(el('span', 'with', `with ${w.join(', ')}`))
-    const acts = el('div', 'acts')
-    if (safeUrl(m.preview)) acts.append(link('Watch', m.preview, 'btn watch'))
-    if (safeUrl(m.link)) acts.append(link(m.linkLabel || 'Open', m.link, 'btn'))
-    row.append(who, st, task, acts)
-    box.append(row)
-  }
 }
 
 function renderPhases(phases) {
@@ -195,7 +413,7 @@ function renderPhases(phases) {
     const ph = el('div', `phase ${state}`)
     ph.append(el('div', 'mark', state === 'done' ? '✓' : String(i + 1)))
     const body = el('div')
-    const head = el('div', 'ph-head'); head.append(el('span', 'ph-name', p.name), el('span', 'meta', { done: 'done', active: 'now', next: 'later' }[state]))
+    const head = el('div', 'ph-head'); head.append(el('span', 'ph-name', p.name), el('span', 'meta', { done: 'cleared', active: 'playing now', next: 'locked' }[state]))
     body.append(head)
     if (p.why) body.append(el('div', 'note', p.why))
     const goals = el('div', 'goals')
@@ -209,12 +427,40 @@ function renderPhases(phases) {
     body.append(goals); ph.append(body); box.append(ph)
   })
   const pct = total > 0 ? Math.round((100 * done) / total) : 0
-  $('pct').textContent = `${pct}%`
-  $('pct-bar').style.width = `${pct}%`
+  $('pct').textContent = `${pct}%`; $('pct-bar').style.width = `${pct}%`
+  const cur = phases.findIndex((p) => p.state === 'active')
+  const at = cur >= 0 ? cur : phases.findIndex((p) => p.state !== 'done')
+  $('board-lvl').textContent = phases.length ? `Level ${at >= 0 ? at + 1 : phases.length} of ${phases.length}` : 'Plan'
+  $('board-ph').textContent = phases.length ? (at >= 0 ? phases[at].name : 'All levels cleared') : 'No phases yet'
+  $('board-pct').textContent = `${pct}%`; $('board-bar').style.width = `${pct}%`
 }
 
+function renderProjects(projects) {
+  $('projects-tab').hidden = projects.length === 0
+  projects.sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+  const box = $('projects'); box.replaceChildren()
+  for (const p of projects) {
+    const row = el('div', 'proj'), info = el('div')
+    const pn = el('div', 'pn'); pn.append(el('span', null, p.name || p.id))
+    const st = ['active', 'paused', 'done'].includes(p.state) ? p.state : 'paused'
+    pn.append(el('span', `chip ${st}`, st))
+    if (p.here) pn.append(el('span', 'here', 'you are here'))
+    info.append(pn)
+    if (p.note) info.append(el('div', 'note', p.note))
+    const pct = Math.max(0, Math.min(100, Math.round(Number(p.progress) || 0)))
+    const pb = el('div', 'pbar'), bar = el('div', 'bar'), fill = el('span'); fill.style.width = `${pct}%`; bar.append(fill)
+    pb.append(bar, el('span', 'num', `${pct}%`)); info.append(pb)
+    const acts = el('div', 'acts')
+    if (safeUrl(p.dashboard) && !p.here) acts.append(link('Open dashboard', p.dashboard, 'btn watch'))
+    if (safeUrl(p.live)) acts.append(link('Live app', p.live, 'btn'))
+    row.append(info, acts); box.append(row)
+  }
+}
+
+const TABS = ['office', 'plan', 'you', 'projects']
 function showTab() {
-  const tab = ['plan', 'team', 'you'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'plan'
+  const h = location.hash.slice(1)
+  const tab = TABS.includes(h) ? h : 'office'
   for (const p of document.querySelectorAll('[data-page]')) p.hidden = p.dataset.page !== tab
   for (const a of document.querySelectorAll('[data-tab]')) {
     if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page')
@@ -233,5 +479,6 @@ const rows = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }))
   db.doc('pm/now').onSnapshot((s) => renderPm(s.exists ? s.data() : null), fail)
   db.collection('team').onSnapshot((s) => renderTeam(rows(s)), fail)
   db.collection('phases').onSnapshot((s) => renderPhases(rows(s)), fail)
+  db.collection('projects').onSnapshot((s) => renderProjects(rows(s)), fail)
 })()
 </script>

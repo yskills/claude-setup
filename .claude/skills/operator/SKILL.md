@@ -87,9 +87,11 @@ Templates in `templates/`.
   thread reads it first; only the operator writes it. Under 100 lines.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
 - **Dashboard** (`templates/dashboard.html`), yskills' live view of the project from day one, in
-  three pages: **Plan** (the operator's update and the phases, each with its goals' progress
-  bars), **Team** (who works on what, with whom, working or idle, Watch and Open links) and **For
-  you** (what needs yskills, next steps, live links). At project start the operator plans the
+  four pages: **Office** (each teammate is a mascot at a desk dressed for its role, typing when
+  working, asleep when idle, ! when blocked, ? when it waits on yskills; tap one for task, next,
+  with whom, Watch and Open; a whiteboard shows the current level and a sticky note what needs
+  yskills), **Plan** (the operator's update and the phases as levels with goal bars), **For you**
+  (what needs yskills, next steps, live links) and **Projects** (shown only with `projects` rows). At project start the operator plans the
   phases (brief (a)'s plan: research, plan, scaffold, one per slice or group of slices, launch,
   grow), publishes the page with the Artifact tool, `capabilities: {db: {rules: [{path: "", read:
   "view", write: "admin"}]}}`, puts the link in `PROGRESS.md` and brief (a), and fills it with one
@@ -98,8 +100,12 @@ Templates in `templates/`.
   done, total, link}]`; a slice's goal counts its passing criteria in `features.json`) and
   `team/<id>` for the operator, each thread and each reviewer agent (`name, role, state` =
   working, blocked, waiting, idle or done, `task, next, with[ids], link, linkLabel, preview,
-  order`). Every write to `PROGRESS.md` updates the same rows in one batch (pin each with
-  `if_version`). Luna's cockpit stays the one view across projects.
+  order`; the mascot follows the role word: Manager, Programmer, Tester, Researcher, Marketer,
+  Security, Legal, Designer). Every write to `PROGRESS.md` updates the same rows in one batch (pin
+  each with `if_version`). The new project also gets a row `projects/<id>` (`name, state` = active,
+  paused or done, `progress` 0-100, `note, dashboard, live, order`) in the Claude Setup HQ
+  dashboard (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT), so yskills can tap from there into
+  each project's own dashboard. Luna's cockpit stays the one view of revenue and analytics.
 
 ## 4. The run
 
