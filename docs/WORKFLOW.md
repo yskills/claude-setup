@@ -19,7 +19,7 @@ whole history every turn.
 | 5a | Probe (anything meant to earn) | one builder thread, then the marketing team | slice `probe` live: offer, price, waitlist; pushed in one channel for ~14 days against the go number from `PLAN.md` | Nothing if it hits the number; else one tap: kill, change or build anyway |
 | 5 | Build | builder threads (Sonnet), one per slice, at most 3 in parallel; a small site is one thread, no slices | PRs with tests, screenshots, preview link; `PROGRESS.md` updated | Nothing |
 | 6 | Gate each PR | QA: `evaluator` on the preview, fresh `code-reviewer`; security: `security-reviewer` + `red-team`; `design-critic` + `legal-reviewer` | a 5/5 table on the PR, or one review the builder fixes | Tap **Merge it** at 5/5 |
-| 7 | Launch | full `red-team` and `legal-reviewer` pass; `publish`, `sell` go-live; Sentry, PostHog | live site | **Brief (c):** ok = merge the last PR; live keys |
+| 7 | Launch | full `red-team` and `legal-reviewer` pass; `publish`, `sell` go-live; PostHog for analytics and errors | live site | **Brief (c):** ok = merge the last PR; live keys |
 | 8 | Grow | marketing team (`market` skill, `seo-specialist`); a weekly routine | posts, launch, a weekly PR with the `metrics/` file Luna's cockpit reads and the next slice | Merge the weekly PR to go on; approve post batches, pay for ads |
 | 9 | Learn | operator | each lesson becomes a rule, skill line, test or check in claude-setup | Merge that PR |
 
