@@ -15,10 +15,9 @@ revenue, analytics) instead of getting their own dashboard.
   check (`docs/WORKFLOW.md`, Learning) moves lasting notes into the repo and deletes the rest.
 - New app idea or "continue the project": follow the `operator` skill. It sizes the job, writes
   acceptance criteria before building, and sends yskills three ok/no briefs.
-- Merging: a fresh gate thread posts the `operator` skill's 5/5 table. Unimportant PRs then merge
-  through GitHub's auto-merge where yskills set it up; important ones (auth, payments, migrations,
-  secrets, launch) and claude-setup wait for yskills' tap. Never press merge yourself unless
-  yskills tells you to. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
+- Merging: a fresh gate thread posts the `operator` skill's 5/5 table and merges small, clear PRs
+  itself; important or hard ones (auth, payments, migrations, secrets, launch) and claude-setup
+  wait for yskills' tap. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
 - Spend little: the operator, `planner` and `architect` on Opus (they decide once per project),
   everything else (threads, other agents) on Sonnet; reviewers get only the diff or URL plus the
   criteria.

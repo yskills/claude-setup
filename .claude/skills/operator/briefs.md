@@ -36,7 +36,7 @@ sends the next round. Each lasting like or dislike becomes a line in `TASTE.md`.
 Below the pick, first the scaffold PR's merge tap (the import builds the default branch), then,
 once per project, the setup only yskills can do (numbered steps with deep links
 and exact names, from the `publish` skill and `sell`'s `keys.md`): Cloudflare import, D1 ids,
-Previews Base secrets, and (with GitHub Pro) the auto-merge ruleset. Test keys come later by key card, when the slice that uses them
+Previews Base secrets. Test keys come later by key card, when the slice that uses them
 starts. Building starts when yskills replies "done".
 
 ## (c) Before launch

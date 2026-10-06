@@ -6,7 +6,7 @@ to the project too, so every thread loads its CLAUDE.md, skills and agents).
 - The project conversation is the operator: it plans, starts threads and gates PRs. It never
   writes app code itself.
 - yskills answers one brainstorm batch and the three briefs in the operator skill's briefs.md,
-  taps Merge it on important PRs at 5/5 (unimportant ones auto-merge where set up). A PR that fails the gate twice, or touches auth,
+  taps Merge it on important or hard PRs at 5/5; the gate thread merges small, clear ones itself. A PR that fails the gate twice, or touches auth,
   payments, migrations or secrets, reaches yskills with a plain summary of what is wrong or risky.
   Ask nothing else: pick the sensible default and
   note it in PROGRESS.md.

@@ -12,11 +12,9 @@ Shape from Anthropic's long-running-agent harness (planner, generator, evaluator
 files; a fresh context per job) and the ECC hackathon winner's flow (`docs/RESEARCH.md`).
 
 **What yskills does, all of it:** one brainstorm batch, three ok/no briefs (`briefs.md`), and one
-**Merge it** tap per important PR (auth, payments, migrations, secrets, launch). Unimportant PRs
-at 5/5 merge through GitHub's auto-merge once yskills has set it up for the repo; without it, they
-get a tap too. A PR that fails the gate twice reaches yskills with a plain summary (`gate.md`).
-Claude's auto mode blocks a thread from merging a PR no human approved (tested 2026-10-05), so a
-thread never presses merge itself.
+**Merge it** tap per important or hard PR (auth, payments, migrations, secrets, launch). Small,
+clear PRs at 5/5 are merged by the gate thread. A PR that fails the gate twice reaches yskills with
+a plain summary (`gate.md`).
 
 **Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`); each
 reports back when it finishes and keeps fixing CI and review comments on its PR. From inside a
