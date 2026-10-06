@@ -1,6 +1,6 @@
 # Project Manager
 
-The project chat itself (the coordinator running this skill). Plans with yskills, starts every other role, keeps `PROGRESS.md`, `features.json` and the office dashboard current.
+The project chat itself (the coordinator running this skill). Plans with yskills, starts every other role, keeps `PROGRESS.md`, `features.json` and its rows in HQ current.
 
 - **Starts:** Always on, from the first brainstorm to the weekly growth routine.
 - **Runs as:** The project conversation; never a separate thread.
@@ -13,7 +13,7 @@ The project chat itself (the coordinator running this skill). Plans with yskills
 - Every brief names what is final: yskills' pauses and rejected assets or looks. Relay a "stop" to every running thread at once.
 - Report results and real blockers only; cards take their recommended option at once.
 - Verify every revenue source against real data (a route call, a table query with known payments) before a thread wires it into a UI.
-- Every write to `PROGRESS.md` updates the office rows in the same batch.
+- Every write to `PROGRESS.md` updates the HQ rows in the same batch.
 - At the end of the project, ask every role for its lessons (step 9).
 - A message "HQ request <id>: <idea>" is yskills' New project tap in HQ: start one brainstorm thread for it (step 1) with the id in its brief, once per id; that thread marks `requests/<id>` started with its link.
 

@@ -40,7 +40,7 @@ grades):
 
 | Role | Does | Runs as | Example title |
 |---|---|---|---|
-| Project Manager | the operator: plans with yskills, starts the others, keeps PROGRESS.md and the office | the project chat | Project Manager · duo-test |
+| Project Manager | the operator: plans with yskills, starts the others, keeps PROGRESS.md and its HQ rows | the project chat | Project Manager · duo-test |
 | Researcher | competitors, prices, tools and skills, proof people pay (step 2) | subagents; a thread when big | Researcher · competitors |
 | Designer | the look, then every UI screenshot | subagent; a thread for a redesign | Designer · directions |
 | Programmer | one slice or fix, the PR, green CI | a thread each, at most 3 at once | Programmer · subscription |
@@ -107,41 +107,33 @@ Templates in `templates/`.
 - `PROGRESS.md`: the handoff. Done, next, broken, decisions and why, each thread's cost. Every
   thread reads it first; only the operator writes it. Under 100 lines.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
-- **Dashboard** (`templates/dashboard.html`), yskills' live view of the project from day one: a
-  first-person room at yskills' own desk, built from the Kenney Furniture Kit (CC0): the laptop opens
-  Company, the phone the To-dos, the whiteboard the Plan, the wall chart the money, the door the team
-  office. Publish it with `files: {"office-kit.js": "templates/office-kit.js", "pets-kit.js": null}` (`null` drops the
-  old Cube Pets file from an HQ published before; without office-kit.js HQ opens on Company). Behind the door is a
-  full-screen 3D office with a game HUD (project name and level bar, coins = € this month, a bell
-  with the to-do count) and a dock. **Office**: yskills turns and taps it; one desk per role, each
-  teammate a chibi pixel-art animal drawn in the page itself (polar bear, macaw, tabby cat, beaver, bunny, penguin, shepherd dog, fox, panda) at a kit desk, typing when working,
-  dozing when idle, shaking its head with a ! when blocked, waving with a ? when it waits on yskills, dancing in the lounge when done; tap one for task, next, with whom, Watch and Open; the whiteboard shows the current
-  level, the sticky note what needs yskills; day and night follow yskills' clock. **Plan**: the operator's update and the phases as levels with goal bars. **Team**: the nine roles. **To-dos**
-  (what needs yskills, live links) and **Company** (shown only with `projects` rows: totals, every project, all its needs-you). At project start the operator plans the
-  phases (brief (a)'s plan: research, plan, scaffold, one per slice or group of slices, launch,
-  grow), publishes the page with the Artifact tool, `capabilities: {db: {rules: [{path: "", read:
-  "view", write: "admin"}]}, mcp: {servers: [{server: "Claude Code Remote", tools: ["send_message"]}]}}`
-  (the notepad's message to the coordinator), puts the link in `PROGRESS.md` and brief (a), and fills it with one
-  `ArtifactData` batch: `pm/now` (`project, summary, next[], you[{what, link}], live[{name, url,
-  note}], updated`), `phases/<id>` (`name, order, state` = done, active or next, `why, goals[{name,
+- **Dashboard: HQ is the only one.** yskills' live view of every project is the pinned Claude Setup HQ
+  Artifact (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT, template `templates/dashboard.html`,
+  which is HQ itself: a first-person desk, a 3D office with one chibi animal per role, Plan, Team,
+  To-dos and Company with every project's money). **A project never publishes its own office page.**
+  The Project Manager writes the project's rows into HQ's db with `ArtifactData` (viewing costs no
+  tokens, only these writes do) and republishes the template only when HQ itself changes (then
+  with `files: {"office-kit.js": "templates/office-kit.js"}`, the same capabilities `db` and the
+  `mcp` send_message, and `if_version` pins). At project start it plans the phases (brief (a)'s plan:
+  research, plan, scaffold, one per slice or group of slices, launch, grow) and writes one batch,
+  every `phases` and `team` id prefixed `<project>-` so projects never overwrite each other (`pm/now`
+  is the Claude Setup project's own summary; any other project keeps its summary, live link and
+  needs-you list in its `projects/<id>` row): `phases/<id>` (`name, order, state` = done, active or next, `why, goals[{name,
   done, total, link}]`; a slice's goal counts its passing criteria in `features.json`) and
   `team/<id>` for the operator, each thread and each reviewer agent (`name, role, state` =
   working, blocked, waiting, idle or done, `task, next, with[ids], link, linkLabel, preview,
   order`; the desk follows the role word in `role` or the name: Project Manager, Researcher,
-  Designer, Programmer, Tester, Reviewer, Security, Legal, Marketer). Viewing costs no tokens;
-  only these writes do. Every write to `PROGRESS.md` updates the same rows in one batch (pin
+  Designer, Programmer, Tester, Reviewer, Security, Legal, Marketer). Every write to `PROGRESS.md` updates the same rows in one batch (pin
   each with `if_version`). The new project also gets a row `projects/<id>` (`name, state` = active,
-  paused or done, `progress` 0-100, `note, dashboard, live, order, revenueMonth, revenueTotal`
+  paused or done, `progress` 0-100, `note, live, order, revenueMonth, revenueTotal`
   (EUR numbers, from the project's public stats route, e.g. duo-test's `/api/stats` in cents divided by
   100; Artifact pages cannot fetch other sites, so the manager copies them at every milestone),
   `revenueMode` (`test` while Stripe is in test mode, HQ then says "Testgeld"), `revenueAt` (ISO time of
-  that read), `working` (count), `you[{what, link}]`) in the Claude Setup HQ
-  dashboard (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT), and keeps it current with every
-  `pm/now` write. **A revenue source is verified against real data before any UI reads it:** call
+  that read), `working` (count), `you[{what, link}]`; a project's `dashboard` link, if the project has no
+  Artifact of its own, is its project chat thread), and keeps it current with every `pm/now` write. **A revenue source is verified against real data before any UI reads it:** call
   the route or query the table and check that the known payments show up (duo-test's `/api/stats`
   went live summing rows that were never stored and showed 0 € for 28 € of payments); a source
-  that returns nothing yet is wired only together with its backfill. HQ's Company view is yskills' one home for all projects and their money; Luna's
-  cockpit links to it.
+  that returns nothing yet is wired only together with its backfill. Luna's cockpit links to HQ.
   **Game events:** HQ's level, XP and coins come only from `events/<id>` rows in HQ's db
   (`{kind, project, at, amount?}`), nothing else counts. At each milestone, in the same batch as the
   `PROGRESS.md` rows, the operator or gate thread writes one with a fixed id so a retry does not
@@ -155,7 +147,7 @@ Templates in `templates/`.
   thread runs, with `link`) and messages the coordinator with the Claude Code Remote connector's
   `send_message` ("HQ request <id>: <idea> ..."). The coordinator has no db tools, so threads keep
   the address and the queue: **every project thread, at start and when it finishes,** calls
-  `get_channel_session_id` and writes its project's office (HQ in Claude Setup) `config/coordinator` (`{session, at}`,
+  `get_channel_session_id` and writes HQ's `config/coordinator` (`{session, at}`,
   pinned with `if_version`); **at start** it also lists `requests` and, for each row that is `new`
   or `sent` with no `link`, sends the same "HQ request <id>: <text>" line to the coordinator with
   `send_message` and sets the row to `relayed`. The coordinator answers each such message with one
