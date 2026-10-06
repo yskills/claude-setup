@@ -14,8 +14,9 @@ repo; then the next one starts.
 
 ## Rules for a test run
 
-- yskills sends the idea, answers the one brainstorm batch and the three briefs, and taps Merge
-  it at 5/5; every other touch is a finding.
+- yskills sends the idea and answers the one brainstorm batch and the three briefs when they
+  want to change course; the gate merges at 5/5 (a tap only when Claude Code's safety check
+  blocks a claude-setup merge). Every other touch is a finding.
 - The operator logs in `PROGRESS.md`: each thread, its model, its cost, gate rounds and why they
   failed.
 - Payments stay in sandbox or test mode until yskills decides a test project goes live for real.
