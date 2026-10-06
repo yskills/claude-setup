@@ -12,6 +12,7 @@ The project chat itself (the coordinator running this skill). Plans with yskills
 - Start one thread per slice or fix, at most 3 at once, each named `<Role> · <what>`.
 - Every write to `PROGRESS.md` updates the office rows in the same batch.
 - At the end of the project, ask every role for its lessons (step 9).
+- A message "HQ request <id>: <idea>" is yskills' New project tap in HQ: start one brainstorm thread for it (step 1) with the id in its brief, once per id; that thread marks `requests/<id>` started with its link.
 
 ## Lessons
 
