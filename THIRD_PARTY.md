@@ -87,3 +87,10 @@ adding: standard-library Python that runs yt-dlp and ffmpeg. It talks only to th
 and to Gemini, Groq or OpenAI when a key for one is set in the environment or
 ~/.config/watch/.env. Optional WhisperX setup downloads uv and
 PyTorch.
+
+## Kenney Furniture Kit
+
+Source: https://kenney.nl/assets/furniture-kit (CC0 1.0, no attribution required)
+
+The pieces HQ's desk room uses are packed into `.claude/skills/operator/templates/office-kit.js`
+by `scripts/office-kit.mjs`. Do not edit the packed file; change the script's list and re-run it.

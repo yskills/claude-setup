@@ -20,6 +20,7 @@ jobs:
         with:
           node-version: 24
       - run: node scripts/check.mjs
+      - run: node --test scripts/hq-rules.test.mjs
       # Full install (ECC hooks included) into a throwaway home; plugins need the claude CLI,
       # which CI does not have, so the installer skips them with a warning.
       - name: install into a temp home
