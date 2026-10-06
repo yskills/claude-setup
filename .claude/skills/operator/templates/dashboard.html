@@ -1,6 +1,6 @@
 <title>Claude Setup HQ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Nunito:wght@500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap">
 <style>
 /* A cozy office game. The office fills the screen; a HUD sits on top: level and coins up top, a dock below.
    Company: every project, its money and what it needs from yskills. Plan: levels. Team: the nine roles. To-dos: what needs yskills. */
@@ -10,7 +10,7 @@
   --ok:#3a8a55;--warn:#c97a00;--bad:#c8402f;--idle:#9a8c7e;--coin:#f2b630;--coin-ink:#8a5a00;
   --stage:#f1e3cf;--shadow:#2b2420;
   --sans:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --mono:"Nunito",ui-rounded,system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#1d1814;--panel:#2a221b;--fg:#f3e9dc;--soft:#b9aa98;--line:#463a2f;--ink:#0e0b09;
@@ -23,7 +23,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font:600 15px/1.45 var(--sans);overflow:hidden}
+body{font-variant-numeric:tabular-nums;margin:0;background:var(--bg);color:var(--fg);font:600 15px/1.45 var(--sans);overflow:hidden}
 a{color:var(--accent);text-underline-offset:2px}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
@@ -34,7 +34,7 @@ button{font:inherit;color:inherit}
 .stage canvas.point{cursor:pointer}
 .labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .tag{all:unset;position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;display:grid;justify-items:center;gap:2px;transform:translate(-50%,-100%);white-space:nowrap}
-.tag .nm{font:800 12px/1.2 var(--sans);color:#2b2420;background:#fffaf0;padding:3px 9px;border-radius:999px;border:2px solid #2b2420}
+.tag .nm{font:800 12px/1.2 var(--sans);color:#2b2420;background:#fffaf0;padding:3px 9px;border-radius:8px;border:2px solid #2b2420;box-shadow:0 2px 0 #2b2420}
 .tag .chip{font-size:11px;padding:0 6px}
 .tag:focus-visible .nm{outline:2px solid var(--accent)}
 .stage-msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--soft)}
@@ -42,12 +42,19 @@ button{font:inherit;color:inherit}
 .hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 16px;pointer-events:none}
 .hud>*{pointer-events:auto}
 .card{background:var(--panel);border:2.5px solid var(--ink);border-radius:16px;box-shadow:0 4px 0 var(--shadow)}
-.plate{padding:10px 14px;min-width:0;max-width:min(360px,58vw);display:grid;gap:6px}
-.plate h1{font:900 19px/1.15 var(--sans);margin:0;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lvl{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;font:800 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
-.lvl .bar{height:10px}
-.lvl .pct{font:600 12px var(--mono);color:var(--fg);font-variant-numeric:tabular-nums}
-.greet{font-size:13px;color:var(--soft);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plate{padding:8px 14px 8px 8px;min-width:0;max-width:min(380px,62vw);display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px}
+.plate .pm{display:grid;gap:4px;min-width:0}
+/* Level badge: a stitched merit badge, like the patches on a scout sash */
+.lv-badge{position:relative;width:54px;height:54px;border-radius:50%;background:var(--accent);border:2.5px solid var(--ink);box-shadow:inset 0 -4px 0 var(--accent-ink);display:grid;place-items:center;align-content:center;color:#fffaf0;line-height:1}
+.lv-badge::before{content:"";position:absolute;inset:4px;border-radius:50%;border:2px dashed rgba(255,250,240,.55)}
+.lv-badge small{font:900 10px var(--sans);letter-spacing:.02em}
+.lv-badge b{font:900 24px/1 var(--sans);margin-top:-1px}
+.plate h1{font:900 18px/1.15 var(--sans);margin:0;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvl{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+.lvl .bar{height:12px;background:var(--bg)}
+.lvl .bar>span{box-shadow:inset 0 3px 0 rgba(255,255,255,.3)}
+.lvl .pct{font:800 12px var(--sans);color:var(--soft)}
+.greet{font-size:12.5px;color:var(--soft);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--idle);margin-right:6px;vertical-align:1px}
 .live-dot.on{background:var(--ok)}
 .right{display:flex;gap:8px;align-items:center}
@@ -71,27 +78,32 @@ button{font:inherit;color:inherit}
 /* Pages slide over the office: a side panel on wide screens, a sheet on phones */
 .page{position:absolute;z-index:5;overflow-y:auto;overscroll-behavior:contain;display:grid;gap:14px;align-content:start;
   left:16px;top:122px;bottom:96px;width:min(460px,calc(100% - 32px));padding:18px 18px 22px}
-@media (max-width:640px){#labels .tag .chip{display:none}#labels .tag .nm{font-size:11px;padding:2px 7px}}
+#labels .tag .chip{display:none}#labels .tag:hover .chip,#labels .tag:focus-visible .chip{display:inline}
+@media (max-width:640px){#labels .tag .nm{font-size:11px;padding:2px 7px}}
 @media (max-width:440px){.dock{left:8px;right:8px;transform:none;gap:0}.dock button{flex:1;min-width:0;padding:6px 2px 5px;font-size:10.5px}}
 @media (max-width:640px){.page{left:10px;right:10px;width:auto;top:auto;max-height:calc(100% - 220px);bottom:86px;padding:16px}}
 .page h2{font:900 22px/1.2 var(--sans);margin:0;text-wrap:balance}
-.page h3{font:800 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:4px 0 0}
+.page h3{font:900 16px var(--sans);color:var(--fg);margin:6px 0 -4px}
 .lead{margin:0;color:var(--soft);font-weight:600}
 .empty{color:var(--soft);margin:0;font-weight:600}
 ol,ul{margin:0;padding:0;list-style:none}
 .note{font-size:13px;color:var(--soft)}
 .btn{display:inline-block;font:900 13px var(--sans);text-decoration:none;padding:7px 14px;border-radius:999px;border:2.5px solid var(--ink);color:var(--fg);background:var(--panel);white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
 .btn.go{background:var(--accent);color:#fffaf0}
-.chip{font:600 12px var(--mono);padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;background:var(--panel)}
+.chip{font:800 12px var(--sans);padding:1px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;background:var(--panel)}
 .chip.working,.chip.active{color:var(--accent);background:var(--accent-soft);border-color:transparent}
 .chip.blocked{color:var(--bad)}
 .chip.waiting{color:var(--warn)}
 .chip.idle,.chip.done,.chip.paused,.chip.off{color:var(--idle)}
 /* Company */
-.totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.tot{border:2px solid var(--line);border-radius:14px;padding:8px 10px;display:grid;gap:0}
-.tot b{font:800 20px/1.2 var(--mono);font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
-.tot span{font:800 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+/* Totals as a ledger: label, dotted leader, amount, like a page in a cash book */
+.totals{display:grid;gap:2px;padding:4px 14px;border-radius:12px;background:var(--bg);border:2px solid var(--line)}
+.tot{display:flex;align-items:baseline;gap:8px;padding:5px 0}
+.tot span{order:1}
+.tot::after{content:"";order:2;flex:1;border-bottom:2px dotted var(--line);transform:translateY(-4px)}
+.tot b{order:3}
+.tot b{font:900 19px/1.2 var(--sans);font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.tot span{font:700 15px var(--sans);color:var(--soft)}
 .tot.need b{color:var(--bad)}
 .projects{display:grid;gap:10px}
 .proj{border:2.5px solid var(--ink);border-radius:16px;padding:12px 14px;display:grid;gap:8px;background:var(--bg)}
@@ -106,6 +118,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .todo li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;padding:9px 0;border-top:2px dashed var(--line)}
 .todo li:first-child{border-top:0}
 .todo li::before{content:"";width:16px;height:16px;margin-top:2px;border:2.5px solid var(--ink);border-radius:5px;background:var(--panel)}
+.todo li.empty{display:block}
 .todo li.empty::before{display:none}
 .todo .from{font:600 11px var(--mono);color:var(--soft);display:block}
 .next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
@@ -148,13 +161,13 @@ ol,ul{margin:0;padding:0;list-style:none}
 .member{border-top:2px dashed var(--line);padding-top:12px;display:grid;gap:8px}
 .member .mh{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-weight:800}
 .member dl{margin:0;display:grid;gap:8px}
-.member dt{font:800 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.member dt{font:800 13px var(--sans);color:var(--soft)}
 .member dd{margin:2px 0 0}
 .close{justify-self:end}
 .stack{display:grid;gap:12px}
 /* New project notepad: a sheet of the yellow pad on the desk */
 .idea{display:grid;gap:10px}
-.idea label{font:800 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.idea label{font:800 14px var(--sans);color:var(--soft)}
 .idea textarea{font:600 16px/1.5 var(--sans);color:#2b2420;resize:vertical;min-height:7.5em;padding:10px 12px 10px 44px;border:2.5px solid var(--ink);border-radius:12px;
   background:linear-gradient(90deg,transparent 30px,#e0645a 30px,#e0645a 32px,transparent 32px),repeating-linear-gradient(#fff3b8 0 23px,#c9d6ea 23px 24px) #fff3b8;background-attachment:local}
 .idea textarea::placeholder{color:#6f5f30}
@@ -186,9 +199,12 @@ ol,ul{margin:0;padding:0;list-style:none}
   <div class="toast" id="toast" role="status" hidden></div>
   <div class="hud">
     <a class="card plate" href="#plan" style="text-decoration:none;color:inherit" aria-label="Open the plan">
-      <h1 id="title">Claude Setup</h1>
-      <div class="lvl"><span id="lvl-label">Lv 1</span><div class="bar" aria-hidden="true"><span id="lvl-bar" style="width:0%"></span></div><span class="pct" id="lvl-pct">0 XP</span></div>
-      <p class="greet"><span class="live-dot" id="dot"></span><span id="greet">Your team is here.</span></p>
+      <span class="lv-badge" id="lvl-label" aria-label="Level 1"><small aria-hidden="true">Lv</small><b id="lvl-num" aria-hidden="true">1</b></span>
+      <div class="pm">
+        <h1 id="title">Claude Setup</h1>
+        <div class="lvl"><div class="bar" aria-hidden="true"><span id="lvl-bar" style="width:0%"></span></div><span class="pct" id="lvl-pct">0 XP</span></div>
+        <p class="greet"><span class="live-dot" id="dot"></span><span id="greet">Your team is here.</span></p>
+      </div>
     </a>
     <div class="right">
       <a class="card pill" href="#company" id="coins" aria-label="Coins earned, one per euro" hidden>
@@ -486,12 +502,22 @@ window.TEAM_ART = (() => {
       if (a === 'head') blob(HX + s * 7.5, HY - 6.5, 2.2, 2.2, armC, armS)
       if (L.armTip && a !== 'key' && a !== 'keyUp') { const y = a === 'side' ? BY + 2.6 : a === 'head' ? HY - 5 : BY - 5; rect(16 + s * (a === 'head' ? 7.5 : a === 'side' ? 6.4 : 8.6) - 0.5 + (a === 'head' ? P.hx : 0), y, 1, 1, L.armTip) }
     }
-    /* dark outline around the whole silhouette */
-    const sil = document.createElement('canvas'); sil.width = o.width; sil.height = o.height
-    const sc = sil.getContext('2d'); sc.drawImage(o, 0, 0); sc.globalCompositeOperation = 'source-in'; sc.fillStyle = INK; sc.fillRect(0, 0, sil.width, sil.height)
-    const k = cv.width / W
+    /* Selective outline, as hand-made pixel art does it: each outline pixel is a dark shade of the fur
+       it touches (lightest on top where the light comes from, darkest underneath), never flat black */
+    const img = c.getImageData(0, 0, o.width, o.height), px = img.data, out = new Uint8ClampedArray(px)
+    const at = (x, y) => (x < 0 || y < 0 || x >= o.width || y >= o.height ? -1 : (y * o.width + x) * 4)
+    for (let y = 0; y < o.height; y += S) for (let x = 0; x < o.width; x += S) {
+      if (px[at(x, y) + 3] > 40) continue
+      let best = null, k = 1
+      for (const [dx, dy, dk] of [[0, S, 0.62], [-S, 0, 0.5], [S, 0, 0.5], [0, -S, 0.34]]) {
+        const i = at(x + dx, y + dy); if (i >= 0 && px[i + 3] > 40 && (!best || dk < k)) { best = i; k = dk }
+      }
+      if (!best) continue
+      const ink = [43, 36, 32], mix = (ch) => Math.round(px[best + ch] * k * 0.55 + ink[ch] * (1 - k * 0.55))
+      for (let yy = y; yy < y + S; yy++) for (let xx = x; xx < x + S; xx++) { const j = at(xx, yy); out[j] = mix(0); out[j + 1] = mix(1); out[j + 2] = mix(2); out[j + 3] = 255 }
+    }
+    img.data.set(out); c.putImageData(img, 0, 0)
     g.imageSmoothingEnabled = false
-    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) g.drawImage(sil, dx * k, dy * k, cv.width, cv.height)
     g.drawImage(o, 0, 0, cv.width, cv.height)
   }
   return { W, H, LOOK, POSES, draw }
@@ -710,7 +736,7 @@ function renderPhases(phases) {
   const cur = phases.findIndex((p) => p.state === 'active')
   const at = cur >= 0 ? cur : phases.findIndex((p) => p.state !== 'done')
   level = {
-    label: phases.length ? `LEVEL ${at >= 0 ? at + 1 : phases.length} OF ${phases.length}` : 'PLAN',
+    label: phases.length ? `Level ${at >= 0 ? at + 1 : phases.length} of ${phases.length}` : 'Plan',
     name: phases.length ? (at >= 0 ? phases[at].name : 'All levels cleared') : 'No phases yet', pct,
   }
   office?.setWall(level, youCount); room?.update()
@@ -720,7 +746,7 @@ function renderPhases(phases) {
 let game = HQ.scoreFrom([])
 function renderGame(g) {
   game = g
-  $('lvl-label').textContent = `Lv ${g.level}`; $('lvl-bar').style.width = `${g.pct}%`; $('lvl-pct').textContent = `${g.xp - g.from}/${g.to - g.from} XP`
+  $('lvl-num').textContent = String(g.level); $('lvl-label').setAttribute('aria-label', `Level ${g.level}`); $('lvl-bar').style.width = `${g.pct}%`; $('lvl-pct').textContent = `${g.xp - g.from} / ${g.to - g.from} XP`
   $('coins').hidden = false; $('coin-val').textContent = String(g.coins)
   $('game-line').textContent = `Level ${g.level} · ${g.xp} XP · ${g.coins} coin${g.coins === 1 ? '' : 's'}`
   room?.update()
@@ -879,9 +905,9 @@ async function buildRoom() {
   })
   const lid = plane(ls.x * 0.84, ls.y * 0.78, screen.t, true)
   lid.position.set(0, dt + ls.y * 0.56, 1.1 - ls.z / 2 + 0.1); lid.rotation.x = -0.1; scene.add(lid)
-  spot(laptop, 'company', 'Projects & money', new T.Vector3(0, dt + ls.y + 0.08, 1.1 - ls.z / 2)); spot(lid, 'company')
+  spot(laptop, 'company', 'Projects & money', new T.Vector3(0, dt + ls.y * 0.92, 1.1 - ls.z / 2)); spot(lid, 'company')
 
-  const phone = new T.Group(); phone.position.set(0.42, dt + 0.008, 1.3); phone.rotation.y = -0.35
+  const phone = new T.Group(); phone.position.set(0.44, dt + 0.008, 1.14); phone.rotation.y = -0.35
   const body = new T.Mesh(new T.BoxGeometry(0.1, 0.014, 0.19), new T.MeshStandardMaterial({ color: '#2b2420', roughness: 0.4 })); body.castShadow = true; phone.add(body)
   const lock = face(160, 300, (g, w, h) => {
     g.fillStyle = '#16202e'; g.fillRect(0, 0, w, h)
@@ -893,7 +919,7 @@ async function buildRoom() {
     g.textAlign = 'left'
   })
   const glass = plane(0.088, 0.17, lock.t, true); glass.rotation.x = -Math.PI / 2; glass.position.y = 0.0075; phone.add(glass)
-  scene.add(phone); spot(phone, 'todo', 'To-dos', new T.Vector3(0.42, dt + 0.1, 1.3))
+  scene.add(phone); spot(phone, 'todo', 'To-dos', new T.Vector3(0.44, dt + 0.1, 1.14))
 
   /* The yellow notepad: tap it to start a new project. Its page shows the newest request's state. */
   const pad = new T.Group(); pad.position.set(-0.4, dt + 0.006, 0.98); pad.rotation.y = 0.22; pad.scale.setScalar(1.4)
@@ -948,6 +974,22 @@ async function buildRoom() {
   })
   spot(frame(0.8, 1.02, 1.32, 1.6, -R + 0.07, chart.t), 'company', 'Money', new T.Vector3(1.32, 2.23, -R + 0.1))
 
+  /* What a real home office has above eye level: shelves with books and plants, a pendant lamp over the desk */
+  const solid = (geo, mat, x, y, z, parent = scene) => { const m = new T.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; parent.add(m); return m }
+  const wood = new T.MeshStandardMaterial({ color: '#c79a6b', roughness: 0.8 })
+  for (const x of [-1.38, 1.32]) {
+    const shelf = solid(new T.BoxGeometry(1.0, 0.05, 0.24), wood, x, 2.42, -R + 0.14)
+    for (const sx of [-0.3, 0.3]) solid(new T.BoxGeometry(0.04, 0.12, 0.2), wood, x + sx, 2.36, -R + 0.13)
+    put(x < 0 ? 'books' : 'plantSmall1', x - 0.24, -R + 0.15, { s: 0.75, y: 2.445 }); put(x < 0 ? 'plantSmall1' : 'books', x + 0.26, -R + 0.15, { s: 0.75, y: 2.445, ry: 0.4 })
+    shelf.receiveShadow = true
+  }
+  const shadeMat = new T.MeshStandardMaterial({ color: '#d9774b', roughness: 0.6, side: T.DoubleSide })
+  const pendant = new T.Group(); scene.add(pendant)
+  const cord = solid(new T.CylinderGeometry(0.008, 0.008, 0.46, 6), new T.MeshStandardMaterial({ color: '#2b2420' }), 0.8, 2.61, -0.4, pendant); cord.castShadow = false
+  const lampShade = solid(new T.CylinderGeometry(0.07, 0.24, 0.2, 24, 1, true), shadeMat, 0.8, 2.3, -0.4, pendant); lampShade.castShadow = false
+  const bulbGlow = new T.MeshBasicMaterial({ color: '#8a8070' })
+  solid(new T.SphereGeometry(0.055, 16, 12), bulbGlow, 0.8, 2.22, -0.4, pendant).castShadow = false
+
   const door = new T.Group(); door.position.set(0, 0, -R + 0.03)
   const slab = new T.Mesh(new T.BoxGeometry(0.98, 2.1, 0.06), new T.MeshStandardMaterial({ color: '#b07a4f', roughness: 0.7 })); slab.position.y = 1.05; slab.castShadow = true; door.add(slab)
   const knob = new T.Mesh(new T.SphereGeometry(0.04, 16, 12), new T.MeshStandardMaterial({ color: '#f2b630', metalness: 0.5, roughness: 0.3 })); knob.position.set(0.36, 1.0, 0.05); door.add(knob)
@@ -964,16 +1006,17 @@ async function buildRoom() {
   const sun = new T.DirectionalLight(0xfff0dc, 0.8); sun.position.set(-9, 7, 1); sun.target.position.set(0, 0, 0); sun.castShadow = true
   sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006; Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 1, far: 25 }); scene.add(sun, sun.target)
   const lamp = new T.PointLight(0xffc27a, 0, 4, 2); lamp.position.set(-0.62, dt + 0.45, 0.86); scene.add(lamp)
-  const ceiling = new T.PointLight(0xffd9a0, 0, 9, 2); ceiling.position.set(0, 2.6, -0.5); scene.add(ceiling)
+  const ceiling = new T.PointLight(0xffd9a0, 0, 9, 2); ceiling.position.set(0.8, 2.1, -0.4); scene.add(ceiling)
   const LIGHT = { day: [0.7, 0.85, 0, 0.15], dusk: [0.5, 0.45, 0.9, 0.6], night: [0.22, 0.08, 1.3, 0.9] }
   function tick() {
     mode = HQ.modeOf(new Date().getHours()); const [h, s, l, c] = LIGHT[mode]
-    hemi.intensity = h; sun.intensity = s; sun.color.set(mode === 'dusk' ? 0xffa66b : 0xfff0dc); lamp.intensity = l; ceiling.intensity = c
+    hemi.intensity = h; sun.intensity = s; sun.color.set(mode === 'dusk' ? 0xffa66b : 0xfff0dc); lamp.intensity = l; ceiling.intensity = c; bulbGlow.color.set(c > 0.3 ? '#ffe2a0' : '#8a8070')
     sky.redraw(); lock.redraw()
   }
   tick(); setInterval(tick, 30000)
 
-  /* First person from the chair: wide screens see the whole wall, phones sit back a little and turn to look around */
+  /* First person from the chair: wide screens see the whole wall, phones sit back a little and turn to look around.
+     The pendant lamp hangs where each sees it: over the wall on wide screens, over the desk on phones. */
   function layout() {
     const w = stage.clientWidth, h = stage.clientHeight
     if (!w || !h) return
@@ -981,8 +1024,9 @@ async function buildRoom() {
     const tall = w / h < 0.8
     camera.fov = tall ? 74 : w / h < 1.3 ? 60 : 50
     camera.position.set(0, tall ? 1.75 : 1.5, tall ? 3.05 : 2.55)
-    const look = new T.Vector3(0, tall ? 0.75 : 1.15, -R).sub(camera.position).normalize().multiplyScalar(0.1)
+    const look = new T.Vector3(0, tall ? 0.75 : 1.0, -R).sub(camera.position).normalize().multiplyScalar(0.1)
     controls.target.copy(camera.position).add(look)
+    pendant.position.set(tall ? -0.8 : 0, 0, tall ? 1.3 : 0); ceiling.position.set(tall ? 0 : 0.8, 2.1, tall ? 0.9 : -0.4)
     camera.updateProjectionMatrix(); controls.update()
   }
   new ResizeObserver(layout).observe(stage); layout()
@@ -1231,14 +1275,14 @@ function buildOffice() {
   /* Whiteboard (level and progress), kanban board and the sticky note that counts what needs you */
   const board = canvasTex(1024, 512, (g, w, h, lv) => {
     g.fillStyle = '#fbfcfa'; g.fillRect(0, 0, w, h)
-    g.fillStyle = '#5d6a65'; g.font = '700 38px "IBM Plex Mono", monospace'; g.fillText(lv.label, 56, 92)
+    g.fillStyle = '#5d6a65'; g.font = '800 40px Nunito, ui-rounded, system-ui, sans-serif'; g.fillText(lv.label, 56, 92)
     g.fillStyle = '#17201d'; g.font = '900 66px "Nunito", sans-serif'
     const words = String(lv.name).split(' '); let line = '', y = 182
     for (const wd of words) { const t = line ? `${line} ${wd}` : wd; if (g.measureText(t).width > w - 112 && line) { g.fillText(line, 56, y); y += 76; line = wd } else line = t }
     g.fillText(line, 56, y)
     g.fillStyle = '#dbe1de'; g.fillRect(56, 400, w - 300, 34)
     g.fillStyle = '#0d6e5b'; g.fillRect(56, 400, (w - 300) * lv.pct / 100, 34)
-    g.fillStyle = '#17201d'; g.font = '700 64px "IBM Plex Mono", monospace'; g.fillText(`${lv.pct}%`, w - 220, 436)
+    g.fillStyle = '#17201d'; g.font = '800 64px Nunito, ui-rounded, system-ui, sans-serif'; g.fillText(`${lv.pct}%`, w - 220, 436)
   })
   box(4.4, 2.3, 0.08, '#8f9a96', 1.2, 3.0, BACK + 0.05)
   const wb = mesh(new T.PlaneGeometry(4.2, 2.1), new T.MeshBasicMaterial({ map: board.t }), 1.2, 3.0, BACK + 0.1)
@@ -1247,7 +1291,7 @@ function buildOffice() {
   for (let i = 0; i < 8; i++) { const n = box(0.28, 0.28, 0.02, ['#ffe58a', '#a8d8c8', '#f7b2a6', '#bcd2f2'][i % 4], -4.7 + (i % 4) * 0.62, 3.78 - Math.floor(i / 4) * 0.42, BACK + 0.08); n.rotation.z = ((i * 37) % 10 - 5) / 60 }
   const sticky = canvasTex(256, 256, (g, w, h, n) => {
     g.fillStyle = '#ffd84d'; g.fillRect(0, 0, w, h)
-    g.fillStyle = '#3d3200'; g.font = '700 120px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.fillText(String(n), w / 2, 140)
+    g.fillStyle = '#3d3200'; g.font = '800 120px Nunito, ui-rounded, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText(String(n), w / 2, 140)
     g.font = '800 34px "Nunito", sans-serif'; g.fillText(n === 1 ? 'needs you' : n ? 'need you' : 'all clear', w / 2, 206)
   })
   const note = mesh(new T.PlaneGeometry(1.0, 1.0), new T.MeshBasicMaterial({ map: sticky.t }), 4.1, 3.4, BACK + 0.1)
@@ -1262,7 +1306,7 @@ function buildOffice() {
   const TEX = {
     blocked: circle('#e0483c', '!'), waiting: circle('#f2b134', '?', '#2a1d00'), done: bubbleTex((g) => { g.fillStyle = '#2b2420'; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.fillStyle = '#3a9a5b'; g.beginPath(); g.arc(64, 64, 53, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 13; g.lineCap = g.lineJoin = 'round'; g.beginPath(); g.moveTo(38, 66); g.lineTo(56, 84); g.lineTo(90, 46); g.stroke() }),
     working: bubbleTex((g) => { g.fillStyle = '#fff'; g.strokeStyle = '#2b2420'; g.lineWidth = 7; g.beginPath(); if (g.roundRect) g.roundRect(8, 24, 112, 70, 26); else g.rect(8, 24, 112, 70); g.fill(); g.stroke(); g.fillStyle = '#0d6e5b'; for (const x of [36, 64, 92]) { g.beginPath(); g.arc(x, 59, 9, 0, 7); g.fill() } }),
-    z: bubbleTex((g) => { g.fillStyle = '#5a6a86'; g.font = '700 96px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('Z', 64, 68) }),
+    z: bubbleTex((g) => { g.fillStyle = '#5a6a86'; g.font = '800 96px Nunito, ui-rounded, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('Z', 64, 68) }),
   }
   const sprite = (tex, s) => { const sp = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })); sp.scale.set(s, s, s); return sp }
   const dogZ = sprite(TEX.z, 0.3); scene.add(dogZ)
@@ -1389,8 +1433,9 @@ function buildOffice() {
       const tg = tags[s.key], st = states[s.key] || 'off', n = counts[s.key] || 0
       const name = n > 1 ? `${s.name} ×${n}` : s.name
       if (tg.nm.textContent !== name) tg.nm.textContent = name
+      tg.t.setAttribute('aria-label', `${name}, ${st === 'off' ? 'off duty' : STATES[st]}`)
       const cls = `chip ${st}`; if (tg.chip.className !== cls) { tg.chip.className = cls; tg.chip.textContent = st === 'off' ? 'off duty' : STATES[st] }
-      seats[s.key].who.localToWorld(v.set(0, seats[s.key].h + 0.5, 0)).project(camera)
+      seats[s.key].who.localToWorld(v.set(0, seats[s.key].h + 0.22, 0)).project(camera)
       tg.t.style.left = `${((v.x + 1) / 2) * w}px`; tg.t.style.top = `${((1 - v.y) / 2) * h}px`
       tg.t.hidden = v.z > 1
     }
@@ -1422,12 +1467,16 @@ function buildOffice() {
     if (key !== hovered) { if (hovered) seats[hovered].ring.visible = false; hovered = key; if (key) seats[key].ring.visible = true }
   })
 
+  let wasTall = null
   function fit() {
     const w = stage.clientWidth, h = stage.clientHeight
     if (!w || !h) return
     renderer.setSize(w, h, false); camera.aspect = w / h
-    const dist = w / h < 0.8 ? 58 : w / h < 1.4 ? 40 : 30
-    const dir = camera.position.clone().sub(controls.target).normalize()
+    /* Phones look down the long side of the office, so the room fills the tall screen; turning is kept until the shape changes */
+    const tall = w / h < 0.8, dist = tall ? 47 : w / h < 1.4 ? 38 : 30
+    const dir = tall !== wasTall ? new T.Vector3().setFromSphericalCoords(1, 0.95, tall ? 1.1 : 0.58) : camera.position.clone().sub(controls.target).normalize()
+    if (tall !== wasTall) controls.target.set(tall ? 0.9 : -0.2, 0.6, tall ? 0.7 : 1.4)
+    wasTall = tall
     camera.position.copy(controls.target).addScaledVector(dir, dist)
     camera.updateProjectionMatrix(); controls.update()
   }
@@ -1490,7 +1539,7 @@ function buildOffice() {
         z.material.opacity = still ? 1 : Math.sin(k * Math.PI)
       })
       const bob = still ? 0 : s.state === 'blocked' || s.state === 'waiting' ? Math.abs(Math.sin(p * 2.4)) * 0.18 : Math.sin(p * 3) * 0.05
-      s.bubble.position.set(0.75, s.h + 0.35 + bob, 0)
+      s.bubble.position.set(0.3, s.h + 1.3 + bob, 0)
     }
     { const k = still ? 0.5 : (t * 0.3) % 1; dogZ.position.set(2.8 + k * 0.4, 0.75 + k * 0.7, 7.3); dogZ.material.opacity = still ? 1 : Math.sin(k * Math.PI) }
     if (!still && t - lastScreen > 0.45) { lastScreen = t; for (const s of Object.values(seats)) if (s.state === 'working') s.screenTex.redraw(1 + (Math.floor(t * 2) % 4)) }
