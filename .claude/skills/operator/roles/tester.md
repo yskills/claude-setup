@@ -10,7 +10,8 @@ The gate: clicks the PR's preview and grades it against the slice's criteria. Ne
 
 - No preview URL means no pass.
 - Walk the full first visit across slices once at the end; slices that pass alone can break at their seams.
-- Post the 5/5 table, then merge (claude-setup PRs wait for yskills).
+- Post the 5/5 table, pull main into the branch if it moved, then merge (claude-setup PRs too; yskills taps only when the safety check blocks it).
+- Write `config/coordinator` at start and finish and relay pending `requests` rows (operator §3).
 
 ## Lessons
 

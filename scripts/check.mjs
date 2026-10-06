@@ -25,12 +25,15 @@ function frontmatter(file) {
 const dirs = (p) => (existsSync(join(root, p)) ? readdirSync(join(root, p)).filter((n) => statSync(join(root, p, n)).isDirectory()) : [])
 const mds = (p) => (existsSync(join(root, p)) ? readdirSync(join(root, p)).filter((n) => n.endsWith('.md')) : [])
 const seen = { skill: new Map(), agent: new Map() }
+// Agent `model:` aliases Claude Code accepts (docs/WORKFLOW.md, Models); a typo here silently falls back to inherit.
+const MODELS = new Set(['fable', 'opus', 'sonnet', 'haiku', 'inherit'])
 function check(kind, file, expected) {
   const fm = frontmatter(join(root, file))
   if (!fm) return errors.push(`${file}: missing frontmatter`)
   if (!fm.name) errors.push(`${file}: missing name`)
   if (!fm.description) errors.push(`${file}: missing description`)
   if (fm.name && fm.name !== expected) errors.push(`${file}: name "${fm.name}" does not match "${expected}"`)
+  if (kind === 'agent' && fm.model && !MODELS.has(fm.model)) errors.push(`${file}: model "${fm.model}" is not one of ${[...MODELS].join(', ')}`)
   if (seen[kind].has(expected)) errors.push(`${kind} "${expected}" defined twice: ${seen[kind].get(expected)} and ${file}`)
   seen[kind].set(expected, file)
 }

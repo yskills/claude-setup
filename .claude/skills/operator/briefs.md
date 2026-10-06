@@ -2,8 +2,9 @@
 
 Besides the gate's summaries (2 failed rounds) and a probe that
 misses its go number, yskills reads three
-messages per project and answers each with ok or no
-(or a tap on an option). Fixed templates, so they read the same every time. Short lines, no prose. German
+messages per project. Under auto-run (2026-10-06) each is posted with its recommended
+pick and work continues at once; yskills' ok, no or a tap changes course, nothing waits for it
+except the steps only their hands can do (keys, domain, Cloudflare import). Fixed templates, so they read the same every time. Short lines, no prose. German
 labels only if yskills writes German in that project.
 
 ## (a) After the plan

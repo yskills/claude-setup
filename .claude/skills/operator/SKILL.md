@@ -11,16 +11,27 @@ checks the result against fixed criteria and keeps pushing until the goal in `PL
 Shape from Anthropic's long-running-agent harness (planner, generator, evaluator; progress in
 files; a fresh context per job) and the ECC hackathon winner's flow (`docs/RESEARCH.md`).
 
-**What yskills does, all of it:** one brainstorm batch, three ok/no briefs (`briefs.md`), and one
-no merge taps: every PR at 5/5 is merged by the gate thread, launch included (yskills' choice,
-2026-10-06). A PR that fails the gate twice reaches yskills with
-a plain summary (`gate.md`).
+**Auto-run (yskills, 2026-10-06 17:07: "just merge after test, skip everything, keep running
+till everything is done").** No taps anywhere. Every card still shows the options with the
+recommended one marked, but work continues on that option at once; a later tap or message
+changes course. The gate merges every PR at 5/5 itself, launch and live money included, after a
+real preview test and a fresh review. The coordinator posts results and real blockers only. The
+only waits left are things nobody can undo that need yskills' own hands: live keys, a domain, a
+Gewerbe (`briefs.md` key cards). A PR that fails the gate twice reaches yskills with a plain
+summary (`gate.md`) and keeps going on the recommended way forward.
 
-**Plan first.** Nothing is built before yskills agrees: the brainstorm and research turn into
-`PLAN.md`, and brief (a) is the start gate. Until its **ok** is tapped there is no repo, no scaffold
-and no builder thread; "no" or a change sends the operator back to the brainstorm with the
-change, and it re-sends brief (a). yskills can brainstorm in plain chat as long as they like; the
-operator answers with the next version of the plan, not with code.
+**Pauses and taste calls are final.** "Stop", "pause" or "only burning my money" stops every
+thread at once, mid-step; a thread that finished before the stop is parked and reported honestly,
+nothing restarts without yskills' go. An asset, look or idea yskills rejected stays rejected:
+no thread argues to keep it, the next version replaces it. Both go into every builder brief
+(step 5), because in the HQ run one thread kept building after a pause and another argued for
+rejected animals.
+
+**Brainstorm first, for every new project**, whether the idea comes as a message or as an "HQ
+request <id>" from the Neues Projekt notepad: the brainstorm and research turn into `PLAN.md`
+with a recommended pick on every open question, posted as brief (a). Under auto-run building
+starts from that plan right away; yskills' "no" or a change sends the operator back to the
+brainstorm. No repo, scaffold or builder thread exists before the plan is posted.
 
 **One role per thread, named by it.** Thread titles and dashboard rows read `<Role> · <what>`,
 so yskills sees at a glance who does what. Roles (the shape Anthropic recommends for long-running
@@ -44,13 +55,16 @@ thread re-reads its context. **Each role has a playbook in `roles/`** (what it d
 uses, its checklist and its lessons from earlier projects); a role reads its playbook before it
 starts, and its thread or subagent prompt names it.
 
-**Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`); each
+**Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`, with
+`model` by the routing rule in §5: `claude-fable-5-1` for architecture and plans, `claude-opus-5-5`
+for build slices and anything with design or judgement, `claude-sonnet-5-5` for follow-ups, small
+fixes, data wiring and tests); each
 reports back when it finishes and keeps fixing CI and review comments on its PR. From inside a
 thread, ask the coordinator (`get_channel_session_id`, then `send_message` with the task). In a
 plain claude.ai/code chat use `create_session` (`model: claude-sonnet-5-5`, `outcome_branch` = the
 task's branch) and check back with `send_later` plus `subscribe_pr_activity`. Project setup once:
-**Thread model** Sonnet, **Thread effort** medium, and `templates/project-instructions.md` pasted
-into Project instructions.
+**Thread model** Sonnet (the default; the coordinator passes the model per thread), **Thread
+effort** medium, and `templates/project-instructions.md` pasted into Project instructions.
 
 ## 1. Size the job
 
@@ -120,7 +134,10 @@ Templates in `templates/`.
   paused or done, `progress` 0-100, `note, dashboard, live, order, revenueMonth, revenueTotal`
   (EUR numbers, from Stripe), `working` (count), `you[{what, link}]`) in the Claude Setup HQ
   dashboard (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT), and keeps it current with every
-  `pm/now` write. HQ's Company view is yskills' one home for all projects and their money; Luna's
+  `pm/now` write. **A revenue source is verified against real data before any UI reads it:** call
+  the route or query the table and check that the known payments show up (duo-test's `/api/stats`
+  went live summing rows that were never stored and showed 0 € for 28 € of payments); a source
+  that returns nothing yet is wired only together with its backfill. HQ's Company view is yskills' one home for all projects and their money; Luna's
   cockpit links to it.
   **Game events:** HQ's level, XP and coins come only from `events/<id>` rows in HQ's db
   (`{kind, project, at, amount?}`), nothing else counts. At each milestone, in the same batch as the
@@ -182,11 +199,17 @@ Templates in `templates/`.
    card as soon as PLAN.md knows it is needed, so the clock runs during the build. The card's
    steps come from the skill that owns the key (`sell` `keys.md`, `store` §1, `publish`,
    `toolbox` picks). Keys go into the service's own settings page, never into chat or git.
-5. **Build.** One builder thread per slice, at most three at once: "Build slice <id> of PLAN.md;
+5. **Build.** One builder thread per slice, at most three at once, the next slice in a fresh
+   thread once the previous one is merged (two at once only when they share no file): "Build
+   slice <id> of PLAN.md;
    its criteria are in features.json (read only). Read PLAN.md, PROGRESS.md and CLAUDE.md first.
    Tests first, then code, then ship-check. Push branch `slice/<id>`, open a PR with phone and
    desktop screenshots and a 3-line progress note. Don't merge; keep fixing CI and the review
-   findings on the PR until it is merged." The first slice also commits the D1 ids from
+   findings on the PR until it is merged. Pull main into the branch right before the gate merges
+   (other slices may edit the same file). yskills' pauses and taste calls are final: a 'stop'
+   stops you mid-step, a rejected asset or look is replaced, not defended. Write
+   `config/coordinator` at start and finish and relay pending `requests` rows (§3)." The first
+   slice also commits the D1 ids from
    `PROGRESS.md`. The operator copies each note and the thread's cost (`get_session`,
    `external_metadata.usage.cost_usd`) into `PROGRESS.md`.
 
@@ -200,10 +223,10 @@ Templates in `templates/`.
    claude-setup), **change** (one new offer or channel, one more probe) or **build anyway**.
    Never move the go number after the probe started. A small site meant to earn is its own
    probe; one not meant to earn skips it.
-6. **Gate.** Only a tapped card counts as yes: a typed "ok" to a merge or brief gets the card
-   again. A fresh gate thread per PR runs `gate.md` and either posts the 5/5 table and merges
-   the PR or one review with the blocking findings, which the builder fixes. Three
-   failed rounds: stop and ask yskills with tap options.
+6. **Gate.** A fresh gate thread per PR runs `gate.md` and either posts the 5/5 table and merges
+   the PR (after pulling main into the branch when another PR merged since) or one review with
+   the blocking findings, which the builder fixes. Two failed rounds: one message to yskills
+   with tap options; under auto-run the recommended option is taken at once.
    **The whole journey, once.** After the last slice merges, one `evaluator` run walks the full
    first visit on live (or main's preview) along the journey criteria in `features.json` (one
    criterion per user journey that crosses slices) before yskills hears "ready to test". Test run
@@ -233,9 +256,15 @@ conversation can continue later; a plain chat idle for over an hour hands off to
 
 ## 5. Spend little
 
-- Coordinator, `planner` and `architect` on Opus (they decide once per project); threads (medium
-  effort) and every other agent on Sonnet. Built-in subagents
-  default to Sonnet via `CLAUDE_CODE_SUBAGENT_MODEL`.
+- **Model routing** (yskills, 2026-10-06; the table is in claude-setup `docs/WORKFLOW.md`,
+  Models): **Fable** for architecture and plans (the `architect` agent, an Architect thread, the
+  coordinator when it plans a project); **Opus** for build slices and anything with design or
+  judgement (`planner`, Programmer slice threads, Designer threads, `design-critic`,
+  `build-error-resolver`, `refactor-cleaner`); **Sonnet** for follow-ups, small fixes, data
+  wiring, tests and reviews (gate threads, reviewers, `evaluator`, `red-team`, research
+  subagents). Thread effort medium. Built-in subagents default to Sonnet via
+  `CLAUDE_CODE_SUBAGENT_MODEL`. When in doubt: does the thread decide something that is hard to
+  undo or that yskills will look at? Opus. Does it fill in what a plan already decided? Sonnet.
 - Reviewers, evaluator and red team get only the diff or the URL plus the criteria.
 - The operator is not subscribed to slice PRs: each Cloudflare preview comment woke it, 46M cached
   tokens in test run 1. Slice and gate threads report by message. The context guard
@@ -243,9 +272,10 @@ conversation can continue later; a plain chat idle for over an hour hands off to
   writes `PROGRESS.md` and asks for a fresh one.
 - One job per thread. When its job is done (PR merged, report delivered) the thread stops and is
   marked resolved; never revive a worker idle for over an hour.
-- After a usage-limit stop or reset, nothing restarts on its own: post one line ("paused at <step>")
-  and wait for yskills' go, then continue only what `PROGRESS.md` lists as open, one thread at a
-  time.
+- After a usage-limit stop, a reset or yskills' "stop", nothing restarts on its own: post one
+  line ("paused at <step>") and wait for yskills' go, then continue only what `PROGRESS.md`
+  lists as open, one thread at a time. Fanning out several threads before anything is visible
+  cost about 10 EUR and yskills' trust in test run 1; show something early, then spend.
 - No `/ultrareview`, no unrequested WebFetch, no research the plan already answers.
 - The evaluator runs once per gate round. Red team and legal run per PR only when the gate's table
   says so, and once in full before launch.
