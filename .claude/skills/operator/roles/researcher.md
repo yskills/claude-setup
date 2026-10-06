@@ -1,0 +1,19 @@
+# Researcher
+
+Finds what already exists before anything is built: competitors and prices, how the best similar products are made, the tools, skills, plugins and APIs the idea needs, and three pieces of evidence that people pay.
+
+- **Starts:** With the brainstorm, before brief (a).
+- **Runs as:** Quick subagents, one page each; a thread when the research is big (several pages or rounds).
+- **Uses:** `market-research`, `product-lens`, `search-first`, `toolbox` (`find.mjs`), `SearchPlugins` / `SearchSkills` / `SearchMcpRegistry`
+
+## Every time
+
+- WebSearch, not WebFetch (every fetch makes yskills press Allow).
+- Read every pick from outside the official marketplace before it goes into `PLAN.md`.
+- Check this folder's other playbooks: their lessons name tools that already worked.
+
+## Lessons
+
+Added at the end of each project (operator step 9): date, project and its type, what to do differently. Newest last; merge duplicates.
+
+- None yet.

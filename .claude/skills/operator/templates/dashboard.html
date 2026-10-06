@@ -1,146 +1,241 @@
 <title>Claude Setup HQ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Nunito:wght@500;600;700;800;900&display=swap">
 <style>
-/* Layout: a control room in three pages. Plan: the manager's update and the phases with each goal's bar. Team: one row per teammate. For you: what needs yskills, next steps, live links. */
+/* A cozy office game. The office fills the screen; a HUD sits on top: level and coins up top, a dock below.
+   Company: every project, its money and what it needs from yskills. Plan: levels. Team: the nine roles. To-dos: what needs yskills. */
 :root{
-  --bg:#f3f5f4;--panel:#ffffff;--fg:#17201d;--soft:#5d6a65;--line:#dbe1de;
-  --accent:#0d6e5b;--accent-soft:#e1f0ec;
-  --ok:#1f7a3f;--warn:#b26a00;--bad:#c0362c;--idle:#8b9792;
-  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --bg:#f3e8d6;--panel:#fffaf0;--fg:#2b2420;--soft:#7a6a5b;--line:#e4d4bb;--ink:#2b2420;
+  --accent:#2f7d6a;--accent-ink:#1d5a4b;--accent-soft:#dcefe5;
+  --ok:#3a8a55;--warn:#c97a00;--bad:#c8402f;--idle:#9a8c7e;--coin:#f2b630;--coin-ink:#8a5a00;
+  --stage:#f1e3cf;--shadow:#2b2420;
+  --sans:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#101614;--panel:#18201d;--fg:#e6ece9;--soft:#93a19b;--line:#2a3531;
-  --accent:#4fc2a6;--accent-soft:#16302a;--ok:#5cc489;--warn:#e9a640;--bad:#ff7a6e;--idle:#6d7a75;color-scheme:dark}}
+  --bg:#1d1814;--panel:#2a221b;--fg:#f3e9dc;--soft:#b9aa98;--line:#463a2f;--ink:#0e0b09;
+  --accent:#6cc4a6;--accent-ink:#2e7a63;--accent-soft:#1f3a31;--ok:#7bcf94;--warn:#f0b04a;--bad:#ff8a74;--idle:#8c7f71;--coin:#f2b630;--coin-ink:#8a5a00;
+  --stage:#2a2119;--shadow:#0e0b09;color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#101614;--panel:#18201d;--fg:#e6ece9;--soft:#93a19b;--line:#2a3531;
-  --accent:#4fc2a6;--accent-soft:#16302a;--ok:#5cc489;--warn:#e9a640;--bad:#ff7a6e;--idle:#6d7a75;color-scheme:dark}
+  --bg:#1d1814;--panel:#2a221b;--fg:#f3e9dc;--soft:#b9aa98;--line:#463a2f;--ink:#0e0b09;
+  --accent:#6cc4a6;--accent-ink:#2e7a63;--accent-soft:#1f3a31;--ok:#7bcf94;--warn:#f0b04a;--bad:#ff8a74;--idle:#8c7f71;--coin:#f2b630;--coin-ink:#8a5a00;
+  --stage:#2a2119;--shadow:#0e0b09;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-.stack{display:grid;gap:16px}
-body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--sans)}
-.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:16px}
-header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px}
-h1{font-size:24px;font-weight:700;margin:0;letter-spacing:-.01em;text-wrap:balance}
-.meta{font:12px/1.4 var(--mono);color:var(--soft)}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:600 15px/1.45 var(--sans);overflow:hidden}
+a{color:var(--accent);text-underline-offset:2px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.app{position:relative;height:100%}
+/* The office */
+.stage{position:absolute;inset:0;background:var(--stage);touch-action:none}
+.stage canvas{display:block;width:100%;height:100%;cursor:grab}
+.stage canvas.point{cursor:pointer}
+.labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.tag{all:unset;position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;display:grid;justify-items:center;gap:2px;transform:translate(-50%,-100%);white-space:nowrap}
+.tag .nm{font:800 12px/1.2 var(--sans);color:#2b2420;background:#fffaf0;padding:3px 9px;border-radius:999px;border:2px solid #2b2420}
+.tag .chip{font-size:11px;padding:0 6px}
+.tag:focus-visible .nm{outline:2px solid var(--accent)}
+.stage-msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--soft)}
+/* HUD: hard ink borders and offset shadows, like a sticker sheet */
+.hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 16px;pointer-events:none}
+.hud>*{pointer-events:auto}
+.card{background:var(--panel);border:2.5px solid var(--ink);border-radius:16px;box-shadow:0 4px 0 var(--shadow)}
+.plate{padding:10px 14px;min-width:0;max-width:min(360px,58vw);display:grid;gap:6px}
+.plate h1{font:900 19px/1.15 var(--sans);margin:0;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvl{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;font:800 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.lvl .bar{height:10px}
+.lvl .pct{font:600 12px var(--mono);color:var(--fg);font-variant-numeric:tabular-nums}
+.greet{font-size:13px;color:var(--soft);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--idle);margin-right:6px;vertical-align:1px}
 .live-dot.on{background:var(--ok)}
-h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:0 0 10px}
-.top{display:grid;gap:16px;grid-template-columns:1fr;align-items:start}
-@media (min-width:880px){.top{grid-template-columns:3fr 2fr}}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;min-width:0}
-.pm p{margin:0;max-width:68ch}
-.progress{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.big{font:600 34px/1 var(--mono);font-variant-numeric:tabular-nums}
-.bar{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.right{display:flex;gap:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:7px;height:42px;padding:0 14px 0 8px;border-radius:999px;cursor:pointer;text-decoration:none;color:var(--fg);font:900 15px var(--sans);font-variant-numeric:tabular-nums}
+.pill:active,.dock button:active,.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow)}
+.coin{width:24px;height:24px;flex:none}
+.bell{position:relative;width:42px;padding:0;justify-content:center}
+.badge{position:absolute;top:-7px;right:-7px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fffaf0;border:2px solid var(--ink);font:900 12px/18px var(--sans);text-align:center}
+.bar{flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden;border:1.5px solid var(--ink)}
 .bar>span{display:block;height:100%;background:var(--accent)}
+/* Dock */
+.dock{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:4px;padding:6px;border-radius:22px;z-index:6}
+.dock button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:1px;min-width:62px;padding:6px 8px 5px;border-radius:15px;font:800 11px var(--sans);color:var(--soft)}
+.dock svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dock button[aria-current="page"]{background:var(--accent);color:#fffaf0;box-shadow:inset 0 -3px 0 var(--accent-ink)}
+.dock button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.dock .dot{position:absolute;margin:-2px 0 0 18px;width:9px;height:9px;border-radius:50%;background:var(--bad);border:1.5px solid var(--ink)}
+/* Pages slide over the office: a side panel on wide screens, a sheet on phones */
+.page{position:absolute;z-index:5;overflow-y:auto;overscroll-behavior:contain;display:grid;gap:14px;align-content:start;
+  left:16px;top:122px;bottom:96px;width:min(460px,calc(100% - 32px));padding:18px 18px 22px}
+@media (max-width:640px){.page{left:10px;right:10px;width:auto;top:auto;max-height:calc(100% - 220px);bottom:86px;padding:16px}}
+.page h2{font:900 22px/1.2 var(--sans);margin:0;text-wrap:balance}
+.page h3{font:800 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:4px 0 0}
+.lead{margin:0;color:var(--soft);font-weight:600}
+.empty{color:var(--soft);margin:0;font-weight:600}
 ol,ul{margin:0;padding:0;list-style:none}
-.next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
-.next li::before{content:"";position:absolute;left:2px;top:14px;width:7px;height:7px;border:1.5px solid var(--accent);border-radius:50%}
-.you{border-color:var(--warn)}
-.you h2{color:var(--warn)}
-.you li{padding:8px 0;border-top:1px solid var(--line);font-weight:500}
-.you li:first-child,.next li:first-child{border-top:0}
-.empty{color:var(--soft);margin:0}
-a{color:var(--accent);text-underline-offset:2px}
-/* Team board */
-.team{display:grid;gap:0}
-.row{display:grid;grid-template-columns:150px 92px minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
-.row:first-child{border-top:0}
-.who{font-weight:600}
-.role{display:block;font:12px var(--mono);color:var(--soft);font-weight:400}
-.state{font:500 12px var(--mono);padding:2px 8px;border-radius:999px;justify-self:start;border:1px solid currentColor}
-.state.working{color:var(--accent);background:var(--accent-soft);border-color:transparent}
-.state.blocked{color:var(--bad)}
-.state.waiting{color:var(--warn)}
-.state.idle,.state.done{color:var(--idle)}
-.task{min-width:0}
-.task small{display:block;color:var(--soft);font-size:13px}
-.with{display:block;font:12px var(--mono);color:var(--soft)}
-.acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.btn{font:500 13px var(--sans);text-decoration:none;padding:6px 12px;border-radius:6px;border:1px solid var(--line);color:var(--fg);background:var(--panel);white-space:nowrap}
-.btn:hover{border-color:var(--accent)}
-.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.btn.watch{background:var(--accent);border-color:var(--accent);color:var(--panel)}
-@media (max-width:720px){.row{grid-template-columns:1fr auto}.task,.acts{grid-column:1/-1}.acts{justify-content:flex-start}}
 .note{font-size:13px;color:var(--soft)}
-/* Tabs */
-nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
-nav.tabs a{font-weight:600;text-decoration:none;color:var(--soft);padding:10px 14px;border-bottom:2px solid transparent;margin-bottom:-1px}
-nav.tabs a[aria-current="page"]{color:var(--fg);border-bottom-color:var(--accent)}
-nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.count{font:12px var(--mono);margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--warn);color:var(--panel)}
-/* Phases */
-.phases{display:grid;gap:0}
-.phase{display:grid;grid-template-columns:28px minmax(0,1fr);gap:0 12px;padding-bottom:18px;position:relative}
-.phase::before{content:"";position:absolute;left:13px;top:26px;bottom:0;width:2px;background:var(--line)}
+.btn{display:inline-block;font:900 13px var(--sans);text-decoration:none;padding:7px 14px;border-radius:999px;border:2.5px solid var(--ink);color:var(--fg);background:var(--panel);white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
+.btn.go{background:var(--accent);color:#fffaf0}
+.chip{font:600 12px var(--mono);padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;background:var(--panel)}
+.chip.working,.chip.active{color:var(--accent);background:var(--accent-soft);border-color:transparent}
+.chip.blocked{color:var(--bad)}
+.chip.waiting{color:var(--warn)}
+.chip.idle,.chip.done,.chip.paused,.chip.off{color:var(--idle)}
+/* Company */
+.totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tot{border:2px solid var(--line);border-radius:14px;padding:8px 10px;display:grid;gap:0}
+.tot b{font:800 20px/1.2 var(--mono);font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.tot span{font:800 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.tot.need b{color:var(--bad)}
+.projects{display:grid;gap:10px}
+.proj{border:2.5px solid var(--ink);border-radius:16px;padding:12px 14px;display:grid;gap:8px;background:var(--bg)}
+.proj.here{background:var(--accent-soft)}
+.pn{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.pn b{font:900 17px var(--sans)}
+.pstats{display:flex;flex-wrap:wrap;gap:4px 14px;font:600 12px var(--mono);color:var(--soft);font-variant-numeric:tabular-nums}
+.pstats .need{color:var(--bad)}
+.pbar{display:flex;align-items:center;gap:10px}
+.pbar .num{font:600 12px var(--mono);width:3.2em;text-align:right;font-variant-numeric:tabular-nums}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.todo li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;padding:9px 0;border-top:2px dashed var(--line)}
+.todo li:first-child{border-top:0}
+.todo li::before{content:"";width:16px;height:16px;margin-top:2px;border:2.5px solid var(--ink);border-radius:5px;background:var(--panel)}
+.todo li.empty::before{display:none}
+.todo .from{font:600 11px var(--mono);color:var(--soft);display:block}
+.next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
+.next li:first-child{border-top:0}
+.next li::before{content:"";position:absolute;left:2px;top:14px;width:7px;height:7px;border:2px solid var(--accent);border-radius:50%}
+/* Plan */
+.big{font:600 30px/1 var(--mono);font-variant-numeric:tabular-nums}
+.progress{display:flex;align-items:center;gap:12px}
+.phases{display:grid}
+.phase{display:grid;grid-template-columns:30px minmax(0,1fr);gap:0 12px;padding-bottom:16px;position:relative}
+.phase::before{content:"";position:absolute;left:14px;top:28px;bottom:0;width:2px;background:var(--line)}
 .phase:last-child::before{display:none}
-.mark{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:var(--panel);display:grid;place-items:center;font:600 12px var(--mono);color:var(--soft)}
-.phase.done .mark{background:var(--ok);border-color:var(--ok);color:var(--panel)}
-.phase.active .mark{border-color:var(--accent);color:var(--accent)}
-.ph-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding-top:3px}
-.ph-name{font-weight:700;font-size:17px}
+.mark{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--ink);background:var(--panel);display:grid;place-items:center;font:700 12px var(--mono);color:var(--soft)}
+.phase.done .mark{background:var(--ok);color:#fffaf0}
+.phase.active .mark{background:var(--coin);color:var(--ink)}
+.ph-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding-top:4px}
+.ph-name{font-weight:900;font-size:16px}
 .phase.next .ph-name{color:var(--soft)}
-.goals{display:grid;gap:10px;margin-top:10px}
-.goal{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:4px 12px}
+.meta{font:12px/1.4 var(--mono);color:var(--soft)}
+.goals{display:grid;gap:10px;margin-top:8px}
+.goal{display:grid;grid-template-columns:minmax(0,1fr) 54px;gap:4px 12px}
 .goal .num{font:12px var(--mono);color:var(--soft);text-align:right;font-variant-numeric:tabular-nums}
-.goal .bar{grid-column:1/-1;flex:none;height:6px}
+.goal .bar{grid-column:1/-1;flex:none;height:8px}
 .phase.done .goal .bar>span{background:var(--ok)}
+/* Team */
+.roster{display:grid;gap:6px}
+.seat{all:unset;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 10px;padding:9px 12px;border-radius:14px;border:2px solid var(--line);background:var(--bg)}
+.seat:hover{border-color:var(--ink)}
+.seat:focus-visible{outline:3px solid var(--accent)}
+.seat b{font-weight:900}
+.seat .pet{grid-column:1;font-size:13px;color:var(--soft);font-weight:600}
+.seat .chip{grid-row:1/3;grid-column:2}
+/* Teammate sheet */
+.scrim{position:fixed;inset:0;background:rgba(20,14,10,.4);z-index:10}
+.sheet{position:fixed;z-index:11;display:grid;gap:14px;align-content:start;overflow-y:auto;
+  left:10px;right:10px;bottom:10px;max-height:85%;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:760px){.sheet{left:auto;right:16px;top:16px;bottom:16px;width:400px;max-height:none;padding:20px 22px}}
+.sheet h3{margin:0;font:900 21px/1.25 var(--sans)}
+.sheet .what{margin:2px 0 0;color:var(--soft);font-size:14px}
+.member{border-top:2px dashed var(--line);padding-top:12px;display:grid;gap:8px}
+.member .mh{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-weight:800}
+.member dl{margin:0;display:grid;gap:8px}
+.member dt{font:800 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.member dd{margin:2px 0 0}
+.close{justify-self:end}
+.stack{display:grid;gap:12px}
 </style>
 
-<div class="wrap">
-  <header>
-    <h1 id="title">Claude Setup</h1>
-    <span class="meta"><span class="live-dot" id="dot"></span><span id="updated">Waiting for the project manager's first update</span></span>
-  </header>
-  <nav class="tabs" aria-label="Pages">
-    <a href="#plan" data-tab="plan">Plan</a>
-    <a href="#team" data-tab="team">Team</a>
-    <a href="#you" data-tab="you">For you<span class="count" id="you-count" hidden></span></a>
+<div class="app">
+  <div class="stage" id="stage">
+    <canvas id="c" aria-label="3D office: the team at their desks"></canvas>
+    <div class="labels" id="labels"></div>
+    <div class="stage-msg" id="stage-msg" hidden>The 3D office didn't load here. Team, Plan and Company still work from the dock.</div>
+  </div>
+
+  <div class="hud">
+    <a class="card plate" href="#plan" style="text-decoration:none;color:inherit" aria-label="Open the plan">
+      <h1 id="title">Claude Setup</h1>
+      <div class="lvl"><span id="lvl-label">Plan</span><div class="bar" aria-hidden="true"><span id="lvl-bar" style="width:0%"></span></div><span class="pct" id="lvl-pct">0%</span></div>
+      <p class="greet"><span class="live-dot" id="dot"></span><span id="greet">Your team is here.</span></p>
+    </a>
+    <div class="right">
+      <a class="card pill" href="#company" id="coins" aria-label="Money earned this month, all projects" hidden>
+        <svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="var(--coin)" stroke="var(--ink)" stroke-width="2.2"/><circle cx="12" cy="12" r="6" fill="none" stroke="var(--coin-ink)" stroke-width="1.6"/><path d="M14.2 9.6a3 3 0 1 0 0 4.8M8.6 11.2h4M8.6 12.9h4" fill="none" stroke="var(--coin-ink)" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span id="coin-val">0 €</span>
+      </a>
+      <a class="card pill bell" href="#todo" aria-label="Your to-dos">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
+        <span class="badge" id="you-count" hidden>0</span>
+      </a>
+    </div>
+  </div>
+
+  <section class="card page" data-page="company" aria-labelledby="company-h" hidden>
+    <div><h2 id="company-h">Company</h2><p class="lead">Every project, what it earns and what it needs from you.</p></div>
+    <div class="totals">
+      <div class="tot"><b id="t-month">0 €</b><span>This month</span></div>
+      <div class="tot"><b id="t-all">0 €</b><span>All time</span></div>
+      <div class="tot need"><b id="t-need">0</b><span>Need you</span></div>
+    </div>
+    <h3>Projects</h3>
+    <div class="projects" id="projects"><p class="empty">Each project's manager adds its row here on day one.</p></div>
+    <h3>Needs you, all projects</h3>
+    <ul class="todo" id="all-you"><li class="empty">Nothing right now.</li></ul>
+  </section>
+
+  <section class="card page" data-page="plan" aria-labelledby="plan-h" hidden>
+    <div><h2 id="plan-h">Plan</h2><p class="lead" id="summary">The project manager writes here what the team is doing.</p></div>
+    <div class="progress"><span class="big" id="pct">0%</span><div class="bar" aria-hidden="true"><span id="pct-bar" style="width:0%"></span></div></div>
+    <div class="phases" id="phases"><p class="empty">The project manager's levels and their goals appear here.</p></div>
+    <h3>Next steps</h3>
+    <ol class="next" id="next"><li class="empty">None yet.</li></ol>
+  </section>
+
+  <section class="card page" data-page="team" aria-labelledby="team-h" hidden>
+    <div><h2 id="team-h">Team</h2><p class="lead">Typing means working, Z is asleep, a red ! is blocked, a ? waits on you. Tap anyone, in here or in the office.</p></div>
+    <div class="roster" id="roster"></div>
+  </section>
+
+  <section class="card page" data-page="todo" aria-labelledby="todo-h" hidden>
+    <div><h2 id="todo-h">Your to-dos</h2><p class="lead">Only the things the team can't do without you.</p></div>
+    <ul class="todo" id="you"><li class="empty">Nothing right now.</li></ul>
+    <h3>Live links</h3>
+    <ul id="live" class="stack" style="gap:6px"><li class="empty">Nothing deployed yet.</li></ul>
+  </section>
+
+  <nav class="card dock" aria-label="Pages">
+    <button type="button" data-tab="company" id="company-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V8l5-3v16M10 21V5l9 4v12M13 11h3M13 15h3"/></svg>Company</button>
+    <button type="button" data-tab="office"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7M5 9.5V20h14V9.5M9.5 20v-5h5v5"/></svg>Office</button>
+    <button type="button" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Plan</button>
+    <button type="button" data-tab="team"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M15 14.6c2.6-.3 4.6 1.2 5.2 4.4"/></svg>Team</button>
+    <button type="button" data-tab="todo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3.5h6v3H9zM8.5 12l2 2 4-4"/></svg>To-dos<span class="dot" id="todo-dot" hidden></span></button>
   </nav>
-
-  <section data-page="plan" class="stack" aria-label="Plan">
-    <div class="panel pm">
-      <h2>Project manager</h2>
-      <div class="progress"><span class="big" id="pct">0%</span><div class="bar" aria-hidden="true"><span id="pct-bar" style="width:0%"></span></div></div>
-      <p id="summary">Claude writes here what the team is doing. It fills in as soon as the first update arrives.</p>
-    </div>
-    <div class="panel">
-      <h2>Phases</h2>
-      <div class="phases" id="phases"><p class="empty">The project manager's phases and their goals appear here.</p></div>
-    </div>
-  </section>
-
-  <section data-page="team" class="panel" aria-labelledby="team-h" hidden>
-    <h2 id="team-h">Who works on what</h2>
-    <div class="team" id="team"><p class="empty">The team appears here once Claude staffs the first task.</p></div>
-    <p class="note" style="margin:12px 0 0">Watch opens what that teammate is building. On your PC, Claude's test browser also opens as a visible Chrome window.</p>
-  </section>
-
-  <section data-page="you" class="top" aria-label="For you" hidden>
-    <div class="panel you">
-      <h2>Needs you</h2>
-      <ul id="you"><li class="empty" style="font-weight:400">Nothing right now.</li></ul>
-    </div>
-    <div class="panel">
-      <h2>Next steps</h2>
-      <ol class="next" id="next"><li class="empty">None yet.</li></ol>
-      <h2 style="margin-top:16px">Live links</h2>
-      <ul id="live"><li class="empty">Nothing deployed yet.</li></ul>
-    </div>
-  </section>
 </div>
 
+<div class="scrim" id="scrim" hidden></div>
+<aside class="card sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-name" hidden>
+  <button class="btn close" id="sheet-close" type="button">Close</button>
+  <div><h3 id="sheet-name"></h3><p class="what" id="sheet-what"></p></div>
+  <div id="sheet-body" class="stack"></div>
+</aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf" crossorigin="anonymous"></script>
 <script>
 const $ = (id) => document.getElementById(id)
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n }
 const safeUrl = (u) => { if (typeof u !== 'string' || !u) return null; try { const x = new URL(u, location.href); return /^https?:$/.test(x.protocol) ? x.href : null } catch { return null } }
 const link = (text, href, cls) => { const u = safeUrl(href); if (!u) return el('span', null, text); const a = el('a', cls, text); a.href = u; a.target = '_blank'; a.rel = 'noopener'; return a }
-const STATES = { working: 'working', blocked: 'blocked', waiting: 'waiting on you', idle: 'idle', done: 'done' }
+const STATES = { working: 'working', blocked: 'blocked', waiting: 'waiting on you', idle: 'asleep', done: 'done' }
+const RANK = { working: 0, blocked: 1, waiting: 2, idle: 3, done: 4 }
+const stateOf = (s) => (s in STATES ? s : 'idle')
 const list = (box, items, render, emptyText) => {
   box.replaceChildren()
-  if (!items.length) { const li = el('li', 'empty', emptyText); box.append(li); return }
+  if (!items.length) { box.append(el('li', 'empty', emptyText)); return }
   for (const it of items) box.append(render(it))
 }
 const ago = (iso) => {
@@ -149,40 +244,100 @@ const ago = (iso) => {
   return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : new Date(t).toLocaleDateString()
 }
 
+/* The nine roles, one desk each. A team row lands on the desk its role word names. */
+const SEATS = [
+  { key: 'researcher', name: 'Researcher', what: 'Market, competitors, tools and APIs, before the plan.', off: 'Starts with the brainstorm.', at: [-3.8, -2.6], re: /research/i },
+  { key: 'pm', name: 'Project Manager', what: 'The project chat: plans with you, starts the others, keeps this office current.', off: 'Waits for your next idea.', at: [-8.5, -6.6], re: /project.?manager|manager|coordinat|operator|\bpm\b|lead/i },
+  { key: 'designer', name: 'Designer', what: 'Sets the look and checks every screenshot so nothing looks AI-made.', off: 'Starts once you OK the plan.', at: [-0.6, -3.4], re: /design/i },
+  { key: 'programmer', name: 'Programmer', what: 'Builds one slice or fix, opens the PR, keeps CI green. Up to three at once.', off: 'Starts once you OK the plan.', at: [2.8, -2.8], re: /program|develop|builder|engineer/i },
+  { key: 'tester', name: 'Tester', what: 'Clicks the preview and grades it against the goals. Never built what it tests.', off: 'Starts when a PR is up.', at: [-4.2, 1.2], re: /test|evaluat|qa\b|gate/i },
+  { key: 'reviewer', name: 'Reviewer', what: 'Reads the code diff for bugs and mess.', off: 'Starts when a PR is up.', at: [-1.0, 0.2], re: /review/i },
+  { key: 'security', name: 'Security', what: 'Security review and red team on login, payments and user input.', off: 'Starts on PRs that touch login, money or input.', at: [2.2, 0.6], re: /secur|red.?team/i },
+  { key: 'legal', name: 'Legal', what: 'Impressum, DSGVO, shop wording, before launch.', off: 'Starts before launch.', at: [5.6, -0.6], re: /legal|law|recht/i },
+  { key: 'marketer', name: 'Marketer', what: 'Launch, posts and weekly growth.', off: 'Starts at launch.', at: [5.0, 3.0], re: /market|growth|social|launch/i },
+]
+const PET = { pm: 'Bear', researcher: 'Owl', designer: 'Cat', programmer: 'Raccoon', tester: 'Rabbit', reviewer: 'Penguin', security: 'Dog', legal: 'Fox', marketer: 'Panda' }
+const ORDER = ['security', 'legal', 'designer', 'researcher', 'reviewer', 'tester', 'marketer', 'pm', 'programmer']
+const BY_KEY = Object.fromEntries(SEATS.map((s) => [s.key, s]))
+const seatIn = (t) => ORDER.find((k) => BY_KEY[k].re.test(t || '')) || null
+const seatOf = (m) => seatIn(m.role) || seatIn(String(m.name || '').split('·')[0])
+
+let team = []
+const seatState = (key) => {
+  const ms = team.filter((m) => m.seat === key)
+  return ms.length ? stateOf(ms[0].state) : 'off'
+}
+
+function renderTeam(members) {
+  const rank = (m) => RANK[stateOf(m.state)]
+  team = members.map((m) => ({ ...m, seat: seatOf(m) })).sort((a, b) => rank(a) - rank(b) || (a.order ?? 99) - (b.order ?? 99))
+  const roster = $('roster'); roster.replaceChildren()
+  const tally = {}
+  for (const s of SEATS) {
+    const st = seatState(s.key), n = team.filter((m) => m.seat === s.key).length
+    tally[st] = (tally[st] || 0) + 1
+    const b = el('button', 'seat'); b.type = 'button'
+    b.append(el('b', null, n > 1 ? `${s.name} ×${n}` : s.name), el('span', `chip ${st}`, st === 'off' ? 'off duty' : STATES[st]), el('span', 'pet', `${PET[s.key]} · ${s.what}`))
+    b.addEventListener('click', () => openSheet(s.key, b))
+    roster.append(b)
+  }
+  office?.setStates(Object.fromEntries(SEATS.map((s) => [s.key, seatState(s.key)])), Object.fromEntries(SEATS.map((s) => [s.key, team.filter((m) => m.seat === s.key).length])))
+  if (sheetFor) fillSheet(sheetFor)
+  window.onDaytime?.(document.documentElement.dataset.daytime || 'day')
+}
+
+let sheetFor = null, lastFocus = null
+function fillSheet(key) {
+  const s = BY_KEY[key]
+  $('sheet-name').textContent = s.name
+  $('sheet-what').textContent = `${PET[s.key]} · ${s.what}`
+  const body = $('sheet-body'); body.replaceChildren()
+  const ms = team.filter((m) => m.seat === key)
+  if (!ms.length) body.append(el('p', 'empty', `Off duty. ${s.off}`))
+  const names = Object.fromEntries(team.map((m) => [m.id, m.name]))
+  for (const m of ms) {
+    const st = stateOf(m.state), box = el('div', 'member')
+    const mh = el('div', 'mh'); mh.append(el('span', null, m.name || s.name), el('span', `chip ${st}`, STATES[st])); box.append(mh)
+    const dl = el('dl')
+    const row = (t, v) => { if (!v) return; const d = el('div'); d.append(el('dt', null, t), el('dd', null, v)); dl.append(d) }
+    row('Working on', m.task || 'No task right now'); row('Next', m.next)
+    row('Works with', (m.with || []).map((id) => names[id]).filter(Boolean).join(', '))
+    box.append(dl)
+    const acts = el('div', 'acts')
+    if (safeUrl(m.preview)) acts.append(link('Watch live', m.preview, 'btn watch'))
+    if (safeUrl(m.link)) acts.append(link(m.linkLabel || 'Open', m.link, 'btn'))
+    if (acts.children.length) box.append(acts)
+    body.append(box)
+  }
+}
+function openSheet(key, from) {
+  sheetFor = key; lastFocus = from || null; fillSheet(key)
+  $('sheet').hidden = false; $('scrim').hidden = false; $('sheet-close').focus()
+}
+function closeSheet() {
+  if ($('sheet').hidden) return
+  sheetFor = null; $('sheet').hidden = true; $('scrim').hidden = true
+  if (lastFocus && document.contains(lastFocus)) lastFocus.focus()
+}
+$('sheet-close').addEventListener('click', closeSheet)
+$('scrim').addEventListener('click', closeSheet)
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet() })
+
+let youCount = 0, level = { label: 'PLAN', name: 'No phases yet', pct: 0 }
+let updated = ''
 function renderPm(d) {
   if (!d) return
   $('title').textContent = d.project || 'Project'
   document.title = `${d.project || 'Project'} HQ`
-  $('updated').textContent = d.updated ? `Updated ${ago(d.updated)}` : 'Live'
-  const n = (d.you || []).length
-  $('you-count').hidden = n === 0
-  $('you-count').textContent = String(n)
+  updated = d.updated ? ago(d.updated) : ''
+  youCount = (d.you || []).length
+  $('you-count').hidden = $('todo-dot').hidden = youCount === 0; $('you-count').textContent = String(youCount)
   $('summary').textContent = d.summary || ''
   list($('next'), d.next || [], (s) => el('li', null, s), 'None yet.')
   list($('you'), d.you || [], (y) => { const li = el('li'); li.append(link(y.what, y.link)); return li }, 'Nothing right now.')
-  list($('live'), d.live || [], (l) => { const li = el('li'); li.style.padding = '4px 0'; li.append(link(l.name, l.url)); if (l.note) li.append(el('span', 'note', ` · ${l.note}`)); return li }, 'Nothing deployed yet.')
-}
-
-function renderTeam(members) {
-  const box = $('team'); box.replaceChildren()
-  if (!members.length) { box.append(el('p', 'empty', 'The team appears here once Claude staffs the first task.')); return }
-  const names = Object.fromEntries(members.map((m) => [m.id, m.name]))
-  const rank = { working: 0, blocked: 1, waiting: 2, idle: 3, done: 4 }
-  members.sort((a, b) => (rank[a.state] ?? 5) - (rank[b.state] ?? 5) || (a.order ?? 99) - (b.order ?? 99))
-  for (const m of members) {
-    const row = el('div', 'row')
-    const who = el('div', 'who', m.name); who.append(el('span', 'role', m.role || ''))
-    const st = el('span', `state ${m.state in STATES ? m.state : 'idle'}`, STATES[m.state] || 'idle')
-    const task = el('div', 'task', m.task || 'No task')
-    if (m.next) task.append(el('small', null, `Next: ${m.next}`))
-    const w = (m.with || []).map((id) => names[id]).filter(Boolean)
-    if (w.length) task.append(el('span', 'with', `with ${w.join(', ')}`))
-    const acts = el('div', 'acts')
-    if (safeUrl(m.preview)) acts.append(link('Watch', m.preview, 'btn watch'))
-    if (safeUrl(m.link)) acts.append(link(m.linkLabel || 'Open', m.link, 'btn'))
-    row.append(who, st, task, acts)
-    box.append(row)
-  }
+  list($('live'), d.live || [], (l) => { const li = el('li'); li.append(link(l.name, l.url)); if (l.note) li.append(el('span', 'note', ` · ${l.note}`)); return li }, 'Nothing deployed yet.')
+  office?.setWall(level, youCount)
+  window.onDaytime?.(document.documentElement.dataset.daytime || 'day')
 }
 
 function renderPhases(phases) {
@@ -195,7 +350,7 @@ function renderPhases(phases) {
     const ph = el('div', `phase ${state}`)
     ph.append(el('div', 'mark', state === 'done' ? '✓' : String(i + 1)))
     const body = el('div')
-    const head = el('div', 'ph-head'); head.append(el('span', 'ph-name', p.name), el('span', 'meta', { done: 'done', active: 'now', next: 'later' }[state]))
+    const head = el('div', 'ph-head'); head.append(el('span', 'ph-name', p.name), el('span', 'meta', { done: 'cleared', active: 'playing now', next: 'locked' }[state]))
     body.append(head)
     if (p.why) body.append(el('div', 'note', p.why))
     const goals = el('div', 'goals')
@@ -209,29 +364,610 @@ function renderPhases(phases) {
     body.append(goals); ph.append(body); box.append(ph)
   })
   const pct = total > 0 ? Math.round((100 * done) / total) : 0
-  $('pct').textContent = `${pct}%`
-  $('pct-bar').style.width = `${pct}%`
+  $('pct').textContent = `${pct}%`; $('pct-bar').style.width = `${pct}%`
+  $('lvl-pct').textContent = `${pct}%`; $('lvl-bar').style.width = `${pct}%`
+  const cur = phases.findIndex((p) => p.state === 'active')
+  const at = cur >= 0 ? cur : phases.findIndex((p) => p.state !== 'done')
+  level = {
+    label: phases.length ? `LEVEL ${at >= 0 ? at + 1 : phases.length} OF ${phases.length}` : 'PLAN',
+    name: phases.length ? (at >= 0 ? phases[at].name : 'All levels cleared') : 'No phases yet', pct,
+  }
+  $('lvl-label').textContent = phases.length ? `Lv ${at >= 0 ? at + 1 : phases.length}/${phases.length}` : 'Plan'
+  office?.setWall(level, youCount)
 }
 
+const EUR = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+const money = (v) => EUR.format(Math.max(0, Number(v) || 0))
+let hasProjects = false
+function renderProjects(projects) {
+  hasProjects = projects.length > 0
+  $('company-tab').hidden = !hasProjects
+  projects.sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+  const sum = (k) => projects.reduce((n, p) => n + Math.max(0, Number(p[k]) || 0), 0)
+  const needs = projects.flatMap((p) => (Array.isArray(p.you) ? p.you : []).map((y) => ({ ...y, from: p.name || p.id })))
+  $('t-month').textContent = money(sum('revenueMonth')); $('t-all').textContent = money(sum('revenueTotal'))
+  $('t-need').textContent = String(needs.length)
+  $('coins').hidden = !hasProjects; $('coin-val').textContent = money(sum('revenueMonth'))
+  list($('all-you'), needs, (y) => { const li = el('li'), d = el('div'); d.append(el('span', 'from', y.from), link(y.what, y.link)); li.append(d); return li }, 'Nothing right now.')
+  const box = $('projects'); box.replaceChildren()
+  if (!hasProjects) box.append(el('p', 'empty', "Each project's manager adds its row here on day one."))
+  for (const p of projects) {
+    const row = el('div', p.here ? 'proj here' : 'proj')
+    const st = ['active', 'paused', 'done'].includes(p.state) ? p.state : 'paused'
+    const pn = el('div', 'pn'); pn.append(el('b', null, p.name || p.id), el('span', `chip ${st}`, st)); row.append(pn)
+    if (p.note) row.append(el('div', 'note', p.note))
+    const pct = Math.max(0, Math.min(100, Math.round(Number(p.progress) || 0)))
+    const pb = el('div', 'pbar'), bar = el('div', 'bar'), fill = el('span'); fill.style.width = `${pct}%`; bar.append(fill)
+    pb.append(bar, el('span', 'num', `${pct}%`)); row.append(pb)
+    const stats = el('div', 'pstats')
+    stats.append(el('span', null, `${money(p.revenueMonth)} this month`), el('span', null, `${money(p.revenueTotal)} total`))
+    const w = Math.max(0, Number(p.working) || 0); if (w) stats.append(el('span', null, `${w} working`))
+    const n = Array.isArray(p.you) ? p.you.length : 0; if (n) stats.append(el('span', 'need', `${n} need you`))
+    row.append(stats)
+    const acts = el('div', 'acts')
+    if (p.here) { const b = el('button', 'btn go', 'You are here'); b.type = 'button'; b.addEventListener('click', () => { location.hash = 'office' }); acts.append(b) }
+    else if (safeUrl(p.dashboard)) acts.append(link('Enter office', p.dashboard, 'btn go'))
+    if (safeUrl(p.live)) acts.append(link('Live app', p.live, 'btn'))
+    row.append(acts); box.append(row)
+  }
+  showTab()
+}
+
+const TABS = ['company', 'office', 'plan', 'team', 'todo'], ALIAS = { you: 'todo', projects: 'company' }
 function showTab() {
-  const tab = ['plan', 'team', 'you'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'plan'
+  const h = location.hash.slice(1), want = ALIAS[h] || h
+  const tab = TABS.includes(want) && (want !== 'company' || hasProjects) ? want : hasProjects ? 'company' : 'office'
   for (const p of document.querySelectorAll('[data-page]')) p.hidden = p.dataset.page !== tab
-  for (const a of document.querySelectorAll('[data-tab]')) {
-    if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page')
-    else a.removeAttribute('aria-current')
+  for (const b of document.querySelectorAll('[data-tab]')) {
+    if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page')
+    else b.removeAttribute('aria-current')
   }
 }
+for (const b of document.querySelectorAll('[data-tab]')) b.addEventListener('click', () => { location.hash = b.dataset.tab })
 window.addEventListener('hashchange', showTab)
 showTab()
 
+/* ---------- The 3D office (three.js r128). Only static shapes and canvas-drawn text; stored text never becomes markup. ---------- */
+const office = (() => {
+  if (!window.THREE || !THREE.OrbitControls) { $('stage-msg').hidden = false; $('c').hidden = true; return null }
+  try { return buildOffice() } catch (e) { console.error(e); $('stage-msg').hidden = false; $('c').hidden = true; return null }
+})()
+
+function buildOffice() {
+  const T = THREE, stage = $('stage'), canvas = $('c')
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+  const renderer = new T.WebGLRenderer({ canvas, antialias: true })
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2))
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap
+  renderer.outputEncoding = T.sRGBEncoding
+  const scene = new T.Scene()
+  const camera = new T.PerspectiveCamera(30, 1, 0.1, 200)
+  camera.position.set(12, 16, 20)
+  const controls = new T.OrbitControls(camera, canvas)
+  controls.target.set(-0.6, 0.6, 0.4)
+  Object.assign(controls, { enableDamping: true, dampingFactor: 0.08, enablePan: false, minDistance: 8, maxDistance: 70, minPolarAngle: 0.35, maxPolarAngle: 1.3, minAzimuthAngle: -0.25, maxAzimuthAngle: 1.35 })
+  const bg = () => { scene.background = new T.Color(getComputedStyle(document.documentElement).getPropertyValue('--stage').trim() || '#dfe7e3') }
+  bg(); matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { if (!MODES[mode]?.bg) bg() })
+
+  scene.add(new T.HemisphereLight(0xfff8ee, 0x9a8670, 0.85))
+  const sun = new T.DirectionalLight(0xfff0dc, 0.75)
+  sun.position.set(7, 16, 10); sun.castShadow = true
+  sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0005
+  Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 50 })
+  scene.add(sun)
+
+  /* Cartoon look: three-step toon shading and dark outlines on the team */
+  const grad = new T.DataTexture(new Uint8Array([110, 110, 110, 190, 190, 190, 255, 255, 255]), 3, 1, T.RGBFormat)
+  grad.minFilter = grad.magFilter = T.NearestFilter; grad.generateMipmaps = false; grad.needsUpdate = true
+  const mats = {}
+  const mat = (c) => mats[c] || (mats[c] = new T.MeshToonMaterial({ color: c, gradientMap: grad }))
+  const LINE = new T.MeshBasicMaterial({ color: '#2b2420', side: T.BackSide })
+  const mesh = (geo, color, x = 0, y = 0, z = 0, parent = scene) => {
+    const m = new T.Mesh(geo, typeof color === 'object' ? color : mat(color))
+    m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m
+  }
+  const box = (w, h, d, c, x, y, z, p) => mesh(new T.BoxGeometry(w, h, d), c, x, y, z, p)
+  const cyl = (rt, rb, h, c, x, y, z, p, seg = 20) => mesh(new T.CylinderGeometry(rt, rb, h, seg), c, x, y, z, p)
+  const ball = (r, c, x, y, z, p) => mesh(new T.SphereGeometry(r, 24, 16), c, x, y, z, p)
+  const cone = (r, h, c, x, y, z, p) => mesh(new T.ConeGeometry(r, h, 16), c, x, y, z, p)
+  const outline = (group) => {
+    const list = []
+    group.traverse((o) => { if (o.isMesh && !o.userData.noLine) list.push(o) })
+    for (const o of list) {
+      o.geometry.computeBoundingSphere()
+      if (o.geometry.boundingSphere.radius < 0.06) continue
+      const l = new T.Mesh(o.geometry, LINE); l.scale.setScalar(1 + 0.035 / o.geometry.boundingSphere.radius + 0.02); l.userData.noLine = true; o.add(l)
+    }
+  }
+  const canvasTex = (w, h, draw) => { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const t = new T.CanvasTexture(cv); t.encoding = T.sRGBEncoding; t.anisotropy = 4; const redraw = (...a) => { draw(cv.getContext('2d'), w, h, ...a); t.needsUpdate = true }; return { t, redraw } }
+  const texMat = (tex) => new T.MeshToonMaterial({ map: tex, gradientMap: grad })
+
+  /* The room: a bigger open-plan floor with oak boards, a brick back wall and a sage side wall with city windows */
+  const W = 22, D = 17, BACK = -D / 2, LEFT = -W / 2
+  const planks = canvasTex(512, 512, (g, w) => { for (let i = 0; i < 16; i++) { g.fillStyle = ['#d8b88f', '#d2b085', '#dcbf98'][i % 3]; g.fillRect(0, i * 32, w, 31); g.fillStyle = '#b8936a'; g.fillRect((i * 157) % w, i * 32, 2, 32); g.fillRect(0, i * 32 + 31, w, 1) } })
+  planks.redraw(); planks.t.wrapS = planks.t.wrapT = T.RepeatWrapping; planks.t.repeat.set(4.5, 3.6)
+  box(W, 0.3, D, texMat(planks.t), 0, -0.15, 0)
+  const brick = canvasTex(512, 256, (g, w, h) => {
+    g.fillStyle = '#e3d3c3'; g.fillRect(0, 0, w, h)
+    for (let r = 0; r < 8; r++) for (let c = -1; c < 9; c++) { g.fillStyle = ['#b9644a', '#ad5a41', '#c26f52', '#a8553d'][(r * 7 + c * 3) & 3]; g.fillRect(c * 64 + (r % 2) * 32 + 3, r * 32 + 3, 58, 26) }
+  })
+  brick.redraw(); brick.t.wrapS = brick.t.wrapT = T.RepeatWrapping; brick.t.repeat.set(5, 2.2)
+  box(W, 4.8, 0.3, texMat(brick.t), 0, 2.4, BACK - 0.15)
+  box(0.3, 4.8, D, '#cddccd', LEFT - 0.15, 2.4, 0)
+  box(W, 0.22, 0.12, '#f4efe6', 0, 0.11, BACK + 0.05)
+  box(0.12, 0.22, D, '#f4efe6', LEFT + 0.05, 0.11, 0)
+  const SKY = { day: ['#bfe3f5', '#8aaec4', '#dcebf3', '#fff6d8'], dusk: ['#f6b98a', '#8b6f86', '#ffd9a0', '#ffe2a8'], night: ['#1c2440', '#2a3350', '#ffd27a', '#f4f1e0'] }
+  const sky = canvasTex(256, 256, (g, w, h, mode) => {
+    const [bgc, bld, win, orb] = SKY[mode]
+    g.fillStyle = bgc; g.fillRect(0, 0, w, h)
+    if (mode === 'night') { g.fillStyle = '#f4f1e0'; for (let i = 0; i < 26; i++) g.fillRect((i * 97) % w, (i * 53) % 110, 2, 2) }
+    g.fillStyle = orb; g.beginPath(); g.arc(mode === 'dusk' ? 60 : 200, mode === 'dusk' ? 120 : 50, 22, 0, 7); g.fill()
+    if (mode === 'night') { g.fillStyle = bgc; g.beginPath(); g.arc(210, 44, 20, 0, 7); g.fill() }
+    const b = [[0, 150, 40], [36, 110, 34], [66, 170, 30], [92, 90, 44], [132, 140, 30], [158, 120, 38], [192, 160, 30], [218, 100, 40]]
+    for (const [x, y, bw] of b) { g.fillStyle = bld; g.fillRect(x, y, bw, h - y); g.fillStyle = win; let n = 0; for (let yy = y + 10; yy < h - 8; yy += 16) for (let xx = x + 6; xx < x + bw - 6; xx += 10) if (mode !== 'night' || (n++ * 7 + x) % 3) g.fillRect(xx, yy, 4, 7) }
+  })
+  sky.redraw('day')
+  for (const z of [-2.6, 1.4]) {
+    box(0.14, 3.0, 3.2, '#ffffff', LEFT + 0.02, 2.4, z)
+    const pane = mesh(new T.PlaneGeometry(2.95, 2.75), new T.MeshBasicMaterial({ map: sky.t }), LEFT + 0.1, 2.4, z); pane.rotation.y = Math.PI / 2; pane.castShadow = false
+    box(0.06, 0.07, 3.0, '#ffffff', LEFT + 0.12, 2.4, z); box(0.06, 2.8, 0.07, '#ffffff', LEFT + 0.12, 2.4, z)
+  }
+  for (const [x, z, r, c] of [[0.6, -0.6, 6.2, '#efe5d2'], [7.4, 6.4, 2.4, '#7aa596']]) { const rr = cyl(r, r, 0.03, c, x, 0.015, z, scene, 56); rr.castShadow = false }
+
+  /* Glass rooms: the Project Manager's corner office (back left) and the meeting room (front left) */
+  const glass = new T.MeshBasicMaterial({ color: '#d6eef5', transparent: true, opacity: 0.2, depthWrite: false, side: T.DoubleSide })
+  const steel = '#3a3f42'
+  const glassRoom = (x0, x1, zWall, zOpen, doorAt) => {
+    const zm = (zWall + zOpen) / 2, depth = Math.abs(zOpen - zWall)
+    const front = [[x0, doorAt - 0.6], [doorAt + 0.6, x1]]
+    for (const [a, b] of front) { const p = mesh(new T.PlaneGeometry(b - a, 3.0), glass, (a + b) / 2, 1.5, zOpen); p.castShadow = false; box(b - a, 0.08, 0.08, steel, (a + b) / 2, 3.0, zOpen); box(b - a, 0.06, 0.06, steel, (a + b) / 2, 0.03, zOpen) }
+    const side = mesh(new T.PlaneGeometry(depth, 3.0), glass, x1, 1.5, zm); side.rotation.y = Math.PI / 2; side.castShadow = false
+    box(0.08, 0.08, depth, steel, x1, 3.0, zm)
+    for (const x of [x0 + 0.04, doorAt - 0.6, doorAt + 0.6, x1]) box(0.08, 3.0, 0.08, steel, x, 1.5, zOpen)
+  }
+  glassRoom(LEFT, -6.0, BACK, -4.4, -7.6)
+  glassRoom(LEFT, -6.0, D / 2, 3.6, -7.6)
+  const plate = canvasTex(256, 64, (g, w, h) => { g.fillStyle = '#2b2420'; g.fillRect(0, 0, w, h); g.fillStyle = '#f4efe6'; g.font = '800 26px "Nunito", sans-serif'; g.textAlign = 'center'; g.fillText('PROJECT MANAGER', w / 2, 42) })
+  plate.redraw(); mesh(new T.PlaneGeometry(1.5, 0.37), new T.MeshBasicMaterial({ map: plate.t }), -9.1, 2.6, -4.39)
+  // meeting room: round table, stools, a screen on the side wall
+  cyl(1.2, 1.2, 0.08, '#f4efe6', -8.5, 0.8, 6.1, scene, 40); cyl(0.1, 0.1, 0.78, steel, -8.5, 0.39, 6.1, scene, 10); cyl(0.5, 0.5, 0.04, steel, -8.5, 0.02, 6.1, scene, 24)
+  for (let i = 0; i < 5; i++) { const a = i * Math.PI * 2 / 5 + 0.3; cyl(0.32, 0.28, 0.5, ['#e0a63a', '#7aa596', '#c0362c', '#5f7d8a', '#b8455f'][i], -8.5 + Math.sin(a) * 1.7, 0.25, 6.1 + Math.cos(a) * 1.7, scene, 24) }
+  box(0.08, 1.2, 2.0, '#2d3236', LEFT + 0.1, 2.0, 6.1)
+  cyl(0.12, 0.1, 0.18, '#f4efe6', -8.2, 0.93, 5.9); box(0.6, 0.02, 0.42, '#ffffff', -8.8, 0.85, 6.3)
+
+  /* Phone booths on the back wall */
+  for (const x of [-4.6, -2.8]) {
+    const pod = new T.Group(); pod.position.set(x, 0, BACK + 0.75); scene.add(pod)
+    box(1.5, 2.5, 1.3, '#5f7d8a', 0, 1.25, -0.05, pod)
+    const door = mesh(new T.PlaneGeometry(1.1, 2.0), glass, 0, 1.15, 0.61, pod); door.castShadow = false
+    cyl(0.3, 0.3, 0.45, '#e0a63a', 0, 0.23, -0.2, pod, 20)
+    box(1.6, 0.12, 1.4, '#3f5862', 0, 2.56, -0.05, pod)
+  }
+
+  /* Plants, bookshelf, lounge with sofa, the office dog, the kitchen */
+  const plant = (x, z, s = 1) => {
+    cyl(0.3 * s, 0.24 * s, 0.55 * s, '#e8e2d6', x, 0.28 * s, z)
+    for (const [dx, dy, dz, r] of [[0, 0.95, 0, 0.42], [-0.25, 1.2, 0.1, 0.32], [0.24, 1.3, -0.08, 0.34], [0.02, 1.55, 0.05, 0.28]]) { const l = ball(r * s, '#4f8a55', x + dx * s, dy * s, z + dz * s); l.scale.y = 0.85 }
+  }
+  for (const [x, z, k] of [[-5.5, -7.8, 0.9], [-1.4, -7.9, 0.8], [10.4, -1.2, 1.1], [10.4, 3.4, 1.0], [-5.5, 8.0, 1.1], [-5.6, -3.6, 0.7], [1.0, 3.2, 0.6], [4.4, -3.0, 0.6], [-10.4, -0.6, 0.9]]) plant(x, z, k)
+  box(0.5, 2.6, 2.4, '#8a6a4c', LEFT + 0.3, 1.3, -0.6 + 3.3)
+  for (let r = 0; r < 4; r++) {
+    box(0.48, 0.05, 2.3, '#a07d5b', LEFT + 0.32, 0.25 + r * 0.6, 2.7)
+    for (let i = 0; i < 9; i++) { const h = 0.32 + ((i * 7 + r) % 4) * 0.05; box(0.32, h, 0.18, ['#c0362c', '#1f5fa8', '#e3b341', '#3f7d4f', '#7a4a8a'][(i + r) % 5], LEFT + 0.36, 0.28 + r * 0.6 + h / 2, 1.8 + i * 0.22) }
+  }
+  box(3.4, 0.5, 1.1, '#e0a63a', 7.4, 0.45, 5.4); box(3.4, 0.9, 0.35, '#d39a30', 7.4, 0.85, 4.95)
+  for (const x of [5.8, 9.0]) box(0.3, 0.75, 1.1, '#d39a30', x, 0.55, 5.4)
+  for (const x of [6.5, 7.4, 8.3]) { const c = box(0.65, 0.45, 0.18, ['#f4efe6', '#7aa596', '#c0362c'][Math.round(x) % 3], x, 1.0, 5.2); c.rotation.x = -0.2 }
+  cyl(0.65, 0.65, 0.08, '#8a6a4c', 7.4, 0.45, 6.9); cyl(0.06, 0.06, 0.42, steel, 7.4, 0.22, 6.9, scene, 8)
+  cyl(0.12, 0.1, 0.18, '#f4efe6', 7.2, 0.58, 6.8); box(0.5, 0.05, 0.35, '#1f5fa8', 7.6, 0.51, 7.0)
+  for (const [x, z, c] of [[4.6, 7.4, '#c0362c'], [10.0, 7.2, '#5f7d8a']]) { const bean = ball(0.75, c, x, 0.45, z); bean.scale.y = 0.6 }
+  cyl(0.04, 0.04, 2.4, '#2b2420', 10.2, 1.2, 5.0, scene, 8); const shade = cone(0.35, 0.4, '#f4efe6', 10.2, 2.5, 5.0); shade.rotation.x = Math.PI
+  // the office dog, always asleep in its bed
+  const dog = new T.Group(); dog.position.set(2.4, 0, 7.2); dog.rotation.y = 0.6; scene.add(dog)
+  mesh(new T.TorusGeometry(0.55, 0.18, 12, 28), '#5f7d8a', 0, 0.18, 0, dog).rotation.x = Math.PI / 2
+  cyl(0.55, 0.55, 0.06, '#7f9aa6', 0, 0.05, 0, dog)
+  const dogBody = ball(0.38, '#e39a4a', 0, 0.3, 0, dog); dogBody.scale.set(1.25, 0.7, 0.85)
+  ball(0.24, '#e39a4a', 0.42, 0.33, 0.12, dog); const muzzle = ball(0.12, '#f7ead8', 0.6, 0.3, 0.16, dog); muzzle.scale.z = 0.8
+  for (const dz of [0.0, 0.24]) cone(0.08, 0.18, '#d4883a', 0.4, 0.55, dz, dog)
+  ball(0.04, '#2b2420', 0.71, 0.33, 0.17, dog)
+  outline(dog)
+  // kitchen: counter on the back wall, an island with stools, a fridge, the sign
+  const bx = 7.6, bz = BACK + 0.55
+  box(5.6, 1.0, 0.95, '#f4efe6', bx, 0.5, bz); box(5.7, 0.08, 1.05, '#8a6a4c', bx, 1.04, bz)
+  box(1.1, 2.3, 0.9, '#d9e2e6', 10.4 - 0.1, 1.15, bz); box(0.05, 0.5, 0.05, steel, 9.95, 1.5, bz + 0.47)
+  box(0.85, 0.75, 0.55, '#b9c0c6', bx - 1.6, 1.45, bz - 0.05); box(0.7, 0.1, 0.25, steel, bx - 1.6, 1.25, bz + 0.25)
+  for (const dx of [-1.8, -1.4]) cyl(0.05, 0.05, 0.12, steel, bx + dx, 1.38, bz + 0.25, scene, 8)
+  cyl(0.14, 0.18, 0.55, steel, bx - 0.6, 1.35, bz - 0.1); cone(0.16, 0.25, '#7a4a2b', bx - 0.6, 1.75, bz - 0.1)
+  for (const [i, c] of [[0, '#c0362c'], [1, '#1f5fa8'], [2, '#e3b341'], [3, '#3f7d4f']]) cyl(0.09, 0.08, 0.17, c, bx + 0.0 + i * 0.25, 1.17, bz + 0.2)
+  const bowl = ball(0.28, '#f4efe6', bx + 1.3, 1.12, bz); bowl.scale.y = 0.45
+  for (const [dx, dz] of [[-0.08, 0], [0.1, 0.06], [0.02, -0.1]]) ball(0.11, '#f08a24', bx + 1.3 + dx, 1.25, bz + dz)
+  box(4.4, 0.06, 0.4, '#8a6a4c', bx - 0.6, 2.45, BACK + 0.2)
+  for (let i = 0; i < 7; i++) cyl(0.13, 0.13, 0.32, ['#f4efe6', '#e8d9bf'][i % 2], bx - 2.4 + i * 0.6, 2.64, BACK + 0.2)
+  const sign = canvasTex(512, 128, (g, w, h) => { g.fillStyle = '#2b2420'; g.fillRect(0, 0, w, h); g.fillStyle = '#f4d58d'; g.font = '800 64px "Nunito", sans-serif'; g.textAlign = 'center'; g.fillText('KAFFEE', w / 2, 86) })
+  sign.redraw(); mesh(new T.PlaneGeometry(2.0, 0.5), new T.MeshBasicMaterial({ map: sign.t }), bx - 0.6, 3.3, BACK + 0.02)
+  box(3.0, 0.95, 1.2, '#7aa596', 7.4, 0.48, -4.6); box(3.2, 0.08, 1.4, '#f4efe6', 7.4, 1.0, -4.6)
+  for (const x of [6.4, 7.4, 8.4]) { cyl(0.26, 0.22, 0.08, '#e0a63a', x, 0.72, -3.55, scene, 20); cyl(0.04, 0.04, 0.7, steel, x, 0.35, -3.55, scene, 8) }
+  cyl(0.12, 0.1, 0.18, '#f4efe6', 7.0, 1.13, -4.5); cyl(0.12, 0.1, 0.18, '#c0362c', 7.9, 1.13, -4.8)
+  const COFFEE = [[5.6, -3.4], [6.9, -3.0], [8.1, -3.0], [9.3, -3.4]]
+
+  /* Whiteboard (level and progress), kanban board and the sticky note that counts what needs you */
+  const board = canvasTex(1024, 512, (g, w, h, lv) => {
+    g.fillStyle = '#fbfcfa'; g.fillRect(0, 0, w, h)
+    g.fillStyle = '#5d6a65'; g.font = '700 38px "IBM Plex Mono", monospace'; g.fillText(lv.label, 56, 92)
+    g.fillStyle = '#17201d'; g.font = '900 66px "Nunito", sans-serif'
+    const words = String(lv.name).split(' '); let line = '', y = 182
+    for (const wd of words) { const t = line ? `${line} ${wd}` : wd; if (g.measureText(t).width > w - 112 && line) { g.fillText(line, 56, y); y += 76; line = wd } else line = t }
+    g.fillText(line, 56, y)
+    g.fillStyle = '#dbe1de'; g.fillRect(56, 400, w - 300, 34)
+    g.fillStyle = '#0d6e5b'; g.fillRect(56, 400, (w - 300) * lv.pct / 100, 34)
+    g.fillStyle = '#17201d'; g.font = '700 64px "IBM Plex Mono", monospace'; g.fillText(`${lv.pct}%`, w - 220, 436)
+  })
+  box(4.4, 2.3, 0.08, '#8f9a96', 1.2, 3.0, BACK + 0.05)
+  const wb = mesh(new T.PlaneGeometry(4.2, 2.1), new T.MeshBasicMaterial({ map: board.t }), 1.2, 3.0, BACK + 0.1)
+  wb.userData.go = 'plan'
+  box(2.6, 1.0, 0.06, '#c9a26a', -3.7, 3.55, BACK + 0.04)
+  for (let i = 0; i < 8; i++) { const n = box(0.28, 0.28, 0.02, ['#ffe58a', '#a8d8c8', '#f7b2a6', '#bcd2f2'][i % 4], -4.7 + (i % 4) * 0.62, 3.78 - Math.floor(i / 4) * 0.42, BACK + 0.08); n.rotation.z = ((i * 37) % 10 - 5) / 60 }
+  const sticky = canvasTex(256, 256, (g, w, h, n) => {
+    g.fillStyle = '#ffd84d'; g.fillRect(0, 0, w, h)
+    g.fillStyle = '#3d3200'; g.font = '700 120px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.fillText(String(n), w / 2, 140)
+    g.font = '800 34px "Nunito", sans-serif'; g.fillText(n === 1 ? 'needs you' : n ? 'need you' : 'all clear', w / 2, 206)
+  })
+  const note = mesh(new T.PlaneGeometry(1.0, 1.0), new T.MeshBasicMaterial({ map: sticky.t }), 4.1, 3.4, BACK + 0.1)
+  note.rotation.z = -0.08; note.userData.go = 'todo'
+  const setWall = (lv, n) => { board.redraw(lv); sticky.redraw(n) }
+  setWall(level, youCount)
+  document.fonts?.ready?.then(() => { setWall(level, youCount); plate.redraw(); sign.redraw() })
+
+  /* Bubble sprites */
+  const bubbleTex = (draw) => { const c = canvasTex(128, 128, draw); c.redraw(); return c.t }
+  const circle = (fill, glyph, fg = '#fff') => bubbleTex((g) => { g.fillStyle = '#2b2420'; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.fillStyle = fill; g.beginPath(); g.arc(64, 64, 53, 0, 7); g.fill(); g.fillStyle = fg; g.font = '700 76px "IBM Plex Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(glyph, 64, 70) })
+  const TEX = {
+    blocked: circle('#e0483c', '!'), waiting: circle('#f2b134', '?', '#2a1d00'), done: circle('#3a9a5b', '✓'),
+    working: bubbleTex((g) => { g.fillStyle = '#fff'; g.strokeStyle = '#2b2420'; g.lineWidth = 7; g.beginPath(); if (g.roundRect) g.roundRect(8, 24, 112, 70, 26); else g.rect(8, 24, 112, 70); g.fill(); g.stroke(); g.fillStyle = '#0d6e5b'; for (const x of [36, 64, 92]) { g.beginPath(); g.arc(x, 59, 9, 0, 7); g.fill() } }),
+    z: bubbleTex((g) => { g.fillStyle = '#5a6a86'; g.font = '700 96px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('Z', 64, 68) }),
+  }
+  const sprite = (tex, s) => { const sp = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })); sp.scale.set(s, s, s); return sp }
+  const dogZ = sprite(TEX.z, 0.3); scene.add(dogZ)
+
+  /* The team: cartoon animals dressed for their role */
+  const ANIMAL = {
+    pm: { kind: 'bear', fur: '#9a643f', muzzle: '#e2bd92', body: '#2f3e5c' },
+    researcher: { kind: 'owl', fur: '#9a7b5a', muzzle: '#f1e2c6', body: '#5f7d4a' },
+    designer: { kind: 'cat', fur: '#f0a35e', muzzle: '#fbe3c6', body: '#2b2b2b' },
+    programmer: { kind: 'raccoon', fur: '#9a9da4', muzzle: '#f2f0ea', body: '#3f6b58' },
+    tester: { kind: 'rabbit', fur: '#f5f1ea', muzzle: '#ffffff', body: '#cfe3f0' },
+    reviewer: { kind: 'penguin', fur: '#2a2e35', muzzle: '#f7f5f0', body: '#2a2e35' },
+    security: { kind: 'dog', fur: '#b07a45', muzzle: '#ecd2b0', body: '#26323a' },
+    legal: { kind: 'fox', fur: '#e0742e', muzzle: '#fbf3e8', body: '#5a4a6b' },
+    marketer: { kind: 'panda', fur: '#f7f5f0', muzzle: '#ffffff', body: '#e07a30' },
+  }
+  function animalHead(a, head) {
+    const f = a.fur
+    ball(0.46, f, 0, 0.42, 0, head)
+    const mz = ball(0.2, a.muzzle, 0, 0.27, 0.36, head); mz.scale.set(1.25, 0.8, 0.7)
+    const eyes = new T.Group(); eyes.position.set(0, 0.47, 0.38); head.add(eyes)
+    const eyeR = a.kind === 'owl' ? 0.1 : 0.07
+    for (const x of [-0.17, 0.17]) {
+      if (a.kind === 'owl') { const disc = ball(0.17, a.muzzle, x, 0.47, 0.32, head); disc.scale.z = 0.4 }
+      if (a.kind === 'panda' || a.kind === 'raccoon') { const patch = ball(0.13, '#2a2e35', x, 0.46, 0.34, head); patch.scale.set(1, 1.15, 0.45) }
+      ball(eyeR, '#1d1a18', x, 0, 0.02, eyes); ball(eyeR * 0.35, '#ffffff', x + eyeR * 0.35, eyeR * 0.4, eyeR * 0.75, eyes)
+    }
+    for (const x of [-0.29, 0.29]) { const c = ball(0.07, '#f4a2a0', x, 0.31, 0.37, head); c.scale.z = 0.35 }
+    if (a.kind === 'owl' || a.kind === 'penguin') { const b = cone(0.07, 0.18, '#f0a330', 0, 0.33, 0.48, head); b.rotation.x = Math.PI / 2 + 0.3 }
+    else ball(0.065, '#2b2420', 0, 0.33, 0.5, head)
+    if (a.kind === 'penguin') { const face = ball(0.36, '#f7f5f0', 0, 0.38, 0.17, head); face.scale.set(1.05, 0.95, 0.75) }
+    const ear = (x, y, z, rz, make) => { const e = make(); e.position.set(x, y, z); e.rotation.z = rz; head.add(e); return e }
+    if (a.kind === 'bear' || a.kind === 'panda' || a.kind === 'raccoon') {
+      const ec = a.kind === 'panda' ? '#2a2e35' : a.kind === 'raccoon' ? '#6e7178' : f
+      for (const x of [-0.32, 0.32]) { ball(0.15, ec, x, 0.82, -0.04, head); if (a.kind === 'bear') ball(0.08, a.muzzle, x, 0.82, 0.06, head) }
+    }
+    if (a.kind === 'cat' || a.kind === 'fox' || a.kind === 'dog') {
+      const tall = a.kind === 'fox' ? 0.36 : 0.3
+      for (const x of [-0.27, 0.27]) {
+        ear(x, 0.86, -0.02, x < 0 ? 0.35 : -0.35, () => new T.Mesh(new T.ConeGeometry(0.14, tall, 4), mat(a.kind === 'dog' ? '#5a3c24' : f)))
+        if (a.kind !== 'dog') { const inner = cone(0.07, tall * 0.6, a.kind === 'fox' ? '#2b2420' : '#f4a2a0', x * 1.02, 0.84, 0.05, head); inner.rotation.z = x < 0 ? 0.35 : -0.35 }
+      }
+      if (a.kind === 'cat') for (const s of [-1, 1]) for (const dy of [0.27, 0.32]) { const wsk = box(0.28, 0.012, 0.012, '#2b2420', s * 0.36, dy, 0.38, head); wsk.rotation.z = s * (dy - 0.3) * 4; wsk.userData.noLine = true }
+      if (a.kind === 'dog') { const top = ball(0.47, '#5a3c24', 0, 0.5, -0.06, head); top.scale.set(1, 0.75, 0.9) }
+    }
+    if (a.kind === 'rabbit') for (const x of [-0.16, 0.16]) { const e = ball(0.12, f, x, 1.05, -0.05, head); e.scale.set(0.8, 2.6, 0.6); const i = ball(0.06, '#f4a2a0', x, 1.05, 0.0, head); i.scale.set(0.8, 3.4, 0.4) }
+    if (a.kind === 'owl') for (const x of [-0.28, 0.28]) { const t = cone(0.09, 0.26, f, x, 0.86, -0.02, head); t.rotation.z = x < 0 ? 0.5 : -0.5 }
+    return eyes
+  }
+
+  const bulbMat = new T.MeshBasicMaterial({ color: '#8a8070' })
+  const deskShape = new T.Shape(), dw = 1.25, dd = 0.6, rr = 0.32
+  deskShape.moveTo(-dw + rr, -dd); deskShape.lineTo(dw - rr, -dd); deskShape.quadraticCurveTo(dw, -dd, dw, -dd + rr); deskShape.lineTo(dw, dd - rr); deskShape.quadraticCurveTo(dw, dd, dw - rr, dd)
+  deskShape.lineTo(-dw + rr, dd); deskShape.quadraticCurveTo(-dw, dd, -dw, dd - rr); deskShape.lineTo(-dw, -dd + rr); deskShape.quadraticCurveTo(-dw, -dd, -dw + rr, -dd)
+  const deskGeo = new T.ExtrudeGeometry(deskShape, { depth: 0.06, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 3, curveSegments: 10 }); deskGeo.rotateX(-Math.PI / 2)
+  const chairBack = new T.CylinderGeometry(0.48, 0.48, 0.72, 24, 1, true, Math.PI * 0.62, Math.PI * 0.76)
+  const chairMat = new T.MeshToonMaterial({ color: '#7aa596', gradientMap: grad, side: T.DoubleSide })
+  const seats = {}, pickables = [wb, note]
+  for (const s of SEATS) {
+    const a = ANIMAL[s.key], root = new T.Group(); root.position.set(s.at[0], 0, s.at[1]); scene.add(root)
+    root.userData.seat = s.key
+    root.rotation.y = Math.atan2(8 - s.at[0], 16 - s.at[1]) * 0.85 + ((s.at[0] * 13 + s.at[1] * 7) % 5) * 0.03
+    mesh(deskGeo, '#efe3cf', 0, 0.94, 0.55, root)
+    cyl(0.1, 0.1, 0.9, '#3a3f42', 0, 0.47, 0.55, root, 12); cyl(0.5, 0.55, 0.05, '#3a3f42', 0, 0.025, 0.55, root, 28)
+    cyl(0.46, 0.44, 0.13, '#7aa596', 0, 0.55, -0.45, root, 28)
+    mesh(chairBack, chairMat, 0, 1.05, -0.45, root)
+    cyl(0.06, 0.06, 0.48, '#2a3136', 0, 0.26, -0.45, root, 8); cyl(0.38, 0.4, 0.04, '#2a3136', 0, 0.03, -0.45, root, 24)
+    const who = new T.Group(); root.add(who)
+    const body = cyl(0.36, 0.44, 0.85, a.body, 0, 1.03, -0.4, who)
+    if (a.kind === 'penguin' || a.kind === 'owl') { const belly = ball(0.3, a.muzzle, 0, 1.0, -0.12, who); belly.scale.set(1, 1.2, 0.5) }
+    void body
+    const legs = []
+    for (const x of [-0.17, 0.17]) {
+      const leg = new T.Group(); leg.position.set(x, 0.62, -0.4); who.add(leg)
+      cyl(0.11, 0.11, 0.52, '#3a3f42', 0, -0.28, 0, leg, 10); const foot = ball(0.13, a.kind === 'penguin' || a.kind === 'owl' ? '#f0a330' : a.fur, 0, -0.55, 0.06, leg); foot.scale.set(1, 0.6, 1.3)
+      legs.push(leg)
+    }
+    const head = new T.Group(); head.position.set(0, 1.45, -0.4); who.add(head)
+    const eyes = animalHead(a, head)
+    const arms = []
+    for (const x of [-0.46, 0.46]) {
+      const arm = new T.Group(); arm.position.set(x, 1.35, -0.4); who.add(arm)
+      cyl(0.1, 0.1, 0.62, a.body, 0, -0.31, 0, arm, 10)
+      ball(0.12, a.kind === 'penguin' ? a.fur : a.kind === 'panda' ? '#2a2e35' : a.fur, 0, -0.64, 0, arm)
+      arm.rotation.x = -1.15; arm.rotation.z = x < 0 ? 0.18 : -0.18
+      arms.push(arm)
+    }
+    const cup = cyl(0.1, 0.09, 0.2, '#f4efe6', 0, -0.78, 0.05, arms[1]); cup.visible = false
+    const screenTex = canvasTex(256, 160, (g, w, h, on) => {
+      g.fillStyle = on ? '#123a32' : '#1b1f22'; g.fillRect(0, 0, w, h)
+      if (!on) return
+      const cols = ['#8fe3cf', '#f4d58d', '#f7b2a6', '#bcd2f2']
+      for (let i = 0; i < 8; i++) { g.fillStyle = cols[(i + on) % 4]; g.fillRect(16 + (i % 3) * 14, 14 + i * 17, 60 + ((i * 53 + on * 17) % 140), 8) }
+    })
+    screenTex.redraw(0)
+    const mon = new T.Group(); mon.position.set(0.55, 1.05, 0.6); mon.rotation.y = -0.45; root.add(mon)
+    box(0.95, 0.62, 0.06, '#2d3236', 0, 0.42, 0, mon)
+    const scr = mesh(new T.PlaneGeometry(0.86, 0.53), new T.MeshBasicMaterial({ map: screenTex.t }), 0, 0.42, -0.035, mon); scr.rotation.y = Math.PI
+    box(0.08, 0.2, 0.08, '#2d3236', 0, 0.1, 0, mon); box(0.35, 0.03, 0.22, '#2d3236', 0, 0.02, 0, mon)
+    box(0.7, 0.03, 0.25, '#f4efe6', -0.15, 1.06, 0.3, root)
+    dress(s.key, root, who, head)
+    cyl(0.12, 0.14, 0.05, '#2b2420', 1.0, 1.06, 0.25, root); cyl(0.02, 0.02, 0.55, '#2b2420', 1.0, 1.33, 0.25, root, 6)
+    const shadeL = cone(0.16, 0.2, '#e0483c', 1.0, 1.62, 0.35, root); shadeL.rotation.x = -0.5
+    const bulb = mesh(new T.SphereGeometry(0.07, 12, 8), bulbMat, 1.0, 1.54, 0.42, root); bulb.castShadow = false
+    outline(who)
+    const bubble = sprite(TEX.working, 0.75); who.add(bubble)
+    const zs = [0, 1, 2].map((i) => { const z = sprite(TEX.z, 0.32 + i * 0.07); who.add(z); return z })
+    const ring = mesh(new T.RingGeometry(1.35, 1.5, 40), new T.MeshBasicMaterial({ color: '#0d6e5b', transparent: true, opacity: 0.85 }), 0, 0.06, 0.1, root)
+    ring.rotation.x = -Math.PI / 2; ring.visible = false
+    const slot = COFFEE[Object.keys(seats).length % COFFEE.length]
+    root.updateMatrixWorld(true)
+    seats[s.key] = { root, who, head, eyes, arms, legs, cup, bubble, zs, ring, screenTex, state: 'off', phase: Math.random() * 6, home: new T.Vector3(), cafe: root.worldToLocal(new T.Vector3(slot[0], 0, slot[1])), cafeTurn: 0.55 - root.rotation.y }
+    root.traverse((o) => { if (o.isMesh && o !== ring && !o.userData.noLine) pickables.push(o) })
+  }
+
+  function dress(key, root, who, head) {
+    const front = 0.02
+    if (key === 'pm') {
+      box(0.16, 0.42, 0.04, '#f4f4f2', 0, 1.25, front, who)
+      box(0.09, 0.38, 0.05, '#c0362c', 0, 1.2, front + 0.02, who)
+      box(0.45, 0.04, 0.6, '#f4efe6', -0.85, 1.06, 0.55, root); box(0.12, 0.05, 0.08, '#7a6a4c', -0.85, 1.09, 0.3, root)
+      mesh(new T.TorusGeometry(0.5, 0.03, 8, 24, Math.PI), '#2d3236', 0, 0.42, 0, head)
+      const mic = box(0.03, 0.03, 0.35, '#2d3236', 0.38, 0.28, 0.2, head); mic.rotation.y = 0.6
+    }
+    if (key === 'researcher') {
+      for (const x of [-0.17, 0.17]) mesh(new T.TorusGeometry(0.15, 0.025, 8, 20), '#2b2b2b', x, 0.47, 0.42, head)
+      ;[['#c0362c', 0], ['#1f5fa8', 1], ['#e3b341', 2]].forEach(([c, i]) => box(0.55 - i * 0.05, 0.1, 0.4, c, -0.85, 1.1 + i * 0.1, 0.55, root))
+      cyl(0.04, 0.12, 0.08, '#7a6a4c', -0.35, 1.08, 0.8, root); ball(0.2, '#4f8fc0', -0.35, 1.35, 0.8, root)
+    }
+    if (key === 'designer') {
+      const beret = cyl(0.38, 0.42, 0.12, '#c0362c', -0.08, 0.86, -0.04, head); beret.rotation.z = 0.3
+      box(0.5, 0.04, 0.38, '#fbf7f0', -0.8, 1.06, 0.65, root)
+      for (const [x, c] of [[-0.95, '#c0362c'], [-0.85, '#e3b341'], [-0.75, '#1f5fa8'], [-0.65, '#3f7d4f']]) cyl(0.025, 0.025, 0.35, c, x, 1.25, 0.32, root, 6)
+      cyl(0.13, 0.11, 0.25, '#3a3f42', -0.8, 1.15, 0.32, root)
+    }
+    if (key === 'programmer') {
+      const hood = ball(0.5, '#3f6b58', 0, 0.36, -0.14, head); hood.scale.set(1.02, 0.95, 0.85)
+      mesh(new T.TorusGeometry(0.5, 0.045, 8, 28, Math.PI), '#22272b', 0, 0.45, 0, head)
+      for (const x of [-0.5, 0.5]) { const c = cyl(0.14, 0.14, 0.1, '#e0483c', x, 0.42, 0, head); c.rotation.z = Math.PI / 2 }
+      const m2 = new T.Group(); m2.position.set(-0.55, 1.05, 0.6); m2.rotation.y = 0.45; root.add(m2)
+      box(0.95, 0.62, 0.06, '#2d3236', 0, 0.42, 0, m2); box(0.08, 0.2, 0.08, '#2d3236', 0, 0.1, 0, m2)
+      cyl(0.07, 0.07, 0.26, '#3d7bd9', 1.05, 1.17, 0.3, root, 12)
+    }
+    if (key === 'tester') {
+      box(0.22, 0.5, 0.04, '#2c8c7a', 0, 1.2, front, who)
+      mesh(new T.TorusGeometry(0.47, 0.05, 8, 28), '#2c8c7a', 0, 0.68, 0, head).rotation.x = Math.PI / 2 - 0.25
+      for (const x of [-0.16, 0.16]) ball(0.11, '#bfe8df', x, 0.74, 0.36, head)
+      mesh(new T.TorusGeometry(0.13, 0.03, 8, 20), '#3a3f42', -0.8, 1.2, 0.55, root)
+      const handle = cyl(0.03, 0.03, 0.25, '#3a3f42', -0.95, 1.06, 0.68, root, 8); handle.rotation.z = 1.1
+      for (const [x, c] of [[-0.45, '#e3b341'], [-0.32, '#c0362c'], [-0.19, '#3d7bd9']]) cyl(0.04, 0.04, 0.28, c, x, 1.18, 0.8, root, 8)
+    }
+    if (key === 'reviewer') {
+      for (const x of [-0.17, 0.17]) { const g = box(0.24, 0.15, 0.03, '#c0362c', x, 0.47, 0.44, head); g.userData.noLine = true }
+      box(0.45, 0.03, 0.6, '#ffffff', -0.85, 1.05, 0.55, root)
+      const pen = cyl(0.025, 0.025, 0.4, '#c0362c', -0.85, 1.09, 0.55, root, 8); pen.rotation.z = Math.PI / 2
+    }
+    if (key === 'security') {
+      mesh(new T.SphereGeometry(0.49, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2.3), '#151a1e', 0, 0.5, 0, head)
+      box(0.55, 0.04, 0.35, '#151a1e', 0, 0.64, 0.42, head)
+      const badge = cyl(0.13, 0.13, 0.04, '#e3b341', 0.18, 1.3, front, who, 6); badge.rotation.x = Math.PI / 2
+      box(0.26, 0.22, 0.14, '#e3b341', -0.85, 1.15, 0.55, root)
+      mesh(new T.TorusGeometry(0.08, 0.025, 8, 16, Math.PI), '#9aa3a8', -0.85, 1.26, 0.55, root)
+    }
+    if (key === 'legal') {
+      for (const x of [-0.08, 0.08]) { const b = cone(0.07, 0.14, '#c0362c', x, 1.38, front + 0.01, who); b.rotation.z = x < 0 ? -Math.PI / 2 : Math.PI / 2 }
+      cyl(0.03, 0.03, 0.55, '#c9a227', -0.85, 1.32, 0.55, root, 8)
+      box(0.6, 0.03, 0.03, '#c9a227', -0.85, 1.58, 0.55, root)
+      for (const x of [-1.12, -0.58]) cyl(0.12, 0.08, 0.05, '#c9a227', x, 1.4, 0.55, root)
+      box(0.4, 0.14, 0.55, '#f6f2ea', -0.25, 1.11, 0.75, root)
+    }
+    if (key === 'marketer') {
+      mesh(new T.SphereGeometry(0.5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2.4), '#1f5fa8', 0, 0.5, 0, head)
+      box(0.5, 0.04, 0.35, '#1f5fa8', 0, 0.64, 0.42, head)
+      const horn = mesh(new T.ConeGeometry(0.18, 0.45, 16, 1, true), '#f4efe6', -0.85, 1.25, 0.55, root); horn.rotation.z = Math.PI / 2
+      cyl(0.04, 0.04, 0.2, '#7a6a4c', -0.85, 1.1, 0.55, root, 8)
+    }
+  }
+
+  let states = {}, counts = {}
+  function setStates(next, n) {
+    states = next; counts = n
+    for (const [k, s] of Object.entries(seats)) {
+      const st = next[k] || 'off', asleep = st === 'idle' || st === 'off'; s.state = st
+      s.bubble.visible = ['working', 'blocked', 'waiting', 'done'].includes(st)
+      if (s.bubble.visible) { s.bubble.material.map = TEX[st]; s.bubble.material.needsUpdate = true }
+      for (const z of s.zs) z.visible = asleep
+      s.eyes.scale.y = asleep ? 0.15 : 1
+      s.head.rotation.x = asleep ? 0.38 : 0
+      s.screenTex.redraw(st === 'working' ? 1 : 0)
+      if (still) s.who.position.copy(st === 'done' ? s.cafe : s.home)
+    }
+  }
+
+  /* Name tags as HTML over the canvas: crisp, tappable, following each teammate */
+  const tags = {}
+  for (const s of SEATS) {
+    const t = el('button', 'tag'); t.type = 'button'
+    const nm = el('span', 'nm', s.name), chip = el('span', 'chip off', 'off duty')
+    t.append(nm, chip); t.addEventListener('click', () => openSheet(s.key, t)); $('labels').append(t)
+    tags[s.key] = { t, nm, chip }
+  }
+  const v = new T.Vector3()
+  function placeTags() {
+    const w = stage.clientWidth, h = stage.clientHeight
+    for (const s of SEATS) {
+      const tg = tags[s.key], st = states[s.key] || 'off', n = counts[s.key] || 0
+      const name = n > 1 ? `${s.name} ×${n}` : s.name
+      if (tg.nm.textContent !== name) tg.nm.textContent = name
+      const cls = `chip ${st}`; if (tg.chip.className !== cls) { tg.chip.className = cls; tg.chip.textContent = st === 'off' ? 'off duty' : STATES[st] }
+      seats[s.key].who.localToWorld(v.set(0, 2.45, -0.4)).project(camera)
+      tg.t.style.left = `${((v.x + 1) / 2) * w}px`; tg.t.style.top = `${((1 - v.y) / 2) * h}px`
+      tg.t.hidden = v.z > 1
+    }
+  }
+
+  /* Tap a teammate, the whiteboard or the sticky note */
+  const ray = new T.Raycaster(), ptr = new T.Vector2()
+  const hit = (e) => {
+    const r = canvas.getBoundingClientRect()
+    ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1)
+    ray.setFromCamera(ptr, camera)
+    const h = ray.intersectObjects(pickables, false)[0]
+    let o = h ? h.object : null
+    while (o && !o.userData.seat && !o.userData.go) o = o.parent
+    return o ? o.userData : null
+  }
+  let down = null, hovered = null
+  canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY] })
+  canvas.addEventListener('pointerup', (e) => {
+    const moved = !down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6
+    down = null; if (moved) return
+    const u = hit(e); if (!u) return
+    if (u.go) location.hash = u.go; else openSheet(u.seat)
+  })
+  canvas.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse' || down) return
+    const u = hit(e), key = u?.seat || null
+    canvas.classList.toggle('point', !!u)
+    if (key !== hovered) { if (hovered) seats[hovered].ring.visible = false; hovered = key; if (key) seats[key].ring.visible = true }
+  })
+
+  function fit() {
+    const w = stage.clientWidth, h = stage.clientHeight
+    if (!w || !h) return
+    renderer.setSize(w, h, false); camera.aspect = w / h
+    const dist = w / h < 0.8 ? 62 : w / h < 1.4 ? 46 : 37
+    const dir = camera.position.clone().sub(controls.target).normalize()
+    camera.position.copy(controls.target).addScaledVector(dir, dist)
+    camera.updateProjectionMatrix(); controls.update()
+  }
+  new ResizeObserver(fit).observe(stage); fit()
+
+  /* Day and night follow yskills' own clock: sky, sun, desk lamps, wall clock */
+  const hemi = scene.children.find((o) => o.isHemisphereLight)
+  const lamps = [[-3.0, 3.2, -1.2], [3.6, 3.2, -1.2], [0.4, 3.2, 2.0], [7.4, 2.6, 5.8], [7.6, 3.0, -5.4], [-8.5, 2.8, -6.4], [-8.5, 2.8, 6.0]].map(([x, y, z]) => { const l = new T.PointLight(0xffc27a, 0, 9, 2); l.position.set(x, y, z); scene.add(l); return l })
+  const clockTex = canvasTex(256, 256, (g, w, h) => {
+    const now = new Date(), cx = w / 2
+    g.fillStyle = '#2b2420'; g.beginPath(); g.arc(cx, cx, 124, 0, 7); g.fill(); g.fillStyle = '#fbf7f0'; g.beginPath(); g.arc(cx, cx, 112, 0, 7); g.fill()
+    g.fillStyle = '#2b2420'; for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; g.fillRect(cx + Math.sin(a) * 92 - 4, cx - Math.cos(a) * 92 - 4, 8, 8) }
+    const hand = (a, len, wd) => { g.lineWidth = wd; g.lineCap = 'round'; g.strokeStyle = '#2b2420'; g.beginPath(); g.moveTo(cx, cx); g.lineTo(cx + Math.sin(a) * len, cx - Math.cos(a) * len); g.stroke() }
+    hand(((now.getHours() % 12) + now.getMinutes() / 60) * Math.PI / 6, 56, 12); hand(now.getMinutes() * Math.PI / 30, 84, 8)
+  })
+  const clk = mesh(new T.CircleGeometry(0.55, 32), new T.MeshBasicMaterial({ map: clockTex.t }), -1.6, 3.9, BACK + 0.04); clk.castShadow = false
+  const MODES = {
+    day: { hemi: [0xfff8ee, 0.62], sun: [0xfff0dc, 0.62], bg: null, lamp: 0, bulb: '#8a8070' },
+    dusk: { hemi: [0xffd9b8, 0.6], sun: [0xffa66b, 0.55], bg: '#e9c9b2', lamp: 0.55, bulb: '#ffd27a' },
+    night: { hemi: [0x8090c0, 0.32], sun: [0x9fb4ff, 0.18], bg: '#18203a', lamp: 1.1, bulb: '#ffe2a0' },
+  }
+  const modeOf = (hr) => (hr >= 7 && hr < 17 ? 'day' : (hr >= 17 && hr < 20) || (hr >= 5 && hr < 7) ? 'dusk' : 'night')
+  let mode = null
+  function tick() {
+    clockTex.redraw()
+    const m = modeOf(new Date().getHours()); if (m === mode) return
+    mode = m; const c = MODES[m]
+    hemi.color.set(c.hemi[0]); hemi.intensity = c.hemi[1]; sun.color.set(c.sun[0]); sun.intensity = c.sun[1]
+    if (c.bg) scene.background = new T.Color(c.bg); else bg()
+    for (const l of lamps) l.intensity = c.lamp
+    bulbMat.color.set(c.bulb); sky.redraw(m)
+    document.documentElement.dataset.daytime = m
+    window.onDaytime?.(m)
+  }
+  tick(); setInterval(tick, 30000)
+
+  /* Each frame: type, doze, walk to the coffee bar when done and back when there is work */
+  const clock = new T.Clock(), d = new T.Vector3()
+  let lastScreen = 0
+  function frame() {
+    requestAnimationFrame(frame)
+    if (stage.offsetParent === null) return
+    const dt = Math.min(clock.getDelta(), 0.05), t = still ? 0 : clock.elapsedTime
+    controls.update()
+    for (const s of Object.values(seats)) {
+      const p = t + s.phase, asleep = s.state === 'idle' || s.state === 'off'
+      const goal = s.state === 'done' ? s.cafe : s.home
+      d.copy(goal).sub(s.who.position); const far = d.length()
+      const walking = !still && far > 0.03
+      if (walking) {
+        s.who.position.addScaledVector(d.normalize(), Math.min(far, 2.4 * dt))
+        s.who.rotation.y = Math.atan2(d.x, d.z)
+        s.who.position.y = Math.abs(Math.sin(p * 9)) * 0.08
+        s.legs[0].rotation.x = Math.sin(p * 9) * 0.6; s.legs[1].rotation.x = -Math.sin(p * 9) * 0.6
+        s.arms[0].rotation.x = Math.sin(p * 9) * 0.5; s.arms[1].rotation.x = -Math.sin(p * 9) * 0.5
+      } else {
+        s.who.position.y = 0
+        const atCafe = s.state === 'done'
+        s.who.rotation.y = atCafe ? s.cafeTurn : 0
+        s.legs[0].rotation.x = s.legs[1].rotation.x = atCafe ? 0 : -1.4
+        const typing = s.state === 'working' && !still
+        s.arms[0].rotation.x = atCafe ? 0 : -1.15 + (typing ? Math.sin(p * 14) * 0.12 : 0)
+        s.arms[1].rotation.x = atCafe ? -1.3 + (still ? 0 : Math.sin(p * 0.8) * 0.25) : -1.15 + (typing ? Math.sin(p * 14 + Math.PI) * 0.12 : 0)
+        s.head.rotation.y = typing ? Math.sin(p * 0.9) * 0.12 : atCafe ? Math.sin(p * 0.5) * 0.3 : 0
+      }
+      s.cup.visible = s.state === 'done'
+      s.who.scale.y = asleep && !still ? 1 + Math.sin(p * 1.6) * 0.015 : 1
+      if (asleep) s.zs.forEach((z, i) => {
+        const k = still ? (i + 1) / 4 : (t * 0.35 + i / 3 + s.phase) % 1
+        z.position.set(0.35 + k * 0.7, 2.1 + k * 1.1, -0.3)
+        z.material.opacity = still ? 1 : Math.sin(k * Math.PI)
+      })
+      const bob = still ? 0 : s.state === 'blocked' || s.state === 'waiting' ? Math.abs(Math.sin(p * 2.4)) * 0.18 : Math.sin(p * 3) * 0.05
+      s.bubble.position.set(0.95, 2.45 + bob, -0.4)
+    }
+    { const k = still ? 0.5 : (t * 0.3) % 1; dogZ.position.set(2.8 + k * 0.4, 0.75 + k * 0.7, 7.3); dogZ.material.opacity = still ? 1 : Math.sin(k * Math.PI) }
+    if (!still && t - lastScreen > 0.45) { lastScreen = t; for (const s of Object.values(seats)) if (s.state === 'working') s.screenTex.redraw(1 + (Math.floor(t * 2) % 4)) }
+    renderer.render(scene, camera)
+    placeTags()
+  }
+  frame()
+  return { setStates, setWall }
+}
+
+const GREET = { day: 'Good day, yskills.', dusk: 'Good evening, yskills.', night: 'Late shift, yskills.' }
+window.onDaytime = (m) => { const w = team.filter((x) => stateOf(x.state) === 'working').length; $('greet').textContent = `${GREET[m]}${w ? ` ${w} working.` : ''}${updated ? ` Updated ${updated}.` : ''}` }
 const rows = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+renderTeam([])
 ;(async () => {
   const db = await window.claude?.use?.('db')
-  if (!db) { $('updated').textContent = 'Sign in to claude.ai to see live updates'; return }
+  if (!db) { $('greet').textContent = 'Sign in to claude.ai to see live updates'; return }
   $('dot').classList.add('on')
-  const fail = () => { $('dot').classList.remove('on'); $('updated').textContent = 'Live updates stopped; reload the page' }
+  const fail = () => { $('dot').classList.remove('on'); $('greet').textContent = 'Live updates stopped; reload the page' }
   db.doc('pm/now').onSnapshot((s) => renderPm(s.exists ? s.data() : null), fail)
   db.collection('team').onSnapshot((s) => renderTeam(rows(s)), fail)
   db.collection('phases').onSnapshot((s) => renderPhases(rows(s)), fail)
+  db.collection('projects').onSnapshot((s) => renderProjects(rows(s)), fail)
 })()
 </script>

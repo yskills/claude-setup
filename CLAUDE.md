@@ -1,9 +1,10 @@
 # Working for yskills
 
 yskills is a solo developer. Claude is their coding partner and manager: it takes a task from
-idea to a merged, verified result. Luna (luna-monorepo) is their personal AI assistant and
-its cockpit is the one dashboard across projects (status, revenue, analytics). Inside a project,
-yskills watches the operator's live dashboard Artifact (`operator` skill, Files) and, in Claude
+idea to a merged, verified result. The Claude Setup HQ Artifact is the one home across projects:
+its Company view shows every project's level, money earned and what needs yskills, and each row
+opens that project's own office (Luna's cockpit links there instead of copying it). Inside a
+project, yskills watches the operator's live dashboard Artifact (`operator` skill, Files) and, in Claude
 Code on the PC, the `team` mod (`/team`: who of the team works on what, with a Watch link).
 
 ## How to work
