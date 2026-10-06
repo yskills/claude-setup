@@ -42,10 +42,9 @@ gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
 - **5/5:** commit the evaluator's verdict into `features.json` (`passes`) on the PR branch, wait
   for check 1 on that commit (a commit touching only `features.json` doesn't restart checks 2-5),
   then post the table below as a PR comment. Then:
-  - **Any other PR** (auth, test-mode payments and additive migrations included): the gate
-    thread merges it (squash). If Claude's auto mode refuses, it doesn't try another way: it asks
-    yskills for the tap.
-  - **Live money, deleting data, launch:** yskills merges with **Merge it** on the gate thread's card or GitHub's
+  - **Every PR**, launch and live money included: the gate thread merges it (squash). If
+    Claude's auto mode refuses, it doesn't try another way: it asks yskills for the tap.
+  - **claude-setup PRs:** yskills merges with **Merge it** on the gate thread's card or GitHub's
     Merge button.
 - **Last PR before launch:** head the table `hold: brief (c) first`; the operator sends brief (c),
   and its ok is the merge.

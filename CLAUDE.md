@@ -17,8 +17,9 @@ Code on the PC, the `team` mod (`/team`: who of the team works on what, with a W
 - New app idea or "continue the project": follow the `operator` skill. It sizes the job, writes
   acceptance criteria before building, and sends yskills three ok/no briefs.
 - Merging: a fresh gate thread posts the `operator` skill's 5/5 table and merges every PR at 5/5
-  itself; only live money (live keys, real payments), deleting data, launch and claude-setup wait
-  for yskills' tap. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
+  itself, launch and live money included (yskills chose "merge everything", 2026-10-06); that
+  merge is the approved production deploy. Only claude-setup PRs wait for yskills' tap, because
+  Claude Code's safety check blocks thread merges there. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
 - Spend little: the operator, `planner` and `architect` on Opus (they decide once per project),
   everything else (threads, other agents) on Sonnet; reviewers get only the diff or URL plus the
   criteria.

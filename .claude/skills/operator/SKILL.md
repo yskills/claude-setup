@@ -1,6 +1,6 @@
 ---
 name: operator
-description: Run a project from idea to live app with the least of yskills' time and tokens - the operator holds the goals, sizes the job, staffs the teams (research inside and outside, legal, design, build, QA, red team, launch, marketing), keeps PLAN.md, features.json and PROGRESS.md, runs the 5/5 gate on every PR and sends yskills three ok/no briefs plus one merge tap per PR. Use when yskills brings a new app idea, says "build", "go", "continue the project", or a project thread starts or resumes.
+description: Run a project from idea to live app with the least of yskills' time and tokens - the operator holds the goals, sizes the job, staffs the teams (research inside and outside, legal, design, build, QA, red team, launch, marketing), keeps PLAN.md, features.json and PROGRESS.md, runs the 5/5 gate on every PR and sends yskills three ok/no briefs; the gate merges every 5/5 PR itself. Use when yskills brings a new app idea, says "build", "go", "continue the project", or a project thread starts or resumes.
 ---
 
 # Operator
@@ -12,8 +12,8 @@ Shape from Anthropic's long-running-agent harness (planner, generator, evaluator
 files; a fresh context per job) and the ECC hackathon winner's flow (`docs/RESEARCH.md`).
 
 **What yskills does, all of it:** one brainstorm batch, three ok/no briefs (`briefs.md`), and one
-**Merge it** tap per PR that touches live money (live keys, real payments), deletes data or
-launches. Every other PR at 5/5 is merged by the gate thread. A PR that fails the gate twice reaches yskills with
+no merge taps: every PR at 5/5 is merged by the gate thread, launch included (yskills' choice,
+2026-10-06). A PR that fails the gate twice reaches yskills with
 a plain summary (`gate.md`).
 
 **Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`); each
@@ -108,8 +108,8 @@ Templates in `templates/`.
    default stack from CLAUDE.md, the `publish` skill's files, `verify`, CI, legal pages per the
    `legal` skill. Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
    directions. **Brief (b)** carries only what every build needs: the Cloudflare import and the D1
-   ids. The scaffold PR's merge tap comes first in brief (b), because the Cloudflare import builds
-   the default branch and needs the scaffold's `wrangler.jsonc` there. Building starts once
+   ids. The gate merges the scaffold PR once CI is green, before brief (b), because the Cloudflare
+   import builds the default branch and needs the scaffold's `wrangler.jsonc` there. Building starts once
    brief (b) is answered.
 
    **Keys and accounts just in time.** Every other key or account is asked for by a **key card**
@@ -139,19 +139,19 @@ Templates in `templates/`.
    Never move the go number after the probe started. A small site meant to earn is its own
    probe; one not meant to earn skips it.
 6. **Gate.** Only a tapped card counts as yes: a typed "ok" to a merge or brief gets the card
-   again. A fresh gate thread per PR runs `gate.md` and either posts the 5/5 table (yskills
-   taps **Merge it**) or one review with the blocking findings, which the builder fixes. Three
+   again. A fresh gate thread per PR runs `gate.md` and either posts the 5/5 table and merges
+   the PR or one review with the blocking findings, which the builder fixes. Three
    failed rounds: stop and ask yskills with tap options.
    **The whole journey, once.** After the last slice merges, one `evaluator` run walks the full
    first visit on live (or main's preview) along the journey criteria in `features.json` (one
    criterion per user journey that crosses slices) before yskills hears "ready to test". Test run
    1's slices each passed and broke at their seams.
-7. **Launch.** The last PR gets the full `red-team` and `legal-reviewer` pass. **Brief (c)**; its
-   ok is the merge tap, which goes live. Then `sell`'s go-live (§4) if it sells.
+7. **Launch.** The last PR gets the full `red-team` and `legal-reviewer` pass. **Brief (c)**; on its ok
+   the gate merges, which goes live. Then `sell`'s go-live (§4) if it sells.
 8. **Grow.** At launch `create_trigger` a weekly routine (fresh session, jittered time): it
    collects the numbers (`market` §5) and opens one PR with the week's `metrics/` file and the best
    next step as a slice in `features.json`. That PR is the weekly report; it gets the gate with
-   checks 2-5 n/a, and yskills' merge tap is the go for the next slice. `PLAN.md` fixes 30/60/90-day
+   checks 2-5 n/a, and its merge is the go for the next slice. `PLAN.md` fixes 30/60/90-day
    targets before launch (defaults: 100 signups, 10 paying, €100 revenue in total); the routine copies them
    into each `metrics/` file. A missed target sends one tap card: **kill** (stop the routine,
    archive, lessons into claude-setup), **change** (one new offer or channel, next target in 30
