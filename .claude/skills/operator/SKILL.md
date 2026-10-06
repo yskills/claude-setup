@@ -94,6 +94,10 @@ Templates in `templates/`.
   thread reads it first; only the operator writes it. Under 100 lines.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
 - **Dashboard** (`templates/dashboard.html`), yskills' live view of the project from day one: a
+  first-person room at yskills' own desk, built from the Kenney Furniture Kit (CC0): the laptop opens
+  Company, the phone the To-dos, the whiteboard the Plan, the wall chart the money, the door the team
+  office. Publish it with `files: {"office-kit.js": "templates/office-kit.js"}` (without that file HQ
+  opens on Company). Behind the door is a
   full-screen 3D office with a game HUD (project name and level bar, coins = € this month, a bell
   with the to-do count) and a dock. **Office**: yskills turns and taps it; one desk per role, each
   teammate a cartoon animal dressed for it (bear, owl, cat, raccoon, rabbit, penguin, dog, fox, panda), typing when working, asleep when idle, ! when blocked, ? when it waits

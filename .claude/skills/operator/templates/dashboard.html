@@ -60,7 +60,7 @@ button{font:inherit;color:inherit}
 .bar>span{display:block;height:100%;background:var(--accent)}
 /* Dock */
 .dock{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:4px;padding:6px;border-radius:22px;z-index:6}
-.dock button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:1px;min-width:62px;padding:6px 8px 5px;border-radius:15px;font:800 11px var(--sans);color:var(--soft)}
+.dock button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:1px;min-width:50px;padding:6px 5px 5px;border-radius:15px;font:800 11px var(--sans);color:var(--soft)}
 .dock svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .dock button[aria-current="page"]{background:var(--accent);color:#fffaf0;box-shadow:inset 0 -3px 0 var(--accent-ink)}
 .dock button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
@@ -68,6 +68,7 @@ button{font:inherit;color:inherit}
 /* Pages slide over the office: a side panel on wide screens, a sheet on phones */
 .page{position:absolute;z-index:5;overflow-y:auto;overscroll-behavior:contain;display:grid;gap:14px;align-content:start;
   left:16px;top:122px;bottom:96px;width:min(460px,calc(100% - 32px));padding:18px 18px 22px}
+@media (max-width:440px){.dock{left:8px;right:8px;transform:none;gap:0}.dock button{flex:1;min-width:0;padding:6px 2px 5px;font-size:10.5px}}
 @media (max-width:640px){.page{left:10px;right:10px;width:auto;top:auto;max-height:calc(100% - 220px);bottom:86px;padding:16px}}
 .page h2{font:900 22px/1.2 var(--sans);margin:0;text-wrap:balance}
 .page h3{font:800 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:4px 0 0}
@@ -150,7 +151,11 @@ ol,ul{margin:0;padding:0;list-style:none}
 </style>
 
 <div class="app">
-  <div class="stage" id="stage">
+  <div class="stage" id="room" hidden>
+    <canvas id="rc" aria-label="Your desk: the laptop opens your projects and money, the phone your to-dos, the whiteboard the plan, the door the team office"></canvas>
+    <div class="labels" id="room-tags"></div>
+  </div>
+  <div class="stage" id="stage" hidden>
     <canvas id="c" aria-label="3D office: the team at their desks"></canvas>
     <div class="labels" id="labels"></div>
     <div class="stage-msg" id="stage-msg" hidden>The 3D office didn't load here. Team, Plan and Company still work from the dock.</div>
@@ -208,6 +213,7 @@ ol,ul{margin:0;padding:0;list-style:none}
   </section>
 
   <nav class="card dock" aria-label="Pages">
+    <button type="button" data-tab="desk" id="desk-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10h18M5 10v10M19 10v10M8 6h8v4H8z"/></svg>Desk</button>
     <button type="button" data-tab="company" id="company-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V8l5-3v16M10 21V5l9 4v12M13 11h3M13 15h3"/></svg>Company</button>
     <button type="button" data-tab="office"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7M5 9.5V20h14V9.5M9.5 20v-5h5v5"/></svg>Office</button>
     <button type="button" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Plan</button>
@@ -225,6 +231,42 @@ ol,ul{margin:0;padding:0;list-style:none}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" integrity="sha384-fljlqkjWlmSFjkESkQvm77heIZpoWmXEOzlCA7kOpGUH+95Zk0yGfQieWM2q136E" crossorigin="anonymous"></script>
+<!-- Published next to this page: the Kenney furniture for the desk room (scripts/office-kit.mjs). Without it HQ opens on Company. -->
+<script src="office-kit.js"></script>
+<script id="hq-rules">
+/* HQ's rules as pure functions; scripts/hq-rules.test.mjs runs this block, so they never drift. */
+window.HQ = (() => {
+  const TABS = ['desk', 'company', 'office', 'plan', 'team', 'todo']
+  const ALIAS = { you: 'todo', projects: 'company', ceo: 'desk', home: 'desk' }
+  /* Day and night on yskills' own clock */
+  const modeOf = (hour) => (hour >= 7 && hour < 17 ? 'day' : (hour >= 17 && hour < 20) || (hour >= 5 && hour < 7) ? 'dusk' : 'night')
+  /* Which page a hash opens. Home is yskills' desk; without 3D it is Company, or the Plan when there are no projects. */
+  function pickTab(hash, { hasProjects, room }) {
+    const h = String(hash || '').replace(/^#/, ''), want = ALIAS[h] || h
+    const ok = (t) => TABS.includes(t) && (t !== 'company' || hasProjects) && (t !== 'desk' || room)
+    if (ok(want)) return want
+    return room ? 'desk' : hasProjects ? 'company' : 'plan'
+  }
+  /* Which room stays behind a page: the desk and the team office swap; other pages keep the room they were opened from. */
+  const worldFor = (tab, current) => (tab === 'desk' ? 'room' : tab === 'office' || tab === 'team' ? 'office' : current || 'room')
+  const eur = (v) => Math.max(0, Number(v) || 0)
+  /* What the things on yskills' desk show */
+  function deskNumbers({ projects = [], you = 0, phases = [] }) {
+    const goals = phases.flatMap((p) => p.goals || [])
+    const done = goals.reduce((n, g) => n + (Number(g.done) || 0), 0), total = goals.reduce((n, g) => n + (Number(g.total) || 0), 0)
+    const needs = projects.reduce((n, p) => n + (Array.isArray(p.you) ? p.you.length : 0), 0)
+    return {
+      month: projects.reduce((n, p) => n + eur(p.revenueMonth), 0),
+      total: projects.reduce((n, p) => n + eur(p.revenueTotal), 0),
+      todos: Math.max(Number(you) || 0, needs),
+      pct: total > 0 ? Math.round((100 * done) / total) : 0,
+      working: projects.reduce((n, p) => n + Math.max(0, Number(p.working) || 0), 0),
+    }
+  }
+  return { TABS, modeOf, pickTab, worldFor, deskNumbers }
+})()
+</script>
 <script>
 const $ = (id) => document.getElementById(id)
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n }
@@ -336,12 +378,13 @@ function renderPm(d) {
   list($('next'), d.next || [], (s) => el('li', null, s), 'None yet.')
   list($('you'), d.you || [], (y) => { const li = el('li'); li.append(link(y.what, y.link)); return li }, 'Nothing right now.')
   list($('live'), d.live || [], (l) => { const li = el('li'); li.append(link(l.name, l.url)); if (l.note) li.append(el('span', 'note', ` · ${l.note}`)); return li }, 'Nothing deployed yet.')
-  office?.setWall(level, youCount)
+  office?.setWall(level, youCount); room?.update()
   window.onDaytime?.(document.documentElement.dataset.daytime || 'day')
 }
 
 function renderPhases(phases) {
   phases.sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+  phasesData = phases
   const box = $('phases'); box.replaceChildren()
   let done = 0, total = 0
   if (!phases.length) box.append(el('p', 'empty', "The project manager's phases and their goals appear here."))
@@ -373,12 +416,12 @@ function renderPhases(phases) {
     name: phases.length ? (at >= 0 ? phases[at].name : 'All levels cleared') : 'No phases yet', pct,
   }
   $('lvl-label').textContent = phases.length ? `Lv ${at >= 0 ? at + 1 : phases.length}/${phases.length}` : 'Plan'
-  office?.setWall(level, youCount)
+  office?.setWall(level, youCount); room?.update()
 }
 
 const EUR = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 const money = (v) => EUR.format(Math.max(0, Number(v) || 0))
-let hasProjects = false
+let hasProjects = false, projectsData = [], phasesData = []
 function renderProjects(projects) {
   hasProjects = projects.length > 0
   $('company-tab').hidden = !hasProjects
@@ -410,13 +453,252 @@ function renderProjects(projects) {
     if (safeUrl(p.live)) acts.append(link('Live app', p.live, 'btn'))
     row.append(acts); box.append(row)
   }
+  projectsData = projects; room?.update()
   showTab()
 }
 
-const TABS = ['company', 'office', 'plan', 'team', 'todo'], ALIAS = { you: 'todo', projects: 'company' }
+/* ---------- yskills' desk: the home screen. First person in a room built from the Kenney Furniture Kit (office-kit.js, CC0).
+   The laptop opens Company, the phone the to-dos, the whiteboard the plan, the wall chart the money, the door the team office. ---------- */
+let roomOk = !!(window.THREE && THREE.GLTFLoader && THREE.OrbitControls && window.OFFICE_KIT)
+let room = null
+if (roomOk) buildRoom().then((r) => { room = r; room.update() }).catch((e) => { console.error(e); roomOk = false; showTab() })
+
+async function buildRoom() {
+  const T = THREE, stage = $('room'), canvas = $('rc'), S = 2.2, R = 3.3
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+  let desk$ = HQ.deskNumbers({}), mode = HQ.modeOf(new Date().getHours())
+  const SKY = { day: ['#8fc9ea', '#d8eef7'], dusk: ['#f39c6b', '#f7d29a'], night: ['#0d1430', '#2a3350'] }
+  const renderer = new T.WebGLRenderer({ canvas, antialias: true })
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2))
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap
+  renderer.outputEncoding = T.sRGBEncoding
+  const scene = new T.Scene(); scene.background = new T.Color('#e9dfd0')
+  const camera = new T.PerspectiveCamera(50, 1, 0.05, 60)
+  const controls = new T.OrbitControls(camera, canvas)
+  Object.assign(controls, { enableZoom: false, enablePan: false, enableDamping: true, dampingFactor: 0.12, rotateSpeed: 0.35, minAzimuthAngle: -0.75, maxAzimuthAngle: 0.75, minPolarAngle: 1.2, maxPolarAngle: 1.8 })
+
+  const loader = new T.GLTFLoader(), kit = {}
+  const bytes = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0)).buffer
+  await Promise.all(Object.entries(window.OFFICE_KIT).map(([k, s]) => new Promise((ok, no) => loader.parse(bytes(s), '', (g) => { kit[k] = g.scene; ok() }, no))))
+  const shade = (o) => o.traverse((n) => { if (n.isMesh) { n.castShadow = true; n.receiveShadow = true } })
+  /* Kit pieces sit on the floor, centred on (x, z); s scales on top of the kit-to-metres factor S */
+  const put = (name, x, z, { ry = 0, s = 1, y = 0 } = {}) => {
+    const m = kit[name].clone(true), g = new T.Group()
+    m.scale.setScalar(S * s)
+    const box = new T.Box3().setFromObject(m), c = box.getCenter(new T.Vector3())
+    m.position.set(-c.x, -box.min.y, -c.z); shade(m)
+    g.add(m); g.position.set(x, y, z); g.rotation.y = ry; g.userData.size = box.getSize(new T.Vector3())
+    scene.add(g); return g
+  }
+  const top = (g) => g.position.y + g.userData.size.y
+
+  /* Canvas-drawn faces: text is drawn, never parsed, so stored text can't become markup */
+  const FONT = (w, px) => `${w} ${px}px Nunito, ui-rounded, system-ui, sans-serif`
+  const face = (w, h, draw) => {
+    const c = document.createElement('canvas'); c.width = w; c.height = h
+    const g = c.getContext('2d'), t = new T.CanvasTexture(c)
+    t.encoding = T.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy()
+    const redraw = () => { g.clearRect(0, 0, w, h); draw(g, w, h); t.needsUpdate = true }
+    redraw(); return { t, redraw }
+  }
+  const fit = (g, text, max) => { let s = String(text || ''); while (s.length > 1 && g.measureText(s).width > max) s = s.slice(0, -2) + '…'; return s }
+  const plane = (w, h, tex, glow) => new T.Mesh(new T.PlaneGeometry(w, h), glow ? new T.MeshBasicMaterial({ map: tex }) : new T.MeshStandardMaterial({ map: tex, roughness: 0.9, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.18 }))
+
+  /* The room: three kit tiles a side, windows on the left, the door to the team in the back wall */
+  for (const x of [-S, 0, S]) for (const z of [-S, 0, S]) put('floorFull', x, z)
+  put('wall', -S, -R); put('wallDoorway', 0, -R); put('wall', S, -R)
+  put('wallWindow', -R, -S, { ry: Math.PI / 2 }); put('wallWindow', -R, 0, { ry: Math.PI / 2 }); put('wall', -R, S, { ry: Math.PI / 2 })
+  for (const z of [-S, 0, S]) put('wall', R, z, { ry: -Math.PI / 2 })
+  const lid0 = new T.Mesh(new T.PlaneGeometry(2 * R, 2 * R), new T.MeshStandardMaterial({ color: '#f4ece0', roughness: 1 })); lid0.rotation.x = Math.PI / 2; lid0.position.y = 1.29 * S; scene.add(lid0)
+  const sky = face(64, 256, (g, w, h) => { const c = SKY[mode]; const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, c[0]); gr.addColorStop(1, c[1]); g.fillStyle = gr; g.fillRect(0, 0, w, h) })
+  const out = new T.Mesh(new T.PlaneGeometry(12, 2.6), new T.MeshBasicMaterial({ map: sky.t })); out.position.set(-R - 1.2, 1.4, 0); out.rotation.y = Math.PI / 2; scene.add(out)
+
+  const desk = put('desk', 0, 1.15, { ry: Math.PI })
+  const dt = top(desk)
+  const laptop = put('laptop', 0, 1.1, { s: 0.55, y: dt }), ls = laptop.userData.size
+  put('lampRoundTable', -0.68, 0.8, { s: 0.6, y: dt })
+  put('books', 0.62, 0.78, { s: 0.9, y: dt, ry: 0.3 })
+  put('plantSmall1', -0.6, 1.35, { s: 0.6, y: dt })
+
+  put('rugRounded', -1.6, -0.9, { ry: Math.PI / 2 })
+  put('loungeSofa', -2.75, -0.9, { ry: Math.PI / 2 })
+  put('tableCoffee', -1.6, -0.9, { ry: Math.PI / 2, s: 0.9 })
+  put('pottedPlant', -2.85, -2.85, { s: 1.2 }); put('pottedPlant', 2.85, -2.85, { s: 1.2 })
+  put('lampRoundFloor', -2.9, 1.0)
+  put('bookcaseOpen', 2.95, -1.4, { ry: -Math.PI / 2 })
+  const side = put('sideTable', 2.95, 0.5, { ry: -Math.PI / 2 })
+  put('kitchenCoffeeMachine', 2.98, 0.35, { y: top(side), ry: -Math.PI / 2 })
+  put('radio', 2.98, 0.85, { y: top(side), ry: -Math.PI / 2, s: 0.8 })
+  put('coatRackStanding', 2.85, 2.2)
+
+  /* The things yskills taps */
+  const hot = []
+  const spot = (obj, go, tag, anchor) => { obj.traverse((n) => { n.userData.go = go }); hot.push({ obj, go, tag, anchor }) }
+  const ink = '#2b2420', paperC = '#fffaf0', teal = '#2f7d6a', coin = '#f2b630'
+
+  const screen = face(512, 320, (g, w, h) => {
+    g.fillStyle = '#1f3a31'; g.fillRect(0, 0, w, h)
+    g.fillStyle = '#dcefe5'; g.font = FONT(900, 30); g.fillText('Projects', 26, 48)
+    g.font = FONT(700, 20); g.fillStyle = '#9fd6c2'; g.fillText(`${money(desk$.month)} this month`, 26, 80)
+    const ps = projectsData.slice(0, 4)
+    if (!ps.length) { g.fillStyle = '#dcefe5'; g.font = FONT(700, 22); g.fillText('No projects yet', 26, 140) }
+    ps.forEach((p, i) => {
+      const y = 126 + i * 46, pct = Math.max(0, Math.min(100, Number(p.progress) || 0))
+      g.fillStyle = '#dcefe5'; g.font = FONT(800, 22); g.fillText(fit(g, p.name || p.id, 250), 26, y)
+      g.fillStyle = '#2f5a4c'; g.fillRect(290, y - 14, 110, 12); g.fillStyle = '#6cc4a6'; g.fillRect(290, y - 14, 1.1 * pct, 12)
+      g.fillStyle = coin; g.font = FONT(800, 20); g.textAlign = 'right'; g.fillText(money(p.revenueTotal), w - 24, y); g.textAlign = 'left'
+    })
+  })
+  const lid = plane(ls.x * 0.84, ls.y * 0.78, screen.t, true)
+  lid.position.set(0, dt + ls.y * 0.56, 1.1 - ls.z / 2 + 0.1); lid.rotation.x = -0.1; scene.add(lid)
+  spot(laptop, 'company', 'Projects & money', new T.Vector3(0, dt + ls.y + 0.08, 1.1 - ls.z / 2)); spot(lid, 'company')
+
+  const phone = new T.Group(); phone.position.set(0.42, dt + 0.008, 1.3); phone.rotation.y = -0.35
+  const body = new T.Mesh(new T.BoxGeometry(0.1, 0.014, 0.19), new T.MeshStandardMaterial({ color: '#2b2420', roughness: 0.4 })); body.castShadow = true; phone.add(body)
+  const lock = face(160, 300, (g, w, h) => {
+    g.fillStyle = '#16202e'; g.fillRect(0, 0, w, h)
+    const now = new Date(); g.fillStyle = '#f3e9dc'; g.textAlign = 'center'; g.font = FONT(800, 44)
+    g.fillText(`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`, w / 2, 78)
+    const n = desk$.todos
+    g.fillStyle = n ? '#c8402f' : '#2f7d6a'; g.beginPath(); if (g.roundRect) g.roundRect(16, 120, w - 32, 96, 18); else g.rect(16, 120, w - 32, 96); g.fill()
+    g.fillStyle = '#fffaf0'; g.font = FONT(900, 46); g.fillText(n ? String(n) : '✓', w / 2, 172); g.font = FONT(800, 18); g.fillText(n ? 'need you' : 'all clear', w / 2, 202)
+    g.textAlign = 'left'
+  })
+  const glass = plane(0.088, 0.17, lock.t, true); glass.rotation.x = -Math.PI / 2; glass.position.y = 0.0075; phone.add(glass)
+  scene.add(phone); spot(phone, 'todo', 'To-dos', new T.Vector3(0.42, dt + 0.1, 1.3))
+
+  const frame = (w, h, x, y, z, tex) => {
+    const g = new T.Group(); g.position.set(x, y, z)
+    const back = new T.Mesh(new T.BoxGeometry(w + 0.08, h + 0.08, 0.04), new T.MeshStandardMaterial({ color: '#c9b79c', roughness: 0.8 })); back.castShadow = true; g.add(back)
+    const p = plane(w, h, tex); p.position.z = 0.021; g.add(p); scene.add(g); return g
+  }
+  const board = face(640, 440, (g, w, h) => {
+    g.fillStyle = '#fbfaf6'; g.fillRect(0, 0, w, h)
+    g.fillStyle = ink; g.font = FONT(900, 40); g.fillText('Plan', 30, 58)
+    g.fillStyle = teal; g.font = FONT(800, 28); g.textAlign = 'right'; g.fillText(`${desk$.pct}%`, w - 30, 58); g.textAlign = 'left'
+    g.fillStyle = '#e4d4bb'; g.fillRect(30, 76, w - 60, 14); g.fillStyle = teal; g.fillRect(30, 76, ((w - 60) * desk$.pct) / 100, 14)
+    const ph = phasesData.slice(0, 6)
+    if (!ph.length) { g.fillStyle = '#7a6a5b'; g.font = FONT(700, 24); g.fillText('No phases yet', 30, 140) }
+    ph.forEach((p, i) => {
+      const y = 140 + i * 48, st = p.state
+      g.fillStyle = st === 'done' ? '#3a8a55' : st === 'active' ? '#c8402f' : '#9a8c7e'
+      g.font = FONT(900, 28); g.fillText(st === 'done' ? '✓' : st === 'active' ? '→' : '○', 30, y)
+      g.fillStyle = st === 'next' ? '#9a8c7e' : ink; g.font = FONT(st === 'active' ? 900 : 700, 26); g.fillText(fit(g, p.name, w - 110), 72, y)
+    })
+  })
+  spot(frame(1.15, 0.8, -1.38, 1.6, -R + 0.07, board.t), 'plan', 'Plan', new T.Vector3(-1.38, 2.12, -R + 0.1))
+
+  const chart = face(440, 560, (g, w, h) => {
+    g.fillStyle = '#f6eedd'; g.fillRect(0, 0, w, h)
+    g.fillStyle = ink; g.font = FONT(900, 34); g.fillText('Earned', 28, 54)
+    g.fillStyle = '#8a5a00'; g.font = FONT(900, 58); g.fillText(money(desk$.total), 28, 122)
+    g.fillStyle = '#7a6a5b'; g.font = FONT(700, 20); g.fillText(`${money(desk$.month)} this month`, 28, 154)
+    const ps = projectsData.slice(0, 5), max = Math.max(1, ...ps.map((p) => Math.max(0, Number(p.revenueTotal) || 0))), bw = (w - 56) / Math.max(ps.length, 1)
+    g.strokeStyle = ink; g.lineWidth = 3; g.beginPath(); g.moveTo(28, 480); g.lineTo(w - 28, 480); g.stroke()
+    ps.forEach((p, i) => {
+      const v = Math.max(0, Number(p.revenueTotal) || 0), bh = Math.max(6, (260 * v) / max), x = 28 + i * bw + bw * 0.18
+      g.fillStyle = coin; g.fillRect(x, 480 - bh, bw * 0.64, bh); g.strokeStyle = ink; g.lineWidth = 3; g.strokeRect(x, 480 - bh, bw * 0.64, bh)
+      g.fillStyle = ink; g.font = FONT(800, 18); g.textAlign = 'center'; g.fillText(fit(g, p.name || p.id, bw - 6), x + bw * 0.32, 510); g.textAlign = 'left'
+    })
+  })
+  spot(frame(0.8, 1.02, 1.32, 1.6, -R + 0.07, chart.t), 'company', 'Money', new T.Vector3(1.32, 2.23, -R + 0.1))
+
+  const door = new T.Group(); door.position.set(0, 0, -R + 0.03)
+  const slab = new T.Mesh(new T.BoxGeometry(0.98, 2.1, 0.06), new T.MeshStandardMaterial({ color: '#b07a4f', roughness: 0.7 })); slab.position.y = 1.05; slab.castShadow = true; door.add(slab)
+  const knob = new T.Mesh(new T.SphereGeometry(0.04, 16, 12), new T.MeshStandardMaterial({ color: '#f2b630', metalness: 0.5, roughness: 0.3 })); knob.position.set(0.36, 1.0, 0.05); door.add(knob)
+  const sign = face(256, 128, (g, w, h) => {
+    g.fillStyle = paperC; g.fillRect(0, 0, w, h); g.strokeStyle = ink; g.lineWidth = 8; g.strokeRect(4, 4, w - 8, h - 8)
+    g.fillStyle = ink; g.textAlign = 'center'; g.font = FONT(900, 40); g.fillText('TEAM', w / 2, 62)
+    g.font = FONT(800, 24); g.fillStyle = teal; g.fillText(desk$.working ? `${desk$.working} working` : 'office', w / 2, 100); g.textAlign = 'left'
+  })
+  const sp = plane(0.42, 0.21, sign.t); sp.position.set(0, 1.55, 0.035); door.add(sp)
+  scene.add(door); spot(door, 'office', 'Team office', new T.Vector3(0, 2.25, -R + 0.1))
+
+  /* Light: the sun through the windows, a desk lamp and a warm room light that come on in the evening */
+  const hemi = new T.HemisphereLight(0xfff8ee, 0x9a8670, 0.7); scene.add(hemi)
+  const sun = new T.DirectionalLight(0xfff0dc, 0.8); sun.position.set(-9, 7, 1); sun.target.position.set(0, 0, 0); sun.castShadow = true
+  sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006; Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 1, far: 25 }); scene.add(sun, sun.target)
+  const lamp = new T.PointLight(0xffc27a, 0, 4, 2); lamp.position.set(-0.62, dt + 0.45, 0.86); scene.add(lamp)
+  const ceiling = new T.PointLight(0xffd9a0, 0, 9, 2); ceiling.position.set(0, 2.6, -0.5); scene.add(ceiling)
+  const LIGHT = { day: [0.7, 0.85, 0, 0.15], dusk: [0.5, 0.45, 0.9, 0.6], night: [0.22, 0.08, 1.3, 0.9] }
+  function tick() {
+    mode = HQ.modeOf(new Date().getHours()); const [h, s, l, c] = LIGHT[mode]
+    hemi.intensity = h; sun.intensity = s; sun.color.set(mode === 'dusk' ? 0xffa66b : 0xfff0dc); lamp.intensity = l; ceiling.intensity = c
+    sky.redraw(); lock.redraw()
+  }
+  tick(); setInterval(tick, 30000)
+
+  /* First person from the chair: wide screens see the whole wall, phones sit back a little and turn to look around */
+  function layout() {
+    const w = stage.clientWidth, h = stage.clientHeight
+    if (!w || !h) return
+    renderer.setSize(w, h, false); camera.aspect = w / h
+    const tall = w / h < 0.8
+    camera.fov = tall ? 74 : w / h < 1.3 ? 60 : 50
+    camera.position.set(0, tall ? 1.75 : 1.5, tall ? 3.05 : 2.55)
+    const look = new T.Vector3(0, tall ? 0.75 : 1.15, -R).sub(camera.position).normalize().multiplyScalar(0.1)
+    controls.target.copy(camera.position).add(look)
+    camera.updateProjectionMatrix(); controls.update()
+  }
+  new ResizeObserver(layout).observe(stage); layout()
+
+  /* Tags float over what you can tap; tapping a tag or the thing itself opens its page */
+  const tags = $('room-tags'), goTo = (go) => { location.hash = go === 'company' && !hasProjects ? 'plan' : go }
+  for (const h of hot.filter((x) => x.tag)) {
+    const b = el('button', 'tag'); b.type = 'button'; b.append(el('span', 'nm', h.tag))
+    b.addEventListener('click', () => goTo(h.go)); tags.append(b); h.el = b
+  }
+  const v = new T.Vector3()
+  function placeTags() {
+    const w = stage.clientWidth, h = stage.clientHeight
+    for (const x of hot) {
+      if (!x.el) continue
+      v.copy(x.anchor).project(camera)
+      const off = v.z > 1 || Math.abs(v.x) > 1.02 || Math.abs(v.y) > 1.02
+      x.el.hidden = off
+      if (!off) x.el.style.transform = `translate(${((v.x + 1) / 2) * w}px, ${((1 - v.y) / 2) * h}px) translate(-50%,-100%)`
+    }
+    const n = desk$.todos; hot.find((x) => x.go === 'todo').el.firstChild.textContent = n ? `To-dos · ${n}` : 'To-dos'
+  }
+  const ray = new T.Raycaster(), pt = new T.Vector2()
+  const hit = (e) => {
+    const r = canvas.getBoundingClientRect(); pt.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1)
+    ray.setFromCamera(pt, camera)
+    return ray.intersectObjects(hot.map((x) => x.obj), true).find((i) => i.object.userData.go)?.object.userData.go || null
+  }
+  let down = null
+  canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY] })
+  canvas.addEventListener('pointerup', (e) => {
+    const moved = down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6; down = null
+    const go = !moved && hit(e); if (go) goTo(go)
+  })
+  canvas.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' && !down) canvas.classList.toggle('point', !!hit(e)) })
+
+  let shown = false
+  function loop() {
+    requestAnimationFrame(loop)
+    if (stage.offsetParent === null) { shown = false; return }
+    if (!shown) { shown = true; layout() }
+    if (!still) controls.update()
+    renderer.render(scene, camera); placeTags()
+  }
+  loop()
+
+  return {
+    hotspots: () => hot.filter((x) => x.el).map((x) => ({ go: x.go, shown: !x.el.hidden })),
+    update() {
+      desk$ = HQ.deskNumbers({ projects: projectsData, you: youCount, phases: phasesData })
+      screen.redraw(); lock.redraw(); board.redraw(); chart.redraw(); sign.redraw()
+    },
+  }
+}
+document.fonts?.ready.then(() => room?.update())
+
+let world = 'room'
 function showTab() {
-  const h = location.hash.slice(1), want = ALIAS[h] || h
-  const tab = TABS.includes(want) && (want !== 'company' || hasProjects) ? want : hasProjects ? 'company' : 'office'
+  const tab = HQ.pickTab(location.hash, { hasProjects, room: roomOk })
+  world = roomOk ? HQ.worldFor(tab, world) : 'office'
+  $('room').hidden = world !== 'room'; $('stage').hidden = world !== 'office'; $('desk-tab').hidden = !roomOk
   for (const p of document.querySelectorAll('[data-page]')) p.hidden = p.dataset.page !== tab
   for (const b of document.querySelectorAll('[data-tab]')) {
     if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page')
