@@ -1437,7 +1437,7 @@ function buildOffice() {
       if (tg.nm.textContent !== name) tg.nm.textContent = name
       tg.t.setAttribute('aria-label', `${name}, ${st === 'off' ? 'off duty' : STATES[st]}`)
       const cls = `chip ${st}`; if (tg.chip.className !== cls) { tg.chip.className = cls; tg.chip.textContent = st === 'off' ? 'off duty' : STATES[st] }
-      seats[s.key].who.localToWorld(v.set(0, seats[s.key].h + 0.22, 0)).project(camera)
+      seats[s.key].who.localToWorld(v.set(0, seats[s.key].h - 0.05, 0)).project(camera)
       tg.t.style.left = `${((v.x + 1) / 2) * w}px`; tg.t.style.top = `${((1 - v.y) / 2) * h}px`
       tg.t.hidden = v.z > 1
     }
@@ -1541,7 +1541,7 @@ function buildOffice() {
         z.material.opacity = still ? 1 : Math.sin(k * Math.PI)
       })
       const bob = still ? 0 : s.state === 'blocked' || s.state === 'waiting' ? Math.abs(Math.sin(p * 2.4)) * 0.18 : Math.sin(p * 3) * 0.05
-      s.bubble.position.set(0.3, s.h + 1.3 + bob, 0)
+      s.bubble.position.set(0.3, s.h + 0.95 + bob, 0)
     }
     { const k = still ? 0.5 : (t * 0.3) % 1; dogZ.position.set(2.8 + k * 0.4, 0.75 + k * 0.7, 7.3); dogZ.material.opacity = still ? 1 : Math.sin(k * Math.PI) }
     if (!still && t - lastScreen > 0.45) { lastScreen = t; for (const s of Object.values(seats)) if (s.state === 'working') s.screenTex.redraw(1 + (Math.floor(t * 2) % 4)) }
