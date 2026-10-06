@@ -90,10 +90,15 @@ Claude:
 - A unit test that checks the `previews` block: same binding names, no live resource ids
   (duo-test `tests/unit/wrangler-config.test.ts`).
 - `.github/workflows/ci.yml` with the verify job only (`sell` skill's `templates/ci.yml`).
-  Optional live smoke test on `check_run` `completed`, filtered to the exact name
+- A live smoke test on `check_run` `completed`, filtered to the exact name
   `Workers Builds: <worker>`, `conclusion == 'success'`,
   `check_suite.head_branch == '<production branch>'` and `head_sha == github.sha`
   (duo-test `live.yml`). Without the conclusion filter it would smoke-test a failed build.
+  Its first test checks that the live site runs the commit just built: the app serves the
+  `WORKERS_CI_COMMIT_SHA` that Workers Builds sets at build time (duo-test: `commit` in
+  `/api/config`; a static site: a generated `version.txt`), and the test compares it with
+  `check_run.head_sha` (`github.sha` on the weekly run). A green Workers Builds check and a 200 prove neither: on 2026-10-05
+  duo-test's main builds passed for hours while a day-old version stayed live.
 
 ## The tradeoff, decided
 
