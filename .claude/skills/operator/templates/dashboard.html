@@ -1,29 +1,31 @@
 <title>Claude Setup HQ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap">
 <style>
-/* A cozy office game. The office fills the screen; a HUD sits on top: level and coins up top, a dock below.
+/* A cozy office game in Cozy pastel (Animal Crossing style). The office fills the screen; a HUD of soft butter
+   balloons sits on top: level and bells up top, a phone-like dock of round app buttons below.
    Company: every project, its money and what it needs from yskills. Plan: levels. Team: the nine roles. To-dos: what needs yskills. */
 :root{
-  --bg:#f3e8d6;--panel:#fffaf0;--fg:#2b2420;--soft:#7a6a5b;--line:#e4d4bb;--ink:#2b2420;
-  --accent:#2f7d6a;--accent-ink:#1d5a4b;--accent-soft:#dcefe5;
-  --ok:#3a8a55;--warn:#c97a00;--bad:#c8402f;--idle:#9a8c7e;--coin:#f2b630;--coin-ink:#8a5a00;
-  --stage:#f1e3cf;--shadow:#2b2420;
-  --sans:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
-  --mono:"Nunito",ui-rounded,system-ui,sans-serif;
+  --bg:#fdf0d2;--panel:#fff6c7;--fg:#6b4b32;--soft:#9a7b5f;--line:#efdcae;--ink:#6b4b32;
+  --accent:#4fb36b;--accent-ink:#358a50;--accent-soft:#dff2d6;
+  --ok:#4fb36b;--warn:#e89a2c;--bad:#ff7b5c;--idle:#b8a48e;--coin:#f7c948;--coin-ink:#a8780c;
+  --stage:#fbe7c4;--shadow:rgba(122,84,52,.22);--sky:#bfe7f3;
+  --lift:0 4px 0 rgba(122,84,52,.16),0 12px 26px -8px rgba(122,84,52,.35);
+  --sans:"M PLUS Rounded 1c",ui-rounded,"Hiragino Maru Gothic ProN",system-ui,sans-serif;
+  --mono:var(--sans);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#1d1814;--panel:#2a221b;--fg:#f3e9dc;--soft:#b9aa98;--line:#463a2f;--ink:#0e0b09;
-  --accent:#6cc4a6;--accent-ink:#2e7a63;--accent-soft:#1f3a31;--ok:#7bcf94;--warn:#f0b04a;--bad:#ff8a74;--idle:#8c7f71;--coin:#f2b630;--coin-ink:#8a5a00;
-  --stage:#2a2119;--shadow:#0e0b09;color-scheme:dark}}
+  --bg:#3a2e3f;--panel:#4a3b4f;--fg:#fff1d6;--soft:#d8c3ae;--line:#5e4b62;--ink:#2a2030;
+  --accent:#7cd08f;--accent-ink:#3f9a58;--accent-soft:#2f4a3a;--ok:#7cd08f;--warn:#f6c25f;--bad:#ff9a80;--idle:#a8949c;--coin:#f7c948;--coin-ink:#a8780c;
+  --stage:#2c2540;--shadow:rgba(10,6,20,.35);--sky:#3d4f7a;--lift:0 4px 0 rgba(10,6,20,.3),0 12px 26px -8px rgba(10,6,20,.6);color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#1d1814;--panel:#2a221b;--fg:#f3e9dc;--soft:#b9aa98;--line:#463a2f;--ink:#0e0b09;
-  --accent:#6cc4a6;--accent-ink:#2e7a63;--accent-soft:#1f3a31;--ok:#7bcf94;--warn:#f0b04a;--bad:#ff8a74;--idle:#8c7f71;--coin:#f2b630;--coin-ink:#8a5a00;
-  --stage:#2a2119;--shadow:#0e0b09;color-scheme:dark}
+  --bg:#3a2e3f;--panel:#4a3b4f;--fg:#fff1d6;--soft:#d8c3ae;--line:#5e4b62;--ink:#2a2030;
+  --accent:#7cd08f;--accent-ink:#3f9a58;--accent-soft:#2f4a3a;--ok:#7cd08f;--warn:#f6c25f;--bad:#ff9a80;--idle:#a8949c;--coin:#f7c948;--coin-ink:#a8780c;
+  --stage:#2c2540;--shadow:rgba(10,6,20,.35);--sky:#3d4f7a;--lift:0 4px 0 rgba(10,6,20,.3),0 12px 26px -8px rgba(10,6,20,.6);color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{font-variant-numeric:tabular-nums;margin:0;background:var(--bg);color:var(--fg);font:600 15px/1.45 var(--sans);overflow:hidden}
+body{font-variant-numeric:tabular-nums;margin:0;background:var(--bg);color:var(--fg);font:700 15px/1.5 var(--sans);overflow:hidden}
 a{color:var(--accent);text-underline-offset:2px}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
@@ -34,19 +36,20 @@ button{font:inherit;color:inherit}
 .stage canvas.point{cursor:pointer}
 .labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .tag{all:unset;position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;display:grid;justify-items:center;gap:2px;transform:translate(-50%,-100%);white-space:nowrap}
-.tag .nm{font:800 12px/1.2 var(--sans);color:#2b2420;background:#fffaf0;padding:3px 9px;border-radius:8px;border:2px solid #2b2420;box-shadow:0 2px 0 #2b2420}
+.tag .nm{font:800 12px/1.2 var(--sans);color:#6b4b32;background:#fff6c7;padding:4px 11px;border-radius:999px;box-shadow:0 3px 0 rgba(122,84,52,.25),0 6px 12px -4px rgba(122,84,52,.4)}
+.tag:hover .nm{background:#fffbe3}
 .tag .chip{font-size:11px;padding:0 6px}
 .tag:focus-visible .nm{outline:2px solid var(--accent)}
 .stage-msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--soft)}
-/* HUD: hard ink borders and offset shadows, like a sticker sheet */
+/* HUD: soft butter balloons with a warm brown drop, no ink borders (New Horizons' speech-balloon panels) */
 .hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 16px;pointer-events:none}
 .hud>*{pointer-events:auto}
-.card{background:var(--panel);border:2.5px solid var(--ink);border-radius:16px;box-shadow:0 4px 0 var(--shadow)}
-.plate{padding:8px 14px 8px 8px;min-width:0;max-width:min(380px,62vw);display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px}
+.card{background:var(--panel);border:0;border-radius:26px;box-shadow:var(--lift)}
+.plate{padding:8px 18px 8px 8px;min-width:0;max-width:min(420px,62vw);display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px}
 .plate .pm{display:grid;gap:4px;min-width:0}
-/* Level badge: a stitched merit badge, like the patches on a scout sash */
-.lv-badge{position:relative;width:54px;height:54px;border-radius:50%;background:var(--accent);border:2.5px solid var(--ink);box-shadow:inset 0 -4px 0 var(--accent-ink);display:grid;place-items:center;align-content:center;color:#fffaf0;line-height:1}
-.lv-badge::before{content:"";position:absolute;inset:4px;border-radius:50%;border:2px dashed rgba(255,250,240,.55)}
+/* Level badge: a leaf-green stitched patch, like the badges in a New Horizons passport */
+.lv-badge{position:relative;width:54px;height:54px;border-radius:50%;background:var(--accent);box-shadow:inset 0 -4px 0 var(--accent-ink),0 2px 0 rgba(122,84,52,.18);display:grid;place-items:center;align-content:center;color:#fffaf0;line-height:1}
+.lv-badge::before{content:"";position:absolute;inset:4px;border-radius:50%;border:2px dashed rgba(255,250,230,.6)}
 .lv-badge small{font:900 10px var(--sans);letter-spacing:.02em}
 .lv-badge b{font:900 24px/1 var(--sans);margin-top:-1px}
 .plate h1{font:900 18px/1.15 var(--sans);margin:0;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -59,29 +62,35 @@ button{font:inherit;color:inherit}
 .live-dot.on{background:var(--ok)}
 .right{display:flex;gap:8px;align-items:center}
 .pill{display:inline-flex;align-items:center;gap:7px;height:42px;padding:0 14px 0 8px;border-radius:999px;cursor:pointer;text-decoration:none;color:var(--fg);font:900 15px var(--sans);font-variant-numeric:tabular-nums}
-.pill:active,.dock button:active,.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow)}
+.pill:active,.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow)}
+.dock button:active{transform:scale(.94)}
 .coin{width:24px;height:24px;flex:none}
-.toast{position:absolute;left:16px;top:94px;z-index:5;padding:6px 12px;border-radius:999px;font:900 15px var(--sans);background:var(--coin);color:var(--ink);border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--shadow);animation:toast-in .5s cubic-bezier(.2,1.4,.4,1) both;pointer-events:none}
+.toast{position:absolute;left:16px;top:94px;z-index:5;padding:6px 12px;border-radius:999px;font:900 15px var(--sans);background:var(--coin);color:#6b4b32;box-shadow:var(--lift);animation:toast-in .5s cubic-bezier(.2,1.4,.4,1) both;pointer-events:none}
 @keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.9)}}
 @media (prefers-reduced-motion:reduce){.toast{animation:none}}
 .bell{position:relative;width:42px;padding:0;justify-content:center}
-.badge{position:absolute;top:-7px;right:-7px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fffaf0;border:2px solid var(--ink);font:900 12px/18px var(--sans);text-align:center}
-.bar{flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden;border:1.5px solid var(--ink)}
+.badge{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fff;box-shadow:0 0 0 2.5px var(--panel);font:900 12px/22px var(--sans);text-align:center}
+.bar{flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden;box-shadow:inset 0 1.5px 0 rgba(122,84,52,.15)}
 .bar>span{display:block;height:100%;background:var(--accent)}
 /* Dock */
-.dock{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:4px;padding:6px;border-radius:22px;z-index:6}
-.dock button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:1px;min-width:50px;padding:6px 5px 5px;border-radius:15px;font:800 11px var(--sans);color:var(--soft)}
-.dock svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.dock button[aria-current="page"]{background:var(--accent);color:#fffaf0;box-shadow:inset 0 -3px 0 var(--accent-ink)}
-.dock button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
-.dock .dot{position:absolute;margin:-2px 0 0 18px;width:9px;height:9px;border-radius:50%;background:var(--bad);border:1.5px solid var(--ink)}
+.dock{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:6px;padding:8px 10px 6px;border-radius:30px;z-index:6}
+/* Each tab is an app on the phone: a round coloured tile with a white glyph, its name under it */
+.dock button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:3px;min-width:54px;padding:0 2px;font:800 11px var(--sans);color:var(--soft);transition:transform .12s}
+.dock button::before{content:"";grid-area:1/1;width:40px;height:40px;border-radius:15px;background:var(--app,#9fd3bd);box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+.dock svg{grid-area:1/1;align-self:center;width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;position:relative}
+.dock button[data-tab="desk"]{--app:#e6a96e}.dock button[data-tab="company"]{--app:#f7b84a}.dock button[data-tab="office"]{--app:#4fb36b}
+.dock button[data-tab="plan"]{--app:#6cb8e0}.dock button[data-tab="team"]{--app:#f29bb0}.dock button[data-tab="todo"]{--app:#ff7b5c}
+.dock button[aria-current="page"]{color:var(--fg)}
+.dock button[aria-current="page"]::before{box-shadow:inset 0 -3px 0 rgba(0,0,0,.12),0 0 0 3px var(--panel),0 0 0 5.5px var(--app)}
+.dock button:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:12px}
+.dock .dot{grid-area:1/1;justify-self:end;align-self:start;position:relative;margin:-3px -3px 0 0;width:12px;height:12px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 2.5px var(--panel)}
 /* Pages slide over the office: a side panel on wide screens, a sheet on phones */
 .page{position:absolute;z-index:5;overflow-y:auto;overscroll-behavior:contain;display:grid;gap:14px;align-content:start;
   left:16px;top:122px;bottom:96px;width:min(460px,calc(100% - 32px));padding:18px 18px 22px}
 #labels .tag .chip{display:none}#labels .tag:hover .chip,#labels .tag:focus-visible .chip{display:inline}
 @media (max-width:640px){#labels .tag .nm{font-size:11px;padding:2px 7px}}
 @media (max-width:440px){.greet{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2}}
-@media (max-width:440px){.dock{left:8px;right:8px;transform:none;gap:0}.dock button{flex:1;min-width:0;padding:6px 2px 5px;font-size:10.5px}}
+@media (max-width:440px){.dock{left:8px;right:8px;transform:none;gap:0;padding:8px 4px 6px}.dock button{flex:1;min-width:0;font-size:10.5px}.dock button::before{width:38px;height:38px;border-radius:14px}}
 @media (max-width:640px){.page{left:10px;right:10px;width:auto;top:auto;max-height:calc(100% - 220px);bottom:86px;padding:16px}}
 .page h2{font:900 22px/1.2 var(--sans);margin:0;text-wrap:balance}
 .page h3{font:900 16px var(--sans);color:var(--fg);margin:6px 0 -4px}
@@ -89,8 +98,8 @@ button{font:inherit;color:inherit}
 .empty{color:var(--soft);margin:0;font-weight:600}
 ol,ul{margin:0;padding:0;list-style:none}
 .note{font-size:13px;color:var(--soft)}
-.btn{display:inline-block;font:900 13px var(--sans);text-decoration:none;padding:7px 14px;border-radius:999px;border:2.5px solid var(--ink);color:var(--fg);background:var(--panel);white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
-.btn.go{background:var(--accent);color:#fffaf0}
+.btn{display:inline-block;font:900 13px var(--sans);text-decoration:none;padding:8px 16px;border-radius:999px;border:0;color:var(--fg);background:var(--bg);white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
+.btn.go{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-ink)}
 .chip{font:800 12px var(--sans);padding:1px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;background:var(--panel)}
 .chip.working,.chip.active{color:var(--accent);background:var(--accent-soft);border-color:transparent}
 .chip.blocked{color:var(--bad)}
@@ -107,7 +116,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .tot span{font:700 15px var(--sans);color:var(--soft)}
 .tot.need b{color:var(--bad)}
 .projects{display:grid;gap:10px}
-.proj{border:2.5px solid var(--ink);border-radius:16px;padding:12px 14px;display:grid;gap:8px;background:var(--bg)}
+.proj{border:0;border-radius:20px;padding:12px 14px;display:grid;gap:8px;background:var(--bg)}
 .proj.here{background:var(--accent-soft)}
 .pn{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
 .pn b{font:900 17px var(--sans)}
@@ -118,7 +127,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
 .todo li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;padding:9px 0;border-top:2px dashed var(--line)}
 .todo li:first-child{border-top:0}
-.todo li::before{content:"";width:16px;height:16px;margin-top:2px;border:2.5px solid var(--ink);border-radius:5px;background:var(--panel)}
+.todo li::before{content:"";width:16px;height:16px;margin-top:2px;border:2.5px solid var(--soft);border-radius:6px;background:var(--panel)}
 .todo li.empty{display:block}
 .todo li.empty::before{display:none}
 .todo .from{font:600 11px var(--mono);color:var(--soft);display:block}
@@ -132,7 +141,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .phase{display:grid;grid-template-columns:30px minmax(0,1fr);gap:0 12px;padding-bottom:16px;position:relative}
 .phase::before{content:"";position:absolute;left:14px;top:28px;bottom:0;width:2px;background:var(--line)}
 .phase:last-child::before{display:none}
-.mark{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--ink);background:var(--panel);display:grid;place-items:center;font:700 12px var(--mono);color:var(--soft)}
+.mark{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--line);background:var(--panel);display:grid;place-items:center;font:700 12px var(--mono);color:var(--soft)}
 .phase.done .mark{background:var(--ok);color:#fffaf0}
 .phase.active .mark{background:var(--coin);color:var(--ink)}
 .ph-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding-top:4px}
@@ -153,7 +162,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .seat .pet{grid-column:1;font-size:13px;color:var(--soft);font-weight:600}
 .seat .chip{grid-row:1/3;grid-column:2}
 /* Teammate sheet */
-.scrim{position:fixed;inset:0;background:rgba(20,14,10,.4);z-index:10}
+.scrim{position:fixed;inset:0;background:rgba(74,50,30,.32);z-index:10}
 .sheet{position:fixed;z-index:11;display:grid;gap:14px;align-content:start;overflow-y:auto;
   left:10px;right:10px;bottom:10px;max-height:85%;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px))}
 @media (min-width:760px){.sheet{left:auto;right:16px;top:16px;bottom:auto;width:400px;max-height:calc(100% - 32px);padding:20px 22px}}
@@ -169,7 +178,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 /* New project notepad: a sheet of the yellow pad on the desk */
 .idea{display:grid;gap:10px}
 .idea label{font:800 14px var(--sans);color:var(--soft)}
-.idea textarea{font:600 16px/1.5 var(--sans);color:#2b2420;resize:vertical;min-height:7.5em;padding:10px 12px 10px 44px;border:2.5px solid var(--ink);border-radius:12px;
+.idea textarea{font:700 16px/1.5 var(--sans);color:#6b4b32;resize:vertical;min-height:7.5em;padding:10px 12px 10px 44px;border:0;border-radius:16px;box-shadow:inset 0 0 0 2px #e8d48a;
   background:linear-gradient(90deg,transparent 30px,#e0645a 30px,#e0645a 32px,transparent 32px),repeating-linear-gradient(#fff3b8 0 23px,#c9d6ea 23px 24px) #fff3b8;background-attachment:local}
 .idea textarea::placeholder{color:#6f5f30}
 .idea .btn{min-height:44px}
@@ -828,6 +837,33 @@ function renderProjects(rowsIn) {
 
 /* ---------- yskills' desk: the home screen. First person in a room built from the Kenney Furniture Kit (office-kit.js, CC0).
    The laptop opens Company, the phone the to-dos, the whiteboard the plan, the wall chart the money, the door the team office. ---------- */
+/* Cozy pastel (Animal Crossing style, yskills' pick): the kit's saturated colours repainted in one warm pastel set,
+   by material name, with a few rooms of their own (the desk room's walls and rugs) */
+const COZY_KIT = {
+  wood: '#e6b788', woodDark: '#bf8d60', metal: '#eef0ec', metalMedium: '#c3c9d6', metalDark: '#a4a9c2',
+  carpet: '#f6a596', carpetDarker: '#e3887d', carpetWhite: '#fff8ec', plant: '#7cc47e', lamp: '#ffe9a8', glass: '#cfe9f1', _defaultMat: '#fff3df',
+}
+const COZY_ROOM = { _defaultMat: '#fbe7c4', wood: '#f1caa0' }
+function cozyKit(name, root, extra = {}) {
+  const own = { wall: COZY_ROOM, wallWindow: COZY_ROOM, wallDoorway: COZY_ROOM, floorFull: { wood: '#e9b98a' }, desk: { wood: '#d9a274' }, rugRounded: { carpet: '#bfe3cf', carpetDarker: '#9fd0bb' } }[name] || {}
+  root.traverse((n) => {
+    if (!n.isMesh) return
+    for (const m of [].concat(n.material)) {
+      const c = extra[m.name] || own[m.name] || COZY_KIT[m.name]
+      if (c) m.color.set(c)
+      if ('roughness' in m) { m.roughness = Math.max(m.roughness, 0.75); m.metalness = 0 }
+    }
+  })
+}
+/* A round leafy bush in a terracotta pot, like the potted plants in a New Horizons room (replaces the kit's spiky ones) */
+function cozyPlant(T, mat, s = 1) {
+  const g = new T.Group(), add = (geo, c, x, y, z) => { const m = new T.Mesh(geo, mat(c)); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; g.add(m); return m }
+  add(new T.CylinderGeometry(0.17, 0.12, 0.26, 20), '#e8956b', 0, 0.13, 0)
+  add(new T.TorusGeometry(0.165, 0.025, 8, 24), '#d98058', 0, 0.26, 0).rotation.x = Math.PI / 2
+  for (const [x, y, z, r, c] of [[0, 0.44, 0, 0.19, '#76c27a'], [-0.11, 0.36, 0.06, 0.13, '#8fd08a'], [0.12, 0.38, -0.04, 0.14, '#6ab56d'], [0.02, 0.58, 0.03, 0.12, '#8fd08a'], [0.05, 0.35, 0.12, 0.11, '#6ab56d']])
+    add(new T.SphereGeometry(r, 18, 14), c, x, y, z)
+  g.scale.setScalar(s); return g
+}
 let roomOk = !!(window.THREE && THREE.GLTFLoader && THREE.OrbitControls && window.OFFICE_KIT)
 let room = null
 if (roomOk) buildRoom().then((r) => { room = r; room.update() }).catch((e) => { console.error(e); roomOk = false; showTab() })
@@ -836,19 +872,19 @@ async function buildRoom() {
   const T = THREE, stage = $('room'), canvas = $('rc'), S = 2.2, R = 3.3
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches
   let desk$ = HQ.deskNumbers({}), mode = HQ.modeOf(new Date().getHours())
-  const SKY = { day: ['#8fc9ea', '#d8eef7'], dusk: ['#f39c6b', '#f7d29a'], night: ['#0d1430', '#2a3350'] }
+  const SKY = { day: ['#7fc8ef', '#fde9c2'], dusk: ['#f39c6b', '#f7d29a'], night: ['#1c2350', '#3d3f6e'] }
   const renderer = new T.WebGLRenderer({ canvas, antialias: true })
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2))
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap
   renderer.outputEncoding = T.sRGBEncoding
-  const scene = new T.Scene(); scene.background = new T.Color('#e9dfd0')
+  const scene = new T.Scene(); scene.background = new T.Color('#fbe7c4')
   const camera = new T.PerspectiveCamera(50, 1, 0.05, 60)
   const controls = new T.OrbitControls(camera, canvas)
   Object.assign(controls, { enableZoom: false, enablePan: false, enableDamping: true, dampingFactor: 0.12, rotateSpeed: 0.35, minAzimuthAngle: -0.75, maxAzimuthAngle: 0.75, minPolarAngle: 1.2, maxPolarAngle: 1.8 })
 
   const loader = new T.GLTFLoader(), kit = {}
   const bytes = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0)).buffer
-  await Promise.all(Object.entries(window.OFFICE_KIT).map(([k, s]) => new Promise((ok, no) => loader.parse(bytes(s), '', (g) => { kit[k] = g.scene; ok() }, no))))
+  await Promise.all(Object.entries(window.OFFICE_KIT).map(([k, s]) => new Promise((ok, no) => loader.parse(bytes(s), '', (g) => { cozyKit(k, g.scene); kit[k] = g.scene; ok() }, no))))
   const shade = (o) => o.traverse((n) => { if (n.isMesh) { n.castShadow = true; n.receiveShadow = true } })
   /* Kit pieces sit on the floor, centred on (x, z); s scales on top of the kit-to-metres factor S */
   const put = (name, x, z, { ry = 0, s = 1, y = 0 } = {}) => {
@@ -862,7 +898,7 @@ async function buildRoom() {
   const top = (g) => g.position.y + g.userData.size.y
 
   /* Canvas-drawn faces: text is drawn, never parsed, so stored text can't become markup */
-  const FONT = (w, px) => `${w} ${px}px Nunito, ui-rounded, system-ui, sans-serif`
+  const FONT = (w, px) => `${w} ${px}px "M PLUS Rounded 1c", ui-rounded, system-ui, sans-serif`
   const face = (w, h, draw) => {
     const c = document.createElement('canvas'); c.width = w; c.height = h
     const g = c.getContext('2d'), t = new T.CanvasTexture(c)
@@ -874,27 +910,39 @@ async function buildRoom() {
   const plane = (w, h, tex, glow) => new T.Mesh(new T.PlaneGeometry(w, h), glow ? new T.MeshBasicMaterial({ map: tex }) : new T.MeshStandardMaterial({ map: tex, roughness: 0.9, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.18 }))
 
   /* The room: three kit tiles a side, windows on the left, the door to the team in the back wall */
-  for (const x of [-S, 0, S]) for (const z of [-S, 0, S]) put('floorFull', x, z)
+  /* Honey floorboards, drawn so each board and its seams show, like a New Horizons wood floor */
+  const boards = face(512, 512, (g, w) => { for (let i = 0; i < 8; i++) { g.fillStyle = ['#ebbd8c', '#e5b483', '#efc596', '#e8b988'][i % 4]; g.fillRect(0, i * 64, w, 62); g.fillStyle = '#d29e6c'; g.fillRect(0, i * 64 + 62, w, 2); g.fillRect((i * 197) % w, i * 64, 2, 64); g.fillRect((i * 197 + 260) % w, i * 64, 2, 64) } })
+  boards.t.wrapS = boards.t.wrapT = T.RepeatWrapping; boards.t.repeat.set(3, 4)
+  const floor = new T.Mesh(new T.PlaneGeometry(2 * R, 2 * R), new T.MeshStandardMaterial({ map: boards.t, roughness: 0.9 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor)
   put('wall', -S, -R); put('wallDoorway', 0, -R); put('wall', S, -R)
   put('wallWindow', -R, -S, { ry: Math.PI / 2 }); put('wallWindow', -R, 0, { ry: Math.PI / 2 }); put('wall', -R, S, { ry: Math.PI / 2 })
   for (const z of [-S, 0, S]) put('wall', R, z, { ry: -Math.PI / 2 })
-  const lid0 = new T.Mesh(new T.PlaneGeometry(2 * R, 2 * R), new T.MeshStandardMaterial({ color: '#f4ece0', roughness: 1 })); lid0.rotation.x = Math.PI / 2; lid0.position.y = 1.29 * S; scene.add(lid0)
+  const lid0 = new T.Mesh(new T.PlaneGeometry(2 * R, 2 * R), new T.MeshBasicMaterial({ color: '#f3dcbc' })), lidDay = new T.Color('#f3dcbc'), lidNight = new T.Color('#6e5f6e'); lid0.rotation.x = Math.PI / 2; lid0.position.y = 1.29 * S; scene.add(lid0)
   const sky = face(64, 256, (g, w, h) => { const c = SKY[mode]; const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, c[0]); gr.addColorStop(1, c[1]); g.fillStyle = gr; g.fillRect(0, 0, w, h) })
+  /* A painted wainscot under a rail, like the two-tone walls of a New Horizons room */
+  const wains = new T.MeshStandardMaterial({ color: '#bfe3cf', roughness: 0.9 }), rail = new T.MeshStandardMaterial({ color: '#fff8ec', roughness: 0.8 })
+  for (const [x0, x1] of [[-R, -0.56], [0.56, R]]) {
+    const w = x1 - x0, b = new T.Mesh(new T.BoxGeometry(w, 0.92, 0.03), wains); b.position.set((x0 + x1) / 2, 0.46, -R + 0.065); b.receiveShadow = true; scene.add(b)
+    const t = new T.Mesh(new T.BoxGeometry(w, 0.05, 0.06), rail); t.position.set((x0 + x1) / 2, 0.94, -R + 0.08); scene.add(t)
+  }
+  { const b = new T.Mesh(new T.BoxGeometry(0.03, 0.92, 2 * R), wains); b.position.set(R - 0.065, 0.46, 0); b.receiveShadow = true; scene.add(b)
+    const t = new T.Mesh(new T.BoxGeometry(0.06, 0.05, 2 * R), rail); t.position.set(R - 0.08, 0.94, 0); scene.add(t) }
   const out = new T.Mesh(new T.PlaneGeometry(12, 2.6), new T.MeshBasicMaterial({ map: sky.t })); out.position.set(-R - 1.2, 1.4, 0); out.rotation.y = Math.PI / 2; scene.add(out)
 
   const desk = put('desk', 0, 1.15, { ry: Math.PI })
   const dt = top(desk)
   const laptop = put('laptop', 0, 1.1, { s: 0.55, y: dt }), ls = laptop.userData.size
-  put('lampRoundTable', -0.68, 0.8, { s: 0.6, y: dt })
+  const shades = [put('lampRoundTable', -0.68, 0.8, { s: 0.6, y: dt })]
   put('books', 0.62, 0.78, { s: 0.9, y: dt, ry: 0.3 })
-  put('plantSmall1', -0.6, 1.35, { s: 0.6, y: dt })
+  const potted = (x, z, s, y = 0) => { const g = cozyPlant(T, (c) => new T.MeshStandardMaterial({ color: c, roughness: 0.85 }), s); g.position.set(x, y, z); scene.add(g); return g }
+  potted(-0.62, 1.38, 0.42, dt)
 
   put('rugRounded', -1.6, -0.9, { ry: Math.PI / 2 })
   put('rugRounded', 0, 2.1, { s: 1.3 })
   put('loungeSofa', -2.75, -0.9, { ry: Math.PI / 2 })
   put('tableCoffee', -1.6, -0.9, { ry: Math.PI / 2, s: 0.9 })
-  put('pottedPlant', -2.85, -2.85, { s: 1.2 }); put('pottedPlant', 2.85, -2.85, { s: 1.2 })
-  put('lampRoundFloor', -2.9, 1.0)
+  potted(-2.85, -2.85, 1.7); potted(2.85, -2.85, 1.7)
+  shades.push(put('lampRoundFloor', -2.9, 1.0))
   put('bookcaseOpen', 2.95, -1.4, { ry: -Math.PI / 2 })
   const side = put('sideTable', 2.95, 0.5, { ry: -Math.PI / 2 })
   put('kitchenCoffeeMachine', 2.98, 0.35, { y: top(side), ry: -Math.PI / 2 })
@@ -904,19 +952,19 @@ async function buildRoom() {
   /* The things yskills taps */
   const hot = []
   const spot = (obj, go, tag, anchor) => { obj.traverse((n) => { n.userData.go = go }); hot.push({ obj, go, tag, anchor }) }
-  const ink = '#2b2420', paperC = '#fffaf0', teal = '#2f7d6a', coin = '#f2b630'
+  const ink = '#6b4b32', paperC = '#fff6c7', leaf = '#4fb36b', coin = '#f7c948', coral = '#ff7b5c', soft = '#9a7b5f'
 
   const screen = face(512, 320, (g, w, h) => {
-    g.fillStyle = '#1f3a31'; g.fillRect(0, 0, w, h)
-    g.fillStyle = '#dcefe5'; g.font = FONT(900, 30); g.fillText('Projects', 26, 48)
-    g.font = FONT(700, 20); g.fillStyle = '#9fd6c2'; g.fillText(`${money(desk$.month)} this month${desk$.test ? ', Testgeld' : ''}`, 26, 80)
+    g.fillStyle = paperC; g.fillRect(0, 0, w, h)
+    g.fillStyle = ink; g.font = FONT(900, 30); g.fillText('Projects', 26, 48)
+    g.font = FONT(700, 20); g.fillStyle = soft; g.fillText(`${money(desk$.month)} this month${desk$.test ? ', Testgeld' : ''}`, 26, 80)
     const ps = projectsData.slice(0, 4)
-    if (!ps.length) { g.fillStyle = '#dcefe5'; g.font = FONT(700, 22); g.fillText('No projects yet', 26, 140) }
+    if (!ps.length) { g.fillStyle = ink; g.font = FONT(700, 22); g.fillText('No projects yet', 26, 140) }
     ps.forEach((p, i) => {
       const y = 126 + i * 46, pct = Math.max(0, Math.min(100, Number(p.progress) || 0))
-      g.fillStyle = '#dcefe5'; g.font = FONT(800, 22); g.fillText(fit(g, p.name || p.id, 250), 26, y)
-      g.fillStyle = '#2f5a4c'; g.fillRect(290, y - 14, 110, 12); g.fillStyle = '#6cc4a6'; g.fillRect(290, y - 14, 1.1 * pct, 12)
-      g.fillStyle = coin; g.font = FONT(800, 20); g.textAlign = 'right'; g.fillText(money(p.revenueTotal), w - 24, y); g.textAlign = 'left'
+      g.fillStyle = ink; g.font = FONT(800, 22); g.fillText(fit(g, p.name || p.id, 250), 26, y)
+      g.fillStyle = '#efe0b0'; g.fillRect(290, y - 14, 110, 12); g.fillStyle = leaf; g.fillRect(290, y - 14, 1.1 * pct, 12)
+      g.fillStyle = '#b07a10'; g.font = FONT(800, 20); g.textAlign = 'right'; g.fillText(money(p.revenueTotal), w - 24, y); g.textAlign = 'left'
     })
   })
   const lid = plane(ls.x * 0.84, ls.y * 0.78, screen.t, true)
@@ -924,13 +972,13 @@ async function buildRoom() {
   spot(laptop, 'company', 'Projects & money', new T.Vector3(0, dt + ls.y * 0.92, 1.1 - ls.z / 2)); spot(lid, 'company')
 
   const phone = new T.Group(); phone.position.set(0.44, dt + 0.008, 1.14); phone.rotation.y = -0.35
-  const body = new T.Mesh(new T.BoxGeometry(0.1, 0.014, 0.19), new T.MeshStandardMaterial({ color: '#2b2420', roughness: 0.4 })); body.castShadow = true; phone.add(body)
+  const body = new T.Mesh(new T.BoxGeometry(0.1, 0.014, 0.19), new T.MeshStandardMaterial({ color: '#ff9e8a', roughness: 0.6 })); body.castShadow = true; phone.add(body)
   const lock = face(160, 300, (g, w, h) => {
-    g.fillStyle = '#16202e'; g.fillRect(0, 0, w, h)
-    const now = new Date(); g.fillStyle = '#f3e9dc'; g.textAlign = 'center'; g.font = FONT(800, 44)
+    g.fillStyle = paperC; g.fillRect(0, 0, w, h)
+    const now = new Date(); g.fillStyle = ink; g.textAlign = 'center'; g.font = FONT(800, 44)
     g.fillText(`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`, w / 2, 78)
     const n = desk$.todos
-    g.fillStyle = n ? '#c8402f' : '#2f7d6a'; g.beginPath(); if (g.roundRect) g.roundRect(16, 120, w - 32, 96, 18); else g.rect(16, 120, w - 32, 96); g.fill()
+    g.fillStyle = n ? coral : leaf; g.beginPath(); if (g.roundRect) g.roundRect(16, 120, w - 32, 96, 18); else g.rect(16, 120, w - 32, 96); g.fill()
     g.fillStyle = '#fffaf0'; g.font = FONT(900, 46); g.fillText(n ? String(n) : '✓', w / 2, 172); g.font = FONT(800, 18); g.fillText(n ? 'need you' : 'all clear', w / 2, 202)
     g.textAlign = 'left'
   })
@@ -944,42 +992,42 @@ async function buildRoom() {
     g.fillStyle = '#fff3b8'; g.fillRect(0, 0, w, h)
     g.strokeStyle = '#c9d6ea'; g.lineWidth = 2; for (let y = 96; y < h; y += 34) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke() }
     g.strokeStyle = '#e0645a'; g.lineWidth = 3; g.beginPath(); g.moveTo(38, 0); g.lineTo(38, h); g.stroke()
-    g.fillStyle = '#c8402f'; g.fillRect(0, 0, w, 30)
+    g.fillStyle = coral; g.fillRect(0, 0, w, 30)
     g.fillStyle = ink; g.font = FONT(900, 30); g.fillText('Neues', 50, 86); g.fillText('Projekt', 50, 120)
-    g.fillStyle = teal; g.font = FONT(900, 40); g.fillText('+', 50, 186); g.font = FONT(800, 24); g.fillText('Idee', 80, 184)
+    g.fillStyle = leaf; g.font = FONT(900, 40); g.fillText('+', 50, 186); g.font = FONT(800, 24); g.fillText('Idee', 80, 184)
     const last = [...requests].sort((a, b) => String(b.at).localeCompare(String(a.at)))[0]
-    if (last) { g.fillStyle = '#7a6a5b'; g.font = FONT(800, 19); g.fillText(fit(g, HQ.requestLine(last), w - 60), 50, 254); g.fillStyle = ink; g.font = FONT(700, 18); g.fillText(fit(g, last.text, w - 60), 50, 288) }
+    if (last) { g.fillStyle = soft; g.font = FONT(800, 19); g.fillText(fit(g, HQ.requestLine(last), w - 60), 50, 254); g.fillStyle = ink; g.font = FONT(700, 18); g.fillText(fit(g, last.text, w - 60), 50, 288) }
   })
   const sheetP = plane(0.15, 0.21, padFace.t); sheetP.rotation.x = -Math.PI / 2; sheetP.position.y = 0.0065; pad.add(sheetP)
   scene.add(pad); spot(pad, 'new', 'Neues Projekt', new T.Vector3(-0.4, dt + 0.12, 0.98))
 
   const frame = (w, h, x, y, z, tex) => {
     const g = new T.Group(); g.position.set(x, y, z)
-    const back = new T.Mesh(new T.BoxGeometry(w + 0.08, h + 0.08, 0.04), new T.MeshStandardMaterial({ color: '#c9b79c', roughness: 0.8 })); back.castShadow = true; g.add(back)
+    const back = new T.Mesh(new T.BoxGeometry(w + 0.08, h + 0.08, 0.04), new T.MeshStandardMaterial({ color: '#e6b788', roughness: 0.85 })); back.castShadow = true; g.add(back)
     const p = plane(w, h, tex); p.position.z = 0.021; g.add(p); scene.add(g); return g
   }
   const board = face(640, 440, (g, w, h) => {
-    g.fillStyle = '#fbfaf6'; g.fillRect(0, 0, w, h)
+    g.fillStyle = '#fffdf6'; g.fillRect(0, 0, w, h)
     g.fillStyle = ink; g.font = FONT(900, 40); g.fillText('Plan', 30, 58)
-    g.fillStyle = teal; g.font = FONT(800, 28); g.textAlign = 'right'; g.fillText(`${desk$.pct}%`, w - 30, 58); g.textAlign = 'left'
-    g.fillStyle = '#e4d4bb'; g.fillRect(30, 76, w - 60, 14); g.fillStyle = teal; g.fillRect(30, 76, ((w - 60) * desk$.pct) / 100, 14)
-    g.fillStyle = '#7a6a5b'; g.font = FONT(900, 30); g.fillText(`Lv ${game.level} · ${game.xp} XP · ${game.coins} coins`, 30, 420)
+    g.fillStyle = leaf; g.font = FONT(800, 28); g.textAlign = 'right'; g.fillText(`${desk$.pct}%`, w - 30, 58); g.textAlign = 'left'
+    g.fillStyle = '#efe0b0'; g.fillRect(30, 76, w - 60, 14); g.fillStyle = leaf; g.fillRect(30, 76, ((w - 60) * desk$.pct) / 100, 14)
+    g.fillStyle = soft; g.font = FONT(900, 30); g.fillText(`Lv ${game.level} · ${game.xp} XP · ${game.coins} coins`, 30, 420)
     const ph = phasesData.slice(0, 6)
-    if (!ph.length) { g.fillStyle = '#7a6a5b'; g.font = FONT(700, 24); g.fillText('No phases yet', 30, 140) }
+    if (!ph.length) { g.fillStyle = soft; g.font = FONT(700, 24); g.fillText('No phases yet', 30, 140) }
     ph.forEach((p, i) => {
       const y = 140 + i * 48, st = p.state
-      g.fillStyle = st === 'done' ? '#3a8a55' : st === 'active' ? '#c8402f' : '#9a8c7e'
+      g.fillStyle = st === 'done' ? leaf : st === 'active' ? coral : '#b8a48e'
       g.font = FONT(900, 28); g.fillText(st === 'done' ? '✓' : st === 'active' ? '→' : '○', 30, y)
-      g.fillStyle = st === 'next' ? '#9a8c7e' : ink; g.font = FONT(st === 'active' ? 900 : 700, 26); g.fillText(fit(g, p.name, w - 110), 72, y)
+      g.fillStyle = st === 'next' ? '#b8a48e' : ink; g.font = FONT(st === 'active' ? 900 : 700, 26); g.fillText(fit(g, p.name, w - 110), 72, y)
     })
   })
   spot(frame(1.15, 0.8, -1.38, 1.6, -R + 0.07, board.t), 'plan', 'Plan', new T.Vector3(-1.38, 2.12, -R + 0.1))
 
   const chart = face(440, 560, (g, w, h) => {
-    g.fillStyle = '#f6eedd'; g.fillRect(0, 0, w, h)
+    g.fillStyle = paperC; g.fillRect(0, 0, w, h)
     g.fillStyle = ink; g.font = FONT(900, 34); g.fillText('Earned', 28, 54)
-    g.fillStyle = '#8a5a00'; g.font = FONT(900, 58); g.fillText(money(desk$.total), 28, 122)
-    g.fillStyle = '#7a6a5b'; g.font = FONT(700, 20); g.fillText(`${money(desk$.month)} this month${desk$.test ? ', Testgeld' : ''}`, 28, 154)
+    g.fillStyle = '#b07a10'; g.font = FONT(900, 58); g.fillText(money(desk$.total), 28, 122)
+    g.fillStyle = soft; g.font = FONT(700, 20); g.fillText(`${money(desk$.month)} this month${desk$.test ? ', Testgeld' : ''}`, 28, 154)
     const ps = projectsData.slice(0, 5), max = Math.max(1, ...ps.map((p) => Math.max(0, Number(p.revenueTotal) || 0))), bw = (w - 56) / Math.max(ps.length, 1)
     g.strokeStyle = ink; g.lineWidth = 3; g.beginPath(); g.moveTo(28, 480); g.lineTo(w - 28, 480); g.stroke()
     ps.forEach((p, i) => {
@@ -992,41 +1040,45 @@ async function buildRoom() {
 
   /* What a real home office has above eye level: shelves with books and plants, a pendant lamp over the desk */
   const solid = (geo, mat, x, y, z, parent = scene) => { const m = new T.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; parent.add(m); return m }
-  const wood = new T.MeshStandardMaterial({ color: '#c79a6b', roughness: 0.8 })
+  const wood = new T.MeshStandardMaterial({ color: '#e6b788', roughness: 0.85 })
   for (const x of [-1.38, 1.32]) {
     const shelf = solid(new T.BoxGeometry(1.0, 0.05, 0.24), wood, x, 2.42, -R + 0.14)
     for (const sx of [-0.3, 0.3]) solid(new T.BoxGeometry(0.04, 0.12, 0.2), wood, x + sx, 2.36, -R + 0.13)
-    put(x < 0 ? 'books' : 'plantSmall1', x - 0.24, -R + 0.15, { s: 0.75, y: 2.445 }); put(x < 0 ? 'plantSmall1' : 'books', x + 0.26, -R + 0.15, { s: 0.75, y: 2.445, ry: 0.4 })
+    if (x < 0) { put('books', x - 0.24, -R + 0.15, { s: 0.75, y: 2.445 }); potted(x + 0.26, -R + 0.15, 0.36, 2.445) } else { potted(x - 0.24, -R + 0.15, 0.36, 2.445); put('books', x + 0.26, -R + 0.15, { s: 0.75, y: 2.445, ry: 0.4 }) }
     shelf.receiveShadow = true
   }
-  const shadeMat = new T.MeshStandardMaterial({ color: '#d9774b', roughness: 0.6, side: T.DoubleSide })
+  const shadeMat = new T.MeshStandardMaterial({ color: '#f6a596', roughness: 0.8, side: T.DoubleSide })
   const pendant = new T.Group(); scene.add(pendant)
-  const cord = solid(new T.CylinderGeometry(0.008, 0.008, 0.46, 6), new T.MeshStandardMaterial({ color: '#2b2420' }), 0.8, 2.61, -0.4, pendant); cord.castShadow = false
+  const cord = solid(new T.CylinderGeometry(0.008, 0.008, 0.46, 6), new T.MeshStandardMaterial({ color: '#8a6a55' }), 0.8, 2.61, -0.4, pendant); cord.castShadow = false
   const lampShade = solid(new T.CylinderGeometry(0.07, 0.24, 0.2, 24, 1, true), shadeMat, 0.8, 2.3, -0.4, pendant); lampShade.castShadow = false
   const bulbGlow = new T.MeshBasicMaterial({ color: '#8a8070' })
   solid(new T.SphereGeometry(0.055, 16, 12), bulbGlow, 0.8, 2.22, -0.4, pendant).castShadow = false
 
   const door = new T.Group(); door.position.set(0, 0, -R + 0.03)
-  const slab = new T.Mesh(new T.BoxGeometry(0.98, 2.1, 0.06), new T.MeshStandardMaterial({ color: '#b07a4f', roughness: 0.7 })); slab.position.y = 1.05; slab.castShadow = true; door.add(slab)
+  const slab = new T.Mesh(new T.BoxGeometry(0.98, 2.1, 0.06), new T.MeshStandardMaterial({ color: '#8fcfb5', roughness: 0.8 })); slab.position.y = 1.05; slab.castShadow = true; door.add(slab)
   const knob = new T.Mesh(new T.SphereGeometry(0.04, 16, 12), new T.MeshStandardMaterial({ color: '#f2b630', metalness: 0.5, roughness: 0.3 })); knob.position.set(0.36, 1.0, 0.05); door.add(knob)
   const sign = face(256, 128, (g, w, h) => {
     g.fillStyle = paperC; g.fillRect(0, 0, w, h); g.strokeStyle = ink; g.lineWidth = 8; g.strokeRect(4, 4, w - 8, h - 8)
     g.fillStyle = ink; g.textAlign = 'center'; g.font = FONT(900, 40); g.fillText('TEAM', w / 2, 62)
-    g.font = FONT(800, 24); g.fillStyle = teal; g.fillText(desk$.working ? `${desk$.working} working` : 'office', w / 2, 100); g.textAlign = 'left'
+    g.font = FONT(800, 24); g.fillStyle = leaf; g.fillText(desk$.working ? `${desk$.working} working` : 'office', w / 2, 100); g.textAlign = 'left'
   })
   const sp = plane(0.42, 0.21, sign.t); sp.position.set(0, 1.55, 0.035); door.add(sp)
   scene.add(door); spot(door, 'office', 'Team office', new T.Vector3(0, 2.25, -R + 0.1))
 
   /* Light: the sun through the windows, a desk lamp and a warm room light that come on in the evening */
-  const hemi = new T.HemisphereLight(0xfff8ee, 0x9a8670, 0.7); scene.add(hemi)
-  const sun = new T.DirectionalLight(0xfff0dc, 0.8); sun.position.set(-9, 7, 1); sun.target.position.set(0, 0, 0); sun.castShadow = true
+  const hemi = new T.HemisphereLight(0xfff1d6, 0xc9a27e, 0.72); const amb = new T.AmbientLight(0xffe6c8, 0.22); scene.add(hemi, amb)
+  const sun = new T.DirectionalLight(0xffd29a, 1.2); sun.position.set(-9, 7, 1); sun.target.position.set(0, 0, 0); sun.castShadow = true
   sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006; Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 1, far: 25 }); scene.add(sun, sun.target)
   const lamp = new T.PointLight(0xffc27a, 0, 4, 2); lamp.position.set(-0.62, dt + 0.45, 0.86); scene.add(lamp)
   const ceiling = new T.PointLight(0xffd9a0, 0, 9, 2); ceiling.position.set(0.8, 2.1, -0.4); scene.add(ceiling)
-  const LIGHT = { day: [0.7, 0.85, 0, 0.15], dusk: [0.5, 0.45, 0.9, 0.6], night: [0.22, 0.08, 1.3, 0.9] }
+  const LIGHT = { day: [0.72, 0.75, 0, 0.05], dusk: [0.5, 0.5, 1.1, 0.7], night: [0.1, 0.04, 1.9, 1.5] }
   function tick() {
     mode = HQ.modeOf(new Date().getHours()); const [h, s, l, c] = LIGHT[mode]
-    hemi.intensity = h; sun.intensity = s; sun.color.set(mode === 'dusk' ? 0xffa66b : 0xfff0dc); lamp.intensity = l; ceiling.intensity = c; bulbGlow.color.set(c > 0.3 ? '#ffe2a0' : '#8a8070')
+    hemi.intensity = h; hemi.color.set(mode === 'night' ? 0x9aa2dc : 0xfff1d6); sun.intensity = s; sun.color.set(mode === 'dusk' ? 0xffa66b : mode === 'night' ? 0xa9b8ff : 0xffd29a); lamp.intensity = l; ceiling.intensity = c; bulbGlow.color.set(c > 0.3 ? '#ffe2a0' : '#8a8070')
+    const dark = mode === 'night', lit = mode !== 'day'
+    amb.intensity = dark ? 0.03 : mode === 'dusk' ? 0.15 : 0.22; amb.color.set(dark ? 0x8a90c8 : 0xffe6c8); lid0.material.color.copy(dark ? lidNight : lidDay)
+    shadeMat.emissive.set(lit ? '#ff9f80' : '#000000'); shadeMat.emissiveIntensity = dark ? 0.4 : 0.2
+    for (const g of shades) g.traverse((n) => { if (n.isMesh && n.material.name === 'lamp') { n.material.emissive.set(lit ? '#ffc56e' : '#000000'); n.material.emissiveIntensity = dark ? 0.9 : 0.5 } })
     sky.redraw(); lock.redraw()
   }
   tick(); setInterval(tick, 30000)
@@ -1136,19 +1188,26 @@ function buildOffice() {
   const bg = () => { scene.background = new T.Color(getComputedStyle(document.documentElement).getPropertyValue('--stage').trim() || '#dfe7e3') }
   bg(); matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { if (!MODES[mode]?.bg) bg() })
 
-  scene.add(new T.HemisphereLight(0xfff8ee, 0x9a8670, 0.85))
-  const sun = new T.DirectionalLight(0xfff0dc, 0.75)
+  scene.add(new T.HemisphereLight(0xfff1d6, 0xc9a27e, 0.6))
+  const sun = new T.DirectionalLight(0xffd29a, 1.15)
   sun.position.set(7, 16, 10); sun.castShadow = true
   sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0005
   Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 50 })
   scene.add(sun)
 
-  /* Cartoon look: three-step toon shading and dark outlines on the team */
-  const grad = new T.DataTexture(new Uint8Array([110, 110, 110, 190, 190, 190, 255, 255, 255]), 3, 1, T.RGBFormat)
+  /* Cozy pastel: soft four-step toon shading like the team's, warm brown outlines, and every colour of the old
+     office repainted from one pastel set (COZY), so the room, its props and the team read as one game */
+  const grad = new T.DataTexture(new Uint8Array([125, 125, 125, 190, 190, 190, 235, 235, 235, 255, 255, 255]), 4, 1, T.RGBFormat)
   grad.minFilter = grad.magFilter = T.NearestFilter; grad.generateMipmaps = false; grad.needsUpdate = true
   const mats = {}
-  const mat = (c) => mats[c] || (mats[c] = new T.MeshToonMaterial({ color: c, gradientMap: grad }))
-  const LINE = new T.MeshBasicMaterial({ color: '#2b2420', side: T.BackSide })
+  const COZY = {
+    '#f4efe6': '#fff6e6', '#ffffff': '#fffaf0', '#3a3f42': '#a88f80', '#2d3236': '#7d6a86', '#c0362c': '#ff8a73', '#1f5fa8': '#7fb6e6',
+    '#e3b341': '#f7cf6a', '#3f7d4f': '#7cc68a', '#7a4a8a': '#b79ad6', '#8a6a4c': '#d1a074', '#a07d5b': '#e2b383', '#5f7d8a': '#8fc6d8',
+    '#3f5862': '#6fa9bd', '#7f9aa6': '#a9d6e3', '#e0a63a': '#f6c25f', '#7aa596': '#a8dcc4', '#b8455f': '#f29bb0', '#efe5d2': '#ead3a8',
+    '#cddccd': '#cfe9d6', '#d9e2e6': '#e6f1f2', '#c9a227': '#f2c94c', '#7a6a4c': '#b89670',
+  }
+  const mat = (c) => { c = COZY[String(c).toLowerCase()] || c; return mats[c] || (mats[c] = new T.MeshToonMaterial({ color: c, gradientMap: grad })) }
+  const LINE = new T.MeshBasicMaterial({ color: '#8a6347', side: T.BackSide })
   const mesh = (geo, color, x = 0, y = 0, z = 0, parent = scene) => {
     const m = new T.Mesh(geo, typeof color === 'object' ? color : mat(color))
     m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m
@@ -1171,12 +1230,12 @@ function buildOffice() {
 
   /* The room: a bigger open-plan floor with oak boards, a brick back wall and a sage side wall with city windows */
   const W = 22, D = 17, BACK = -D / 2, LEFT = -W / 2
-  const planks = canvasTex(512, 512, (g, w) => { for (let i = 0; i < 16; i++) { g.fillStyle = ['#d8b88f', '#d2b085', '#dcbf98'][i % 3]; g.fillRect(0, i * 32, w, 31); g.fillStyle = '#b8936a'; g.fillRect((i * 157) % w, i * 32, 2, 32); g.fillRect(0, i * 32 + 31, w, 1) } })
+  const planks = canvasTex(512, 512, (g, w) => { for (let i = 0; i < 16; i++) { g.fillStyle = ['#e3ab76', '#dda26c', '#e8b47f'][i % 3]; g.fillRect(0, i * 32, w, 31); g.fillStyle = '#c48a55'; g.fillRect((i * 157) % w, i * 32, 2, 32); g.fillRect(0, i * 32 + 31, w, 1) } })
   planks.redraw(); planks.t.wrapS = planks.t.wrapT = T.RepeatWrapping; planks.t.repeat.set(4.5, 3.6)
   box(W, 0.3, D, texMat(planks.t), 0, -0.15, 0)
   const brick = canvasTex(512, 256, (g, w, h) => {
-    g.fillStyle = '#e3d3c3'; g.fillRect(0, 0, w, h)
-    for (let r = 0; r < 8; r++) for (let c = -1; c < 9; c++) { g.fillStyle = ['#b9644a', '#ad5a41', '#c26f52', '#a8553d'][(r * 7 + c * 3) & 3]; g.fillRect(c * 64 + (r % 2) * 32 + 3, r * 32 + 3, 58, 26) }
+    g.fillStyle = '#fbeedd'; g.fillRect(0, 0, w, h)
+    for (let r = 0; r < 8; r++) for (let c = -1; c < 9; c++) { g.fillStyle = ['#f4b49a', '#efaa8f', '#f7bea6', '#eba58b'][(r * 7 + c * 3) & 3]; g.fillRect(c * 64 + (r % 2) * 32 + 3, r * 32 + 3, 58, 26) }
   })
   brick.redraw(); brick.t.wrapS = brick.t.wrapT = T.RepeatWrapping; brick.t.repeat.set(5, 2.2)
   box(W, 4.8, 0.3, texMat(brick.t), 0, 2.4, BACK - 0.15)
@@ -1214,7 +1273,7 @@ function buildOffice() {
   }
   glassRoom(LEFT, -6.0, BACK, -4.4, -7.6)
   glassRoom(LEFT, -6.0, D / 2, 3.6, -7.6)
-  const plate = canvasTex(256, 64, (g, w, h) => { g.fillStyle = '#2b2420'; g.fillRect(0, 0, w, h); g.fillStyle = '#f4efe6'; g.font = '800 26px "Nunito", sans-serif'; g.textAlign = 'center'; g.fillText('PROJECT MANAGER', w / 2, 42) })
+  const plate = canvasTex(256, 64, (g, w, h) => { g.fillStyle = '#6b4b32'; g.fillRect(0, 0, w, h); g.fillStyle = '#f4efe6'; g.font = '800 26px "M PLUS Rounded 1c", ui-rounded, sans-serif'; g.textAlign = 'center'; g.fillText('Project Manager', w / 2, 42) })
   plate.redraw(); mesh(new T.PlaneGeometry(1.5, 0.37), new T.MeshBasicMaterial({ map: plate.t }), -9.1, 2.6, -4.39)
   // meeting room: round table, stools, a screen on the side wall
   cyl(1.2, 1.2, 0.08, '#f4efe6', -8.5, 0.8, 6.1, scene, 40); cyl(0.1, 0.1, 0.78, steel, -8.5, 0.39, 6.1, scene, 10); cyl(0.5, 0.5, 0.04, steel, -8.5, 0.02, 6.1, scene, 24)
@@ -1235,7 +1294,7 @@ function buildOffice() {
   const KS = 2.2, kit = {}, later = []
   const kitLoader = new T.GLTFLoader(new T.LoadingManager())
   const kitBytes = (b64) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)).buffer
-  const parseKit = (src) => Promise.all(Object.entries(src || {}).map(([k, b64]) => new Promise((ok, no) => kitLoader.parse(kitBytes(b64), '', (g) => { kit[k] = g; ok() }, no))))
+  const parseKit = (src) => Promise.all(Object.entries(src || {}).map(([k, b64]) => new Promise((ok, no) => kitLoader.parse(kitBytes(b64), '', (g) => { cozyKit(k, g.scene); kit[k] = g; ok() }, no))))
   /* A kit piece standing on (x, z) of its parent, centred; y may be a function read once the kit is in */
   const piece = (name, x, z, { ry = 0, s = 1, y = 0, parent = scene } = {}) => {
     const g = new T.Group(); g.position.set(x, 0, z); g.rotation.y = ry; parent.add(g)
@@ -1249,7 +1308,7 @@ function buildOffice() {
     return g
   }
   /* Plants, bookshelf, lounge with sofa, the office dog, the kitchen */
-  const plant = (x, z, s = 1) => piece('pottedPlant', x, z, { s: 1.5 * s })
+  const plant = (x, z, s = 1) => { const g = cozyPlant(T, mat, 1.9 * s); g.position.set(x, 0, z); scene.add(g); return g }
   for (const [x, z, k] of [[-5.5, -7.8, 0.9], [-1.4, -7.9, 0.8], [10.4, -1.2, 1.1], [10.4, 3.4, 1.0], [-5.5, 8.0, 1.1], [-5.6, -3.6, 0.7], [1.0, 3.2, 0.6], [4.4, -3.0, 0.6], [-10.4, -0.6, 0.9]]) plant(x, z, k)
   box(0.5, 2.6, 2.4, '#8a6a4c', LEFT + 0.3, 1.3, -0.6 + 3.3)
   for (let r = 0; r < 4; r++) {
@@ -1260,7 +1319,7 @@ function buildOffice() {
   cyl(0.65, 0.65, 0.08, '#8a6a4c', 7.4, 0.45, 6.9); cyl(0.06, 0.06, 0.42, steel, 7.4, 0.22, 6.9, scene, 8)
   cyl(0.12, 0.1, 0.18, '#f4efe6', 7.2, 0.58, 6.8); box(0.5, 0.05, 0.35, '#1f5fa8', 7.6, 0.51, 7.0)
   for (const [x, z, c] of [[4.6, 7.4, '#c0362c'], [10.0, 7.2, '#5f7d8a']]) { const bean = ball(0.75, c, x, 0.45, z); bean.scale.y = 0.6 }
-  cyl(0.04, 0.04, 2.4, '#2b2420', 10.2, 1.2, 5.0, scene, 8); const shade = cone(0.35, 0.4, '#f4efe6', 10.2, 2.5, 5.0); shade.rotation.x = Math.PI
+  cyl(0.04, 0.04, 2.4, '#6b4b32', 10.2, 1.2, 5.0, scene, 8); const shade = cone(0.35, 0.4, '#f4efe6', 10.2, 2.5, 5.0); shade.rotation.x = Math.PI
   // the office dog, always asleep in its bed
   const dog = new T.Group(); dog.position.set(2.4, 0, 7.2); dog.rotation.y = 0.6; scene.add(dog)
   mesh(new T.TorusGeometry(0.55, 0.18, 12, 28), '#5f7d8a', 0, 0.18, 0, dog).rotation.x = Math.PI / 2
@@ -1268,7 +1327,7 @@ function buildOffice() {
   const dogBody = ball(0.38, '#e39a4a', 0, 0.3, 0, dog); dogBody.scale.set(1.25, 0.7, 0.85)
   ball(0.24, '#e39a4a', 0.42, 0.33, 0.12, dog); const muzzle = ball(0.12, '#f7ead8', 0.6, 0.3, 0.16, dog); muzzle.scale.z = 0.8
   for (const dz of [0.0, 0.24]) cone(0.08, 0.18, '#d4883a', 0.4, 0.55, dz, dog)
-  ball(0.04, '#2b2420', 0.71, 0.33, 0.17, dog)
+  ball(0.04, '#6b4b32', 0.71, 0.33, 0.17, dog)
   outline(dog)
   // kitchen: counter on the back wall, an island with stools, a fridge, the sign
   const bx = 7.6, bz = BACK + 0.55
@@ -1281,7 +1340,7 @@ function buildOffice() {
   for (const [dx, dz] of [[-0.08, 0], [0.1, 0.06], [0.02, -0.1]]) ball(0.11, '#f08a24', bx + 1.3 + dx, 1.25, bz + dz)
   box(4.4, 0.06, 0.4, '#8a6a4c', bx - 0.6, 2.45, BACK + 0.2)
   for (let i = 0; i < 7; i++) cyl(0.13, 0.13, 0.32, ['#f4efe6', '#e8d9bf'][i % 2], bx - 2.4 + i * 0.6, 2.64, BACK + 0.2)
-  const sign = canvasTex(512, 128, (g, w, h) => { g.fillStyle = '#2b2420'; g.fillRect(0, 0, w, h); g.fillStyle = '#f4d58d'; g.font = '800 64px "Nunito", sans-serif'; g.textAlign = 'center'; g.fillText('KAFFEE', w / 2, 86) })
+  const sign = canvasTex(512, 128, (g, w, h) => { g.fillStyle = '#6b4b32'; g.fillRect(0, 0, w, h); g.fillStyle = '#f4d58d'; g.font = '800 64px "M PLUS Rounded 1c", ui-rounded, sans-serif'; g.textAlign = 'center'; g.fillText('Kaffee', w / 2, 86) })
   sign.redraw(); mesh(new T.PlaneGeometry(2.0, 0.5), new T.MeshBasicMaterial({ map: sign.t }), bx - 0.6, 3.3, BACK + 0.02)
   for (const x of [6.4, 7.4, 8.4]) piece('kitchenBar', x, -4.6)
   for (const x of [6.4, 7.4, 8.4]) piece('stoolBar', x, -3.55)
@@ -1291,14 +1350,14 @@ function buildOffice() {
   /* Whiteboard (level and progress), kanban board and the sticky note that counts what needs you */
   const board = canvasTex(1024, 512, (g, w, h, lv) => {
     g.fillStyle = '#fbfcfa'; g.fillRect(0, 0, w, h)
-    g.fillStyle = '#5d6a65'; g.font = '800 40px Nunito, ui-rounded, system-ui, sans-serif'; g.fillText(lv.label, 56, 92)
-    g.fillStyle = '#17201d'; g.font = '900 66px "Nunito", sans-serif'
+    g.fillStyle = '#9a7b5f'; g.font = '800 40px "M PLUS Rounded 1c", ui-rounded, sans-serif'; g.fillText(lv.label, 56, 92)
+    g.fillStyle = '#6b4b32'; g.font = '900 66px "M PLUS Rounded 1c", ui-rounded, sans-serif'
     const words = String(lv.name).split(' '); let line = '', y = 182
     for (const wd of words) { const t = line ? `${line} ${wd}` : wd; if (g.measureText(t).width > w - 112 && line) { g.fillText(line, 56, y); y += 76; line = wd } else line = t }
     g.fillText(line, 56, y)
-    g.fillStyle = '#dbe1de'; g.fillRect(56, 400, w - 300, 34)
-    g.fillStyle = '#0d6e5b'; g.fillRect(56, 400, (w - 300) * lv.pct / 100, 34)
-    g.fillStyle = '#17201d'; g.font = '800 64px Nunito, ui-rounded, system-ui, sans-serif'; g.fillText(`${lv.pct}%`, w - 220, 436)
+    g.fillStyle = '#efe0b0'; g.fillRect(56, 400, w - 300, 34)
+    g.fillStyle = '#4fb36b'; g.fillRect(56, 400, (w - 300) * lv.pct / 100, 34)
+    g.fillStyle = '#6b4b32'; g.font = '800 64px "M PLUS Rounded 1c", ui-rounded, sans-serif'; g.fillText(`${lv.pct}%`, w - 220, 436)
   })
   box(4.4, 2.3, 0.08, '#8f9a96', 1.2, 3.0, BACK + 0.05)
   const wb = mesh(new T.PlaneGeometry(4.2, 2.1), new T.MeshBasicMaterial({ map: board.t }), 1.2, 3.0, BACK + 0.1)
@@ -1307,8 +1366,8 @@ function buildOffice() {
   for (let i = 0; i < 8; i++) { const n = box(0.28, 0.28, 0.02, ['#ffe58a', '#a8d8c8', '#f7b2a6', '#bcd2f2'][i % 4], -4.7 + (i % 4) * 0.62, 3.78 - Math.floor(i / 4) * 0.42, BACK + 0.08); n.rotation.z = ((i * 37) % 10 - 5) / 60 }
   const sticky = canvasTex(256, 256, (g, w, h, n) => {
     g.fillStyle = '#ffd84d'; g.fillRect(0, 0, w, h)
-    g.fillStyle = '#3d3200'; g.font = '800 120px Nunito, ui-rounded, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText(String(n), w / 2, 140)
-    g.font = '800 34px "Nunito", sans-serif'; g.fillText(n === 1 ? 'needs you' : n ? 'need you' : 'all clear', w / 2, 206)
+    g.fillStyle = '#3d3200'; g.font = '800 120px "M PLUS Rounded 1c", ui-rounded, sans-serif'; g.textAlign = 'center'; g.fillText(String(n), w / 2, 140)
+    g.font = '800 34px "M PLUS Rounded 1c", ui-rounded, sans-serif'; g.fillText(n === 1 ? 'needs you' : n ? 'need you' : 'all clear', w / 2, 206)
   })
   const note = mesh(new T.PlaneGeometry(1.0, 1.0), new T.MeshBasicMaterial({ map: sticky.t }), 4.1, 3.4, BACK + 0.1)
   note.rotation.z = -0.08; note.userData.go = 'todo'
@@ -1318,11 +1377,11 @@ function buildOffice() {
 
   /* Bubble sprites */
   const bubbleTex = (draw) => { const c = canvasTex(128, 128, draw); c.redraw(); return c.t }
-  const circle = (fill, glyph, fg = '#fff') => bubbleTex((g) => { g.fillStyle = '#2b2420'; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.fillStyle = fill; g.beginPath(); g.arc(64, 64, 53, 0, 7); g.fill(); g.fillStyle = fg; g.font = '700 76px "IBM Plex Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(glyph, 64, 70) })
+  const circle = (fill, glyph, fg = '#fff') => bubbleTex((g) => { g.fillStyle = '#6b4b32'; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.fillStyle = fill; g.beginPath(); g.arc(64, 64, 53, 0, 7); g.fill(); g.fillStyle = fg; g.font = '700 76px "IBM Plex Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(glyph, 64, 70) })
   const TEX = {
-    blocked: circle('#e0483c', '!'), waiting: circle('#f2b134', '?', '#2a1d00'), done: bubbleTex((g) => { g.fillStyle = '#2b2420'; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.fillStyle = '#3a9a5b'; g.beginPath(); g.arc(64, 64, 53, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 13; g.lineCap = g.lineJoin = 'round'; g.beginPath(); g.moveTo(38, 66); g.lineTo(56, 84); g.lineTo(90, 46); g.stroke() }),
-    working: bubbleTex((g) => { g.fillStyle = '#fff'; g.strokeStyle = '#2b2420'; g.lineWidth = 7; g.beginPath(); if (g.roundRect) g.roundRect(8, 24, 112, 70, 26); else g.rect(8, 24, 112, 70); g.fill(); g.stroke(); g.fillStyle = '#0d6e5b'; for (const x of [36, 64, 92]) { g.beginPath(); g.arc(x, 59, 9, 0, 7); g.fill() } }),
-    z: bubbleTex((g) => { g.fillStyle = '#5a6a86'; g.font = '800 96px Nunito, ui-rounded, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('Z', 64, 68) }),
+    blocked: circle('#e0483c', '!'), waiting: circle('#f2b134', '?', '#2a1d00'), done: bubbleTex((g) => { g.fillStyle = '#6b4b32'; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.fillStyle = '#3a9a5b'; g.beginPath(); g.arc(64, 64, 53, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 13; g.lineCap = g.lineJoin = 'round'; g.beginPath(); g.moveTo(38, 66); g.lineTo(56, 84); g.lineTo(90, 46); g.stroke() }),
+    working: bubbleTex((g) => { g.fillStyle = '#fff'; g.strokeStyle = '#6b4b32'; g.lineWidth = 7; g.beginPath(); if (g.roundRect) g.roundRect(8, 24, 112, 70, 26); else g.rect(8, 24, 112, 70); g.fill(); g.stroke(); g.fillStyle = '#4fb36b'; for (const x of [36, 64, 92]) { g.beginPath(); g.arc(x, 59, 9, 0, 7); g.fill() } }),
+    z: bubbleTex((g) => { g.fillStyle = '#5a6a86'; g.font = '800 96px "M PLUS Rounded 1c", ui-rounded, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('Z', 64, 68) }),
   }
   const sprite = (tex, s) => { const sp = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })); sp.scale.set(s, s, s); return sp }
   const dogZ = sprite(TEX.z, 0.3); scene.add(dogZ)
@@ -1349,19 +1408,19 @@ function buildOffice() {
     screenTex.redraw(0)
     const props = new T.Group(); root.add(props)
     dress(s.key, props)
-    cyl(0.12, 0.14, 0.05, '#2b2420', 1.0, 1.06, 0.25, props); cyl(0.02, 0.02, 0.55, '#2b2420', 1.0, 1.33, 0.25, props, 6)
+    cyl(0.12, 0.14, 0.05, '#6b4b32', 1.0, 1.06, 0.25, props); cyl(0.02, 0.02, 0.55, '#6b4b32', 1.0, 1.33, 0.25, props, 6)
     const shadeL = cone(0.16, 0.2, '#e0483c', 1.0, 1.62, 0.35, props); shadeL.rotation.x = -0.5
     const bulb = mesh(new T.SphereGeometry(0.07, 12, 8), bulbMat, 1.0, 1.54, 0.42, props); bulb.castShadow = false
     const who = new T.Group(); who.position.set(0, 0.5, -0.5); root.add(who)
     const bubble = sprite(TEX.working, 0.75); who.add(bubble)
     const zs = [0, 1, 2].map((i) => { const z = sprite(TEX.z, 0.32 + i * 0.07); who.add(z); return z })
-    const ring = mesh(new T.RingGeometry(1.35, 1.5, 40), new T.MeshBasicMaterial({ color: '#0d6e5b', transparent: true, opacity: 0.85 }), 0, 0.06, 0.1, root)
+    const ring = mesh(new T.RingGeometry(1.35, 1.5, 40), new T.MeshBasicMaterial({ color: '#4fb36b', transparent: true, opacity: 0.85 }), 0, 0.06, 0.1, root)
     ring.rotation.x = -Math.PI / 2; ring.visible = false
     const slot = LOUNGE[Object.keys(seats).length]
     root.updateMatrixWorld(true)
     const pet = HQ.PET_OF[s.key], rig = TEAM_3D.build(T, pet); who.add(rig.group)
     const hitBox = new T.Mesh(new T.BoxGeometry(1.1, 1.5, 1.0), new T.MeshBasicMaterial({ visible: false })); hitBox.position.y = 0.75; who.add(hitBox)
-    const shadow = mesh(new T.CircleGeometry(0.42, 20), new T.MeshBasicMaterial({ color: '#2b2420', transparent: true, opacity: 0.2, depthWrite: false }), 0, 0.02, 0, root)
+    const shadow = mesh(new T.CircleGeometry(0.42, 20), new T.MeshBasicMaterial({ color: '#6b4b32', transparent: true, opacity: 0.2, depthWrite: false }), 0, 0.02, 0, root)
     shadow.rotation.x = -Math.PI / 2; shadow.castShadow = shadow.receiveShadow = false
     const seat = seats[s.key] = { root, who, bubble, zs, ring, screenTex, rig, shadow, pet, h: rig.height, state: 'off', phase: Math.random() * 6, home: who.position.clone(), cafe: root.worldToLocal(new T.Vector3(slot[0], 0, slot[1])) }
     later.push(() => {
@@ -1492,16 +1551,16 @@ function buildOffice() {
   const lamps = [[-3.0, 3.2, -1.2], [3.6, 3.2, -1.2], [0.4, 3.2, 2.0], [7.4, 2.6, 5.8], [7.6, 3.0, -5.4], [-8.5, 2.8, -6.4], [-8.5, 2.8, 6.0]].map(([x, y, z]) => { const l = new T.PointLight(0xffc27a, 0, 9, 2); l.position.set(x, y, z); scene.add(l); return l })
   const clockTex = canvasTex(256, 256, (g, w, h) => {
     const now = new Date(), cx = w / 2
-    g.fillStyle = '#2b2420'; g.beginPath(); g.arc(cx, cx, 124, 0, 7); g.fill(); g.fillStyle = '#fbf7f0'; g.beginPath(); g.arc(cx, cx, 112, 0, 7); g.fill()
-    g.fillStyle = '#2b2420'; for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; g.fillRect(cx + Math.sin(a) * 92 - 4, cx - Math.cos(a) * 92 - 4, 8, 8) }
-    const hand = (a, len, wd) => { g.lineWidth = wd; g.lineCap = 'round'; g.strokeStyle = '#2b2420'; g.beginPath(); g.moveTo(cx, cx); g.lineTo(cx + Math.sin(a) * len, cx - Math.cos(a) * len); g.stroke() }
+    g.fillStyle = '#6b4b32'; g.beginPath(); g.arc(cx, cx, 124, 0, 7); g.fill(); g.fillStyle = '#fbf7f0'; g.beginPath(); g.arc(cx, cx, 112, 0, 7); g.fill()
+    g.fillStyle = '#6b4b32'; for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; g.fillRect(cx + Math.sin(a) * 92 - 4, cx - Math.cos(a) * 92 - 4, 8, 8) }
+    const hand = (a, len, wd) => { g.lineWidth = wd; g.lineCap = 'round'; g.strokeStyle = '#6b4b32'; g.beginPath(); g.moveTo(cx, cx); g.lineTo(cx + Math.sin(a) * len, cx - Math.cos(a) * len); g.stroke() }
     hand(((now.getHours() % 12) + now.getMinutes() / 60) * Math.PI / 6, 56, 12); hand(now.getMinutes() * Math.PI / 30, 84, 8)
   })
   const clk = mesh(new T.CircleGeometry(0.55, 32), new T.MeshBasicMaterial({ map: clockTex.t }), -1.6, 3.9, BACK + 0.04); clk.castShadow = false
   const MODES = {
-    day: { hemi: [0xfff8ee, 0.62], sun: [0xfff0dc, 0.62], bg: null, lamp: 0, bulb: '#8a8070' },
-    dusk: { hemi: [0xffd9b8, 0.6], sun: [0xffa66b, 0.55], bg: '#e9c9b2', lamp: 0.55, bulb: '#ffd27a' },
-    night: { hemi: [0x8090c0, 0.32], sun: [0x9fb4ff, 0.18], bg: '#18203a', lamp: 1.1, bulb: '#ffe2a0' },
+    day: { hemi: [0xfff1d6, 0.42], sun: [0xffd29a, 0.66], bg: null, lamp: 0, bulb: '#c9b8a0' },
+    dusk: { hemi: [0xffd9b8, 0.5], sun: [0xffa66b, 0.6], bg: '#f2c9b0', lamp: 0.8, bulb: '#ffd27a' },
+    night: { hemi: [0x9aa2dc, 0.24], sun: [0xa9b8ff, 0.12], bg: '#2c2540', lamp: 1.7, bulb: '#ffe2a0' },
   }
   const modeOf = (hr) => (hr >= 7 && hr < 17 ? 'day' : (hr >= 17 && hr < 20) || (hr >= 5 && hr < 7) ? 'dusk' : 'night')
   let mode = null
