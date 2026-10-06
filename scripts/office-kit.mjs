@@ -4,7 +4,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const PIECES = ['wall', 'wallWindow', 'wallDoorway', 'floorFull', 'desk', 'chairDesk', 'laptop', 'lampRoundTable',
+const PIECES = ['wall', 'wallWindow', 'wallDoorway', 'floorFull', 'desk', 'laptop', 'lampRoundTable',
   'lampRoundFloor', 'pottedPlant', 'plantSmall1', 'bookcaseOpen', 'books', 'loungeSofa', 'tableCoffee', 'rugRounded',
   'sideTable', 'kitchenCoffeeMachine', 'coatRackStanding', 'radio']
 const dir = process.argv[2]

@@ -560,7 +560,7 @@ async function buildRoom() {
     const now = new Date(); g.fillStyle = '#f3e9dc'; g.textAlign = 'center'; g.font = FONT(800, 44)
     g.fillText(`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`, w / 2, 78)
     const n = desk$.todos
-    g.fillStyle = n ? '#c8402f' : '#2f7d6a'; g.beginPath(); g.roundRect?.(16, 120, w - 32, 96, 18) ?? g.rect(16, 120, w - 32, 96); g.fill()
+    g.fillStyle = n ? '#c8402f' : '#2f7d6a'; g.beginPath(); if (g.roundRect) g.roundRect(16, 120, w - 32, 96, 18); else g.rect(16, 120, w - 32, 96); g.fill()
     g.fillStyle = '#fffaf0'; g.font = FONT(900, 46); g.fillText(n ? String(n) : '✓', w / 2, 172); g.font = FONT(800, 18); g.fillText(n ? 'need you' : 'all clear', w / 2, 202)
     g.textAlign = 'left'
   })
@@ -643,10 +643,10 @@ async function buildRoom() {
   new ResizeObserver(layout).observe(stage); layout()
 
   /* Tags float over what you can tap; tapping a tag or the thing itself opens its page */
-  const tags = $('room-tags')
+  const tags = $('room-tags'), goTo = (go) => { location.hash = go === 'company' && !hasProjects ? 'plan' : go }
   for (const h of hot.filter((x) => x.tag)) {
     const b = el('button', 'tag'); b.type = 'button'; b.append(el('span', 'nm', h.tag))
-    b.addEventListener('click', () => { location.hash = h.go }); tags.append(b); h.el = b
+    b.addEventListener('click', () => goTo(h.go)); tags.append(b); h.el = b
   }
   const v = new T.Vector3()
   function placeTags() {
@@ -670,7 +670,7 @@ async function buildRoom() {
   canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY] })
   canvas.addEventListener('pointerup', (e) => {
     const moved = down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6; down = null
-    const go = !moved && hit(e); if (go) location.hash = go
+    const go = !moved && hit(e); if (go) goTo(go)
   })
   canvas.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' && !down) canvas.classList.toggle('point', !!hit(e)) })
 
