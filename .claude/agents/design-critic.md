@@ -1,6 +1,7 @@
 ---
 name: design-critic
 description: Reviews UI screenshots with fresh eyes against the project's design doc and references, and lists what makes the UI look generic or AI-made. Use after every UI change, before opening the PR.
+model: opus
 tools: Read, Glob, Grep
 ---
 

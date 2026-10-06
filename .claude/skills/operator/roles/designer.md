@@ -31,3 +31,4 @@ Added at the end of each project (operator step 9): date, project and its type, 
 
 - 2026-10-06 (duo-test): yskills wanted it simple, Duolingo-like and good at full screen; the first pass was neither.
 - 2026-10-06 (Claude Setup HQ, game page): the first pass read as a dashboard (mono numbers, caps labels, status chips, stat tiles) and left phones half empty; a design-critic round on real 390 px shots caught it.
+- 2026-10-06 (Claude Setup HQ, team animals): yskills called the Kenney cube animals "not good" and the thread argued to keep them. A rejected look is final; the redo (hand-drawn pixel chibis) was what they wanted. Taste: cute cartoon or pixel, cozy, never a dashboard.
