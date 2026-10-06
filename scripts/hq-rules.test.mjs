@@ -70,13 +70,11 @@ test('reduced motion shows a finished still pose for each state', () => {
   assert.equal(new Set(shown).size, 5)
 })
 
-test('a project\'s live stats replace the saved money and carry the Testgeld label', () => {
-  const row = { id: 'duo', revenueMonth: 1, revenueTotal: 2 }
-  const test = HQ.withStats(row, { revenueTotalCents: 2800, revenueMonthCents: 600, mode: 'test' })
-  assert.equal(test.revenueTotal, 28); assert.equal(test.revenueMonth, 6); assert.equal(test.testMoney, true)
-  assert.equal(HQ.withStats(row, { revenueTotalCents: 2800, revenueMonthCents: 600, mode: 'live' }).testMoney, false)
-  assert.equal(HQ.deskNumbers({ projects: [test] }).test, true)
-  assert.deepEqual(HQ.withStats(row, null), row)
-  assert.deepEqual(HQ.withStats(row, { revenueTotalCents: 'x', revenueMonthCents: 1 }), row)
-  assert.deepEqual(HQ.withStats(row, { revenueTotalCents: -5, revenueMonthCents: 0 }), row)
+test('a project row in test mode is tagged Testgeld; live money is not', () => {
+  const row = { id: 'duo', revenueMonth: 6, revenueTotal: 28 }
+  assert.equal(HQ.tagMoney({ ...row, revenueMode: 'test' }).testMoney, true)
+  assert.equal(HQ.tagMoney({ ...row, revenueMode: 'live' }).testMoney, false)
+  assert.equal(HQ.tagMoney(row).testMoney, false)
+  assert.equal(HQ.deskNumbers({ projects: [HQ.tagMoney({ ...row, revenueMode: 'test' })] }).test, true)
+  assert.equal(HQ.tagMoney({ ...row, revenueMode: 'test' }).revenueTotal, 28)
 })

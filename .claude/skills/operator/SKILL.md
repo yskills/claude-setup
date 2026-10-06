@@ -117,7 +117,10 @@ Templates in `templates/`.
   only these writes do. Every write to `PROGRESS.md` updates the same rows in one batch (pin
   each with `if_version`). The new project also gets a row `projects/<id>` (`name, state` = active,
   paused or done, `progress` 0-100, `note, dashboard, live, order, revenueMonth, revenueTotal`
-  (EUR numbers, from Stripe), `working` (count), `you[{what, link}]`) in the Claude Setup HQ
+  (EUR numbers, from the project's public stats route, e.g. duo-test's `/api/stats` in cents divided by
+  100; Artifact pages cannot fetch other sites, so the manager copies them at every milestone),
+  `revenueMode` (`test` while Stripe is in test mode, HQ then says "Testgeld"), `revenueAt` (ISO time of
+  that read), `working` (count), `you[{what, link}]`) in the Claude Setup HQ
   dashboard (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT), and keeps it current with every
   `pm/now` write. HQ's Company view is yskills' one home for all projects and their money; Luna's
   cockpit links to it.

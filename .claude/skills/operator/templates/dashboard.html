@@ -281,13 +281,10 @@ window.HQ = (() => {
     if (BETWEEN[clip] && t % GESTURE_EVERY > GESTURE_FOR) clip = BETWEEN[clip]
     return { clip, frame: Math.floor(Math.max(0, t) * FPS[clip]) % FRAMES[clip] }
   }
-  /* A project's own live figures (its stats route, cents) replace the saved ones; without a usable answer the row stays as saved. */
-  function withStats(project, stats) {
-    const ok = (v) => Number.isFinite(v) && v >= 0
-    if (!stats || !ok(stats.revenueTotalCents) || !ok(stats.revenueMonthCents)) return project
-    return { ...project, revenueTotal: stats.revenueTotalCents / 100, revenueMonth: stats.revenueMonthCents / 100, testMoney: stats.mode !== 'live' }
-  }
-  return { TABS, modeOf, pickTab, worldFor, deskNumbers, withStats, PET_OF, FRAMES, poseAt }
+  /* Artifact pages cannot fetch other sites (their network is blocked), so money is what each project's manager wrote into its row:
+     revenueMonth and revenueTotal in euros, revenueMode 'test' while Stripe is in test mode, revenueAt when it was read. */
+  const tagMoney = (project) => ({ ...project, testMoney: project.revenueMode === 'test' })
+  return { TABS, modeOf, pickTab, worldFor, deskNumbers, tagMoney, PET_OF, FRAMES, poseAt }
 })()
 </script>
 <script id="team-art">
@@ -578,21 +575,8 @@ function renderPhases(phases) {
 const EUR = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 const money = (v) => EUR.format(Math.max(0, Number(v) || 0))
 let hasProjects = false, projectsData = [], phasesData = []
-const liveStats = {}, statsAsked = new Set()
-/* Real money: each project row may name a public stats route; ask it once when the page opens and redraw with the answer. */
-function askStats(projects) {
-  for (const p of projects) {
-    const url = safeUrl(p.statsUrl)
-    if (!url || statsAsked.has(p.id)) continue
-    statsAsked.add(p.id)
-    fetch(url, { credentials: 'omit' }).then((r) => (r.ok ? r.json() : null)).then((j) => { if (j) { liveStats[p.id] = j; renderProjects(lastRows) } }).catch(() => {})
-  }
-}
-let lastRows = []
 function renderProjects(rowsIn) {
-  lastRows = rowsIn
-  askStats(rowsIn)
-  const projects = rowsIn.map((p) => HQ.withStats(p, liveStats[p.id]))
+  const projects = rowsIn.map(HQ.tagMoney)
   const testMoney = projects.some((p) => p.testMoney)
   $('t-all-l').textContent = testMoney ? 'All time, Testgeld' : 'All time'
   hasProjects = projects.length > 0
@@ -615,7 +599,7 @@ function renderProjects(rowsIn) {
     const pb = el('div', 'pbar'), bar = el('div', 'bar'), fill = el('span'); fill.style.width = `${pct}%`; bar.append(fill)
     pb.append(bar, el('span', 'num', `${pct}%`)); row.append(pb)
     const stats = el('div', 'pstats')
-    stats.append(el('span', null, `${money(p.revenueMonth)} this month`), el('span', null, `${money(p.revenueTotal)} total${p.testMoney ? ' (Testgeld)' : ''}`))
+    stats.append(el('span', null, `${money(p.revenueMonth)} this month`), el('span', null, `${money(p.revenueTotal)} total${p.testMoney ? ' (Testgeld)' : ''}${p.revenueAt ? `, saved ${ago(p.revenueAt)}` : ''}`))
     const w = Math.max(0, Number(p.working) || 0); if (w) stats.append(el('span', null, `${w} working`))
     const n = Array.isArray(p.you) ? p.you.length : 0; if (n) stats.append(el('span', 'need', `${n} need you`))
     row.append(stats)
