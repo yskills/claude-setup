@@ -193,6 +193,49 @@ ol,ul{margin:0;padding:0;list-style:none}
 .reqs .rs{font:600 12px var(--mono);color:var(--soft)}
 .reqs .rs.started{color:var(--accent)}
 .reqs .btn{justify-self:start;margin-top:4px}
+/* Kassenbuch: a shop owner's cash book. A till receipt carries the big number, bars on the squared page show the months,
+   the payments read like lines on a bank statement, a payout slip waits in its envelope. All numbers from finance/<project>. */
+.money{--paper:#fffdf4;--grid:rgba(108,184,224,.16);--net:#4fb36b;--fee:#ff9d84}
+.m-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.stamp{flex:none;margin-top:4px;font:900 13px/1 var(--sans);color:#d2553f;padding:7px 11px 6px;border:2.5px solid currentColor;border-radius:10px;transform:rotate(-6deg);opacity:.85;background:rgba(255,123,92,.08)}
+.m-pick{display:flex;gap:6px;flex-wrap:wrap}
+.m-pick button{all:unset;cursor:pointer;font:800 13px var(--sans);padding:6px 14px;border-radius:999px;background:var(--bg);box-shadow:0 3px 0 var(--shadow)}
+.m-pick button[aria-pressed="true"]{background:var(--coin);color:#6b4b32;box-shadow:0 3px 0 var(--coin-ink)}
+.m-pick button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.receipt{position:relative;background:var(--paper);color:#6b4b32;padding:16px 18px 26px;border-radius:14px 14px 0 0;box-shadow:0 6px 14px -8px rgba(122,84,52,.45);
+  -webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/16px 100%;mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/16px 100%}
+.receipt .r-lab{display:block;font:800 14px var(--sans);color:#9a7b5f}
+.receipt .r-big{display:block;font:900 44px/1.05 var(--sans);color:var(--accent-ink);letter-spacing:-.02em;margin:2px 0 10px}
+.receipt .r-big.gross{color:#a8780c}
+.receipt .r-note{margin:-4px 0 10px;font:700 13px var(--sans);color:#9a7b5f}
+.r-line{display:flex;align-items:baseline;gap:8px;padding:4px 0;font:700 15px var(--sans)}
+.r-line::after{content:"";order:2;flex:1;border-bottom:2px dotted #e6d6b0;transform:translateY(-4px)}
+.r-line span{order:1;color:#9a7b5f}.r-line b{order:3;font-weight:900}
+.r-line.fee b{color:#d2553f}
+.r-line.sum{border-top:2px dashed #e6d6b0;margin-top:4px;padding-top:8px}
+.sheetpad{background:var(--paper);color:#6b4b32;border-radius:16px;padding:12px 14px;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:14px 14px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .key{display:flex;gap:14px;font:800 12px var(--sans);color:#9a7b5f;margin-top:6px}
+.chart .key i{display:inline-block;width:11px;height:11px;border-radius:4px;margin-right:5px;vertical-align:-1px}
+.stmt li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 12px;align-items:baseline;padding:9px 0;border-top:2px dashed var(--line)}
+.stmt li:first-child{border-top:0}
+.stmt .d{font:800 13px var(--sans);color:var(--soft);min-width:3.6em}
+.stmt .w{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stmt .n{font-weight:900;text-align:right}
+.stmt .x{grid-column:2/-1;font:600 12px var(--sans);color:var(--soft);text-align:right}
+.stmt li.empty{display:block}
+.tokens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.token{display:grid;justify-items:center;gap:4px;text-align:center;font:700 12.5px/1.25 var(--sans);color:var(--soft)}
+.token b{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font:900 22px var(--sans);color:#fffaf0;background:var(--c);box-shadow:inset 0 -4px 0 rgba(0,0,0,.14)}
+.token.none b{background:var(--line);color:var(--soft)}
+.slip{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:center;background:#e9f5fb;color:#4a6a7c;border-radius:16px;padding:12px 14px}
+.slip svg{grid-row:1/3;width:40px;height:30px}
+.slip b{font:900 20px var(--sans);color:#2f5f78}
+.slip span{font:700 13px var(--sans)}
+.m-foot{font:600 12.5px var(--sans);color:var(--soft);margin:0}
+.m-foot.warn{color:var(--bad)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .money{--grid:rgba(108,184,224,.12)}:root:not([data-theme="light"]) .slip{background:#2f4058;color:#cfe2ee}:root:not([data-theme="light"]) .slip b{color:#e3f1f8}}
+:root[data-theme="dark"] .slip{background:#2f4058;color:#cfe2ee}:root[data-theme="dark"] .slip b{color:#e3f1f8}
 </style>
 
 <div class="app">
@@ -217,7 +260,7 @@ ol,ul{margin:0;padding:0;list-style:none}
       </div>
     </a>
     <div class="right">
-      <a class="card pill" href="#company" id="coins" aria-label="Coins earned, one per euro" hidden>
+      <a class="card pill" href="#money" id="coins" aria-label="Coins earned, one per euro" hidden>
         <svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="var(--coin)" stroke="var(--ink)" stroke-width="2.2"/><circle cx="12" cy="12" r="6" fill="none" stroke="var(--coin-ink)" stroke-width="1.6"/><path d="M14.2 9.6a3 3 0 1 0 0 4.8M8.6 11.2h4M8.6 12.9h4" fill="none" stroke="var(--coin-ink)" stroke-width="1.6" stroke-linecap="round"/></svg>
         <span id="coin-val">0</span>
       </a>
@@ -237,10 +280,17 @@ ol,ul{margin:0;padding:0;list-style:none}
       <div class="tot"><b id="t-all">0 €</b><span id="t-all-l">All time</span></div>
       <div class="tot need"><b id="t-need">0</b><span>Need you</span></div>
     </div>
+    <div class="acts"><a class="btn" href="#money">Kassenbuch öffnen</a></div>
     <h3>Projects</h3>
     <div class="projects" id="projects"><p class="empty">Each project's manager adds its row here on day one.</p></div>
     <h3>Needs you, all projects</h3>
     <ul class="todo" id="all-you"><li class="empty">Nothing right now.</li></ul>
+  </section>
+
+  <section class="card page money" data-page="money" aria-labelledby="money-h" hidden>
+    <div class="m-head"><div><h2 id="money-h">Kassenbuch</h2><p class="lead" id="m-lead">Was deine Projekte einnehmen, nach Stripes Gebühr.</p></div><span class="stamp" id="m-stamp" hidden>Testgeld</span></div>
+    <div class="m-pick" id="m-pick" role="group" aria-label="Projekt" hidden></div>
+    <div class="stack" id="m-body"><p class="empty">noch keine Daten</p></div>
   </section>
 
   <section class="card page" data-page="plan" aria-labelledby="plan-h" hidden>
@@ -288,8 +338,8 @@ ol,ul{margin:0;padding:0;list-style:none}
 <script id="hq-rules">
 /* HQ's rules as pure functions; scripts/hq-rules.test.mjs runs this block, so they never drift. */
 window.HQ = (() => {
-  const TABS = ['desk', 'company', 'office', 'plan', 'team', 'todo']
-  const ALIAS = { you: 'todo', projects: 'company', ceo: 'desk', home: 'desk' }
+  const TABS = ['desk', 'company', 'money', 'office', 'plan', 'team', 'todo']
+  const ALIAS = { you: 'todo', projects: 'company', ceo: 'desk', home: 'desk', geld: 'money', kassenbuch: 'money' }
   /* Day and night on yskills' own clock */
   const modeOf = (hour) => (hour >= 7 && hour < 17 ? 'day' : (hour >= 17 && hour < 20) || (hour >= 5 && hour < 7) ? 'dusk' : 'night')
   /* Which page a hash opens. Home is yskills' desk; without 3D it is Company, or the Plan when there are no projects. */
@@ -384,7 +434,69 @@ window.HQ = (() => {
     if (code === 'needs_reauth' || code === 'server_not_connected' || code === 'selection_required') return 'Gespeichert. Claude Code Remote unter Einstellungen → Connectors verbinden.'
     return 'Gespeichert, Claude meldet sich.'
   }
-  return { TABS, modeOf, pickTab, worldFor, deskNumbers, tagMoney, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble }
+  /* The cash book (money page): finance/<project> is the project's stats route copied as it came (duo-test: /api/stats and
+     /api/stats/report merged, integer cents, docs/STATS-API.md) plus savedAt. Only whole cents >= 0 count; anything else is
+     null and shows as "noch keine Daten", never a guess. Money is Testgeld unless the row says mode 'live'. */
+  const cents = (v) => (Number.isInteger(v) && v >= 0 ? v : null)
+  const count = (v) => (Number.isInteger(v) && v >= 0 ? v : null)
+  const PLAN_DE = { yearly: 'Jahres-Abo', monthly: 'Monats-Abo', once: 'Einmalkauf' }
+  const MONTH_DE = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
+  const MONTHS_SHOWN = 6
+  const berlinMonth = (now) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit' }).format(now)
+  const isTime = (s) => typeof s === 'string' && !Number.isNaN(Date.parse(s))
+  function moneyOf(m) {
+    const gross = cents(m?.grossCents)
+    if (gross == null) return null
+    const complete = m.complete === true && cents(m.feeCents) != null && cents(m.netCents) != null
+    return { gross, fee: cents(m.feeCents), net: cents(m.netCents), complete }
+  }
+  /* The big number: net once every payment's fee is known, else gross with a plain note (net would be too high) */
+  const headline = (t) => (!t ? null : t.complete ? { label: 'Netto', cents: t.net } : { label: 'Brutto', cents: t.gross, note: 'Netto folgt, sobald Stripe jede Gebühr gemeldet hat.' })
+  /* The last six months up to now, months without payments at 0 (the series lists every month that had one) */
+  function monthSeries(list, now) {
+    const byMonth = new Map()
+    for (const m of Array.isArray(list) ? list : []) {
+      const v = moneyOf(m)
+      if (v && typeof m.month === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(m.month)) byMonth.set(m.month, { ...v, payments: count(m.payments) ?? 0 })
+    }
+    if (!byMonth.size) return []
+    const [y, mo] = berlinMonth(now).split('-').map(Number), out = []
+    for (let i = MONTHS_SHOWN - 1; i >= 0; i--) {
+      const d = new Date(Date.UTC(y, mo - 1 - i, 1)), key = d.toISOString().slice(0, 7), yy = d.getUTCFullYear()
+      const v = byMonth.get(key) || { gross: 0, fee: 0, net: 0, complete: true, payments: 0 }
+      out.push({ month: key, label: `${MONTH_DE[d.getUTCMonth()]}${yy === y ? '' : ` ${String(yy).slice(2)}`}`, ...v })
+    }
+    return out
+  }
+  function syncTrouble(name, s) {
+    if (typeof s !== 'string' || s === 'ok' || s === 'none') return null
+    if (s === 'off') return `${name}: kein Stripe-Schlüssel am Worker.`
+    const why = s.replace(/^failed:\s*/, '').replace(/\s+/g, ' ').trim().slice(0, 140)
+    return `${name} hakt${why ? `: ${why}` : '.'}`
+  }
+  function moneyReport(row, now = new Date()) {
+    if (!row || typeof row !== 'object') return { has: false }
+    const total = moneyOf(row.total), month = moneyOf(row.month)
+    const payments = (Array.isArray(row.payments) ? row.payments : [])
+      .filter((p) => p && isTime(p.at) && cents(p.grossCents) != null)
+      .map((p) => ({ at: p.at, plan: PLAN_DE[p.plan] || 'Sonstiges', gross: p.grossCents, fee: cents(p.feeCents), net: cents(p.netCents), discount: cents(p.discountCents) || 0 }))
+      .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
+    const s = row.subscriptions, pay = row.nextPayout
+    const pair = (o) => (o && count(o.count) != null && cents(o.cents) != null ? { count: o.count, cents: o.cents } : null)
+    return {
+      has: !!total,
+      test: row.mode !== 'live',
+      total, month, headline: headline(total),
+      months: monthSeries(row.months, now),
+      payments,
+      subs: s && typeof s === 'object' ? { active: count(s.active), trialing: count(s.trialing), ending: count(s.endingAtPeriodEnd) } : null,
+      refunds: pair(row.refunds), discounts: pair(row.discounts),
+      payout: pay && cents(pay.amountCents) != null && isTime(pay.arrivesAt) ? { cents: pay.amountCents, at: pay.arrivesAt, status: typeof pay.status === 'string' ? pay.status : '' } : null,
+      at: [row.asOf, row.savedAt].find(isTime) || null,
+      trouble: [syncTrouble('Stripe-Abgleich', row.sync), syncTrouble('Gebühren', row.feeSync), syncTrouble('Auszahlung', row.payoutSync)].filter(Boolean),
+    }
+  }
+  return { TABS, modeOf, pickTab, worldFor, deskNumbers, tagMoney, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport }
 })()
 </script>
 <script id="team-3d">
@@ -831,8 +943,94 @@ function renderProjects(rowsIn) {
     if (safeUrl(p.live)) acts.append(link('Live app', p.live, 'btn'))
     row.append(acts); box.append(row)
   }
-  projectsData = projects; room?.update()
+  projectsData = projects; room?.update(); renderMoney()
   showTab()
+}
+
+/* ---------- Kassenbuch: one project's money from finance/<project> (HQ.moneyReport). Nothing here is made up: a part with no data says so. ---------- */
+const EUR2 = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' })
+const eur2 = (c) => EUR2.format(c / 100)
+const NO_DATA = 'noch keine Daten'
+const dayDe = (iso) => new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', timeZone: 'Europe/Berlin' })
+const PAYOUT_DE = { pending: 'unterwegs', in_transit: 'unterwegs', paid: 'ausgezahlt', failed: 'fehlgeschlagen', canceled: 'storniert' }
+let financeRows = [], moneyFor = null
+const svgEl = (tag, attrs) => { const n = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n }
+function moneyChart(months) {
+  const W = 360, H = 170, base = 140, top = 26, max = Math.max(1, ...months.map((m) => m.gross)), bw = W / months.length
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': months.map((m) => `${m.label}: ${m.gross ? `${eur2(m.net ?? 0)} netto, ${eur2(m.gross)} brutto` : 'nichts'}`).join('; ') })
+  svg.append(svgEl('line', { x1: 0, x2: W, y1: base + 1, y2: base + 1, stroke: '#e6d6b0', 'stroke-width': 2.5, 'stroke-linecap': 'round' }))
+  months.forEach((m, i) => {
+    const x = i * bw + bw * 0.22, w = bw * 0.56, cx = i * bw + bw / 2
+    if (m.gross > 0) {
+      const gh = Math.max(10, ((base - top) * m.gross) / max), nh = m.net == null ? 0 : Math.min(gh, Math.max(8, ((base - top) * m.net) / max))
+      svg.append(svgEl('rect', { x, y: base - gh, width: w, height: gh, rx: 9, fill: 'var(--fee)' }))
+      if (nh) svg.append(svgEl('rect', { x, y: base - nh, width: w, height: nh, rx: 9, fill: 'var(--net)' }))
+      const t = svgEl('text', { x: cx, y: base - gh - 7, 'text-anchor': 'middle', 'font-size': 12.5, 'font-weight': 900, fill: '#6b4b32' }); t.textContent = eur2(m.complete ? m.net : m.gross).replace(/\s?€/, ''); svg.append(t)
+    } else svg.append(svgEl('circle', { cx, cy: base - 4, r: 3.5, fill: '#e6d6b0' }))
+    const l = svgEl('text', { x: cx, y: base + 22, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 800, fill: '#9a7b5f' }); l.textContent = m.label; svg.append(l)
+  })
+  return svg
+}
+function renderMoney() {
+  const rowsById = Object.fromEntries(financeRows.map((r) => [r.id, r]))
+  const order = (id) => projectsData.find((p) => p.id === id)?.order ?? 99
+  const ids = financeRows.map((r) => r.id).sort((a, b) => order(a) - order(b))
+  if (!ids.includes(moneyFor)) moneyFor = ids[0] || null
+  const name = (id) => projectsData.find((p) => p.id === id)?.name || id
+  const pick = $('m-pick'); pick.replaceChildren(); pick.hidden = ids.length < 2
+  for (const id of ids) { const b = el('button', null, name(id)); b.type = 'button'; b.setAttribute('aria-pressed', String(id === moneyFor)); b.addEventListener('click', () => { moneyFor = id; renderMoney() }); pick.append(b) }
+  const r = HQ.moneyReport(moneyFor ? rowsById[moneyFor] : null)
+  const body = $('m-body'); body.replaceChildren()
+  $('m-stamp').hidden = !r.has || !r.test
+  $('m-lead').textContent = moneyFor ? `${name(moneyFor)}${r.has && r.test ? ' · Stripe-Testmodus' : ''}` : 'Was deine Projekte einnehmen, nach Stripes Gebühr.'
+  if (!r.has) { body.append(el('p', 'empty', moneyFor ? "Noch keine Daten. Der Stripe-Abgleich hat noch nichts geliefert." : `Noch keine Daten. Sobald ein Projekt mit Stripe Geld einnimmt, steht es hier.`)); return }
+  /* The till receipt */
+  const rc = el('div', 'receipt'), h = r.headline
+  rc.append(el('span', 'r-lab', `${h.label}, alles bisher`), el('b', `r-big${h.label === 'Netto' ? '' : ' gross'}`, eur2(h.cents)))
+  if (h.note) rc.append(el('p', 'r-note', h.note))
+  const line = (label, value, cls = '') => { const d = el('div', `r-line ${cls}`); d.append(el('span', null, label), el('b', null, value)); return d }
+  rc.append(line('Brutto', eur2(r.total.gross)), line('Stripe-Gebühr', r.total.fee == null ? NO_DATA : `−${eur2(r.total.fee)}`, 'fee'))
+  if (r.total.complete) rc.append(line('Netto', eur2(r.total.net), 'sum'))
+  if (r.month) rc.append(line('Diesen Monat', r.month.complete ? `${eur2(r.month.net)} netto` : `${eur2(r.month.gross)} brutto`))
+  body.append(rc)
+  /* The months on squared paper */
+  body.append(el('h3', null, 'Pro Monat'))
+  if (r.months.length) {
+    const c = el('div', 'sheetpad chart'); c.append(moneyChart(r.months))
+    const key = el('div', 'key'), k = (color, t) => { const s = el('span'), i = el('i'); i.style.background = color; s.append(i, t); return s }
+    key.append(k('var(--net)', 'Netto'), k('var(--fee)', 'Gebühr')); c.append(key); body.append(c)
+  } else body.append(el('p', 'empty', NO_DATA))
+  /* Every payment, like a bank statement */
+  body.append(el('h3', null, `Zahlungen${r.payments.length ? ` (${r.payments.length})` : ''}`))
+  list(body.appendChild(el('ul', 'stmt')), r.payments, (p) => {
+    const li = el('li'), x = [`${eur2(p.gross)} brutto`, p.fee == null ? 'Gebühr kommt noch' : `−${eur2(p.fee)} Gebühr`]
+    if (p.discount) x.push(`Gutschein −${eur2(p.discount)}`)
+    li.append(el('span', 'd', dayDe(p.at)), el('span', 'w', p.plan), el('span', 'n', p.net == null ? eur2(p.gross) : eur2(p.net)), el('span', 'x', x.join(' · ')))
+    return li
+  }, NO_DATA)
+  /* Subscriptions as tokens */
+  body.append(el('h3', null, 'Abos'))
+  if (r.subs) {
+    const tk = el('div', 'tokens'), token = (n, label, color) => { const t = el('div', n ? 'token' : 'token none'); t.style.setProperty('--c', color); t.append(el('b', null, n == null ? '–' : String(n)), el('span', null, label)); return t }
+    tk.append(token(r.subs.active, 'zahlen gerade', '#4fb36b'), token(r.subs.trialing, 'in der Probezeit', '#6cb8e0'), token(r.subs.ending, 'gekündigt, laufen aus', '#e89a2c'))
+    body.append(tk)
+  } else body.append(el('p', 'empty', NO_DATA))
+  /* Refunds and coupons as cash book lines */
+  const led = el('div', 'totals'), tot = (label, v) => { const d = el('div', 'tot'); d.append(el('b', null, v), el('span', null, label)); return d }
+  const pair = (v, word) => (v ? (v.count ? `${v.count} ${word}, ${eur2(v.cents)}` : 'keine') : NO_DATA)
+  led.append(tot('Erstattet', pair(r.refunds, r.refunds?.count === 1 ? 'Zahlung' : 'Zahlungen')), tot('Gutscheine', pair(r.discounts, 'mal')))
+  body.append(led)
+  /* The next payout slip */
+  body.append(el('h3', null, 'Nächste Auszahlung'))
+  if (r.payout) {
+    const slip = el('div', 'slip')
+    const env = svgEl('svg', { viewBox: '0 0 40 30', 'aria-hidden': 'true' })
+    env.append(svgEl('rect', { x: 2, y: 3, width: 36, height: 24, rx: 5, fill: '#fffdf4', stroke: '#6cb8e0', 'stroke-width': 2.5 }), svgEl('path', { d: 'M4 6l16 11L36 6', fill: 'none', stroke: '#6cb8e0', 'stroke-width': 2.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }))
+    slip.append(env, el('b', null, eur2(r.payout.cents)), el('span', null, `am ${new Date(r.payout.at).toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' })}${PAYOUT_DE[r.payout.status] ? `, ${PAYOUT_DE[r.payout.status]}` : ''}`))
+    body.append(slip)
+  } else body.append(el('p', 'empty', NO_DATA))
+  body.append(el('p', 'm-foot', `Aus Stripe${r.test ? ' (Testmodus)' : ''}${r.at ? `, Stand ${agoDe(r.at)}` : ''}.`))
+  for (const t of r.trouble) body.append(el('p', 'm-foot warn', t))
 }
 
 /* ---------- yskills' desk: the home screen. First person in a room built from the Kenney Furniture Kit (office-kit.js, CC0).
@@ -1036,7 +1234,7 @@ async function buildRoom() {
       g.fillStyle = ink; g.font = FONT(800, 18); g.textAlign = 'center'; g.fillText(fit(g, p.name || p.id, bw - 6), x + bw * 0.32, 510); g.textAlign = 'left'
     })
   })
-  spot(frame(0.8, 1.02, 1.32, 1.6, -R + 0.07, chart.t), 'company', 'Money', new T.Vector3(1.32, 2.23, -R + 0.1))
+  spot(frame(0.8, 1.02, 1.32, 1.6, -R + 0.07, chart.t), 'money', 'Kassenbuch', new T.Vector3(1.32, 2.23, -R + 0.1))
 
   /* What a real home office has above eye level: shelves with books and plants, a pendant lamp over the desk */
   const solid = (geo, mat, x, y, z, parent = scene) => { const m = new T.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; parent.add(m); return m }
@@ -1642,6 +1840,7 @@ renderTeam([])
   db.collection('team').onSnapshot((s) => renderTeam(rows(s)), fail)
   db.collection('phases').onSnapshot((s) => renderPhases(rows(s)), fail)
   db.collection('projects').onSnapshot((s) => renderProjects(rows(s)), fail)
+  db.collection('finance').onSnapshot((s) => { financeRows = rows(s); renderMoney() }, () => {})
   /* Events: the first answer sets the score quietly (and writes today's visit once); later ones toast what they earned */
   let known = null
   db.collection('events').onSnapshot((s) => {
