@@ -49,8 +49,9 @@ gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
     Claude's auto mode refuses, it doesn't try another way: it asks yskills for the tap.
   - **claude-setup PRs:** the gate thread merges them too; only when Claude Code's safety check
     blocks the merge does yskills tap **Merge it** on the card or GitHub's Merge button.
-- **Last PR before launch:** head the table `hold: brief (c) first`; the operator sends brief (c),
-  and its ok is the merge.
+- **Last PR before launch:** the operator posts brief (c) with the table; the gate merges at 5/5
+  (auto-run, launch included). Live keys yskills has not set yet stay a key card; the site goes
+  live without them.
 - **Less:** post the blocking findings as one PR review and stop. The builder fixes them; the next
   round re-runs the failed checks with fresh agents on the new head.
 - **2 failed rounds:** send one message to yskills: what the PR does, what is wrong in plain words (from
@@ -63,7 +64,7 @@ like every other under auto-run, but their table comes with three plain lines fo
 afterwards: what changed, what could break, how to undo it.
 
 ```
-Gate 5/5 (round <n>), ready to merge | hold: brief (c) first   [risky: auth | payments | migration | secrets]
+Gate 5/5 (round <n>), merging | launch: brief (c) below   [risky: auth | payments | migration | secrets]
 1 CI + Workers Builds .. pass  <run links>
 2 Evaluator ............ pass  <n>/<n> criteria
 3 Code review .......... pass

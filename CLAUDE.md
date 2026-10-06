@@ -19,8 +19,8 @@ Code on the PC, the `team` mod (`/team`: who of the team works on what, with a W
   acceptance criteria before building, and sends yskills three ok/no briefs.
 - Merging: a fresh gate thread posts the `operator` skill's 5/5 table and merges every PR at 5/5
   itself, launch and live money included (yskills chose "merge everything", 2026-10-06); that
-  merge is the approved production deploy. Only claude-setup PRs wait for yskills' tap, because
-  Claude Code's safety check blocks thread merges there. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
+  merge is the approved production deploy, claude-setup PRs included; yskills taps only when
+  Claude Code's safety check blocks a thread's merge. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
 - Models (`docs/WORKFLOW.md`, Models): Fable for architecture and plans, Opus for build slices
   and anything with design or judgement, Sonnet for follow-ups, small fixes, data wiring, tests
   and reviews; reviewers get only the diff or URL plus the criteria.

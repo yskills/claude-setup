@@ -52,7 +52,7 @@ Live keys needed: <list with deep links, or none>
 Branch builds off before live keys: <yes | not needed, no live keys>
 Offene Risiken: <max 3 lines>
 
-ok = set the keys above; the gate then merges <link>, which goes live / no
+The gate merges <link> at 5/5, which goes live (auto-run). Set the keys above when you want real money; until then test mode. no = stop before the merge
 ```
 
 ## Key card (any time a slice needs a key or account)

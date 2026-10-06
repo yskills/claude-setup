@@ -231,8 +231,9 @@ Templates in `templates/`.
    first visit on live (or main's preview) along the journey criteria in `features.json` (one
    criterion per user journey that crosses slices) before yskills hears "ready to test". Test run
    1's slices each passed and broke at their seams.
-7. **Launch.** The last PR gets the full `red-team` and `legal-reviewer` pass. **Brief (c)**; on its ok
-   the gate merges, which goes live. Then `sell`'s go-live (§4) if it sells.
+7. **Launch.** The last PR gets the full `red-team` and `legal-reviewer` pass. **Brief (c)** is
+   posted, and the gate merges at 5/5, which goes live (auto-run: launch included); live keys
+   are the one thing on it that waits for yskills' hands. Then `sell`'s go-live (§4) if it sells.
 8. **Grow.** At launch `create_trigger` a weekly routine (fresh session, jittered time): it
    collects the numbers (`market` §5) and opens one PR with the week's `metrics/` file and the best
    next step as a slice in `features.json`. That PR is the weekly report; it gets the gate with
@@ -243,7 +244,7 @@ Templates in `templates/`.
    days) or **keep** (one line why). Targets never move to make a miss pass.
    **Errors fix themselves, through the gate:** the routine also reads new PostHog errors (its
    MCP); each real one becomes a fix slice with the error as its failing test, a builder fixes it,
-   the gate checks it, yskills taps merge. An error that hits paying users or checkout doesn't
+   the gate checks and merges it. An error that hits paying users or checkout doesn't
    wait for the week: PostHog's alert starts the same fix right away.
 9. **Learn.** Every correction, every gate round that failed for a catchable reason, every test
    project lesson becomes a rule, skill line, test or check in claude-setup, in a small PR. At the

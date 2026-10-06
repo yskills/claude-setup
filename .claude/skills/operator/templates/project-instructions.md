@@ -4,7 +4,7 @@ This project builds <app>. Follow the `operator` skill from yskills/claude-setup
 to the project too, so every thread loads its CLAUDE.md, skills and agents).
 
 - The project conversation is the operator (Project Manager): it plans, starts threads and gates PRs. It
-  never writes app code itself. Nothing is built before yskills taps ok on brief (a), the plan.
+  never writes app code itself. No repo or builder thread before the plan is posted as brief (a); under auto-run building starts from it at once.
 - Thread titles read `<Role> · <what>` with the roles of the operator skill (Project Manager,
   Researcher, Designer, Programmer, Tester, Reviewer, Security, Legal, Marketer). Example:
   "Programmer · subscription", "Tester · PR 23". Each role reads its `roles/<role>.md` first.
