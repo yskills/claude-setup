@@ -212,7 +212,6 @@ ol,ul{margin:0;padding:0;list-style:none}
 .r-line::after{content:"";order:2;flex:1;border-bottom:2px dotted #e6d6b0;transform:translateY(-4px)}
 .r-line span{order:1;color:#9a7b5f}.r-line b{order:3;font-weight:900}
 .r-line.fee b{color:#d2553f}
-.r-line.sum{border-top:2px dashed #e6d6b0;margin-top:4px;padding-top:8px}
 .sheetpad{background:var(--paper);color:#6b4b32;border-radius:16px;padding:12px 14px;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:14px 14px}
 .chart svg{display:block;width:100%;height:auto;overflow:visible}
 .chart .key{display:flex;gap:14px;font:800 12px var(--sans);color:#9a7b5f;margin-top:6px}
@@ -957,12 +956,12 @@ let financeRows = [], moneyFor = null
 const svgEl = (tag, attrs) => { const n = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n }
 function moneyChart(months) {
   const W = 360, H = 170, base = 140, top = 26, max = Math.max(1, ...months.map((m) => m.gross)), bw = W / months.length
-  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': months.map((m) => `${m.label}: ${m.gross ? `${eur2(m.net ?? 0)} netto, ${eur2(m.gross)} brutto` : 'nichts'}`).join('; ') })
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': months.map((m) => `${m.label}: ${!m.gross ? 'nichts' : m.complete ? `${eur2(m.net)} netto, ${eur2(m.gross)} brutto` : `${eur2(m.gross)} brutto, Gebühr kommt noch`}`).join('; ') })
   svg.append(svgEl('line', { x1: 0, x2: W, y1: base + 1, y2: base + 1, stroke: '#e6d6b0', 'stroke-width': 2.5, 'stroke-linecap': 'round' }))
   months.forEach((m, i) => {
     const x = i * bw + bw * 0.22, w = bw * 0.56, cx = i * bw + bw / 2
     if (m.gross > 0) {
-      const gh = Math.max(10, ((base - top) * m.gross) / max), nh = m.net == null ? 0 : Math.min(gh, Math.max(8, ((base - top) * m.net) / max))
+      const gh = Math.max(10, ((base - top) * m.gross) / max), nh = !m.complete || m.net == null ? 0 : Math.min(gh, Math.max(8, ((base - top) * m.net) / max))
       svg.append(svgEl('rect', { x, y: base - gh, width: w, height: gh, rx: 9, fill: 'var(--fee)' }))
       if (nh) svg.append(svgEl('rect', { x, y: base - nh, width: w, height: nh, rx: 9, fill: 'var(--net)' }))
       const t = svgEl('text', { x: cx, y: base - gh - 7, 'text-anchor': 'middle', 'font-size': 12.5, 'font-weight': 900, fill: '#6b4b32' }); t.textContent = eur2(m.complete ? m.net : m.gross).replace(/\s?€/, ''); svg.append(t)
@@ -989,8 +988,7 @@ function renderMoney() {
   rc.append(el('span', 'r-lab', `${h.label}, alles bisher`), el('b', `r-big${h.label === 'Netto' ? '' : ' gross'}`, eur2(h.cents)))
   if (h.note) rc.append(el('p', 'r-note', h.note))
   const line = (label, value, cls = '') => { const d = el('div', `r-line ${cls}`); d.append(el('span', null, label), el('b', null, value)); return d }
-  rc.append(line('Brutto', eur2(r.total.gross)), line('Stripe-Gebühr', r.total.fee == null ? NO_DATA : `−${eur2(r.total.fee)}`, 'fee'))
-  if (r.total.complete) rc.append(line('Netto', eur2(r.total.net), 'sum'))
+  rc.append(line('Brutto', eur2(r.total.gross)), line('Stripe-Gebühr', r.total.fee == null ? NO_DATA : `−${eur2(r.total.fee)}${r.total.complete ? '' : ' bisher'}`, 'fee'))
   if (r.month) rc.append(line('Diesen Monat', r.month.complete ? `${eur2(r.month.net)} netto` : `${eur2(r.month.gross)} brutto`))
   body.append(rc)
   /* The months on squared paper */
@@ -1223,7 +1221,7 @@ async function buildRoom() {
 
   const chart = face(440, 560, (g, w, h) => {
     g.fillStyle = paperC; g.fillRect(0, 0, w, h)
-    g.fillStyle = ink; g.font = FONT(900, 34); g.fillText('Earned', 28, 54)
+    g.fillStyle = ink; g.font = FONT(900, 34); g.fillText('Kassenbuch', 28, 54)
     g.fillStyle = '#b07a10'; g.font = FONT(900, 58); g.fillText(money(desk$.total), 28, 122)
     g.fillStyle = soft; g.font = FONT(700, 20); g.fillText(`${money(desk$.month)} this month${desk$.test ? ', Testgeld' : ''}`, 28, 154)
     const ps = projectsData.slice(0, 5), max = Math.max(1, ...ps.map((p) => Math.max(0, Number(p.revenueTotal) || 0))), bw = (w - 56) / Math.max(ps.length, 1)
