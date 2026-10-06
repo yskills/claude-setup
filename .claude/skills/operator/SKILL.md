@@ -95,9 +95,9 @@ Templates in `templates/`.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
 - **Dashboard** (`templates/dashboard.html`), yskills' live view of the project from day one, in
   four pages: **Office** (a 3D office yskills can turn and tap: one desk per role above, each
-  teammate dressed for it, typing when working, asleep when idle, ! when blocked, ? when it waits
+  teammate a cartoon animal dressed for it (bear, owl, cat, raccoon, rabbit, penguin, dog, fox, panda), typing when working, asleep when idle, ! when blocked, ? when it waits
   on yskills; tap one for task, next, with whom, Watch and Open; the whiteboard shows the current
-  level, the sticky note what needs yskills), **Plan** (the operator's update and the phases as levels with goal bars), **For you**
+  level, the sticky note what needs yskills; done teammates take a coffee break, and day and night follow yskills' clock), **Plan** (the operator's update and the phases as levels with goal bars), **For you**
   (what needs yskills, next steps, live links) and **Projects** (shown only with `projects` rows). At project start the operator plans the
   phases (brief (a)'s plan: research, plan, scaffold, one per slice or group of slices, launch,
   grow), publishes the page with the Artifact tool, `capabilities: {db: {rules: [{path: "", read:
