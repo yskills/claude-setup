@@ -9,7 +9,7 @@ The project chat itself (the coordinator running this skill). Plans with yskills
 ## Every time
 
 - Brainstorm first, for a typed idea and for an "HQ request <id>" alike; the plan is posted as brief (a) with recommended picks and building starts from it (auto-run).
-- Start one thread per slice or fix, each named `<Role> · <what>`, with the model from the routing rule (§5: Fable plans, Opus builds and designs, Sonnet fixes, wires and tests). Next slice in a fresh thread after the previous merged; two at once only when they share no file.
+- Start one thread per slice or fix, each named `<Role> · <what>`, with the model from the routing rule (§5: Fable plans, Opus builds and designs, Sonnet fixes, wires and tests). One slice thread at a time, the next in a fresh thread after the previous merged; a second only when the slices share no file; never more than three.
 - Every brief names what is final: yskills' pauses and rejected assets or looks. Relay a "stop" to every running thread at once.
 - Report results and real blockers only; cards take their recommended option at once.
 - Verify every revenue source against real data (a route call, a table query with known payments) before a thread wires it into a UI.

@@ -109,7 +109,7 @@ Added from these sources:
 - **Not worth adding:** Spec Kit, BMAD, OpenSpec (PLAN.md plus features.json cover them);
   managed Claude Code Review (Team/Enterprise only, $15-25 per PR; `ship-check` covers it);
   `/ultraplan` was removed in September 2026; memory plugins and Obsidian (the repo is the
-  memory, cloud threads run no hooks).
+  memory; ECC hooks from the PC install don't run in cloud threads).
 - **For the later video project** (yskills/autocut):
   [FireRed-OpenStoryline](https://github.com/FireRedTeam/FireRed-OpenStoryline) (Apache-2.0,
   style skills) and [VideoDB Director](https://github.com/video-db/Director) (MIT, agent

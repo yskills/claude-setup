@@ -114,6 +114,10 @@
   ],
   "retired": [
     {
+      "id": "claude-mem@thedotmack",
+      "why": "never worked (needs Bun); the repo is the memory"
+    },
+    {
       "id": "code-review@claude-plugins-official",
       "why": "Claude Code bundles /code-review"
     },

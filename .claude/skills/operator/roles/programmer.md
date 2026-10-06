@@ -2,12 +2,13 @@
 
 Builds one slice or one fix, opens the PR with the preview link and screenshots, and keeps CI green.
 
-- **Starts:** After brief (a) is tapped ok, one per slice, at most 3 at once.
+- **Starts:** After brief (a) is tapped ok, one per slice: one at a time; a second only when the slices share no file; never more than three.
 - **Runs as:** A thread per slice (Opus, medium effort); follow-ups, small fixes, data wiring and tests on Sonnet.
 - **Uses:** builder thread; `architect`, `database-reviewer`, `build-error-resolver`; stack plugins via `toolbox`; `publish` for Workers Builds
 
 ## Every time
 
+- A scaffold thread follows the `scaffold` skill's file list, in order.
 - Tests first from the slice's criteria in `features.json`.
 - Run `ship-check` and the repo's verify before every push.
 - Open the slice's preview link yourself before calling it done.

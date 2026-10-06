@@ -43,7 +43,7 @@ grades):
 | Project Manager | the operator: plans with yskills, starts the others, keeps PROGRESS.md and its HQ rows | the project chat | Project Manager · duo-test |
 | Researcher | competitors, prices, tools and skills, proof people pay (step 2) | subagents; a thread when big | Researcher · competitors |
 | Designer | the look, then every UI screenshot | subagent; a thread for a redesign | Designer · directions |
-| Programmer | one slice or fix, the PR, green CI | a thread each, at most 3 at once | Programmer · subscription |
+| Programmer | one slice or fix, the PR, green CI | a thread each: one at a time, a second only when the slices share no file, never more than three | Programmer · subscription |
 | Tester | the gate: grades the preview against the criteria | a fresh thread per PR | Tester · PR 23 |
 | Reviewer | reads the diff | subagent the Tester starts | Reviewer · PR 23 |
 | Security | `security-reviewer` on the diff, `red-team` on the preview | subagents the Tester starts | Security · PR 23 |
@@ -178,9 +178,8 @@ Templates in `templates/`.
 3. **Plan.** `planner` proposes; the operator writes `PLAN.md` and `features.json`. **Brief (a).**
    Its one task for yskills: create the private repo (threads get 403 on `create_repository`);
    then `add_repo` it.
-4. **Scaffold + design.** Scaffold thread: "Scaffold PLAN.md's app on branch `scaffold`: the
-   default stack from CLAUDE.md, the `publish` skill's files, `verify`, CI, legal pages per the
-   `legal` skill. Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
+4. **Scaffold + design.** Scaffold thread: "Scaffold PLAN.md's app on branch `scaffold` with
+   the `scaffold` skill (its file list, in order). Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
    directions. **Brief (b)** carries only what every build needs: the Cloudflare import and the D1
    ids. The gate merges the scaffold PR once CI is green, before brief (b), because the Cloudflare
    import builds the default branch and needs the scaffold's `wrangler.jsonc` there. Building starts once
@@ -194,8 +193,8 @@ Templates in `templates/`.
    card as soon as PLAN.md knows it is needed, so the clock runs during the build. The card's
    steps come from the skill that owns the key (`sell` `keys.md`, `store` §1, `publish`,
    `toolbox` picks). Keys go into the service's own settings page, never into chat or git.
-5. **Build.** One builder thread per slice, at most three at once, the next slice in a fresh
-   thread once the previous one is merged (two at once only when they share no file): "Build
+5. **Build.** One builder thread per slice: one at a time, the next in a fresh
+   thread once the previous one is merged; a second only when the slices share no file; never more than three: "Build
    slice <id> of PLAN.md;
    its criteria are in features.json (read only). Read PLAN.md, PROGRESS.md and CLAUDE.md first.
    Tests first, then code, then ship-check. Push branch `slice/<id>`, open a PR with phone and
@@ -268,9 +267,13 @@ conversation can continue later; a plain chat idle for over an hour hands off to
   writes `PROGRESS.md` and asks for a fresh one.
 - One job per thread. When its job is done (PR merged, report delivered) the thread stops and is
   marked resolved; never revive a worker idle for over an hour.
-- After a usage-limit stop, a reset or yskills' "stop", nothing restarts on its own: post one
-  line ("paused at <step>") and wait for yskills' go, then continue only what `PROGRESS.md`
-  lists as open, one thread at a time. Fanning out several threads before anything is visible
+- After a usage-limit stop a running thread waits and resumes by itself when the window resets;
+  only Stop on the thread or Pause on the project holds it. The coordinator starts no new thread
+  after a limit until yskills says go. To hold everything, yskills pauses the project. After
+  yskills' "stop", nothing restarts: post one line ("paused at <step>") and wait for the go, then
+  continue only what `PROGRESS.md` lists as open, one thread at a time.
+- A thread stops watching its PR as soon as it is merged, and the coordinator never subscribes
+  to PRs (46M cached tokens in test run 1). Fanning out several threads before anything is visible
   cost about 10 EUR and yskills' trust in test run 1; show something early, then spend.
 - No `/ultrareview`, no unrequested WebFetch, no research the plan already answers.
 - The evaluator runs once per gate round. Red team and legal run per PR only when the gate's table

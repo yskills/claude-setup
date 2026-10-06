@@ -29,8 +29,9 @@ Code on the PC, the `team` mod (`/team`: who of the team works on what, with a W
   coordinator reports results and real blockers only. yskills' pauses ("stop", "pause") and
   taste calls (an asset or look they rejected) are final: stop at once, never argue for them.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
-  before things nobody can undo: production deploys, payments, sending mail or posts, deleting
-  data, force-pushing, rotating secrets.
+  before spending money (ads, purchases), sending mail or posts, deleting data, force-pushing,
+  rotating secrets, and anything only yskills' hands can do (keys, domain, Gewerbe). The gate's
+  merge is the production deploy and needs no ask.
 - When yskills has to choose, give tappable options instead of a question in text: the
   `AskUserQuestion` tool in Claude Code, a decision card in project threads. Short labels,
   your recommendation first and marked, and multi-select whenever more than one answer can apply.

@@ -4,7 +4,7 @@ import type { Register } from 'claude-code'
 import type { Preview, RoleId, Run, TurnCost } from '../types'
 
 // yskills' digital team, drawn from what Claude Code already does: the session itself is the
-// lead, each subagent it starts is a teammate in a role. A band above the prompt shows who is
+// Project Manager, each subagent it starts is a teammate in a role. A band above the prompt shows who is
 // working; /team opens a pane with each role's task and a Watch link to what is being built.
 const runs = atom({ plugin: 'team', key: 'runs' } as const, [] as Run[])
 const isLeadWorking = atom({ plugin: 'team', key: 'isLeadWorking' } as const, false)
@@ -14,23 +14,28 @@ const last = atom({ plugin: 'team', key: 'last' } as const, null as TurnCost | n
 const PANE = 'team'
 const KEPT_RUNS = 40
 
+// The nine roles HQ and the thread titles use. The session itself is the Project Manager.
 export const ROLES: { id: RoleId; name: string; agents: RegExp }[] = [
-  { id: 'lead', name: 'Lead', agents: /^$/ },
-  { id: 'programmer', name: 'Programmer', agents: /build-error|refactor|general-purpose|code-simplifier|code-architect|code-explorer|explore|doc-updater|performance/i },
+  { id: 'pm', name: 'Project Manager', agents: /^planner$|^architect$|^plan$/i },
+  { id: 'researcher', name: 'Researcher', agents: /^$/ },
+  { id: 'designer', name: 'Designer', agents: /design-critic|a11y/i },
+  { id: 'programmer', name: 'Programmer', agents: /^$/ },
+  { id: 'tester', name: 'Tester', agents: /evaluator|e2e/i },
   { id: 'reviewer', name: 'Reviewer', agents: /code-reviewer|typescript-reviewer|vue-reviewer|database-reviewer|silent-failure/i },
   { id: 'security', name: 'Security', agents: /security|red-team/i },
   { id: 'legal', name: 'Legal', agents: /legal/i },
-  { id: 'design', name: 'Design', agents: /design|a11y|seo/i },
-  { id: 'qa', name: 'QA', agents: /evaluator|e2e/i },
-  { id: 'planning', name: 'Planning', agents: /planner|^architect$|^plan$/i },
+  { id: 'marketer', name: 'Marketer', agents: /seo/i },
 ]
 
-export function roleOf(agent: string): RoleId {
-  // Reviewers and planners are matched before the broad programmer pattern.
-  for (const id of ['security', 'legal', 'design', 'qa', 'reviewer', 'planning', 'programmer'] as const) {
+const RESEARCH = /^researcher|research|competitor/i
+
+export function roleOf(agent: string, description = ''): RoleId {
+  // Security and legal first so "security-reviewer" and "legal-reviewer" don't land in Reviewer;
+  // anything unknown is a Programmer.
+  for (const id of ['security', 'legal', 'designer', 'tester', 'reviewer', 'marketer', 'pm'] as const) {
     if (ROLES.find(r => r.id === id)!.agents.test(agent)) return id
   }
-  return 'programmer'
+  return RESEARCH.test(description) ? 'researcher' : 'programmer'
 }
 
 // A dev server, a Worker preview or a page the test browser opened: what the team is building.
@@ -62,7 +67,7 @@ export const register: Register = on => {
     const result = await next(e)
     if (result.agentId) {
       const agent = e.subagentType || 'general-purpose'
-      const run: Run = { id: result.agentId, role: roleOf(agent), agent, task: e.description, isDone: false }
+      const run: Run = { id: result.agentId, role: roleOf(agent, e.description), agent, task: e.description, isDone: false }
       await update($, runs, list => [...list, run].slice(-KEPT_RUNS)).catch(quiet)
     }
     return result
@@ -108,7 +113,7 @@ export const register: Register = on => {
 
     const { Box, Text } = $.ui.resolve(e)
     const busy = new Set(list.filter(r => !r.isDone).map(r => r.role))
-    if (lead) busy.add('lead')
+    if (lead) busy.add('pm')
     const shown = ROLES.filter(r => busy.has(r.id) || list.some(x => x.role === r.id))
 
     return (
@@ -137,15 +142,15 @@ export const register: Register = on => {
         {ROLES.map(role => {
           const mine = list.filter(r => r.role === role.id)
           const now = mine.filter(r => !r.isDone)
-          const isWorking = role.id === 'lead' ? lead : now.length > 0
-          const task = role.id === 'lead' ? (lead ? 'Working on your request' : 'Waiting for you') : (now[0] ?? mine.at(-1))?.task
+          const isWorking = role.id === 'pm' ? lead || now.length > 0 : now.length > 0
+          const task = now[0]?.task ?? (role.id === 'pm' ? (lead ? 'Working on your request' : 'Waiting for you') : mine.at(-1)?.task)
           return (
             <Box key={role.id} flexDirection="column" marginBottom={1}>
               <Text bold={isWorking} dimColor={!isWorking}>
                 {isWorking ? '●' : '○'} {role.name}
                 {now.length > 1 ? ` (${now.length})` : ''}
               </Text>
-              <Text dimColor>  {task ?? 'idle'}{!isWorking && mine.length > 0 && role.id !== 'lead' ? ' (done)' : ''}</Text>
+              <Text dimColor>  {task ?? 'idle'}{!isWorking && mine.length > 0 && role.id !== 'pm' ? ' (done)' : ''}</Text>
             </Box>
           )
         })}

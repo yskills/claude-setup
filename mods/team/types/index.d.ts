@@ -1,4 +1,4 @@
-export type RoleId = 'lead' | 'programmer' | 'reviewer' | 'security' | 'legal' | 'design' | 'qa' | 'planning'
+export type RoleId = 'pm' | 'researcher' | 'designer' | 'programmer' | 'tester' | 'reviewer' | 'security' | 'legal' | 'marketer'
 export type Run = { id: string; role: RoleId; agent: string; task: string; isDone: boolean }
 export type Preview = { url: string; from: string }
 export type TurnCost = { tokens: number; cacheRead: number }
