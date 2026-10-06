@@ -94,11 +94,3 @@ Source: https://kenney.nl/assets/furniture-kit (CC0 1.0, no attribution required
 
 The pieces HQ's desk room uses are packed into `.claude/skills/operator/templates/office-kit.js`
 by `scripts/office-kit.mjs`. Do not edit the packed file; change the script's list and re-run it.
-
-## Kenney Cube Pets
-
-Source: https://kenney.nl/assets/cube-pets (CC0 1.0, no attribution required)
-
-The nine animals of HQ's team office and their colormap are packed into
-`.claude/skills/operator/templates/pets-kit.js` by `scripts/pets-kit.mjs`. Do not edit the packed file;
-change the script's list and re-run it.
