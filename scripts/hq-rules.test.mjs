@@ -43,13 +43,30 @@ test('desk numbers add up and ignore junk', () => {
   assert.deepEqual({ ...HQ.deskNumbers({}) }, { month: 0, total: 0, todos: 0, pct: 0, working: 0, test: false })
 })
 
-test('every role has its own pet, and each state its own clip', () => {
+test('every role has its own animal, and each state its own pose', () => {
   assert.equal(new Set(Object.values(HQ.PET_OF)).size, 9)
-  assert.equal(HQ.clipFor('working'), 'idle'); assert.equal(HQ.clipFor('done'), 'dance')
-  assert.equal(HQ.clipFor('blocked'), 'gesture-negative'); assert.equal(HQ.clipFor('waiting'), 'gesture-positive')
-  assert.equal(HQ.clipFor('idle'), 'static'); assert.equal(HQ.clipFor('off'), 'static'); assert.equal(HQ.clipFor('nope'), 'static')
-  assert.equal(HQ.clipFor('done', true), 'walk')
-  const shown = ['working', 'done', 'blocked', 'waiting', 'idle'].map((s) => HQ.clipFor(s))
+  const clip = (st, walking, t, still) => HQ.poseAt(st, walking, t, still).clip
+  assert.equal(clip('working'), 'type'); assert.equal(clip('done'), 'dance'); assert.equal(clip('idle'), 'doze')
+  assert.equal(clip('off'), 'doze'); assert.equal(clip('nope'), 'doze'); assert.equal(clip('done', true), 'walk')
+  assert.equal(clip('blocked', false, 0.5), 'shake'); assert.equal(clip('waiting', false, 0.5), 'wave')
+  const shown = ['working', 'done', 'blocked', 'waiting', 'idle'].map((s) => clip(s, false, 0.5))
+  assert.equal(new Set(shown).size, 5)
+})
+
+test('gestures play every few seconds, not nonstop', () => {
+  assert.equal(HQ.poseAt('blocked', false, 3).clip, 'fret'); assert.equal(HQ.poseAt('blocked', false, 4.6).clip, 'shake')
+  assert.equal(HQ.poseAt('waiting', false, 3).clip, 'look'); assert.equal(HQ.poseAt('waiting', false, 9.2).clip, 'wave')
+  for (const st of ['working', 'done', 'blocked', 'waiting', 'idle']) for (const t of [0, 0.3, 1.1, 2.7, 7.9]) {
+    const { clip, frame } = HQ.poseAt(st, false, t)
+    assert.ok(Number.isInteger(frame) && frame >= 0 && frame < HQ.FRAMES[clip], `${st} @${t}`)
+  }
+})
+
+test('reduced motion shows a finished still pose for each state', () => {
+  assert.deepEqual({ ...HQ.poseAt('blocked', false, 3, true) }, { clip: 'fret', frame: 0 })
+  assert.deepEqual({ ...HQ.poseAt('waiting', false, 3, true) }, { clip: 'wave', frame: 0 })
+  assert.equal(HQ.poseAt('done', true, 3, true).clip, 'dance')
+  const shown = ['working', 'done', 'blocked', 'waiting', 'idle'].map((s) => HQ.poseAt(s, false, 0, true).clip)
   assert.equal(new Set(shown).size, 5)
 })
 

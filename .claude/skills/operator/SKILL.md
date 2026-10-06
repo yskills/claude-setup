@@ -96,11 +96,11 @@ Templates in `templates/`.
 - **Dashboard** (`templates/dashboard.html`), yskills' live view of the project from day one: a
   first-person room at yskills' own desk, built from the Kenney Furniture Kit (CC0): the laptop opens
   Company, the phone the To-dos, the whiteboard the Plan, the wall chart the money, the door the team
-  office. Publish it with `files: {"office-kit.js": "templates/office-kit.js", "pets-kit.js": "templates/pets-kit.js"}`
-  (without office-kit.js HQ opens on Company; without pets-kit.js the office has no team). Behind the door is a
+  office. Publish it with `files: {"office-kit.js": "templates/office-kit.js", "pets-kit.js": null}` (`null` drops the
+  old Cube Pets file from an HQ published before; without office-kit.js HQ opens on Company). Behind the door is a
   full-screen 3D office with a game HUD (project name and level bar, coins = € this month, a bell
   with the to-do count) and a dock. **Office**: yskills turns and taps it; one desk per role, each
-  teammate a Kenney Cube Pet at a kit desk (polar bear, parrot, cat, beaver, bunny, penguin, dog, fox, panda), busy when working,
+  teammate a chibi pixel-art animal drawn in the page itself (polar bear, macaw, tabby cat, beaver, bunny, penguin, shepherd dog, fox, panda) at a kit desk, typing when working,
   dozing when idle, shaking its head with a ! when blocked, waving with a ? when it waits on yskills, dancing in the lounge when done; tap one for task, next, with whom, Watch and Open; the whiteboard shows the current
   level, the sticky note what needs yskills; day and night follow yskills' clock. **Plan**: the operator's update and the phases as levels with goal bars. **Team**: the nine roles. **To-dos**
   (what needs yskills, live links) and **Company** (shown only with `projects` rows: totals, every project, all its needs-you). At project start the operator plans the
