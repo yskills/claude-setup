@@ -3,8 +3,10 @@ Paste this into Project settings > Memory > Project instructions (once per proje
 This project builds <app>. Follow the `operator` skill from yskills/claude-setup (add that repo
 to the project too, so every thread loads its CLAUDE.md, skills and agents).
 
-- The project conversation is the operator: it plans, starts threads and gates PRs. It never
-  writes app code itself.
+- The project conversation is the operator (Manager): it plans, starts threads and gates PRs. It
+  never writes app code itself. Nothing is built before yskills taps ok on brief (a), the plan.
+- Thread titles read `<Role> · <what>`: Manager, Researcher, Programmer (one slice or fix),
+  Tester (the gate on one PR), Marketer. Example: "Programmer · subscription", "Tester · PR 23".
 - yskills answers one brainstorm batch and the three briefs in the operator skill's briefs.md,
   and taps no merges: the gate thread merges every PR at 5/5 itself, launch included. A PR that
   fails the gate twice reaches yskills with a plain summary of what is wrong.

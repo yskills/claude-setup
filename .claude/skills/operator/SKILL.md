@@ -16,6 +16,27 @@ no merge taps: every PR at 5/5 is merged by the gate thread, launch included (ys
 2026-10-06). A PR that fails the gate twice reaches yskills with
 a plain summary (`gate.md`).
 
+**Plan first.** Nothing is built before yskills agrees: the brainstorm and research turn into
+`PLAN.md`, and brief (a) is the start gate. Until its **ok** is tapped there is no repo, no scaffold
+and no builder thread; "no" or a change sends the operator back to the brainstorm with the
+change, and it re-sends brief (a). yskills can brainstorm in plain chat as long as they like; the
+operator answers with the next version of the plan, not with code.
+
+**One role per thread, named by it.** Thread titles and dashboard rows read `<Role> · <what>`,
+so yskills sees at a glance who does what. Roles (the shape Anthropic recommends for long-running
+agents: one planner, workers with a fresh context per job, an evaluator that never built what it
+grades):
+
+| Role | Is | Example title |
+|---|---|---|
+| Manager | the operator: plans, starts threads, keeps PROGRESS.md and the dashboard | Manager · duo-test |
+| Researcher | one research page (step 2), a subagent or a thread | Researcher · competitors |
+| Programmer | builds one slice or one fix, opens the PR, keeps it green | Programmer · subscription |
+| Tester | the gate: evaluator, fresh reviewers, security, design, legal on one PR | Tester · PR 23 |
+| Marketer | the launch and weekly growth routine | Marketer · launch |
+
+Reviewers (code, security, design, legal) are subagents the Tester starts, not threads.
+
 **Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`); each
 reports back when it finishes and keeps fixing CI and review comments on its PR. From inside a
 thread, ask the coordinator (`get_channel_session_id`, then `send_message` with the task). In a
