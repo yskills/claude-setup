@@ -932,7 +932,9 @@ window.CARDS_3D = (() => {
     if (!v1 && !v0) throw new Error('not_vrm')
     const imageAt = v1 ? v1.thumbnailImage : json.textures?.[v0.texture]?.source
     const img = json.images?.[imageAt], view = img && json.bufferViews?.[img.bufferView]
-    const thumb = view ? new Blob([new Uint8Array(buf, binAt + (view.byteOffset || 0), view.byteLength)], { type: img.mimeType || 'image/png' }) : null
+    if ([...(json.buffers || []), ...(json.images || [])].some((x) => x.uri && !x.uri.startsWith('data:'))) throw new Error('not_vrm')
+    const type = ['image/png', 'image/jpeg'].includes(img?.mimeType) ? img.mimeType : null
+    const thumb = view && type ? new Blob([new Uint8Array(buf, binAt + (view.byteOffset || 0), view.byteLength)], { type }) : null
     const words = (s) => String(s || '').slice(0, 60)
     return v1
       ? { name: words(v1.name), author: words(v1.authors?.join(', ')), licence: words(v1.licenseUrl), share: v1.allowRedistribution === true, thumb }
@@ -943,7 +945,9 @@ window.CARDS_3D = (() => {
      scene and turns to where she walks; pose() moves `root` inside it */
   async function make(T, assetId, height) {
     const [V, buf] = await Promise.all([loadLib(), bytesOf(assetId)])
-    const loader = new T.GLTFLoader(); loader.register((p) => new V.VRMLoaderPlugin(p))
+    /* A card never pulls anything from the network: only the file's own embedded data may load */
+    const manager = new T.LoadingManager(); manager.setURLModifier((u) => (/^(data|blob):/.test(u) ? u : 'data:,'))
+    const loader = new T.GLTFLoader(manager); loader.register((p) => new V.VRMLoaderPlugin(p))
     const gltf = await new Promise((ok, no) => loader.parse(buf.slice(0), '', ok, no))
     const vrm = gltf.userData.vrm
     if (!vrm) throw new Error('not_vrm')
