@@ -423,6 +423,15 @@ window.HQ = (() => {
   /* Artifact pages cannot fetch other sites (their network is blocked), so money is what each project's manager wrote into its row:
      revenueMonth and revenueTotal in euros, revenueMode 'test' while Stripe is in test mode, revenueAt when it was read. */
   const tagMoney = (project) => ({ ...project, testMoney: project.revenueMode === 'test' })
+  /* Where the cash book has the project's Stripe figures, Company, the laptop and the wall chart show the same amount as the cash
+     book: what is left after Stripe's fee once every fee is known (else what was paid), in euros with cents. Without a finance
+     row the manager's own figures stay. */
+  function withFinance(project, row, now = new Date()) {
+    const r = moneyReport(row, now)
+    if (!r.has) return project
+    const left = (t) => (!t ? 0 : t.complete ? t.net : t.gross)
+    return { ...project, revenueTotal: left(r.total) / 100, revenueMonth: left(r.month) / 100, revenueNet: r.total.complete, testMoney: r.test }
+  }
   /* The game loop: level, XP and coins come only from real events (events/<id> { kind, project, at, amount? }), never from clicks.
      A PR merged 50 XP, the 5/5 gate passed 20, a project launched 100, each euro earned 10 XP and 1 coin, each day visited 5. */
   const XP_OF = { pr_merged: 50, gate_passed: 20, launched: 100, visit: 5 }, XP_PER_EURO = 10, XP_PER_LEVEL = 100
@@ -522,15 +531,18 @@ window.HQ = (() => {
       .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
     const s = row.subscriptions, pay = row.nextPayout
     const pair = (o) => (o && count(o.count) != null && cents(o.cents) != null ? { count: o.count, cents: o.cents } : null)
+    const subs = s && typeof s === 'object' ? { active: count(s.active), trialing: count(s.trialing), ending: count(s.endingAtPeriodEnd) } : null
+    const refunds = pair(row.refunds), discounts = pair(row.discounts)
+    const payout = pay && cents(pay.amountCents) != null && isTime(pay.arrivesAt) ? { cents: pay.amountCents, at: pay.arrivesAt, status: typeof pay.status === 'string' ? pay.status : '' } : null
     return {
       has: !!total,
       test: row.mode !== 'live',
       total, month, headline: headline(total),
       months: monthSeries(row.months, now),
       payments,
-      subs: s && typeof s === 'object' ? { active: count(s.active), trialing: count(s.trialing), ending: count(s.endingAtPeriodEnd) } : null,
-      refunds: pair(row.refunds), discounts: pair(row.discounts),
-      payout: pay && cents(pay.amountCents) != null && isTime(pay.arrivesAt) ? { cents: pay.amountCents, at: pay.arrivesAt, status: typeof pay.status === 'string' ? pay.status : '' } : null,
+      subs, refunds, discounts, payout,
+      /* Parts with no data yet, named once instead of a heading each */
+      missing: [[payments.length, 'Einzelzahlungen'], [subs, 'Abos'], [refunds, 'Erstattungen'], [discounts, 'Gutscheine'], [payout, 'Auszahlung']].filter(([v]) => !v).map(([, n]) => n),
       at: [row.asOf, row.savedAt].find(isTime) || null,
       trouble: [syncTrouble('Stripe-Abgleich', row.sync), syncTrouble('Gebühren', row.feeSync), syncTrouble('Auszahlung', row.payoutSync)].filter(Boolean),
     }
@@ -657,7 +669,7 @@ window.HQ = (() => {
   const moodOf = (state) => ({ working: 'busy', blocked: 'stuck', waiting: 'asks', done: 'proud' })[state] || 'free'
   const WORLD_TABS = ['desk', 'office']
   const closeTo = (tab, world) => (!tab || WORLD_TABS.includes(tab) ? null : world === 'room' ? 'desk' : 'office')
-  return { TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf }
+  return { TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, withFinance, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf }
 })()
 </script>
 <script id="team-3d">
@@ -1270,11 +1282,14 @@ function showToast(text) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true }, 3200)
 }
 
-const EUR = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+/* Every amount in HQ shows its cents, German style (28,80 €), the same as the cash book */
+const EUR = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' })
 const money = (v) => EUR.format(Math.max(0, Number(v) || 0))
-let hasProjects = false, projectsData = [], phasesData = []
-function renderProjects(rowsIn) {
-  const projects = rowsIn.map(HQ.tagMoney)
+let hasProjects = false, projectsData = [], phasesData = [], projectRows = []
+function renderProjects(rowsIn = projectRows) {
+  projectRows = rowsIn
+  const fin = Object.fromEntries(financeRows.map((r) => [r.id, r]))
+  const projects = rowsIn.map((p) => HQ.withFinance(HQ.tagMoney(p), fin[p.id]))
   const testMoney = projects.some((p) => p.testMoney)
   $('t-all-l').textContent = testMoney ? 'All time, Testgeld' : 'All time'
   hasProjects = projects.length > 0
@@ -1347,51 +1362,58 @@ function renderMoney() {
   $('m-stamp').hidden = !r.has || !r.test
   $('m-lead').textContent = moneyFor ? `${name(moneyFor)}${r.has && r.test ? ' · Stripe-Testmodus' : ''}` : 'Was deine Projekte einnehmen, nach Stripes Gebühr.'
   if (!r.has) { body.append(el('p', 'empty', moneyFor ? "Noch keine Daten. Der Stripe-Abgleich hat noch nichts geliefert." : `Noch keine Daten. Sobald ein Projekt mit Stripe Geld einnimmt, steht es hier.`)); return }
-  /* The till receipt */
-  const rc = el('div', 'receipt'), h = r.headline
-  rc.append(el('span', 'r-lab', `${h.label}, alles bisher`), el('b', `r-big${h.label === 'Netto' ? '' : ' gross'}`, eur2(h.cents)))
-  if (h.note) rc.append(el('p', 'r-note', h.note))
   const line = (label, value, cls = '') => { const d = el('div', `r-line ${cls}`); d.append(el('span', null, label), el('b', null, value)); return d }
-  rc.append(line('Brutto', eur2(r.total.gross)), line('Stripe-Gebühr', r.total.fee == null ? NO_DATA : `−${eur2(r.total.fee)}${r.total.complete ? '' : ' bisher'}`, 'fee'))
-  if (r.month) rc.append(line('Diesen Monat', r.month.complete ? `${eur2(r.month.net)} netto` : `${eur2(r.month.gross)} brutto`))
+  const t = r.total, h = r.headline, kept = h.label === 'Netto'
+  const fee = t.fee == null ? NO_DATA : `−${eur2(t.fee)}${t.complete ? '' : ' bisher'}`
+  /* The till receipt: the result first, then how it came about (what customers paid, minus what Stripe keeps) */
+  const rc = el('div', 'receipt')
+  rc.append(el('span', 'r-lab', kept ? 'Bleibt dir, alles bisher' : 'Bezahlt, alles bisher'), el('b', `r-big${kept ? '' : ' gross'}`, eur2(h.cents)))
+  rc.append(line('Kunden haben bezahlt', eur2(t.gross)), line('Stripe-Gebühr', fee, 'fee'))
+  if (h.note) rc.append(el('p', 'r-note', h.note))
   body.append(rc)
   /* The months on squared paper */
   body.append(el('h3', null, 'Pro Monat'))
   if (r.months.length) {
     const c = el('div', 'sheetpad chart'); c.append(moneyChart(r.months))
     const key = el('div', 'key'), k = (color, t) => { const s = el('span'), i = el('i'); i.style.background = color; s.append(i, t); return s }
-    key.append(k('var(--net)', 'Netto'), k('var(--fee)', 'Gebühr')); c.append(key); body.append(c)
+    key.append(k('var(--net)', 'Bleibt dir'), k('var(--fee)', 'Stripe-Gebühr')); c.append(key); body.append(c)
   } else body.append(el('p', 'empty', NO_DATA))
   /* Every payment, like a bank statement */
-  body.append(el('h3', null, `Zahlungen${r.payments.length ? ` (${r.payments.length})` : ''}`))
-  list(body.appendChild(el('ul', 'stmt')), r.payments, (p) => {
-    const li = el('li'), x = [`${eur2(p.gross)} brutto`, p.fee == null ? 'Gebühr kommt noch' : `−${eur2(p.fee)} Gebühr`]
-    if (p.discount) x.push(`Gutschein −${eur2(p.discount)}`)
-    li.append(el('span', 'd', dayDe(p.at)), el('span', 'w', p.plan), el('span', 'n', p.net == null ? eur2(p.gross) : eur2(p.net)), el('span', 'x', x.join(' · ')))
-    return li
-  }, NO_DATA)
+  if (r.payments.length) {
+    body.append(el('h3', null, `Zahlungen (${r.payments.length})`))
+    list(body.appendChild(el('ul', 'stmt')), r.payments, (p) => {
+      const li = el('li'), x = [`${eur2(p.gross)} bezahlt`, p.fee == null ? 'Gebühr kommt noch' : `−${eur2(p.fee)} Gebühr`]
+      if (p.discount) x.push(`Gutschein −${eur2(p.discount)}`)
+      li.append(el('span', 'd', dayDe(p.at)), el('span', 'w', p.plan), el('span', 'n', p.net == null ? eur2(p.gross) : eur2(p.net)), el('span', 'x', x.join(' · ')))
+      return li
+    }, NO_DATA)
+  }
   /* Subscriptions as tokens */
-  body.append(el('h3', null, 'Abos'))
   if (r.subs) {
+    body.append(el('h3', null, 'Abos'))
     const tk = el('div', 'tokens'), token = (n, label, color) => { const t = el('div', n ? 'token' : 'token none'); t.style.setProperty('--c', color); t.append(el('b', null, n == null ? '–' : String(n)), el('span', null, label)); return t }
     tk.append(token(r.subs.active, 'zahlen gerade', '#4fb36b'), token(r.subs.trialing, 'in der Probezeit', '#6cb8e0'), token(r.subs.ending, 'gekündigt, laufen aus', '#e89a2c'))
     body.append(tk)
-  } else body.append(el('p', 'empty', NO_DATA))
+  }
   /* Refunds and coupons as cash book lines */
-  const led = el('div', 'totals'), tot = (label, v) => { const d = el('div', 'tot'); d.append(el('b', null, v), el('span', null, label)); return d }
-  const pair = (v, word) => (v ? (v.count ? `${v.count} ${word}, ${eur2(v.cents)}` : 'keine') : NO_DATA)
-  led.append(tot('Erstattet', pair(r.refunds, r.refunds?.count === 1 ? 'Zahlung' : 'Zahlungen')), tot('Gutscheine', pair(r.discounts, 'mal')))
-  body.append(led)
+  if (r.refunds || r.discounts) {
+    const led = el('div', 'totals'), tot = (label, v) => { const d = el('div', 'tot'); d.append(el('b', null, v), el('span', null, label)); return d }
+    const pair = (v, word) => (v ? (v.count ? `${v.count} ${word}, ${eur2(v.cents)}` : 'keine') : NO_DATA)
+    led.append(tot('Erstattet', pair(r.refunds, r.refunds?.count === 1 ? 'Zahlung' : 'Zahlungen')), tot('Gutscheine', pair(r.discounts, 'mal')))
+    body.append(led)
+  }
   /* The next payout slip */
-  body.append(el('h3', null, 'Nächste Auszahlung'))
   if (r.payout) {
+    body.append(el('h3', null, 'Nächste Auszahlung'))
     const slip = el('div', 'slip')
     const env = svgEl('svg', { viewBox: '0 0 40 30', 'aria-hidden': 'true' })
     env.append(svgEl('rect', { x: 2, y: 3, width: 36, height: 24, rx: 5, fill: '#fffdf4', stroke: '#6cb8e0', 'stroke-width': 2.5 }), svgEl('path', { d: 'M4 6l16 11L36 6', fill: 'none', stroke: '#6cb8e0', 'stroke-width': 2.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }))
     slip.append(env, el('b', null, eur2(r.payout.cents)), el('span', null, `am ${new Date(r.payout.at).toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' })}${PAYOUT_DE[r.payout.status] ? `, ${PAYOUT_DE[r.payout.status]}` : ''}`))
     body.append(slip)
-  } else body.append(el('p', 'empty', NO_DATA))
-  body.append(el('p', 'm-foot', `Aus Stripe${r.test ? ' (Testmodus)' : ''}${r.at ? `, Stand ${agoDe(r.at)}` : ''}.`))
+  }
+  /* The parts Stripe has not sent yet, in one quiet line instead of a heading each */
+  if (r.missing.length) body.append(el('p', 'm-foot', `Noch nicht gemeldet: ${r.missing.join(', ')}.`))
+  body.append(el('p', 'm-foot', `Aus Stripe${r.test ? ' (Testmodus)' : ''}${r.at ? `, Stand ${agoDe(r.at)}` : ''}`.replace(/\.?$/, '.')))
   for (const t of r.trouble) body.append(el('p', 'm-foot warn', t))
 }
 
@@ -2628,7 +2650,7 @@ renderTeam([]); renderSkinSwitch()
   db.collection('team').onSnapshot((s) => renderTeam(rows(s)), fail)
   db.collection('phases').onSnapshot((s) => renderPhases(rows(s)), fail)
   db.collection('projects').onSnapshot((s) => renderProjects(rows(s)), fail)
-  db.collection('finance').onSnapshot((s) => { financeRows = rows(s); renderMoney() }, () => {})
+  db.collection('finance').onSnapshot((s) => { financeRows = rows(s); renderProjects() }, () => {})
   /* Second skin: cards, who sits where, each card's bond */
   db.collection('cards').onSnapshot((s) => { cards = rows(s).filter((c) => Array.isArray(c.outfits) && c.outfits.length).sort((a, b) => String(a.added).localeCompare(String(b.added))); applySkin(); fillRoster(); if (sheetFor) fillSheet(sheetFor) }, () => {})
   db.doc('roster/desks').onSnapshot((s) => { desks = s.exists ? s.data() : {}; applySkin(); fillRoster(); if (sheetFor) fillSheet(sheetFor) }, () => {})
