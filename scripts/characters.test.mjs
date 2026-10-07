@@ -7,14 +7,14 @@ const manifest = read('manifest.json'), roster = read('roster.json')
 
 test('every roster figure has a manifest row that allows commercial use', () => {
   for (const f of roster.figures) {
-    const row = manifest.files.find((r) => r.name === `${f.id}.vrm`)
+    const row = manifest.assets.find((r) => r.path === `assets/characters/${f.id}/model.vrm`)
     assert.ok(row, `${f.id} has no manifest row`)
     assert.equal(row.commercial, true, `${f.id} is not cleared for commercial use`)
   }
 })
 
 test('every manifest row names its source and licence', () => {
-  for (const r of manifest.files) assert.ok(r.source && r.licence && r.author, `${r.name} lacks source, licence or author`)
+  for (const r of manifest.assets) assert.ok(r.source && r.licence && r.author, `${r.name} lacks source, licence or author`)
 })
 
 test('roster figures use adult bases only and valid colours', () => {

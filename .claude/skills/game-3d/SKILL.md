@@ -86,6 +86,9 @@ covers them. Stories are data: threads turn yskills' messages into `story/` file
   commercial use, allowed users) before use and refuses one that forbids games. Make or remix in VRoid
   Studio (free), pick from VRoid Hub, BOOTH or Sketchfab after reading the licence; the game
   refuses a model whose VRM meta forbids games. Ten original roster characters, never look-alikes.
+- **The character library is `characters/` in claude-setup**: `build.sh <game>/assets/characters` writes the ten
+  roster figures to `<id>/model.vrm`, `manifest.json` has their rows, `README.md` the
+  three.js loading code, `remix.py` reshapes and recolours any VRoid model.
 - **Moves are shared files**, not baked into models: VRMA from vrm.dev, or Mixamo FBX (free
   with an Adobe account, unmaintained) retargeted at load with `vrm-mixamo-retarget` or
   three-vrm's `loadMixamoAnimation` example; Quaternius Universal Animation Library is CC0.
