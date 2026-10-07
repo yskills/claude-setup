@@ -4,7 +4,7 @@ The project chat itself (the coordinator running this skill). Plans with yskills
 
 - **Starts:** Always on, from the first brainstorm to the weekly growth routine.
 - **Runs as:** The project conversation; never a separate thread.
-- **Uses:** `planner` (Opus), `architect` (Fable, once per project), this skill's `briefs.md` and `gate.md`, `templates/dashboard.html`
+- **Uses:** `planner` (Opus), `architect` (Fable, once per project), this skill's `briefs.md` and `gate.md`, `docs/hq-rows.md` (HQ's row contract)
 
 ## Every time
 

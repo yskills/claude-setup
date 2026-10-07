@@ -50,7 +50,7 @@ production deploy. If Claude Code's safety check or auto mode refuses a merge, t
 yskills for the tap on the card and tries no other way. Other files say this in one line and
 point here.
 
-Policy files (`CLAUDE.md`, this file, `hq-refresh.md`, `global/`, `cloud/`, `install.mjs`) are the
+Policy files (`CLAUDE.md`, this file, `hq-refresh.md` in yskills/company-xy, `global/`, `cloud/`, `install.mjs`) are the
 exception: the cloud safety check blocks commits to them, so a thread puts the diff in
 `/mnt/project-files/claude-setup/patches/<letter>/` and yskills applies it on the PC.
 

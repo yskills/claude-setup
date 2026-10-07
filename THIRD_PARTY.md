@@ -92,8 +92,8 @@ PyTorch.
 
 Source: https://kenney.nl/assets/furniture-kit (CC0 1.0, no attribution required)
 
-The pieces HQ's desk room uses are packed into `.claude/skills/operator/templates/office-kit.js`
-by `scripts/office-kit.mjs`. Do not edit the packed file; change the script's list and re-run it.
+The pieces HQ's desk room uses are packed into `office-kit.js` in yskills/company-xy by its
+`scripts/office-kit.mjs`. Do not edit the packed file; change the script's list and re-run it.
 
 ## Game-dev skill references (game-3d)
 
