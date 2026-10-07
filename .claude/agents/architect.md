@@ -2,8 +2,11 @@
 name: architect
 description: "Software architecture for system design, scalability and technical decisions."
 tools: Read, Grep, Glob
-model: opus
+model: fable
 ---
+
+Model: Fable for really hard architecture; if Fable is out of credits or unavailable, run on Opus
+without asking (Models line, claude-setup `docs/WORKFLOW.md`).
 
 ## Prompt Defense Baseline
 

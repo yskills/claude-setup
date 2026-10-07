@@ -26,7 +26,7 @@ const dirs = (p) => (existsSync(join(root, p)) ? readdirSync(join(root, p)).filt
 const mds = (p) => (existsSync(join(root, p)) ? readdirSync(join(root, p)).filter((n) => n.endsWith('.md')) : [])
 const seen = { skill: new Map(), agent: new Map() }
 // Agent `model:` aliases Claude Code accepts (docs/WORKFLOW.md, Models); a typo here silently falls back to inherit.
-const MODELS = new Set(['opus', 'sonnet', 'haiku', 'inherit'])
+const MODELS = new Set(['fable', 'opus', 'sonnet', 'haiku', 'inherit'])
 function check(kind, file, expected) {
   const fm = frontmatter(join(root, file))
   if (!fm) return errors.push(`${file}: missing frontmatter`)
@@ -114,11 +114,12 @@ for (const f of [...own, ...walk('.claude/rules'), ...walk('.claude/skills').fil
 }
 
 // One model line (docs/WORKFLOW.md, Models), copied word for word into the project-instructions
-// template; nothing else names the retired model (yskills, 2026-10-07: threads kept switching to it).
+// template. No other file names a model id: a second table or wording drifts (yskills, 2026-10-07:
+// threads kept following an outdated copy).
 const modelLine = readFileSync(join(root, 'docs/WORKFLOW.md'), 'utf8').match(/^Models: .*$/m)?.[0]
 if (!modelLine) errors.push('docs/WORKFLOW.md: the Models line is missing')
 else if (!readFileSync(join(root, '.claude/skills/operator/templates/project-instructions.md'), 'utf8').includes(modelLine)) errors.push('operator/templates/project-instructions.md: Models line differs from docs/WORKFLOW.md')
-const RETIRED = new RegExp(['fa', 'ble'].join(''), 'i')
+const lineIds = new Set(modelLine?.match(/claude-[a-z]+-[\d-]+/g) ?? [])
 const anyText = (d) => readdirSync(join(root, d)).flatMap((n) => {
   const rel = d === '.' ? n : `${d}/${n}`
   if (['.git', 'node_modules', 'research'].includes(n)) return []
@@ -126,11 +127,14 @@ const anyText = (d) => readdirSync(join(root, d)).flatMap((n) => {
   return /\.(md|mjs|js|json|sh|ya?ml|tsx?)$/.test(n) ? [rel] : []
 })
 for (const f of anyText('.')) {
+  if (f === 'scripts/check.mjs') continue
   const text = readFileSync(join(root, f), 'utf8').split(modelLine ?? '\0').join('')
-  if (!RETIRED.test(text)) continue
-  // CLAUDE.md is a policy file only yskills changes; warn until the paste lands instead of blocking every PR.
-  if (f === 'CLAUDE.md') console.warn(`! ${f}: names the retired model; paste the Models line from docs/WORKFLOW.md`)
-  else errors.push(`${f}: names the retired model; use the Models line in docs/WORKFLOW.md`)
+  for (const id of new Set(text.match(/claude-(?:fable|opus|sonnet|haiku)-[\d-]+/g) ?? [])) {
+    const why = lineIds.has(id) ? 'a second copy of a model id' : 'a model id the Models line does not name'
+    // CLAUDE.md is a policy file only yskills changes; warn until the paste lands instead of blocking every PR.
+    if (f === 'CLAUDE.md') console.warn(`! ${f}: ${why} (${id}); paste the Models line from docs/WORKFLOW.md`)
+    else errors.push(`${f}: ${why} (${id}); link the Models line in docs/WORKFLOW.md instead`)
+  }
 }
 
 if (errors.length) { console.error(errors.map((e) => `x ${e}`).join('\n')); process.exit(1) }

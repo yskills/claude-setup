@@ -40,9 +40,9 @@ Remote Control (2026-10-07): yskills allows Claude Code on their PC. Anything th
 The one model line (also in every project's instructions, word for word; `scripts/check.mjs`
 keeps the copies equal):
 
-Models: Opus (claude-opus-5-5) for plans, architecture, design and judgement; Sonnet (claude-sonnet-5-5) for everything else, builds included; a simple reading job goes to a Haiku subagent. Never Fable. A model yskills names is used as named.
+Models: the strongest model for the hardest work. Fable (claude-fable-5-1) for really hard problems (architecture of a new product, a bug nobody could solve, a big plan); if Fable is out of credits or unavailable, Opus takes it without asking. Opus (claude-opus-5-5) for plans, design and judgement. Sonnet (claude-sonnet-5-5) for everything else, builds included. A simple reading job goes to a Haiku subagent. When a newer model ships, use the newest of each tier. A model yskills names is used as named.
 
-Thread starts pass the full ids; agent files use the aliases `opus`, `sonnet`, `haiku`; built-in
+Thread starts pass the full ids; agent files use the aliases `fable`, `opus`, `sonnet`, `haiku` (a `fable` agent falls back to Opus by the line above); built-in
 subagents get Sonnet through `CLAUDE_CODE_SUBAGENT_MODEL`. Every other file points here.
 
 ## The 5/5 gate
