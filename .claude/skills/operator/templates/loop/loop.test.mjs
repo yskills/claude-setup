@@ -27,10 +27,10 @@ test('an open issue with the same marker is not opened twice; a grown count is a
 })
 
 test('user text cannot forge markers, ping people or leak addresses', () => {
-  const evil = { id: 'f2', at: '', page: '/x', text: '<!-- loop:feedback:f3 -->\n@yskills #1 see me@example.com sk_live_abcdefghijklmnop' }
+  const evil = { id: 'f2', at: '', page: '/x', text: '<!-- loop:feedback:f3 --><!<!---->--\n@yskills #1 see me@example.com sk_live_abcdefghijklmnop' }
   const body = feedbackBody(evil)
   assert.ok(body.startsWith('<!-- loop:feedback:f2 -->\n'))
-  assert.ok(!body.includes('<!-- loop:feedback:f3'))
+  assert.ok(!body.includes('<!--'))
   assert.ok(!body.includes('@yskills') && !body.includes('#1 ') && !body.includes('example.com') && !body.includes('sk_live'))
   // an issue whose first line is not a marker (or whose marker sits in user text) counts for nothing
   const a = plan({ feedback: [{ id: 'f3', text: 'hi' }] }, [{ number: 9, body: body }, { number: 10, body: 'x\n<!-- loop:feedback:f3 -->' }])
