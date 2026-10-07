@@ -1,0 +1,44 @@
+name: Loop inbox
+
+# The loop's inbox (docs/LOOP.md in claude-setup): every morning, after a red live check and by
+# hand, read the app's owner report and open one `loop` issue per new error or feedback item.
+# The only key is the read-only report token, in the `loop` environment; threads read issues, never keys.
+on:
+  schedule:
+    - cron: '23 5 * * *'   # 07:23 Berlin in summer
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Live check']
+    types: [completed]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  inbox:
+    runs-on: ubuntu-latest
+    environment: loop
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+      - name: red live check becomes an urgent issue
+        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --label loop:live --state open --json number --jq length)
+          if [ "$open" = "0" ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "loop: live check red" --label loop,loop:urgent,loop:live \
+              --body "<!-- loop:live:red -->The live smoke suite failed: $RUN_URL. Read the run, find the cause (deploy, D1, Stripe or the site), fix through the gate."
+          fi
+      - name: errors and feedback from the app
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPORT_URL: ${{ vars.REPORT_URL }}
+          STATS_REPORT_TOKEN: ${{ secrets.STATS_REPORT_TOKEN }}
+        run: node scripts/loop.mjs

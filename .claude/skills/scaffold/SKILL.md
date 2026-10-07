@@ -32,7 +32,10 @@ need it, and say so in the PR. Follow the order; each step commits on its own.
    (b) exactly as `publish` writes them.
 7. Repo setup from `onboard-project`: `CLAUDE.md` (under 60 lines), `.claude/settings.json`,
    `.claude/skills/verify/SKILL.md`, and `.github/workflows/ci.yml` running only `npm run
-   verify` (no keys in GitHub).
+   verify` (no keys in GitHub). The loop's inbox from the operator's `templates/loop/`:
+   `scripts/loop.mjs` and `.github/workflows/loop.yml` (its only key, the read-only report
+   token, lives in the `loop` GitHub environment); the app's error and feedback tables and the
+   owner report come with the first slice that has users (`docs/LOOP.md`).
 8. Impressum and Datenschutz pages per the `legal` skill, in German and English, linked from the
    footer of every page; texts with placeholders for what only yskills can supply.
 9. `PLAN.md`, `features.json`, `PROGRESS.md` from the operator's `templates/` (PLAN.md and
