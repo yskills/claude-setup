@@ -57,6 +57,12 @@ end, agents: [{label, model, state, start, end}]}]}`; states `running`, `done`, 
 written at every phase start and end and at every agent start and finish, never per tool call
 (one write per event, pinned with `if_version`, `at` = now). HQ shows the tree with durations, puts
 the role's animal at its desk while a phase runs and greys rows older than 2 hours.
+How: the doc id is the thread's own session id (`get_session` with no id); `thread` is the thread title
+(`<Role> · <what>`), `title` the task in short German, `role` the role word. Write the planned phases
+up front as `waiting`, then flip each to `running` (with `start`) and `done` or `failed` (with `end`);
+a subagent the phase starts goes into its `agents` with its `label` (agent type) and `model`. Times
+are ISO from the real clock (`date -u +%FT%TZ`), never guessed. A finished thread leaves its row (it
+greys after 2 hours). Rule: `HQ.workTree` and `HQ.busyRoles` in company-xy's `hq-rules.js`.
 
 **Day one:** a new project writes, in the hour its plan is posted and in one batch, `projects/<id>`
 (traction fields 0, `firstEuroBy` = PLAN.md's go date, `revenueMode: 'test'`), the `<id>-` `phases` and

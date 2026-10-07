@@ -179,7 +179,9 @@ Templates in `templates/`.
    findings on the PR until it is merged. Pull main into the branch right before the gate merges
    (other slices may edit the same file). yskills' pauses and taste calls are final: a 'stop'
    stops you mid-step, a rejected asset or look is replaced, not defended. Write
-   `config/coordinator` at start and finish and relay pending `requests` rows (§3)." The first
+   `config/coordinator` at start and finish and relay pending `requests` rows (§3). Keep HQ's
+   `work/<your session>` row current: one write at every phase and agent start and end
+   (`docs/hq-rows.md`, Work board)." The first
    slice also commits the D1 ids from
    `PROGRESS.md`. The operator copies each note and the thread's cost (`get_session`,
    `external_metadata.usage.cost_usd`) into `PROGRESS.md`.
