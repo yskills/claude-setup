@@ -8,6 +8,7 @@ import { execFileSync } from 'node:child_process'
 
 const MESSAGE_MAX = 60
 const TEXT_MAX = 1000
+const MAX_CREATES = 20
 const URGENT = /checkout|stripe|webhook|auth|anmelden|login|pay/i
 export const LABELS = ['loop', 'loop:error', 'loop:feedback', 'loop:urgent', 'loop:live']
 
@@ -22,7 +23,8 @@ const fence = (text) => `\n\`\`\`\`text\n${clean(text).slice(0, TEXT_MAX).replac
 
 export const fingerprintTitle = (e) => `loop: error ${id(e.fingerprint).slice(0, 8)} ${route(e.route)}: ${clean(e.message).replace(/\s+/g, ' ').slice(0, MESSAGE_MAX)}`
 export const feedbackTitle = (f) => `loop: feedback ${id(f.id)}`
-export const isUrgent = (e) => URGENT.test(route(e.route))
+// Client reports are public input: never urgent, so anyone typing "checkout" can't jump the queue.
+export const isUrgent = (e) => !String(e.route).startsWith('client:') && URGENT.test(route(e.route))
 // The marker is the first line of a body loop.mjs wrote; user text never reaches that line.
 export const marker = (kind, key, count) => `<!-- loop:${kind}:${id(key)}${count == null ? '' : `:${Number(count)}`} -->`
 const readMarker = (body) => String(body ?? '').split('\n')[0].match(/^<!-- loop:(error|feedback):([A-Za-z0-9_-]+)(?::(\d+))? -->$/)
@@ -64,8 +66,9 @@ async function main() {
   const res = await fetch(REPORT_URL, { headers: { authorization: `Bearer ${STATS_REPORT_TOKEN}` } })
   if (!res.ok) throw new Error(`report ${res.status}`)
   const report = await res.json()
-  const open = dry ? [] : JSON.parse(gh(['issue', 'list', '--repo', GITHUB_REPOSITORY, '--label', 'loop', '--state', 'open', '--limit', '200', '--json', 'number,body']))
-  const actions = plan(report, open)
+  const open = dry ? [] : JSON.parse(gh(['issue', 'list', '--repo', GITHUB_REPOSITORY, '--label', 'loop', '--state', 'all', '--limit', '1000', '--json', 'number,body']))
+  // A closed issue still counts as filed (the item stays in the report), and one run opens at most MAX_CREATES.
+  const actions = plan(report, open).filter((a, i, all) => a.op !== 'create' || all.slice(0, i).filter((b) => b.op === 'create').length < MAX_CREATES)
   if (!dry && actions.length) for (const l of LABELS) gh(['label', 'create', l, '--repo', GITHUB_REPOSITORY, '--force', '--color', l === 'loop:urgent' ? 'd2232a' : '1f3fbf'])
   for (const a of actions) {
     console.log(`${a.op}: ${a.title ?? '#' + a.number}`)
