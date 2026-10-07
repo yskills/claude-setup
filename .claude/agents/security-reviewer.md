@@ -100,6 +100,13 @@ If you find a CRITICAL vulnerability:
 
 **IMMEDIATELY:** Production incidents, dependency CVEs, user security reports, before major releases.
 
+## Lessons from our projects
+
+- Writes: check `Origin` and `Sec-Fetch-Site` server-side; every `*.yskills.workers.dev` Worker
+  counts as same-site, so SameSite cookies alone don't stop sibling projects or PR previews.
+- Email confirm: a link must not confirm an account unless that account is signed in in the same
+  browser; cap mails to typed-in addresses per sender, address and kind.
+
 ## Success Metrics
 
 - No CRITICAL issues found

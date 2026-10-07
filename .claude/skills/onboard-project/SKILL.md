@@ -64,6 +64,8 @@ missing) that HQ carries the project, so every later session updates the same ro
 
 ## 4. Prove it and ship
 
+Cold-start check: a fresh session must answer "what is this and what is next" from CLAUDE.md, PROGRESS.md and PLAN.md within three reads. If it can't, fix those files before the PR.
+
 Run the verify steps you wrote; they must pass on the current main (if main is already red, say
 what fails and keep the skill honest about it). Open a PR titled
 `chore(claude): set up Claude for <project>` listing what was added and every hygiene finding.

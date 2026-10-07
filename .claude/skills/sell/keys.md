@@ -19,7 +19,7 @@
 5. **The webhook endpoint is made by hand**, once per mode, in the Stripe Dashboard. Its
    `whsec_…` goes into Production as `STRIPE_WEBHOOK_SECRET`.
 6. **Cloud threads can't reach the Stripe or Cloudflare APIs**, so they never handle a key; a
-   deploy is yskills' merge tap (`publish` skill).
+   deploy is the gate's merge (`gate.md`, `publish` skill).
 
 ## The keys
 

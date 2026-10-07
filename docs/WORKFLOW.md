@@ -48,7 +48,8 @@ One rule, applied by the project chat when it starts a thread (`start_thread_ses
 Agent files use the aliases `fable`, `opus`, `sonnet`, `haiku`, which follow the newest model of
 each family; thread starts pass the full ids above. Rule of thumb: a thread that decides
 something hard to undo or that you will look at runs on Opus; one that fills in what a plan
-already decided runs on Sonnet; the plan itself comes from Fable.
+already decided runs on Sonnet; the plan itself comes from Fable. Default is Sonnet: Opus only
+for design or judgement, and simple reading jobs go to Haiku subagents.
 
 ## The 5/5 gate
 

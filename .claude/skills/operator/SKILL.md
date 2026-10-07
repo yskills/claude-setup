@@ -202,7 +202,7 @@ Templates in `templates/`.
 5. **Build.** One builder thread per slice: one at a time, the next in a fresh
    thread once the previous one is merged; a second only when the slices share no file; never more than three: "Build
    slice <id> of PLAN.md;
-   its criteria are in features.json (read only). Read PLAN.md, PROGRESS.md and CLAUDE.md first.
+   its criteria are in features.json (read only). Read PLAN.md, PROGRESS.md and CLAUDE.md first. Do not read: node_modules, build output, lockfiles, generated files, screenshots, other slices' code, HANDOFF files of old threads; `grep` first, read only the part you need.
    Tests first, then code, then ship-check. Push branch `slice/<id>`, open a PR with phone and
    desktop screenshots and a 3-line progress note. Don't merge; keep fixing CI and the review
    findings on the PR until it is merged. Pull main into the branch right before the gate merges
@@ -266,6 +266,13 @@ conversation can continue later; a plain chat idle for over an hour hands off to
   subagents). Thread effort medium. Built-in subagents default to Sonnet via
   `CLAUDE_CODE_SUBAGENT_MODEL`. When in doubt: does the thread decide something that is hard to
   undo or that yskills will look at? Opus. Does it fill in what a plan already decided? Sonnet.
+- Hand off or finish at 150k context (two long threads were 77% of usage on 2026-10-04); one brief = one slice that ends under it. A template over 2000 lines is split before the next change.
+- Where 2026-10-07 burned tokens, and the rule that stops each: hand-offs at 270k (write the
+  hand-off at the guard's first warning); `dashboard.html` read whole again and again (grep the
+  part, read it once); the same answer in two threads (a thread checks the timeline before
+  answering and a hand-off thread never repeats); research with many searches (one WebSearch per
+  open fact); extra screenshots and subagents (only what the ask needs; simple reading jobs go to Haiku subagents).
+- Literal mode and the cost rules go into every brief (`briefs.md`, last block).
 - Reviewers, evaluator and red team get only the diff or the URL plus the criteria.
 - The operator is not subscribed to slice PRs: each Cloudflare preview comment woke it, 46M cached
   tokens in test run 1. Slice and gate threads report by message. The context guard

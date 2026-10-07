@@ -28,6 +28,11 @@ whichever sees that payment first) switches it to `Mode: product`. Until someone
 
 No `Mode:` line in `PLAN.md` means product mode. Product mode is the full table above. The headline names the mode: `Gate 5/5 (probe, round <n>)`.
 
+**Preview test:** check 2 opens the live preview and the evaluator attaches a screenshot of it;
+nothing is called done without a screenshot of the live page (phone 390 px and desktop 1440 px).
+Roblox projects have no preview URL: play the test place through the Studio MCP server and
+`screen_capture` it (`toolbox/catalog/roblox.md`, The loop).
+
 **No preview URL is not a pass.** Check 2 runs on the branch's Worker Preview. A PR without one
 (the Deploy or Preview command isn't set up, `publish` §A new project) is not 5/5: the gate stops
 and the operator fixes the deploy first. A flow that depends on mail (a confirm link, a mailed
@@ -36,6 +41,28 @@ cancel) passes check 4 only where mail is configured in that environment, else t
 **No preview yet or any more:** the scaffold PR (before Workers Builds is connected) needs CI
 only. Once branch builds are off (live payment keys, `publish` skill), check 1 is CI only and the
 gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
+
+## Merge policy (the one source)
+
+Under auto-run the gate thread merges (squash) every PR at 5/5: launch, live money and
+claude-setup PRs included (yskills, "merge everything", 2026-10-06). That merge is the approved
+production deploy. If Claude Code's safety check or auto mode refuses a merge, the gate asks
+yskills for the tap on the card and tries no other way. Other files say this in one line and
+point here.
+
+Policy files (`CLAUDE.md`, this file, `hq-refresh.md`, `global/`, `cloud/`, `install.mjs`) are the
+exception: the cloud safety check blocks commits to them, so a thread puts the diff in
+`/mnt/project-files/claude-setup/patches/<letter>/` and yskills applies it on the PC.
+
+How to undo a merge, by kind of change (write the line into the PR's "undo" line):
+
+| Change | Undo |
+|---|---|
+| Code, Worker deploy | Cloudflare dashboard → Worker → Deployments → roll back to the previous version, or revert the PR and merge it |
+| D1 migration | D1 Time Travel restores the database to a minute before the deploy (`wrangler d1 time-travel restore <db> --timestamp=<ISO>`); migrations stay additive so a code rollback works without it |
+| Row in the HQ db | `ArtifactData` set the row back to its previous value (the PR comment quotes it) |
+| Key or secret | rotate it in the provider's dashboard, then set the new value on the Worker |
+| Docs, skills, templates | revert the PR |
 
 ## Rounds
 
@@ -71,3 +98,5 @@ Gate 5/5 (round <n>), merging | launch: brief (c) below   [risky: auth | payment
 4 Security / red team .. pass | n/a
 5 Design / legal ....... pass | n/a
 ```
+
+A gate thread reads the PR diff, PLAN.md and features.json only. Do not read: node_modules, build output, lockfiles, generated files, screenshots, other slices' code, HANDOFF files of old threads; `grep` first, read only the part you need.

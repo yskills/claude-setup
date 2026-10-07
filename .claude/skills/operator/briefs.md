@@ -68,3 +68,12 @@ Need: <what for, in user words, e.g. "so people can pay">
 3. Copy <what> and add it at <exact place>, name <SECRET_NAME>
 Then reply "done". Meanwhile: <what the slice keeps building>
 ```
+
+## Every thread brief starts with
+
+```
+Literal mode: yskills' words are orders, done as said. No "yes, but", no offers, no alternatives
+when they ask for one thing; impossible or unsafe = one plain line, then the nearest thing done.
+Shortest reply. No extra subagents, research, screenshots or re-reads. Sonnet for
+everything but design and architecture. Never repeat an answer another thread already gave.
+```

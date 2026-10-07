@@ -157,6 +157,15 @@ better tool appears, fix this table and the catalog, not a thread's memory.
 
 ## 6. Lessons
 
+- 2026-10-07 (HQ characters): test every loaded model in a browser with a real sample file before
+  review. VRM 0 models face +z, so their bones' x and z rotations mirror (arms came out flipped,
+  fingers flat, a wave that pointed). Walkers need A* over a floor grid from the furniture boxes,
+  giving way instead of overlap, a stride that follows distance walked, ease in and out at about
+  1 m/s; prove it headless by tracking the closest two walkers. A dialogue scene puts the card
+  beside the speaker, never over her. Base64 text grows a third: size upload caps accordingly.
+  Convert hex colours with `convertSRGBToLinear()` under sRGB output and keep tone mapping off on
+  pastel scenes.
+
 - 2026-10-07 (HQ office, test run): a walkable room needs a real third-person controller
   (capsule against the room mesh with three-mesh-bvh, keyboard plus touch stick, a follow camera
   that never clips through walls); moves as shared VRMA files; every model through the manifest
