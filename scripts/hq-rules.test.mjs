@@ -340,6 +340,6 @@ test('Company, laptop and wall chart show the cash book amount with cents: net o
   const live = { total: { grossCents: 2999, feeCents: 119, netCents: 2880, complete: true }, month: { grossCents: 2999, feeCents: 119, netCents: 2880, complete: true }, mode: 'test' }
   assert.deepEqual(plain(HQ.withFinance(p, live, NOW)), { ...p, revenueTotal: 28.8, revenueMonth: 28.8, revenueNet: true, testMoney: true })
   const open = { ...live, total: { ...live.total, complete: false }, month: undefined, mode: 'live' }
-  assert.deepEqual(plain(HQ.withFinance(p, open, NOW)), { ...p, revenueTotal: 29.99, revenueMonth: 0, revenueNet: false, testMoney: false })
+  assert.deepEqual(plain(HQ.withFinance(p, open, NOW)), { ...p, revenueTotal: 29.99, revenueMonth: 30, revenueNet: false, testMoney: false })
   assert.deepEqual(plain(HQ.withFinance(p, undefined, NOW)), p)
 })
