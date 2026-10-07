@@ -131,7 +131,17 @@ ol,ul{margin:0;padding:0;list-style:none}
 .todo li.empty{display:block}
 .todo li.empty::before{display:none}
 .todo .from{font:600 11px var(--mono);color:var(--soft);display:block}
-.todo li.info::before{width:8px;height:8px;margin:6px 4px 0;border:0;border-radius:50%;background:var(--soft)}
+/* Heute für dich: a notepad page, the things that need yskills first, info after; content-high, never a full-height drawer */
+.page[data-page=todo]{bottom:auto;max-height:calc(100% - 218px);border-top:10px solid var(--bad)}
+@media (max-width:640px){.page[data-page=todo]{top:auto;bottom:86px;max-height:calc(100% - 200px)}}
+.today li{grid-template-columns:18px minmax(0,1fr) auto;align-items:center;min-height:44px}
+.today li::before{width:12px;height:12px;margin:5px 0 0 2px;border:0;border-radius:50%;background:var(--bad);align-self:start}
+.today li.info::before{width:8px;height:8px;background:var(--line);margin:7px 0 0 4px}
+.today .what{font-weight:700}
+@media (min-width:641px){.today .what{font-size:15px}}
+.today .from{font:700 13px var(--sans);color:var(--fg);opacity:.85;margin-top:2px}
+.today .btn{display:inline-grid;place-items:center;min-height:44px;padding:0 16px;background:var(--coin);color:var(--ink);box-shadow:0 3px 0 var(--coin-ink)}
+#today-info-h[hidden]{display:none}
 #today-at{margin-top:10px}
 #today-at.warn{color:var(--bad)}
 .next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
@@ -344,8 +354,11 @@ ol,ul{margin:0;padding:0;list-style:none}
   </section>
 
   <section class="card page" data-page="todo" aria-labelledby="todo-h" hidden>
-    <div><h2 id="todo-h">Heute für dich</h2><p class="lead">Was heute dich braucht, aus GitHub, Stripe, Roblox und dem Team. Jede Zeile sagt, woher sie kommt und wie alt sie ist.</p></div>
-    <ul class="todo" id="you"><li class="empty">Nichts zu tun. Genieß den Tag.</li></ul>
+    <div><h2 id="todo-h">Heute für dich</h2><p class="lead">Jede Zeile sagt, woher sie kommt und wie alt sie ist.</p></div>
+    <h3>Für dich</h3>
+    <ul class="todo today" id="you"><li class="empty">Nichts zu tun. Genieß den Tag.</li></ul>
+    <h3 id="today-info-h" hidden>Zur Info</h3>
+    <ul class="todo today" id="today-info"></ul>
     <p class="meta" id="today-at" role="status"></p>
     <div class="row"><button type="button" class="btn" id="today-go" hidden>Jetzt abgleichen</button></div>
     <h3>Live-Seiten</h3>
@@ -1275,12 +1288,18 @@ function renderToday() {
   const t = HQ.todayFor({ today: todayRow, pm: pmNow })
   youCount = t.you
   $('you-count').hidden = $('todo-dot').hidden = youCount === 0; $('you-count').textContent = String(youCount)
-  list($('you'), t.items, (y) => {
+  const row = (y) => {
     const li = el('li', y.kind === 'info' ? 'info' : null)
-    const what = el('div'); what.append(y.link ? link(y.what, y.link) : el('span', null, y.what))
+    const what = el('div'); what.append(el('span', 'what', y.what))
     what.append(el('span', 'from', [y.source, y.age].filter(Boolean).join(' · ')))
-    li.append(what); return li
-  }, 'Nichts zu tun. Genieß den Tag.')
+    li.append(what)
+    if (y.link) li.append(link('Öffnen', y.link, 'btn'))
+    return li
+  }
+  const info = t.items.filter((y) => y.kind === 'info')
+  list($('you'), t.items.filter((y) => y.kind !== 'info'), row, 'Nichts zu tun. Genieß den Tag.')
+  list($('today-info'), info, row, '')
+  $('today-info-h').hidden = $('today-info').hidden = info.length === 0
   const off = t.sources.filter((x) => !x.ok).map((x) => (x.note ? `${x.name}: ${x.note}` : `${x.name} nicht erreichbar`))
   $('today-at').textContent = !t.at ? 'Noch kein Abgleich gelaufen.'
     : [`Abgeglichen ${t.age}`, 'neu bei jedem Öffnen und morgens um 8', ...off].join(' · ')

@@ -131,7 +131,7 @@ Templates in `templates/`.
   (EUR numbers, from the project's public stats route, e.g. duo-test's `/api/stats` in cents divided by
   100; Artifact pages cannot fetch other sites, so the manager copies them at every milestone),
   `revenueMode` (`test` while Stripe is in test mode, HQ then says "Testgeld"), `revenueAt` (ISO time of
-  that read), `working` (count), `you[{what, link}]`; a project's `dashboard` link, if the project has no
+  that read), `working` (count), `you[{what, link}]` (every `what` here and in `pm/now` is one plain German sentence with a verb, because HQ shows it as-is in Heute für dich); a project's `dashboard` link, if the project has no
   Artifact of its own, is its project chat thread), and keeps it current with every `pm/now` write. **A revenue source is verified against real data before any UI reads it:** call
   the route or query the table and check that the known payments show up (duo-test's `/api/stats`
   went live summing rows that were never stored and showed 0 € for 28 € of payments); a source
