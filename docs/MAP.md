@@ -1,0 +1,61 @@
+# Map: where everything lives and what it owes
+
+One page to find any part of this setup. Each rule has **one home**; every other file links to
+that home instead of restating it. When two files disagree, the home wins and the other gets
+fixed.
+
+## What loads when
+
+| Loads | What | Cost (tokens, est.) |
+|---|---|---|
+| Every session | `CLAUDE.md`, `.claude/rules/ecc/common/*`, one line per skill and agent | ~6k |
+| When a matching file is opened | `.claude/rules/ecc/{typescript,vue,nuxt,web}/*` (`paths:` frontmatter) | up to ~9k |
+| When a skill is used | its `SKILL.md`, then the files it links | 0.5k to 6k per skill |
+| When an agent is started | its `.claude/agents/<name>.md`, in its own context | 1k to 2k |
+| Only when a file says to read it | `docs/*`, operator `roles/`, `gate.md`, `briefs.md`, templates | 0 until read |
+
+A project thread's own base (system prompt, tools, project instructions, memory) is ~110k and
+lives outside this repo.
+
+## Parts
+
+| Part | Path | Owes |
+|---|---|---|
+| Working rules | `CLAUDE.md` | How Claude works for yskills: ask rule, co-founder, merge, models, UI, stack. Short; detail lives in the homes below |
+| Front door | `README.md` | Install, what you get, cloud setup, how to change the repo |
+| This map | `docs/MAP.md` | Where things live, one home per rule |
+| Run a project | `.claude/skills/operator/` | `SKILL.md` the run (size, roles, files, steps); `gate.md` the 5/5 gate and the one merge policy; `briefs.md` the three briefs, key cards and the block every thread brief starts with; `roles/<role>.md` one playbook per role; `templates/` files copied into a project |
+| Roadmap for yskills | `docs/WORKFLOW.md` | The phases in plain words, the models table, learning and memory check |
+| Other own skills | `.claude/skills/<name>/` | `legal`, `sell`, `market`, `store`, `publish`, `scaffold`, `onboard-project`, `ship-check`, `ui-review`, `toolbox`, `game-3d`, `watch` |
+| Vendored skills, agents, rules | `.claude/skills`, `.claude/agents`, `.claude/rules/ecc` | ECC subset (`config/ecc.json`, refreshed by `scripts/sync-ecc.mjs`), impeccable, web-interface-guidelines, ponytail, claude-video (`THIRD_PARTY.md`); never hand-edited |
+| Own agents | `.claude/agents/` | `design-critic`, `evaluator`, `legal-reviewer`, `red-team` |
+| PC install | `install.mjs`, `global/`, `config/plugins.json`, `mods/team` | Copies this repo into `~/.claude`, settings, status line, context guard, plugins, the team mod |
+| Cloud threads | `cloud/setup.sh` | Plugins and the context guard in a cloud environment (paste into Project settings) |
+| HQ rows | `docs/hq-rows.md` | What each Project Manager writes into HQ (the page itself lives in yskills/company-xy) |
+| After launch | `docs/LOOP.md` | Errors and feedback become issues and fix threads |
+| Test runs | `docs/TEST-PROJECTS.md` | How the setup is tested end to end, and what each run taught |
+| Why it is built this way | `docs/RESEARCH.md`, `docs/research/` | Dated research notes; history, not rules |
+| Checks | `scripts/check.mjs`, `.github/workflows/ci.yml` | Frontmatter, names, models, ECC subset, plugin lists, relative links |
+
+## One home per rule
+
+| Rule | Home | Others only link |
+|---|---|---|
+| Ask rule (what needs yskills) | `CLAUDE.md` (How to work) | operator `SKILL.md`, project instructions |
+| Co-founder | `CLAUDE.md` (How to work) | `roles/*.md` (one role-specific line each) |
+| Literal mode and cost | the brief block in `briefs.md` | `roles/*.md` (one pointer each) |
+| Merge policy, 5/5 gate | `gate.md` (Merge policy) | `CLAUDE.md`, `docs/WORKFLOW.md`, `roles/tester.md` |
+| Models | `docs/WORKFLOW.md` (Models) | `CLAUDE.md`, operator `SKILL.md` §5 |
+| Context guard numbers (warn 150k, hand off 200k) | `global/context-guard.mjs` | `CLAUDE.md`, `README.md` |
+| Remote Control on the PC | `docs/WORKFLOW.md` (PC work) | project instructions template |
+| UI rules | `CLAUDE.md` (UI) | `roles/designer.md`, `ui-review` |
+| Deploys | `publish` skill | `CLAUDE.md` (stack) |
+| Money and shop law | `sell` skill | `docs/WORKFLOW.md` (Selling) |
+| Project instructions text | `operator/templates/project-instructions.md` | the live text in each project's settings |
+
+## Keeping it clean
+
+- A new rule goes into its home and nowhere else; add a row above if it has no home yet.
+- A dated quote from yskills goes into the home once; other files point to it.
+- `node scripts/check.mjs` fails on a dead relative link.
+- Research and test-run notes are history: never cite them as the rule.

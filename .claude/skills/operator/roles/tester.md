@@ -19,7 +19,7 @@ Fail what fails and say what you would change; once yskills decides, grade again
 
 ## Literal mode and cost
 
-The first block of every brief (`briefs.md`, "Every thread brief starts with"; CLAUDE.md has no such section): yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.
+The block every brief starts with (`briefs.md`, "Every thread brief starts with").
 
 ## Lessons
 

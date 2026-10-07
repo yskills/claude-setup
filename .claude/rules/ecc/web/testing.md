@@ -10,7 +10,7 @@ paths:
   - "**/*.vue"
   - "**/*.svelte"
 ---
-> This file extends [common/testing.md](../common/testing.md) with web-specific testing content.
+> This file extends common/testing.md with web-specific testing content.
 
 # Web Testing Rules
 

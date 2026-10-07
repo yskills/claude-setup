@@ -95,17 +95,19 @@ if (gDeny.join() !== pDeny.join()) errors.push('.claude/settings.json deny list 
 
 // Our own docs: relative markdown links resolve, and phrases that describe a rule we dropped stay out.
 const BANNED = [/merge tap/i, /caveman voice/i]
-const OWN_DOCS = ['README.md', 'CLAUDE.md', 'docs/WORKFLOW.md', 'docs/TEST-PROJECTS.md']
 const walk = (d) => readdirSync(join(root, d)).flatMap((n) => {
   const rel = `${d}/${n}`
   if (statSync(join(root, rel)).isDirectory()) return walk(rel)
   return rel.endsWith('.md') ? [rel] : []
 })
 const eccDirs = (ecc?.skills ?? []).map((n) => `.claude/skills/${n}/`)
+// docs/research holds dated notes that quote old paths; they are history, not instructions.
+const OWN_DOCS = ['README.md', 'CLAUDE.md', ...walk('docs').filter((f) => !f.startsWith('docs/research/'))]
 const own = [...OWN_DOCS, ...walk('.claude/skills').filter((f) => !eccDirs.some((e) => f.startsWith(e))), ...walk('.claude/agents')]
-for (const f of own) {
+// Vendored files are link-checked too: sync-ecc.mjs unlinks targets the subset left out.
+for (const f of [...own, ...walk('.claude/rules'), ...walk('.claude/skills').filter((f) => eccDirs.some((e) => f.startsWith(e)))]) {
   const text = readFileSync(join(root, f), 'utf8')
-  for (const re of BANNED) if (re.test(text)) errors.push(`${f}: banned phrase ${re}`)
+  if (own.includes(f)) for (const re of BANNED) if (re.test(text)) errors.push(`${f}: banned phrase ${re}`)
   for (const m of text.matchAll(/\]\((?!https?:|#|mailto:)([^)\s#]+)(?:#[^)]*)?\)/g)) {
     if (!existsSync(join(root, dirname(f), m[1]))) errors.push(`${f}: dead link ${m[1]}`)
   }

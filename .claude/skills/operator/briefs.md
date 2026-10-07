@@ -76,6 +76,6 @@ Then reply "done". Meanwhile: <what the slice keeps building>
 ```
 Literal mode: yskills' words are orders, done as said. No "yes, but", no offers, no alternatives
 when they ask for one thing; impossible or unsafe = one plain line, then the nearest thing done.
-Shortest reply. No extra subagents, research, screenshots or re-reads. Sonnet for
-everything but design and architecture. Never repeat an answer another thread already gave.
+Shortest reply. No extra subagents, research, screenshots or re-reads. Models as in
+docs/WORKFLOW.md (Models). Never repeat an answer another thread already gave.
 ```
