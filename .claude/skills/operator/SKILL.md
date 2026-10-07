@@ -26,8 +26,8 @@ first only when a step touches real money (a live key, a purchase, an ad budget,
 sends mail or posts, deletes data, force-pushes or rotates a secret (CLAUDE.md's list), when a
 choice changes the result and no option is clearly the sensible default (then it's a card, and
 auto-run keeps working on the recommended one), when it needs design input (a look, an asset,
-taste), or when it can't do the step itself (a web account, a key, a safety-check refusal).
-Everything else it pushes, tests, merges and reports. A refusal by a
+taste), or when it can't do the step itself (a web account, a key). Everything else it pushes, tests,
+merges and reports. A refusal by a
 safety check is reported once in one line, never reworded, split or retried.
 
 **Pauses and taste calls are final.** "Stop", "pause" or "only burning my money" stops every
