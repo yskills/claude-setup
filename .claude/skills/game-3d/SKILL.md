@@ -127,6 +127,30 @@ covers them. Stories are data: threads turn yskills' messages into `story/` file
 Only yskills' hands: account, tax interview, fee, first upload, release click. Everything else
 is a thread's job; when yskills must act, give the exact Steamworks page and the field names.
 
+## 5b. Tools: what is installed and why (checked 2026-10-07)
+
+Plugin directory, skills.sh and the ECC index were searched (`toolbox` `find.mjs`,
+`SearchPlugins`, `SearchSkills`). Nothing in the Anthropic Directory fits a cloud three.js
+team: the Unity plugin is for Unity, CellCog and Mojulo are generation services. One candidate
+to read on the PC later: `parallax-threejs` (community: three.js and GLSL debugging, visual
+regression tests; needs its own MCP servers). The two best community skill packs were read in
+full and vendored as text into `refs/` (licences in `THIRD_PARTY.md`); a game thread reads the
+ones its slice needs:
+
+| Folder under `refs/` | Use it for |
+|---|---|
+| `gamedev-skills/threejs-scene-setup`, `threejs-gltf-loading`, `threejs-materials-lighting` | current three.js API (r186: `setAnimationLoop`, `Timer`, physical lights, DRACO/Meshopt/KTX2) |
+| `gamedev-skills/camera-systems`, `game-feel`, `level-design`, `audio-design` | the follow camera, juice, pacing, adaptive music |
+| `gamedev-skills/performance-optimization` | frame and asset budgets (engine-neutral) |
+| `gamedev-skills/steam-publish` | SteamPipe, depots, branches, store page (engine exports there are Godot/Unity; our Electron path is §5) |
+| `threejs-game-skills/threejs-gameplay-systems` | Vite + TypeScript scaffold (`assets/threejs-vite-game`), physics choice, genre notes |
+| `threejs-game-skills/threejs-aaa-graphics-builder` | `references/visual-scorecard.md`: the 10-point look check the design critic uses with the references |
+| `threejs-game-skills/threejs-qa-release` | Playwright canvas inspector, bot playtest, release checks |
+
+Libraries are per game via npm (§1); nothing global to install. Blender's official connector
+(PC only) and VRoid Studio stay yskills' PC tools (`toolbox` catalog `data-web.md`). When a
+better tool appears, fix this table and the catalog, not a thread's memory.
+
 ## 6. Lessons
 
 - 2026-10-07 (HQ office, test run): a walkable room needs a real third-person controller
