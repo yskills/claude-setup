@@ -235,6 +235,35 @@ ol,ul{margin:0;padding:0;list-style:none}
 .m-foot.warn{color:var(--bad)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .money{--grid:rgba(108,184,224,.12)}:root:not([data-theme="light"]) .slip{background:#2f4058;color:#cfe2ee}:root:not([data-theme="light"]) .slip b{color:#e3f1f8}}
 :root[data-theme="dark"] .slip{background:#2f4058;color:#cfe2ee}:root[data-theme="dark"] .slip b{color:#e3f1f8}
+/* Second character skin: the visit's text box (a visual-novel line under a name tab), the roster cards, the toggle */
+.scene{position:absolute;z-index:7;left:10px;right:10px;bottom:calc(96px + env(safe-area-inset-bottom,0px));padding:22px 18px 16px;border-radius:22px;display:grid;gap:12px}
+/* On wide screens the card stands beside her, never over her */
+@media (min-width:760px){.scene{left:auto;right:max(24px,calc(50% - 640px));width:420px;bottom:auto;top:50%;transform:translateY(-50%)}}
+.scene:focus{outline:none}
+.sc-head{position:absolute;top:-16px;left:18px;display:flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;background:#f29bb0;color:#fff;box-shadow:0 3px 0 rgba(122,84,52,.2)}
+.sc-head b{font:900 15px var(--sans)}
+.sc-line{margin:0;font:700 17px/1.5 var(--sans)}
+.sc-acts{display:flex;flex-wrap:wrap;gap:8px}
+.sc-acts .btn{white-space:normal;text-align:left;min-height:44px}
+.sc-acts .btn.reply{flex:1 1 100%}
+.sc-acts .btn.bye{background:none;box-shadow:none;color:var(--muted,inherit);text-decoration:underline}
+.hearts{display:inline-flex;gap:2px}
+.hearts svg{width:14px;height:14px;fill:rgba(255,255,255,.35)}
+.hearts svg.on{fill:#fff}
+.vcard .hearts svg{fill:var(--line)}.vcard .hearts svg.on{fill:#f29bb0}
+.skin{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-top:2px dashed var(--line);padding-top:12px}
+.skin span{font-weight:900;margin-right:4px}
+.skin [aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-ink)}
+.vcards{display:grid;gap:10px}
+.vcard{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;padding:10px;border-radius:16px;border:2px solid var(--line);background:var(--bg)}
+.vcard .pic{width:64px;height:84px;border-radius:12px;background:#f6dbe2;overflow:hidden;display:grid;place-items:center;font:900 28px var(--sans);color:#c66f86}
+.vcard .pic img{width:100%;height:100%;object-fit:cover}
+.vcard .info{display:grid;gap:4px;align-content:start}
+.vcard .meta{font-size:12.5px;color:var(--soft);font-weight:600}
+.vcard .ctl{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.vcard select,.add select{font:800 13px var(--sans);color:var(--fg);background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:5px 10px}
+.btn.quiet{background:none;box-shadow:none;text-decoration:underline;color:#b5462f}
+.btn.file{position:relative;overflow:hidden}.btn.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
 </style>
 
 <div class="app">
@@ -248,6 +277,11 @@ ol,ul{margin:0;padding:0;list-style:none}
     <div class="stage-msg" id="stage-msg" hidden>The 3D office didn't load here. Team, Plan and Company still work from the dock.</div>
   </div>
 
+  <div class="card scene" id="scene" role="dialog" aria-labelledby="scene-name" tabindex="-1" hidden>
+    <div class="sc-head"><b id="scene-name"></b><span id="scene-bond"></span></div>
+    <p class="sc-line" id="scene-line" aria-live="polite"></p>
+    <div class="sc-acts" id="scene-acts"></div>
+  </div>
   <div class="toast" id="toast" role="status" hidden></div>
   <div class="hud">
     <a class="card plate" href="#plan" style="text-decoration:none;color:inherit" aria-label="Open the plan">
@@ -303,6 +337,12 @@ ol,ul{margin:0;padding:0;list-style:none}
   <section class="card page" data-page="team" aria-labelledby="team-h" hidden>
     <div><h2 id="team-h">Team</h2><p class="lead">Busy at the desk means working, a dance in the lounge is done, Z is asleep, a head shake and a red ! is blocked, a wave and a ? waits on you. Tap anyone, in here or in the office.</p></div>
     <div class="roster" id="roster"></div>
+    <div class="skin" role="group" aria-label="Figuren">
+      <span>Figuren</span>
+      <button type="button" class="btn" data-skin="animals" aria-pressed="true">Tiere</button>
+      <button type="button" class="btn" data-skin="cards" aria-pressed="false">Eigene</button>
+      <button type="button" class="btn" id="skin-manage" hidden>Verwalten</button>
+    </div>
   </section>
 
   <section class="card page" data-page="todo" aria-labelledby="todo-h" hidden>
@@ -329,9 +369,9 @@ ol,ul{margin:0;padding:0;list-style:none}
   <div id="sheet-body" class="stack"></div>
 </aside>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" integrity="sha384-fljlqkjWlmSFjkESkQvm77heIZpoWmXEOzlCA7kOpGUH+95Zk0yGfQieWM2q136E" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js" integrity="sha384-vV17nr/rMaJqmeZkFUzXLpHdQ+ME5QHKdydaqqN+3Ga39RJlNrTatJxHwGV4ml2C" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js" integrity="sha384-I0DMsfimAPIqWT8lF+oA997gRgdUi3jhidoTq3fN0zmn35smXZukD01FLnsPRU9i" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js" integrity="sha384-FassWWYNEPQsuRQm+59KIMcDetEc30bNyE9yfx16Ok8lvoowyH81LtrPmLWltJMh" crossorigin="anonymous"></script>
 <!-- Published next to this page: the Kenney furniture for the desk room (scripts/office-kit.mjs). Without it HQ opens on Company. -->
 <script src="office-kit.js"></script>
 <script id="hq-rules">
@@ -577,13 +617,51 @@ window.HQ = (() => {
   }
   /* One panel at a time, like a game menu: a page (company, money, plan, team, to-dos) closes on a tap outside it,
      back to the room it was opened from; the world views themselves have nothing to close */
+  /* Second character skin: bond with each card, from calls into the office and real merged PRs (game-research.md).
+     Points reach the next level in a few visits; only the first CALLS_A_DAY calls of a Berlin day count, and a missed
+     day costs nothing. Every unlock is fixed by the level, never random, never bought. */
+  const BOND_AT = [0, 3, 7, 12, 18], CALLS_A_DAY = 3
+  const berlinDay = (now) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin' }).format(now)
+  const nat = (v) => (Number.isInteger(v) && v > 0 ? v : 0)
+  const UNLOCK = { 1: { outfit: 1 }, 2: { item: 'mug' }, 3: { outfit: 2 }, 4: { item: 'poster' }, 5: { outfit: 3, item: 'trophy', badge: true } }
+  function bondOf(row, events = [], now = new Date()) {
+    const since = isTime(row?.since) ? Date.parse(row.since) : Infinity
+    const prs = events.filter((e) => e?.kind === 'pr_merged' && isTime(e.at) && Date.parse(e.at) >= since).length
+    const points = nat(row?.points) + prs
+    const level = BOND_AT.filter((p) => points >= p).length
+    const calls = row?.day === berlinDay(now) ? nat(row?.calls) : 0
+    const got = Object.entries(UNLOCK).filter(([lv]) => Number(lv) <= level).map(([, u]) => u)
+    return {
+      points, level, toNext: level < BOND_AT.length ? BOND_AT[level] - points : null, callsLeft: Math.max(0, CALLS_A_DAY - calls),
+      outfits: Math.max(...got.map((u) => u.outfit || 1)), items: got.map((u) => u.item).filter(Boolean), badge: level >= 5,
+    }
+  }
+  /* A finished call: the reply's score (0 to 2) is added while calls are left today; returns the new bond row */
+  function afterCall(row, score, now = new Date()) {
+    const day = berlinDay(now), calls = row?.day === day ? nat(row?.calls) : 0
+    const add = calls < CALLS_A_DAY ? Math.max(0, Math.min(2, nat(score))) : 0
+    return { points: nat(row?.points) + add, day, calls: calls + 1, since: isTime(row?.since) ? row.since : now.toISOString(), added: add }
+  }
+  /* Who sits where: a desk keeps its card only while the card exists, and a card sits at one desk at most */
+  function seating(desks, cards) {
+    const ids = new Set((cards || []).map((c) => c.id)), out = {}, used = new Set()
+    for (const [seat, id] of Object.entries(desks || {})) if (typeof id === 'string' && ids.has(id) && !used.has(id)) { out[seat] = id; used.add(id) }
+    return out
+  }
+  const seatCard = (desks, seat, id) => {
+    const next = Object.fromEntries(Object.entries(desks || {}).filter(([k, v]) => k !== seat && v !== id))
+    if (id) next[seat] = id
+    return next
+  }
+  /* What a called card opens with: her desk's real state, never made up */
+  const moodOf = (state) => ({ working: 'busy', blocked: 'stuck', waiting: 'asks', done: 'proud' })[state] || 'free'
   const WORLD_TABS = ['desk', 'office']
   const closeTo = (tab, world) => (!tab || WORLD_TABS.includes(tab) ? null : world === 'room' ? 'desk' : 'office')
-  return { TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay }
+  return { TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf }
 })()
 </script>
 <script id="team-3d">
-/* The team's nine animals in soft 3D, built in code for three.js r128 (no asset licence): chibi proportions
+/* The team's nine animals in soft 3D, built in code for three.js (no asset licence): chibi proportions
    (big round head, eyes low and wide, short limbs) with each species' real markings (polar bear's black pads,
    macaw's face patch and blue wings, tabby stripes, beaver teeth and paddle tail, shepherd saddle and dark muzzle,
    fox ear tips, legs and white tail tip, panda patches). Toon light plus a few short fur shells for a fluffy edge.
@@ -629,7 +707,7 @@ window.TEAM_3D = (() => {
     const id = `${color}|${furry ? 1 : 0}`
     if (mats[id]) return mats[id]
     if (!grad) {
-      grad = new T.DataTexture(new Uint8Array([150, 150, 150, 205, 205, 205, 240, 240, 240, 255, 255, 255]), 4, 1, T.RGBFormat)
+      grad = new T.DataTexture(new Uint8Array([150, 150, 150, 255, 205, 205, 205, 255, 240, 240, 240, 255, 255, 255, 255, 255]), 4, 1, T.RGBAFormat)
       grad.minFilter = grad.magFilter = T.NearestFilter; grad.generateMipmaps = false; grad.needsUpdate = true
     }
     const m = new T.MeshToonMaterial({ color: lin(T, color), gradientMap: grad })
@@ -827,6 +905,118 @@ gl_FragColor.rgb += uRim * 0.22 * pow(fres, 3.0);
   return { LOOK, build, pose, night }
 })()
 </script>
+<script id="cards-3d">
+/* The second character skin: yskills' own characters as VRM files ("cards", made in VRoid Studio and exported as .vrm).
+   three-vrm (pixiv, MIT) loads only once this skin is on. A card is stored as an artifact asset (binary, or base64
+   text where the store refuses the model type); make() turns its bytes into a posed character for either room, and
+   pose() acts out the same clips as the animals (HQ.poseAt) with the humanoid bones and the face's expressions. */
+window.CARDS_3D = (() => {
+  const LIB = { src: 'https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@1.0.10/lib/three-vrm.min.js', integrity: 'sha384-v5P16yDf82yiaal9mkRYxR+fNDXL49amXnW1vd8jun/rkETRHqVcTGy/9+hDqdP8' }
+  let lib = null
+  const loadLib = () => lib || (lib = new Promise((ok, no) => {
+    if (window.THREE_VRM) return ok(window.THREE_VRM)
+    const s = document.createElement('script'); Object.assign(s, { src: LIB.src, integrity: LIB.integrity, crossOrigin: 'anonymous' })
+    s.onload = () => (window.THREE_VRM ? ok(window.THREE_VRM) : no(new Error('three-vrm missing')))
+    s.onerror = () => { lib = null; no(new Error('three-vrm did not load')) }
+    document.head.append(s)
+  }))
+  /* Bytes of a stored card, fetched once per asset id */
+  const cache = {}
+  const bytesOf = (id) => cache[id] || (cache[id] = fetch(`/_blob/${encodeURIComponent(id)}`).then(async (r) => {
+    if (!r.ok) throw new Error(`card file ${r.status}`)
+    if (!(r.headers.get('content-type') || '').startsWith('text/')) return r.arrayBuffer()
+    return (await fetch(`data:application/octet-stream;base64,${(await r.text()).trim()}`)).arrayBuffer()
+  }).catch((e) => { delete cache[id]; throw e }))
+
+  /* What a .vrm says about itself, read straight from its glTF header before upload: name, author, licence, portrait */
+  function readMeta(buf) {
+    const dv = new DataView(buf)
+    if (buf.byteLength < 20 || dv.getUint32(0, true) !== 0x46546c67) throw new Error('not_vrm')
+    const jsonLen = dv.getUint32(12, true), json = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 20, jsonLen)))
+    const binAt = 20 + jsonLen + 8, v1 = json.extensions?.VRMC_vrm?.meta, v0 = json.extensions?.VRM?.meta
+    if (!v1 && !v0) throw new Error('not_vrm')
+    const imageAt = v1 ? v1.thumbnailImage : json.textures?.[v0.texture]?.source
+    const img = json.images?.[imageAt], view = img && json.bufferViews?.[img.bufferView]
+    if ([...(json.buffers || []), ...(json.images || [])].some((x) => x.uri && !x.uri.startsWith('data:'))) throw new Error('not_vrm')
+    const type = ['image/png', 'image/jpeg'].includes(img?.mimeType) ? img.mimeType : null
+    const thumb = view && type ? new Blob([new Uint8Array(buf, binAt + (view.byteOffset || 0), view.byteLength)], { type }) : null
+    const words = (s) => String(s || '').slice(0, 60)
+    return v1
+      ? { name: words(v1.name), author: words(v1.authors?.join(', ')), licence: words(v1.licenseUrl), share: v1.allowRedistribution === true, thumb }
+      : { name: words(v0.title), author: words(v0.author), licence: words(v0.licenseName === 'Other' ? v0.otherLicenseUrl : v0.licenseName), share: v0.licenseName === 'CC0' || /redistribution=allow/.test(v0.otherPermissionUrl || ''), thumb }
+  }
+
+  /* A character from a card's bytes, scaled to `height` (world units), facing +z like the animals. `group` goes in the
+     scene and turns to where she walks; pose() moves `root` inside it */
+  async function make(T, assetId, height) {
+    const [V, buf] = await Promise.all([loadLib(), bytesOf(assetId)])
+    /* A card never pulls anything from the network: only the file's own embedded data may load */
+    const manager = new T.LoadingManager(); manager.setURLModifier((u) => (/^(data|blob):/.test(u) ? u : 'data:,'))
+    const loader = new T.GLTFLoader(manager); loader.register((p) => new V.VRMLoaderPlugin(p))
+    const gltf = await new Promise((ok, no) => loader.parse(buf.slice(0), '', ok, no))
+    const vrm = gltf.userData.vrm
+    if (!vrm) throw new Error('not_vrm')
+    V.VRMUtils.removeUnnecessaryVertices(gltf.scene); V.VRMUtils.removeUnnecessaryJoints(gltf.scene)
+    if (vrm.meta?.metaVersion === '0') V.VRMUtils.rotateVRM0(vrm)
+    vrm.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false } })
+    vrm.scene.updateMatrixWorld(true)
+    const tall = new T.Box3().setFromObject(vrm.scene).max.y || 1.6, k = height / tall
+    const hipY = vrm.humanoid.getNormalizedBoneNode('hips').getWorldPosition(new T.Vector3()).y * k
+    const root = new T.Group(); root.scale.setScalar(k); root.add(vrm.scene)
+    const hit = new T.Mesh(new T.BoxGeometry(0.5 / k, tall, 0.4 / k), new T.MeshBasicMaterial({ visible: false })); hit.position.y = tall / 2; root.add(hit)
+    const group = new T.Group(); group.add(root)
+    return { vrm, vrm0: vrm.meta?.metaVersion === '0', root, group, k, hipY, height, tag: height - hipY + 0.25, blinkAt: Math.random() * 4 }
+  }
+  const dispose = (c) => { if (!c) return; c.group.removeFromParent(); window.THREE_VRM?.VRMUtils.deepDispose(c.vrm.scene) }
+
+  /* Clips. Sitting clips put the hips on the chair (the seat is where the animal's body sits); walking, dancing and the
+     visit's standing clips keep the feet on the floor. Rotations are on the normalized bones (T-pose = 0). */
+  const BONES = ['hips', 'spine', 'chest', 'neck', 'head', 'leftUpperArm', 'rightUpperArm', 'leftLowerArm', 'rightLowerArm', 'leftHand', 'rightHand', 'leftUpperLeg', 'rightUpperLeg', 'leftLowerLeg', 'rightLowerLeg', 'leftFoot', 'rightFoot']
+  const FINGERS = ['Index', 'Middle', 'Ring', 'Little']
+  const FACES = ['happy', 'relaxed', 'sad', 'angry', 'surprised', 'blink', 'aa']
+  const STAND = new Set(['walk', 'dance', 'stand', 'hello', 'joy', 'shy', 'pout', 'spin', 'bye'])
+  function pose(c, clip, t, dt = 0) {
+    const v = c.vrm, h = v.humanoid
+    const b = (n) => h.getNormalizedBoneNode(n)
+    /* A VRM 0 model is turned round to face +z, so its bones' x and z axes point the other way */
+    const m = c.vrm0 ? -1 : 1
+    const r = (n, x = 0, y = 0, z = 0) => b(n)?.rotation.set(x * m, y, z * m)
+    for (const n of BONES) r(n)
+    /* Fingers rest softly curled, never spread flat as in the T-pose */
+    for (const [s, side] of [[-1, 'left'], [1, 'right']]) for (const f of FINGERS) for (const j of ['Proximal', 'Intermediate', 'Distal']) r(`${side}${f}${j}`, 0, 0, s * 0.45)
+    const face = {}
+    const sit = !STAND.has(clip)
+    c.root.position.set(0, sit ? 0.06 - c.hipY : 0, sit ? -0.08 : 0)
+    /* Arms rest along the body, a little forward */
+    r('leftUpperArm', 0.1, 0, -1.2); r('rightUpperArm', 0.1, 0, 1.2); r('leftLowerArm', 0, -0.15, 0); r('rightLowerArm', 0, 0.15, 0)
+    if (sit) { r('leftUpperLeg', -1.45, 0, 0.08); r('rightUpperLeg', -1.45, 0, -0.08); r('leftLowerLeg', 1.4); r('rightLowerLeg', 1.4) }
+    if (clip === 'type') { r('spine', 0.12); r('head', 0.18); for (const [s, n] of [[1, 'left'], [-1, 'right']]) { r(`${n}UpperArm`, 0.25, s * -0.85, s * -0.95); r(`${n}LowerArm`, 0, s * -1.0, 0); r(`${n}Hand`, s * Math.sin(t * 11 + s) * 0.12, 0, 0) } }
+    if (clip === 'doze') { const k = Math.sin(t * 1.6); r('spine', 0.18); r('neck', 0.25 + k * 0.03); r('head', 0.2, 0, 0.18); face.blink = 1; face.relaxed = 0.4 }
+    if (clip === 'shake') { r('head', 0.1, Math.sin(t * 9) * 0.35, 0); face.sad = 0.7 }
+    if (clip === 'fret') { r('leftUpperArm', 0, -0.6, -0.1); r('rightUpperArm', 0, 0.6, 0.1); r('leftLowerArm', 0, -2.2, 0); r('rightLowerArm', 0, 2.2, 0); r('head', 0.15); face.sad = 0.5 }
+    if (clip === 'wave' || clip === 'hello' || clip === 'bye') { r('rightUpperArm', -0.2, 0, 0.75); r('rightLowerArm', 0, 0, -2.1 + Math.sin(t * 9) * 0.3); r('rightHand', 0, 0, -0.2); r('head', 0, 0, 0.1); face.happy = 0.8 }
+    if (clip === 'look') { r('head', -0.1, 0.35, 0.08); face.surprised = 0.25 }
+    if (clip === 'walk' || clip === 'dance') {
+      const w = Math.sin(t * 8), step = Math.abs(Math.cos(t * 8))
+      if (clip === 'walk') { c.root.position.y = step * 0.02; r('leftUpperLeg', w * 0.5); r('rightUpperLeg', -w * 0.5); r('leftLowerLeg', Math.max(0, -w) * 0.7); r('rightLowerLeg', Math.max(0, w) * 0.7); r('leftUpperArm', -w * 0.35, 0, -1.25); r('rightUpperArm', w * 0.35, 0, 1.25); r('hips', 0, w * 0.06, 0) }
+      else { const d = Math.sin(t * 6); c.root.position.y = Math.abs(d) * 0.05; r('hips', 0, d * 0.25, 0); r('leftUpperArm', 0, 0, 0.4 + d * 0.3); r('rightUpperArm', 0, 0, -0.4 + d * 0.3); r('leftLowerArm', 0, 0, 0.6); r('rightLowerArm', 0, 0, -0.6); face.happy = 1 }
+    }
+    /* The visit: standing, breathing, and a reaction to each reply */
+    if (clip === 'stand' || clip === 'joy' || clip === 'shy' || clip === 'pout' || clip === 'spin') {
+      const k = Math.sin(t * 1.8); r('spine', k * 0.015); r('head', -0.04, 0, k * 0.03); face.relaxed = 0.25
+      if (clip === 'joy') { c.root.position.y = Math.abs(Math.sin(t * 7)) * 0.05; r('leftUpperArm', 0, 0, 0.5); r('rightUpperArm', 0, 0, -0.5); r('leftLowerArm', 0, 0, 0.9); r('rightLowerArm', 0, 0, -0.9); face.happy = 1; face.relaxed = 0 }
+      if (clip === 'shy') { r('head', 0.18, 0.25, 0.15); r('leftUpperArm', 0.5, -0.5, -1.0); r('rightUpperArm', 0.5, 0.5, 1.0); r('leftLowerArm', 0, -1.2, 0); r('rightLowerArm', 0, 1.2, 0); face.happy = 0.6 }
+      if (clip === 'pout') { r('head', -0.06, -0.3, -0.05); r('leftUpperArm', 0.3, -0.7, -1.0); r('rightUpperArm', 0.3, 0.7, 1.0); r('leftLowerArm', 0, -2.0, 0); r('rightLowerArm', 0, 2.0, 0); face.angry = 0.75; face.relaxed = 0 }
+      if (clip === 'spin') { c.root.rotation.y = (t % 1.2) / 1.2 * Math.PI * 2; face.happy = 0.8 } else c.root.rotation.y = 0
+    }
+    /* A blink every few seconds, unless the clip shuts the eyes */
+    if (face.blink == null) { const p = (t + c.blinkAt) % 4; face.blink = p < 0.14 ? 1 - Math.abs(p - 0.07) / 0.07 : 0 }
+    if (v.expressionManager) for (const f of FACES) v.expressionManager.setValue(f, face[f] || 0)
+    v.update(dt)
+  }
+  return { loadLib, readMeta, make, pose, dispose }
+})()
+</script>
 <script>
 const $ = (id) => document.getElementById(id)
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n }
@@ -889,11 +1079,25 @@ function renderTeam(members) {
 }
 
 let sheetFor = null, lastFocus = null
+/* Second character skin state (its code is further down, after the office) */
+const SKIN = { key: 'hq.skin', code: 'hq.skin.code' }
+const local = { get: (k) => { try { return localStorage.getItem(k) } catch { return null } }, set: (k, v) => { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v) } catch {} } }
+let skinOn = local.get(SKIN.key) === 'cards', cards = [], desks = {}, bonds = {}, eventsAll = [], visitOn = null
+let rosterOpen = false
 function fillSheet(key) {
   const s = BY_KEY[key]
   $('sheet-name').textContent = s.name
   $('sheet-what').textContent = `${PET[s.key]} · ${s.what}`
   const body = $('sheet-body'); body.replaceChildren()
+  const own = skinOn && cardOf(HQ.seating(desks, cards)[key])
+  if (own) {
+    const b = bondFor(own), box = el('div', 'vcard'), pic = el('div', 'pic'), info = el('div', 'info'), u = thumbUrl(own)
+    if (u) { const img = el('img'); img.src = u; img.alt = ''; pic.append(img) } else pic.textContent = (own.name || '?').slice(0, 1).toUpperCase()
+    info.append(el('b', null, own.name), hearts(b.level), el('span', 'meta', b.toNext == null ? 'Bindung voll' : `Noch ${b.toNext} bis Bindung ${b.level + 1} · heute ${b.callsLeft} von ${HQ.CALLS_A_DAY} Anrufen`))
+    const call = el('button', 'btn go', 'Ins Büro rufen'); call.type = 'button'; call.disabled = !room
+    call.addEventListener('click', () => callIn(own.id, call)); info.append(call)
+    box.append(pic, info); body.append(box)
+  }
   const ms = team.filter((m) => m.seat === key)
   if (!ms.length) body.append(el('p', 'empty', `Off duty. ${s.off}`))
   const names = Object.fromEntries(team.map((m) => [m.id, m.name]))
@@ -913,13 +1117,14 @@ function fillSheet(key) {
   }
 }
 function openSheet(key, from) {
+  endVisit(); rosterOpen = false
   if (!from?.closest?.('.page')) closePage()
   sheetFor = key; lastFocus = from || null; fillSheet(key)
   $('sheet').hidden = false; $('scrim').hidden = false; $('sheet-close').focus()
 }
 function closeSheet() {
   if ($('sheet').hidden) return
-  sheetFor = null; ideaOpen = false; $('sheet').hidden = true; $('scrim').hidden = true
+  sheetFor = null; ideaOpen = false; rosterOpen = false; $('sheet').hidden = true; $('scrim').hidden = true
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus()
 }
 $('sheet-close').addEventListener('click', closeSheet)
@@ -964,6 +1169,7 @@ function renderRequests() {
   }, 'Noch keine Ideen.')
 }
 function openIdea(from) {
+  endVisit(); rosterOpen = false
   if (!from?.closest?.('.page')) closePage()
   sheetFor = null; lastFocus = from || document.activeElement; ideaOpen = true
   $('sheet-name').textContent = 'Neues Projekt'
@@ -1410,7 +1616,7 @@ async function buildRoom() {
   const bulbGlow = new T.MeshBasicMaterial({ color: '#8a8070' })
   solid(new T.SphereGeometry(0.055, 16, 12), bulbGlow, 0.8, 2.22, -0.4, pendant).castShadow = false
 
-  const door = new T.Group(); door.position.set(0, 0, -R + 0.03)
+  const door = new T.Group()
   const slab = new T.Mesh(new T.BoxGeometry(0.98, 2.1, 0.06), new T.MeshStandardMaterial({ color: '#8fcfb5', roughness: 0.8 })); slab.position.y = 1.05; slab.castShadow = true; door.add(slab)
   const knob = new T.Mesh(new T.SphereGeometry(0.04, 16, 12), new T.MeshStandardMaterial({ color: '#f2b630', metalness: 0.5, roughness: 0.3 })); knob.position.set(0.36, 1.0, 0.05); door.add(knob)
   const sign = face(256, 128, (g, w, h) => {
@@ -1419,7 +1625,9 @@ async function buildRoom() {
     g.font = FONT(800, 24); g.fillStyle = leaf; g.fillText(desk$.working ? `${desk$.working} working` : 'office', w / 2, 100); g.textAlign = 'left'
   })
   const sp = plane(0.42, 0.21, sign.t); sp.position.set(0, 1.55, 0.035); door.add(sp)
-  scene.add(door); spot(door, 'office', 'Team office', new T.Vector3(0, 2.25, -R + 0.1))
+  /* The door swings on its left hinge when someone from the team comes in */
+  const hinge = new T.Group(); hinge.position.set(-0.49, 0, -R + 0.03); door.position.set(0.49, 0, 0); hinge.add(door)
+  scene.add(hinge); spot(door, 'office', 'Team office', new T.Vector3(0, 2.25, -R + 0.1))
 
   /* Light: the sun through the windows, a desk lamp and a warm room light that come on in the evening */
   const hemi = new T.HemisphereLight(0xfff1d6, 0xc9a27e, 0.72); const amb = new T.AmbientLight(0xffe6c8, 0.22); scene.add(hemi, amb)
@@ -1468,7 +1676,8 @@ async function buildRoom() {
       if (!x.el) continue
       v.copy(x.anchor).project(camera)
       const off = v.z > 1 || Math.abs(v.x) > 1.02 || Math.abs(v.y) > 1.02
-      x.el.hidden = off
+      /* During a visit she is the only thing to look at: the room's labels step aside */
+      x.el.hidden = off || !!visit
       if (!off) x.el.style.transform = `translate(${((v.x + 1) / 2) * w}px, ${((1 - v.y) / 2) * h}px) translate(-50%,-100%)`
     }
     const n = desk$.todos; hot.find((x) => x.go === 'todo').el.firstChild.textContent = n ? `To-dos · ${n}` : 'To-dos'
@@ -1483,22 +1692,60 @@ async function buildRoom() {
   canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY] })
   canvas.addEventListener('pointerup', (e) => {
     const moved = down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6; down = null
+    if (!moved && !$('scene').hidden) { endVisit(); return }
     if (!moved && closePage()) return
     const go = !moved && hit(e); if (go) goTo(go)
   })
   canvas.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' && !down) canvas.classList.toggle('point', !!hit(e)) })
 
+  /* A visit (the second skin's call into the office): she opens the door, walks to the desk, acts out her replies
+     while looking at yskills, and walks out again */
+  const DOOR_Z = -R + 0.25, STOP_Z = 0.45, WALK = 0.9, clk = new T.Clock()
+  let visit = null
+  const doorTo = (open, dt) => { hinge.rotation.y += ((open ? -1.25 : 0) - hinge.rotation.y) * Math.min(1, dt * 4) }
+  function stepVisit(dt) {
+    const v = visit; v.t += dt
+    if (v.phase === 'in' || v.phase === 'out') {
+      const to = v.phase === 'in' ? STOP_Z : DOOR_Z, g = v.card.group
+      const left = to - g.position.z, go = Math.sign(left) * Math.min(Math.abs(left), WALK * dt)
+      if (v.t > 0.5 || v.phase === 'out') { g.position.z += still ? left : go; v.gait += Math.abs(go) * 1.3 }
+      g.rotation.y = v.phase === 'in' ? 0 : Math.PI
+      if (Math.abs(to - g.position.z) < 0.01) {
+        if (v.phase === 'in') { v.phase = 'here'; v.clip = 'hello'; v.until = v.t + 1.6; v.arrived?.() }
+        else { CARDS_3D.dispose(v.card); visit = null; return }
+      }
+    }
+    if (v.phase === 'here' && v.until && v.t > v.until) { v.clip = 'stand'; v.until = 0 }
+    doorTo(v.phase === 'in' ? true : v.phase === 'out' ? Math.abs(v.card.group.position.z - DOOR_Z) > 0.05 || v.t < 0.3 : false, dt)
+    const moving = v.phase !== 'here'
+    CARDS_3D.pose(v.card, moving ? 'walk' : v.clip, moving ? v.gait : (still ? 0 : v.t), dt)
+  }
+
   let shown = false
   function loop() {
     requestAnimationFrame(loop)
+    const dt = Math.min(clk.getDelta(), 0.05)
     if (stage.offsetParent === null) { shown = false; return }
     if (!shown) { shown = true; layout() }
     if (!still) controls.update()
+    if (visit) stepVisit(dt); else if (hinge.rotation.y) doorTo(false, dt)
     renderer.render(scene, camera); placeTags()
   }
   loop()
 
   return {
+    T,
+    /* Resolves once she stands at the desk */
+    callIn(card) {
+      if (visit) CARDS_3D.dispose(visit.card)
+      card.group.position.set(0, 0, DOOR_Z); scene.add(card.group)
+      if (card.vrm.lookAt) card.vrm.lookAt.target = camera
+      return new Promise((arrived) => { visit = { card, phase: 'in', t: 0, gait: 0, clip: 'stand', arrived } })
+    },
+    react(clip, secs = 2.2) { if (visit?.phase === 'here') { visit.clip = clip; visit.until = visit.t + secs } },
+    swap(card) { if (!visit) return CARDS_3D.dispose(card); card.group.position.copy(visit.card.group.position); CARDS_3D.dispose(visit.card); scene.add(card.group); if (card.vrm.lookAt) card.vrm.lookAt.target = camera; visit.card = card },
+    leave() { if (visit && visit.phase !== 'out') { visit.phase = 'out'; visit.t = 0; if (visit.card.vrm.lookAt) visit.card.vrm.lookAt.target = null } },
+    visiting: () => visit?.card || null,
     hotspots: () => hot.filter((x) => x.el).map((x) => ({ go: x.go, shown: !x.el.hidden })),
     update() {
       desk$ = HQ.deskNumbers({ projects: projectsData, you: youCount, phases: phasesData })
@@ -1516,6 +1763,7 @@ const closePage = () => { const back = HQ.closeTo(tabNow, world); if (back) loca
 function showTab() {
   const tab = HQ.pickTab(location.hash, { hasProjects, room: roomOk })
   if (tab !== tabNow && HQ.closeTo(tab, world)) closeSheet()
+  if (tab !== 'desk') endVisit()
   tabNow = tab
   world = roomOk ? HQ.worldFor(tab, world) : 'office'
   $('room').hidden = world !== 'room'; $('stage').hidden = world !== 'office'; $('desk-tab').hidden = !roomOk
@@ -1529,7 +1777,7 @@ for (const b of document.querySelectorAll('[data-tab]')) b.addEventListener('cli
 window.addEventListener('hashchange', showTab)
 showTab()
 
-/* ---------- The 3D office (three.js r128). Only static shapes and canvas-drawn text; stored text never becomes markup. ---------- */
+/* ---------- The 3D office (three.js r147). Only static shapes and canvas-drawn text; stored text never becomes markup. ---------- */
 const office = (() => {
   if (!window.THREE || !THREE.OrbitControls) { $('stage-msg').hidden = false; $('c').hidden = true; return null }
   try { return buildOffice() } catch (e) { console.error(e); $('stage-msg').hidden = false; $('c').hidden = true; return null }
@@ -1560,7 +1808,7 @@ function buildOffice() {
 
   /* Cozy pastel: soft four-step toon shading like the team's, warm brown outlines, and every colour of the old
      office repainted from one pastel set (COZY), so the room, its props and the team read as one game */
-  const grad = new T.DataTexture(new Uint8Array([125, 125, 125, 190, 190, 190, 235, 235, 235, 255, 255, 255]), 4, 1, T.RGBFormat)
+  const grad = new T.DataTexture(new Uint8Array([125, 125, 125, 255, 190, 190, 190, 255, 235, 235, 235, 255, 255, 255, 255, 255]), 4, 1, T.RGBAFormat)
   grad.minFilter = grad.magFilter = T.NearestFilter; grad.generateMipmaps = false; grad.needsUpdate = true
   const mats = {}
   const COZY = {
@@ -1788,7 +2036,7 @@ function buildOffice() {
     const hitBox = new T.Mesh(new T.BoxGeometry(1.1, 1.5, 1.0), new T.MeshBasicMaterial({ visible: false })); hitBox.position.y = 0.75; who.add(hitBox)
     const shadow = mesh(new T.CircleGeometry(0.42, 20), new T.MeshBasicMaterial({ color: '#6b4b32', transparent: true, opacity: 0.2, depthWrite: false }), 0, 0.02, 0, root)
     shadow.rotation.x = -Math.PI / 2; shadow.castShadow = shadow.receiveShadow = false
-    const seat = seats[s.key] = { root, who, bubble, zs, ring, screenTex, rig, shadow, pet, h: rig.height, state: 'off', phase: Math.random() * 6, home: who.position.clone(), cafe: root.worldToLocal(new T.Vector3(slot[0], 0, slot[1])), exit: new T.Vector3(0, 0, -1.4) }
+    const seat = seats[s.key] = { root, who, props, bubble, zs, ring, screenTex, rig, shadow, pet, h: rig.height, state: 'off', phase: Math.random() * 6, home: who.position.clone(), cafe: root.worldToLocal(new T.Vector3(slot[0], 0, slot[1])), exit: new T.Vector3(0, 0, -1.4) }
     later.push(() => {
       /* The kit decides the heights: props sit on the desk top, the animal on the chair seat, the screen face on the monitor */
       const top = deskTop(); props.position.y = top - 1.04
@@ -1861,7 +2109,7 @@ function buildOffice() {
     const w = stage.clientWidth, h = stage.clientHeight
     for (const s of SEATS) {
       const tg = tags[s.key], st = states[s.key] || 'off', n = counts[s.key] || 0
-      const name = n > 1 ? `${s.name} ×${n}` : s.name
+      const own = seats[s.key].card?.name, role = n > 1 ? `${s.name} ×${n}` : s.name, name = own ? `${own} · ${role}` : role
       if (tg.nm.textContent !== name) tg.nm.textContent = name
       tg.t.setAttribute('aria-label', `${name}, ${st === 'off' ? 'off duty' : STATES[st]}`)
       const cls = `chip ${st}`; if (tg.chip.className !== cls) { tg.chip.className = cls; tg.chip.textContent = st === 'off' ? 'off duty' : STATES[st] }
@@ -2044,6 +2292,26 @@ function buildOffice() {
   }
 
   /* Each frame: work, doze, walk to the lounge and dance when done and back when there is work */
+  /* Second skin: a card's character (CARDS_3D) sits in for the animal at a desk, with what her bond has put on the desk;
+     null puts the animal back */
+  const ITEM = {
+    mug: (g) => { cyl(0.08, 0.07, 0.16, '#ff8a73', -0.35, 1.12, 0.3, g, 16); mesh(new T.TorusGeometry(0.045, 0.014, 6, 12), '#ff8a73', -0.27, 1.12, 0.3, g) },
+    poster: (g) => { const f = box(0.34, 0.42, 0.03, '#e6b788', 0.95, 1.3, 0.75, g); f.rotation.x = -0.2; box(0.28, 0.36, 0.01, '#f29bb0', 0.95, 1.3, 0.735, g).rotation.x = -0.2 },
+    trophy: (g) => { cyl(0.1, 0.06, 0.16, '#f7cf6a', -0.6, 1.27, 0.75, g, 18); cyl(0.03, 0.03, 0.1, '#f7cf6a', -0.6, 1.14, 0.75, g, 8); box(0.16, 0.05, 0.12, '#bf8d60', -0.6, 1.08, 0.75, g) },
+  }
+  function wear(key, card, items = []) {
+    const s = seats[key]
+    if (s.card && s.card !== card) CARDS_3D.dispose(s.card)
+    const itemsKey = card ? items.join() : null
+    if (s.card === (card || null) && s.itemsKey === itemsKey) return
+    s.extras?.traverse((o) => { o.geometry?.dispose(); o.material?.dispose() }); s.extras?.removeFromParent(); s.extras = null; s.itemsKey = itemsKey
+    s.card = card || null; s.rig.group.visible = !s.card; s.h = s.card ? s.card.tag : s.rig.height
+    if (!s.card) return
+    s.who.add(s.card.group); s.card.group.rotation.y = s.rig.group.rotation.y
+    s.extras = new T.Group(); s.extras.position.y = s.props.position.y; s.root.add(s.extras)
+    for (const it of items) ITEM[it]?.(s.extras)
+  }
+
   const clock = new T.Clock(), d = new T.Vector3()
   let lastScreen = 0
   function frame() {
@@ -2062,9 +2330,10 @@ function buildOffice() {
       if (s.state === 'done') s.bubble.visible = walking || s.who.position.distanceTo(s.cafe) > 0.1
       /* The frame for this moment: typing, dozing, a head shake or wave every few seconds, dancing, walking */
       const clip = HQ.poseAt(s.state, walking, p, still).clip
-      TEAM_3D.pose(s.rig, clip, clip === 'walk' ? s.gait : p)
+      if (s.card) CARDS_3D.pose(s.card, clip, clip === 'walk' ? s.gait : p, dt)
+      else TEAM_3D.pose(s.rig, clip, clip === 'walk' ? s.gait : p)
       if (dir) s.yaw = Math.atan2(dir[0], dir[1]) - s.root.rotation.y
-      const yaw = walking ? s.yaw ?? 0 : 0, g = s.rig.group.rotation
+      const yaw = walking ? s.yaw ?? 0 : 0, g = (s.card ? s.card.group : s.rig.group).rotation
       g.y += Math.atan2(Math.sin(yaw - g.y), Math.cos(yaw - g.y)) * Math.min(1, dt * 5)
       s.shadow.visible = s.who.position.distanceTo(s.home) > 0.3
       if (s.shadow.visible) s.shadow.position.set(s.who.position.x, 0.02, s.who.position.z)
@@ -2084,13 +2353,259 @@ function buildOffice() {
   /* The kits arrive after the first frame; without them the office keeps its room and name tags */
   parseKit(window.OFFICE_KIT).then(() => { for (const f of later.splice(0)) f(); setStates(states, counts) }).catch((e) => console.error('office kits', e))
   frame()
-  return { setStates, setWall }
+  return { setStates, setWall, wear, T }
+}
+
+/* ---------- Second character skin: yskills' own VRM characters (cards) at the desks, behind a page toggle.
+   The 4-digit code only keeps the skin out of sight on a shared screen; it is a convenience, not security. Cards,
+   who sits where and each card's bond live in the db (cards/<id>, roster/desks, bond/<id>), the files in the
+   artifact's assets. A tap on a card's desk calls her into the desk room for a short visit. ---------- */
+/* 14 MB: a card stored as base64 text grows by a third and must stay under the asset store's 20 MiB limit */
+const OFFICE_H = 2.4, ROOM_H = 1.62, MAX_BYTES = 14 * 1024 * 1024
+const cardOf = (id) => cards.find((c) => c.id === id)
+const bondFor = (c) => HQ.bondOf({ ...bonds[c.id], since: c.added }, eventsAll)
+const outfitFor = (c, b = bondFor(c)) => Math.max(0, Math.min(Number(bonds[c.id]?.wear) || 0, b.outfits - 1, (c.outfits?.length || 1) - 1))
+const thumbUrl = (c) => (typeof c.thumb === 'string' && /^[0-9a-f]{32}$/.test(c.thumb) ? `/_blob/${c.thumb}` : null)
+function hearts(level) {
+  const box = el('span', 'hearts'); box.setAttribute('aria-label', `Bindung ${level} von 5`)
+  const NS = 'http://www.w3.org/2000/svg'
+  for (let i = 1; i <= 5; i++) {
+    const svg = document.createElementNS(NS, 'svg'), path = document.createElementNS(NS, 'path')
+    svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true'); if (i <= level) svg.classList.add('on')
+    path.setAttribute('d', 'M12 20.5s-7.5-4.6-9-9.4C1.9 7.4 4.3 4.5 7.4 4.5c2 0 3.6 1.1 4.6 2.7 1-1.6 2.6-2.7 4.6-2.7 3.1 0 5.5 2.9 4.4 6.6-1.5 4.8-9 9.4-9 9.4z')
+    svg.append(path); box.append(svg)
+  }
+  return box
+}
+
+/* The office: each desk shows its card (in the outfit she last wore) or the animal */
+const worn = {}
+function applySkin() {
+  if (!office) return
+  const want = skinOn ? HQ.seating(desks, cards) : {}
+  for (const s of SEATS) {
+    const c = cardOf(want[s.key]), b = c && bondFor(c), key = c ? `${c.id}:${outfitFor(c, b)}` : null
+    const cur = worn[s.key]
+    if (cur?.key === key) { if (cur.fig) office.wear(s.key, cur.fig, b.items); continue }
+    worn[s.key] = { key }
+    if (!c) { office.wear(s.key, null); continue }
+    CARDS_3D.make(office.T, c.outfits[outfitFor(c, b)].asset, OFFICE_H).then((fig) => {
+      if (worn[s.key]?.key !== key) return CARDS_3D.dispose(fig)
+      fig.name = c.name; worn[s.key].fig = fig; office.wear(s.key, fig, bondFor(c).items)
+    }).catch((e) => { console.error('card', c.id, e); if (worn[s.key]?.key === key) worn[s.key].failed = true })
+  }
+}
+
+/* The toggle on the Team page; the code is asked in the sheet */
+function renderSkinSwitch() {
+  for (const b of document.querySelectorAll('[data-skin]')) b.setAttribute('aria-pressed', String((b.dataset.skin === 'cards') === skinOn))
+  $('skin-manage').hidden = !skinOn
+}
+function setSkin(on) { skinOn = on; local.set(SKIN.key, on ? 'cards' : null); renderSkinSwitch(); applySkin(); if (sheetFor) fillSheet(sheetFor) }
+function openCode(from) {
+  const has = /^\d{4}$/.test(local.get(SKIN.code) || '')
+  openPanel(from, has ? 'Code eingeben' : 'Code festlegen', 'Vier Ziffern. Der Code blendet die Figuren nur auf geteilten Bildschirmen aus, er ist kein Schutz.')
+  const form = el('form', 'idea'); form.method = 'post'
+  const lab = el('label', null, 'Code'); lab.htmlFor = 'skin-code'
+  const inp = el('input'); Object.assign(inp, { id: 'skin-code', inputMode: 'numeric', autocomplete: 'off', maxLength: 4, pattern: '\\d{4}', required: true })
+  const go = el('button', 'btn go', has ? 'Öffnen' : 'Festlegen'); go.type = 'submit'
+  const said = el('p', 'said'); said.setAttribute('role', 'status')
+  const row = el('div', 'row'); row.append(go); form.append(lab, inp, row, said)
+  form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    if (!/^\d{4}$/.test(inp.value)) { said.textContent = 'Bitte genau vier Ziffern.'; return }
+    if (has && inp.value !== local.get(SKIN.code)) { said.textContent = 'Der Code passt nicht.'; inp.select(); return }
+    if (!has) local.set(SKIN.code, inp.value)
+    closeSheet(); setSkin(true)
+  })
+  $('sheet-body').append(form); inp.focus()
+}
+for (const b of document.querySelectorAll('[data-skin]')) b.addEventListener('click', (e) => { if (b.dataset.skin === 'cards') { if (!skinOn) openCode(e.currentTarget) } else setSkin(false) })
+$('skin-manage').addEventListener('click', (e) => openRoster(e.currentTarget))
+
+/* A sheet with a title and an empty body, closing whatever else is open */
+function openPanel(from, title, what) {
+  endVisit()
+  if (!from?.closest?.('.page')) closePage()
+  sheetFor = null; ideaOpen = false; rosterOpen = false; lastFocus = from || document.activeElement
+  $('sheet-name').textContent = title; $('sheet-what').textContent = what; $('sheet-body').replaceChildren()
+  $('sheet').hidden = false; $('scrim').hidden = false
+}
+
+/* Figuren: the roster. Add a .vrm (VRoid Studio export), pick her desk, add outfits, remove her. */
+const VOICE_NAMES = { warm: 'herzlich', frech: 'frech', stolz: 'stolz', ruhig: 'ruhig', scheu: 'schüchtern' }
+async function storeVrm(file, assets, said) {
+  if (!/\.vrm$/i.test(file.name)) throw new Error('Das ist keine .vrm-Datei.')
+  if (file.size > MAX_BYTES) throw new Error('Zu groß (über 14 MB). In VRoid Studio beim Export die Texturen auf 1024 stellen.')
+  const buf = await file.arrayBuffer()
+  /* Any broken or odd file (cut short, bad header) reads as "not a model", never as a raw error */
+  let meta
+  try { meta = CARDS_3D.readMeta(buf) } catch { throw new Error('Die Datei ist kein VRM-Modell.') }
+  said.textContent = 'Wird hochgeladen…'
+  let up
+  try { up = await assets.upload(new Blob([buf]), { type: 'model/gltf-binary' }) } catch (e) {
+    if (e?.code !== 'unsupported_type') throw e
+    const b64 = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.onerror = no; r.readAsDataURL(new Blob([buf])) })
+    up = await assets.upload(new Blob([b64]), { type: 'text/plain' })
+  }
+  return { up, meta }
+}
+async function openRoster(from) {
+  openPanel(from, 'Figuren', 'Deine eigenen Figuren aus VRoid Studio. Jede sitzt an einem Schreibtisch oder wartet auf der Bank.')
+  closePage(); rosterOpen = true; fillRoster()
+}
+let rosterRun = 0
+async function fillRoster() {
+  if (!rosterOpen) return
+  const run = ++rosterRun, body = $('sheet-body')
+  const assets = await window.claude?.use?.('assets').catch(() => null)
+  /* Snapshots can land together: only the newest render may draw */
+  if (!rosterOpen || run !== rosterRun) return
+  body.replaceChildren()
+  const can = !!(assets && hqDb)
+  const list = el('div', 'vcards')
+  if (!cards.length) list.append(el('p', 'empty', 'Noch keine Figuren. Exportiere eine Figur in VRoid Studio als .vrm und füge sie hier hinzu.'))
+  for (const c of cards) {
+    const b = bondFor(c), item = el('div', 'vcard')
+    const pic = el('div', 'pic'); const u = thumbUrl(c); if (u) { const img = el('img'); img.src = u; img.alt = ''; pic.append(img) } else pic.textContent = (c.name || '?').slice(0, 1).toUpperCase()
+    const info = el('div', 'info')
+    const nm = el('b', null, c.name || 'Ohne Namen'); info.append(nm, hearts(b.level))
+    info.append(el('span', 'meta', `${VOICE_NAMES[c.voice] || 'herzlich'} · ${c.author ? `von ${c.author}` : 'Autor unbekannt'} · ${c.share ? 'Weitergabe erlaubt' : 'Weitergabe nicht erlaubt'}`))
+    const ctl = el('div', 'ctl')
+    const sel = el('select'); sel.setAttribute('aria-label', `Schreibtisch für ${c.name}`)
+    const seated = Object.entries(HQ.seating(desks, cards)).find(([, id]) => id === c.id)?.[0] || ''
+    sel.append(new Option('Bank', ''))
+    for (const s of SEATS) { const who = cardOf(HQ.seating(desks, cards)[s.key]); sel.append(new Option(who && who.id !== c.id ? `${s.name} (jetzt ${who.name})` : s.name, s.key)) }
+    sel.value = seated; sel.disabled = !hqDb
+    sel.addEventListener('change', () => hqDb.doc('roster/desks').set(HQ.seatCard(desks, sel.value || seated, sel.value ? c.id : null)).catch(() => fillRoster()))
+    ctl.append(sel)
+    if (can && (c.outfits?.length || 0) < 3) {
+      const add = el('label', 'btn file', `Outfit ${c.outfits.length + 1} hinzufügen`), f = el('input'); f.type = 'file'; f.accept = '.vrm'; add.append(f)
+      f.addEventListener('change', async () => {
+        const said = info.querySelector('.said') || info.appendChild(el('p', 'said'))
+        if (!f.files[0]) return
+        try { const { up } = await storeVrm(f.files[0], assets, said); await hqDb.doc(`cards/${c.id}`).update({ outfits: [...c.outfits, { asset: up.id, label: f.files[0].name.replace(/\.vrm$/i, '').slice(0, 24) }] }) } catch (e) { said.textContent = e.message || 'Hochladen hat nicht geklappt.' }
+      })
+      ctl.append(add)
+    }
+    if (can) {
+      const del = el('button', 'btn quiet', 'Entfernen'); del.type = 'button'
+      del.addEventListener('click', async () => {
+        if (del.dataset.sure !== '1') { del.dataset.sure = '1'; del.textContent = 'Wirklich entfernen?'; return }
+        await hqDb.doc('roster/desks').set(HQ.seatCard(desks, seated, null)).catch(() => {})
+        await hqDb.doc(`cards/${c.id}`).delete().catch(() => {})
+        await hqDb.doc(`bond/${c.id}`).delete().catch(() => {})
+        for (const id of [...c.outfits.map((o) => o.asset), c.thumb]) if (id) assets.delete(id).catch(() => {})
+      })
+      ctl.append(del)
+    }
+    info.append(el('span', 'meta', `Outfits: ${c.outfits?.length || 1} hochgeladen, ${b.outfits} freigespielt`), ctl)
+    item.append(pic, info); list.append(item)
+  }
+  body.append(list)
+  if (!can) { body.append(el('p', 'empty', hqDb ? 'Figuren hinzufügen kann nur, wer HQ bearbeiten darf.' : 'Bei claude.ai anmelden, dann geht es los.')); return }
+  const form = el('form', 'idea add'); form.method = 'post'
+  const voice = el('select'); voice.id = 'card-voice'; for (const [k, v] of Object.entries(VOICE_NAMES)) voice.append(new Option(v, k))
+  const vl = el('label', null, 'Wie sie spricht'); vl.htmlFor = 'card-voice'
+  const pick = el('label', 'btn go file', 'Figur hinzufügen (.vrm)'), f = el('input'); f.type = 'file'; f.accept = '.vrm'; pick.append(f)
+  const said = el('p', 'said'); said.setAttribute('role', 'status')
+  form.append(vl, voice, pick, said)
+  f.addEventListener('change', async () => {
+    const file = f.files[0]; if (!file) return
+    try {
+      const { up, meta } = await storeVrm(file, assets, said)
+      const thumb = meta.thumb ? await assets.upload(meta.thumb, { type: meta.thumb.type }).then((t) => t.id).catch(() => null) : null
+      const id = `c${Date.now().toString(36)}`
+      await hqDb.doc(`cards/${id}`).set({ name: meta.name || file.name.replace(/\.vrm$/i, '').slice(0, 24), voice: voice.value, outfits: [{ asset: up.id, label: 'Büro' }], thumb, author: meta.author, licence: meta.licence, share: meta.share, added: new Date().toISOString() })
+      said.textContent = 'Fertig. Wähle jetzt ihren Schreibtisch.'
+    } catch (e) { said.textContent = e.message === 'not_vrm' ? 'Die Datei ist kein VRM-Modell.' : e.message || 'Hochladen hat nicht geklappt.' }
+    f.value = ''
+  })
+  body.append(form)
+}
+
+/* The visit: greeting from her desk's real state, one scene per bond level, three replies, a reaction, the bond */
+const OPEN = { warm: 'Da bist du ja!', frech: 'Na, Chef? Vermisst?', stolz: 'Du hast mich gerufen. Das ehrt dich.', ruhig: 'Hallo. Schön, dich zu sehen.', scheu: 'Oh! Du wolltest mich sprechen?' }
+const MOOD = {
+  busy: (t) => `Ich stecke mitten in „${t}“. Für dich mache ich gern eine Pause.`,
+  stuck: (t) => `„${t}“ hängt fest. Gut, dass du rufst, ich könnte Hilfe gebrauchen.`,
+  asks: (t) => `Ich warte auf dich: ${t}. Schaust du gleich mal drauf?`,
+  proud: (t) => `„${t}“ ist fertig! Hast du es gesehen?`,
+  free: () => 'Gerade liegt nichts auf meinem Tisch. Ich hatte gehofft, dass du anrufst.',
+}
+const SCENES = [
+  ['Erzähl mal: Warum hast du mich an diesen Schreibtisch gesetzt?', [['Weil niemand das so gut kann wie du.', 2, 'joy', 'Dann gebe ich mir besonders Mühe. Für dich.'], ['Ich wollte dich in meiner Nähe haben.', 1, 'shy', 'Nähe, ja? Das klingt nach mehr als Arbeit.'], ['Der Platz war gerade frei.', 0, 'pout', 'Wie romantisch. Ich merke mir das.']]],
+  ['Kaffee oder Tee, wenn wir zusammen Pause machen?', [['Was du nimmst, nehme ich auch.', 2, 'shy', 'Dann zwei Kakao. Mit Sahne. Keine Widerrede.'], ['Kaffee, schwarz, schnell.', 1, 'joy', 'Typisch. Ich lege dir trotzdem einen Keks dazu.'], ['Keine Zeit für Pausen.', 0, 'pout', 'Dann bringe ich die Pause eben zu dir.']]],
+  ['Ich habe heute etwas gebaut, auf das ich stolz bin. Willst du es sehen?', [['Zeig her, ich will alles wissen.', 2, 'joy', 'Ich wusste, dass du so schaust. Genau deshalb arbeite ich gern für dich.'], ['Später, okay?', 1, 'shy', 'Okay. Aber ich halte dir einen Platz frei.'], ['Hauptsache, es läuft.', 0, 'pout', 'Es läuft. Ein bisschen Lob würde auch laufen.']]],
+  ['Darf ich ehrlich sein? Die Abende im Büro sind schöner, seit du öfter vorbeischaust.', [['Bei mir ist es genauso.', 2, 'shy', 'Dann sollten wir das beibehalten. Abgemacht?'], ['Liegt bestimmt am Licht.', 1, 'joy', 'Am Licht. Natürlich. Dann lassen wir es öfter an.'], ['Ich schaue nur nach den Zahlen.', 0, 'pout', 'Dann bin ich ab jetzt deine Lieblingszahl.']]],
+  ['Weißt du noch, wie wir angefangen haben? Ich würde alles wieder genauso machen. Mit dir.', [['Ich auch. Jedes Mal.', 2, 'joy', 'Dann bleiben wir ein Team. Du und ich, ganz vorne.'], ['Wir haben noch viel vor.', 1, 'shy', 'Viel vor. Mit dir klingt das wie ein Versprechen.'], ['Zurück an die Arbeit.', 0, 'pout', 'Na gut, Chef. Aber ich lächle dabei.']]],
+]
+const GOT = { 2: 'Neu auf ihrem Schreibtisch: eine Tasse.', 3: 'Neues Outfit freigespielt.', 4: 'Neu auf ihrem Schreibtisch: ein Bild.', 5: 'Letztes Outfit und ihr Pokal sind frei.' }
+function sceneOf(c, b) {
+  const seen = Array.isArray(bonds[c.id]?.seen) ? bonds[c.id].seen : []
+  for (let i = 0; i < b.level; i++) if (!seen.includes(i)) return i
+  return Math.floor(Math.random() * b.level)
+}
+function say(c, line, buttons) {
+  $('scene-name').textContent = c.name; $('scene-line').textContent = line
+  $('scene-bond').replaceChildren(hearts(bondFor(c).level))
+  const acts = $('scene-acts'); acts.replaceChildren()
+  for (const [text, fn, cls] of buttons) { const b = el('button', `btn ${cls || ''}`, text); b.type = 'button'; b.addEventListener('click', fn); acts.append(b) }
+  $('scene').hidden = false; $('scene').focus({ preventScroll: true })
+}
+async function callIn(id, from) {
+  const c = cardOf(id); if (!c || !room) return
+  closeSheet(); endVisit(); location.hash = 'desk'
+  const token = visitOn = { id }
+  say(c, 'klopft an…', [['Tschüss', endVisit]])
+  let fig
+  try { fig = await CARDS_3D.make(room.T, c.outfits[outfitFor(c)].asset, ROOM_H) } catch (e) { console.error(e); if (visitOn === token) say(c, 'Ihre Datei ließ sich nicht laden.', [['Schließen', endVisit]]); return }
+  if (visitOn !== token) return CARDS_3D.dispose(fig)
+  fig.name = c.name; await room.callIn(fig)
+  if (visitOn !== token) return
+  const seat = Object.entries(HQ.seating(desks, cards)).find(([, x]) => x === id)?.[0]
+  const m = team.find((x) => x.seat === seat), task = String(m?.task || '').slice(0, 80) || 'meiner Aufgabe'
+  say(c, `${OPEN[c.voice] || OPEN.warm} ${MOOD[HQ.moodOf(m ? stateOf(m.state) : 'off')](task)}`, [['Weiter', () => ask(c, token), 'go'], ['Tschüss', endVisit, 'bye']])
+}
+function ask(c, token) {
+  const before = bondFor(c), n = sceneOf(c, before), [line, replies] = SCENES[n]
+  /* Replies in a new order each time, so the best one is never simply the first */
+  const mixed = [...replies].sort(() => Math.random() - 0.5)
+  say(c, line, mixed.map(([text, score, clip, answer]) => [text, async () => {
+    if (visitOn !== token) return
+    room.react(clip)
+    const old = bonds[c.id] || {}, next = HQ.afterCall(old, score)
+    const seen = [...new Set([...(Array.isArray(old.seen) ? old.seen : []), n])]
+    const after = HQ.bondOf({ ...next, since: c.added }, eventsAll)
+    if (hqDb) await hqDb.doc(`bond/${c.id}`).set({ ...old, ...next, seen }).catch((e) => console.error('bond', e))
+    if (visitOn !== token) return
+    const pay = next.added ? `+${next.added} Bindung.` : 'Heute zählen keine Anrufe mehr. Morgen wieder.'
+    const up = after.level > before.level ? ` Bindung ${after.level}! ${GOT[after.level] || ''}` : ''
+    const outfits = Math.min(after.outfits, c.outfits?.length || 1)
+    say(c, `${answer} ${pay}${up}`, [...(outfits > 1 ? [['Outfit wechseln', () => wardrobe(c, token, outfits)]] : []), ['Tschüss', endVisit, 'go']])
+  }, 'reply']).concat([['Tschüss', endVisit, 'bye']]))
+}
+function wardrobe(c, token, outfits) {
+  say(c, 'Was soll ich anziehen?', c.outfits.slice(0, outfits).map((o, i) => [o.label || `Outfit ${i + 1}`, async () => {
+    if (visitOn !== token) return
+    room.react('spin', 1.2)
+    const fig = await CARDS_3D.make(room.T, o.asset, ROOM_H).catch(() => null)
+    if (!fig || visitOn !== token) return fig && CARDS_3D.dispose(fig)
+    room.swap(fig)
+    if (hqDb) await hqDb.doc(`bond/${c.id}`).set({ ...(bonds[c.id] || {}), wear: i }).catch((e) => console.error('bond', e))
+    if (visitOn !== token) return
+    room.react('joy', 2.5); say(c, 'Und? Gefällt es dir?', [['Tschüss', endVisit, 'go']])
+  }]).concat([['Tschüss', endVisit]]))
+}
+function endVisit() {
+  if (!visitOn && $('scene').hidden) return
+  visitOn = null; $('scene').hidden = true; room?.leave()
 }
 
 const GREET = { day: 'Good day, yskills.', dusk: 'Good evening, yskills.', night: 'Late shift, yskills.' }
 window.onDaytime = (m) => { const w = team.filter((x) => stateOf(x.state) === 'working').length; $('greet').textContent = `${GREET[m]}${w ? ` ${w} working.` : ''}${updated ? ` Updated ${updated}.` : ''}` }
 const rows = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }))
-renderTeam([])
+renderTeam([]); renderSkinSwitch()
 ;(async () => {
   const db = await window.claude?.use?.('db')
   if (!db) { $('greet').textContent = 'Sign in to claude.ai to see live updates'; return }
@@ -2114,10 +2629,14 @@ renderTeam([])
   db.collection('phases').onSnapshot((s) => renderPhases(rows(s)), fail)
   db.collection('projects').onSnapshot((s) => renderProjects(rows(s)), fail)
   db.collection('finance').onSnapshot((s) => { financeRows = rows(s); renderMoney() }, () => {})
+  /* Second skin: cards, who sits where, each card's bond */
+  db.collection('cards').onSnapshot((s) => { cards = rows(s).filter((c) => Array.isArray(c.outfits) && c.outfits.length).sort((a, b) => String(a.added).localeCompare(String(b.added))); applySkin(); fillRoster(); if (sheetFor) fillSheet(sheetFor) }, () => {})
+  db.doc('roster/desks').onSnapshot((s) => { desks = s.exists ? s.data() : {}; applySkin(); fillRoster(); if (sheetFor) fillSheet(sheetFor) }, () => {})
+  db.collection('bond').onSnapshot((s) => { bonds = Object.fromEntries(rows(s).map(({ id, ...b }) => [id, b])); applySkin() }, () => {})
   /* Events: the first answer sets the score quietly (and writes today's visit once); later ones toast what they earned */
   let known = null
   db.collection('events').onSnapshot((s) => {
-    const all = rows(s)
+    const all = rows(s); eventsAll = all
     if (known) showToast(HQ.toastFor(all.filter((e) => !known.has(e.id))))
     known = new Set(all.map((e) => e.id))
     renderGame(HQ.scoreFrom(all))
