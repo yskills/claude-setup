@@ -1,0 +1,54 @@
+# .github/workflows/steam-deploy.yml: build the Windows and Linux depots and upload them to the
+# Steam "beta" branch on every tag. Secrets (yskills sets them once, from the builder account):
+# STEAM_USERNAME, STEAM_CONFIG_VDF (Steam Guard login saved by steamcmd), STEAM_APP_ID.
+name: steam
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            flag: --win
+            depot: win
+          - os: ubuntu-latest
+            flag: --linux
+            depot: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - run: npm ci
+      - run: npm run verify
+      - run: npm run build
+      - run: npx electron-builder --dir ${{ matrix.flag }} --x64
+      # tar keeps the executable bit; upload-artifact alone drops it and the Linux build won't start.
+      - shell: bash
+        run: tar -C release/*unpacked -cf depot-${{ matrix.depot }}.tar .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: depot-${{ matrix.depot }}
+          path: depot-${{ matrix.depot }}.tar
+  upload:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: tars }
+      - run: for d in win linux; do mkdir -p depots/depot-$d && tar -C depots/depot-$d -xf tars/depot-$d/depot-$d.tar; done
+      # Third-party action pinned to the commit of its tag (git ls-remote --tags https://github.com/game-ci/steam-deploy).
+      - uses: game-ci/steam-deploy@0a1f7f01cef36bd706b2a609b98ae40d0d4c54e7 # v3.0.4
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+          appId: ${{ secrets.STEAM_APP_ID }}
+          buildDescription: ${{ github.ref_name }}
+          rootPath: depots
+          depot1Path: depot-win
+          depot2Path: depot-linux
+          releaseBranch: beta

@@ -16,4 +16,4 @@ Finds what already exists before anything is built: competitors and prices, how 
 
 Added at the end of each project (operator step 9): date, project and its type, what to do differently. Newest last; merge duplicates.
 
-- None yet.
+- 2026-10-07 (Claude Setup, 3D game path): judge an engine by what cloud threads can run and look at headless, not by features; name every price (Steam Direct 100 $, licences, asset services) and what only yskills' hands can do, and check exact library versions on npm instead of trusting blog dates.
