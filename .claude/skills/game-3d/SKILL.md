@@ -25,6 +25,26 @@ TypeScript, Vitest, Playwright, `electron` 44 + `electron-builder` + `steamworks
 `@gltf-transform/cli` to shrink models. All MIT or Apache. Start on WebGL; switch a game to the
 WebGPU renderer only when its scenes need it (Electron and every browser run WebGL).
 
+## 1b. From a wish to a build brief (reference first)
+
+yskills says what they want in one sentence, pictures or a story; the team turns it into a
+concrete brief before any build. Order, every time:
+
+1. **Find the bar.** WebSearch the most popular games or features of that kind (Steam top
+   sellers and reviews, itch.io, YouTube devlogs): what players praise, what they complain about.
+   Pick the three to five patterns that make the best ones good (camera, controls, pacing, art
+   direction, onboarding), with a link each, in `design/REFERENCES.md`.
+2. **Write the brief** into `PLAN.md`: the wish in yskills' words, the references and the
+   patterns taken from them, the places and characters, the story beats as quests, the look
+   (`design/DESIGN.md`, cozy pastel unless the wish says otherwise), the slices with acceptance
+   criteria in `features.json`, the Steam decision (yes or later), and prices for anything that
+   costs money. Open questions get one recommended pick and a card.
+3. **Build to that bar**: the gate's `design-critic` gets the references next to the
+   screenshots; a slice that falls short of them is not 5/5.
+
+Pictures and stories are inputs, never the art: photos become references and splat postcards
+(§3), stories become `story/` files.
+
 ## 2. Folder layout
 
 One repo per game, scaffolded with the `scaffold` skill (Vue is optional: a game is a Vite app
@@ -57,7 +77,9 @@ covers them. Stories are data: threads turn yskills' messages into `story/` file
 - **No file without a manifest row.** `node scripts/check-assets.mjs assets/manifest.json`
   fails on a file with no row, a row with no file, or a licence that forbids a paid game
   (CC-BY-NC, personal use, VRM meta `commercialUsage: personalNonProfit`). It runs in `verify`.
-- **Characters: VRM only** (why: `research/characters-formats.md`). Make or remix in VRoid
+- **Characters: VRM only** (why: `research/characters-formats.md`). A model may be loaded from
+  a link (VRoid Hub, BOOTH, a shared card) at runtime: the game shows the VRM meta (author,
+  commercial use, allowed users) before use and refuses one that forbids games. Make or remix in VRoid
   Studio (free), pick from VRoid Hub, BOOTH or Sketchfab after reading the licence; the game
   refuses a model whose VRM meta forbids games. Ten original roster characters, never look-alikes.
 - **Moves are shared files**, not baked into models: VRMA from vrm.dev, or Mixamo FBX (free
