@@ -41,14 +41,14 @@ source, at, link}], sources[{name, ok, note}]}`), filled from live sources by th
 (`hq-refresh.md` in company-xy): HQ asks it on open when the list is over 150 minutes old; no routine of its own.
 Rule: `HQ.todayFor`, `HQ.refreshDue`.
 **New project tap:** HQ's yellow notepad saves `requests/<id>` (`{text, at, status}`: `new` saved,
-`sent` the page reached the coordinator, `relayed` a thread passed it on, `started` the brainstorm
+`sent` the page reached the coordinator, `relayed` the refresher passed it on, `started` the brainstorm
 thread runs, with `link`) and messages the coordinator with the Claude Code Remote connector's
-`send_message` ("HQ request <id>: <idea> ..."). The coordinator has no db tools, so threads keep
-the address and the queue: **every project thread, at start and when it finishes,** calls
-`get_channel_session_id` and writes HQ's `config/coordinator` (`{session, at}`,
-pinned with `if_version`); **at start** it also lists `requests` and, for each row that is `new`
-or `sent` with no `link`, sends the same "HQ request <id>: <text>" line to the coordinator with
-`send_message` and sets the row to `relayed`. The coordinator answers each such message with one
+`send_message` ("HQ request <id>: <idea> ..."). The coordinator has no db tools, so the **HQ refresher**
+(company-xy `hq-refresh.md`, one bounded call) keeps the address and the queue on every run: it calls
+`get_channel_session_id`, updates HQ's `config/coordinator` (`{session, at}`, pinned with `if_version`), and for each
+`requests` row that is `new` or `sent` with no `link` sends the same "HQ request <id>: <text>" line to the coordinator
+with `send_message` and sets the row to `relayed`. The page wakes the refresher when a tap could not reach the
+coordinator, and on every open with an old list. Other threads do neither (proven end to end 2026-10-07). The coordinator answers each such message with one
 `Researcher · <idea>` brainstorm thread whose brief names the request id, unless a thread for that
 id already runs (a resend repeats it); that thread sets the row to `started` with its thread link.
 

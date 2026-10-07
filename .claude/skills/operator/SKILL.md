@@ -178,8 +178,7 @@ Templates in `templates/`.
    desktop screenshots and a 3-line progress note. Don't merge; keep fixing CI and the review
    findings on the PR until it is merged. Pull main into the branch right before the gate merges
    (other slices may edit the same file). yskills' pauses and taste calls are final: a 'stop'
-   stops you mid-step, a rejected asset or look is replaced, not defended. Write
-   `config/coordinator` at start and finish and relay pending `requests` rows (§3). Keep HQ's
+   stops you mid-step, a rejected asset or look is replaced, not defended. Keep HQ's
    `work/<your session>` row current: one write at every phase and agent start and end
    (`docs/hq-rows.md`, Work board)." The first
    slice also commits the D1 ids from
