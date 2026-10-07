@@ -283,3 +283,47 @@ test('one panel at a time: a tap outside a page goes back to its room', () => {
   assert.equal(HQ.closeTo('money', 'room'), 'desk'); assert.equal(HQ.closeTo('todo', 'office'), 'office')
   assert.equal(HQ.closeTo('desk', 'room'), null); assert.equal(HQ.closeTo('office', 'office'), null); assert.equal(HQ.closeTo(null, 'room'), null)
 })
+
+test('bond: levels come from points, a few visits apart, and merged PRs count after the card came', () => {
+  const now = new Date('2026-10-07T10:00:00Z')
+  assert.equal(HQ.bondOf(null, [], now).level, 1)
+  assert.equal(HQ.bondOf({ points: 2 }, [], now).toNext, 1)
+  assert.equal(HQ.bondOf({ points: 3 }, [], now).level, 2)
+  assert.equal(HQ.bondOf({ points: 99 }, [], now).level, 5)
+  assert.equal(HQ.bondOf({ points: 99 }, [], now).toNext, null)
+  assert.equal(HQ.bondOf({ points: -4 }, [], now).points, 0)
+  const events = [{ kind: 'pr_merged', at: '2026-10-06T09:00:00Z' }, { kind: 'pr_merged', at: '2026-10-07T09:00:00Z' }, { kind: 'visit', at: '2026-10-07T09:00:00Z' }]
+  assert.equal(HQ.bondOf({ points: 1, since: '2026-10-07T00:00:00Z' }, events, now).points, 2)
+  assert.equal(HQ.bondOf({ points: 1 }, events, now).points, 1)
+})
+
+const plain = (x) => JSON.parse(JSON.stringify(x))
+test('bond: unlocks are fixed by level (outfits at 3 and 5, desk items at 2, 4, 5)', () => {
+  const at = (points) => HQ.bondOf({ points }, [], new Date('2026-10-07T10:00:00Z'))
+  assert.deepEqual([at(0).outfits, at(7).outfits, at(18).outfits], [1, 2, 3])
+  assert.deepEqual(plain(at(3).items), ['mug'])
+  assert.deepEqual(plain(at(12).items), ['mug', 'poster'])
+  assert.deepEqual(plain(at(18).items), ['mug', 'poster', 'trophy'])
+  assert.equal(at(12).badge, false); assert.equal(at(18).badge, true)
+})
+
+test('bond: only three calls a Berlin day count, a new day starts fresh, nothing is lost', () => {
+  const day1 = new Date('2026-10-07T10:00:00Z'), late = new Date('2026-10-07T21:59:00Z'), day2 = new Date('2026-10-07T22:30:00Z')
+  let row = null
+  for (let i = 0; i < 4; i++) row = HQ.afterCall(row, 2, day1)
+  assert.equal(row.points, 6); assert.equal(row.calls, 4); assert.equal(row.added, 0)
+  assert.equal(HQ.bondOf(row, [], late).callsLeft, 0)
+  assert.equal(HQ.bondOf(row, [], day2).callsLeft, 3)
+  row = HQ.afterCall(row, 5, day2)
+  assert.equal(row.points, 8); assert.equal(row.calls, 1)
+  assert.equal(row.since, '2026-10-07T10:00:00.000Z')
+  assert.equal(HQ.afterCall(null, 'x', day1).points, 0)
+})
+
+test('seating: one card per desk, one desk per card, removed cards leave their desk', () => {
+  const cards = [{ id: 'a' }, { id: 'b' }]
+  assert.deepEqual(plain(HQ.seating({ pm: 'a', designer: 'a', legal: 'gone', tester: 'b' }, cards)), { pm: 'a', tester: 'b' })
+  assert.deepEqual(plain(HQ.seatCard({ pm: 'a', tester: 'b' }, 'tester', 'a')), { tester: 'a' })
+  assert.deepEqual(plain(HQ.seatCard({ pm: 'a' }, 'pm', null)), {})
+  assert.equal(HQ.moodOf('blocked'), 'stuck'); assert.equal(HQ.moodOf('off'), 'free')
+})
