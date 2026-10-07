@@ -6,10 +6,12 @@
    balloons sits on top: level and bells up top, a phone-like dock of round app buttons below.
    Company: every project, its money and what it needs from yskills. Plan: levels. Team: the nine roles. To-dos: what needs yskills. */
 :root{
-  --bg:#fdf0d2;--panel:#fff6c7;--fg:#6b4b32;--soft:#9a7b5f;--line:#efdcae;--ink:#6b4b32;
+  --bg:#fdf0d2;--panel:#fff6c7;--fg:#6b4b32;--soft:#7a5c43;--line:#efdcae;--ink:#6b4b32;
   --accent:#4fb36b;--accent-ink:#358a50;--accent-soft:#dff2d6;
   --ok:#4fb36b;--warn:#e89a2c;--bad:#ff7b5c;--idle:#b8a48e;--coin:#f7c948;--coin-ink:#a8780c;
   --stage:#fbe7c4;--shadow:rgba(122,84,52,.22);--sky:#bfe7f3;
+  --on-accent:#10301c;--on-bad:#3a0e04;
+  --ok-ink:#1e5c34;--ok-bg:#dff2d6;--warn-ink:#7a4a00;--warn-bg:#fbe3b8;--bad-ink:#8f2a14;--bad-bg:#ffd9cf;--idle-ink:#5e4b3a;--idle-bg:#efe3cc;
   --lift:0 4px 0 rgba(122,84,52,.16),0 12px 26px -8px rgba(122,84,52,.35);
   --sans:"M PLUS Rounded 1c",ui-rounded,"Hiragino Maru Gothic ProN",system-ui,sans-serif;
   --mono:var(--sans);
@@ -17,11 +19,13 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#3a2e3f;--panel:#4a3b4f;--fg:#fff1d6;--soft:#d8c3ae;--line:#5e4b62;--ink:#2a2030;
   --accent:#7cd08f;--accent-ink:#3f9a58;--accent-soft:#2f4a3a;--ok:#7cd08f;--warn:#f6c25f;--bad:#ff9a80;--idle:#a8949c;--coin:#f7c948;--coin-ink:#a8780c;
-  --stage:#2c2540;--shadow:rgba(10,6,20,.35);--sky:#3d4f7a;--lift:0 4px 0 rgba(10,6,20,.3),0 12px 26px -8px rgba(10,6,20,.6);color-scheme:dark}}
+  --stage:#2c2540;--shadow:rgba(10,6,20,.35);--sky:#3d4f7a;--lift:0 4px 0 rgba(10,6,20,.3),0 12px 26px -8px rgba(10,6,20,.6);
+  --ok-ink:#9fe0b0;--ok-bg:#2f4a3a;--warn-ink:#f6c25f;--warn-bg:#4d4128;--bad-ink:#ffb09c;--bad-bg:#5a3438;--idle-ink:#d8c3ae;--idle-bg:#4a3b4f;color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#3a2e3f;--panel:#4a3b4f;--fg:#fff1d6;--soft:#d8c3ae;--line:#5e4b62;--ink:#2a2030;
   --accent:#7cd08f;--accent-ink:#3f9a58;--accent-soft:#2f4a3a;--ok:#7cd08f;--warn:#f6c25f;--bad:#ff9a80;--idle:#a8949c;--coin:#f7c948;--coin-ink:#a8780c;
-  --stage:#2c2540;--shadow:rgba(10,6,20,.35);--sky:#3d4f7a;--lift:0 4px 0 rgba(10,6,20,.3),0 12px 26px -8px rgba(10,6,20,.6);color-scheme:dark}
+  --stage:#2c2540;--shadow:rgba(10,6,20,.35);--sky:#3d4f7a;--lift:0 4px 0 rgba(10,6,20,.3),0 12px 26px -8px rgba(10,6,20,.6);
+  --ok-ink:#9fe0b0;--ok-bg:#2f4a3a;--warn-ink:#f6c25f;--warn-bg:#4d4128;--bad-ink:#ffb09c;--bad-bg:#5a3438;--idle-ink:#d8c3ae;--idle-bg:#4a3b4f;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
@@ -35,8 +39,8 @@ button{font:inherit;color:inherit}
 .stage canvas{display:block;width:100%;height:100%;cursor:grab}
 .stage canvas.point{cursor:pointer}
 .labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.tag{all:unset;position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;display:grid;justify-items:center;gap:2px;transform:translate(-50%,-100%);white-space:nowrap}
-.tag .nm{font:800 12px/1.2 var(--sans);color:#6b4b32;background:#fff6c7;padding:4px 11px;border-radius:999px;box-shadow:0 3px 0 rgba(122,84,52,.25),0 6px 12px -4px rgba(122,84,52,.4)}
+.tag{all:unset;position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;display:grid;justify-items:center;align-content:end;gap:2px;min-height:44px;min-width:44px;transform:translate(-50%,-100%);white-space:nowrap}
+.tag .nm{font:800 12px/1.2 var(--sans);color:#6b4b32;background:#fff6c7;padding:8px 12px;border-radius:999px;box-shadow:0 3px 0 rgba(122,84,52,.25),0 6px 12px -4px rgba(122,84,52,.4)}
 .tag:hover .nm{background:#fffbe3}
 .tag .chip{font-size:11px;padding:0 6px}
 .tag:focus-visible .nm{outline:2px solid var(--accent)}
@@ -48,8 +52,8 @@ button{font:inherit;color:inherit}
 .plate{padding:8px 18px 8px 8px;min-width:0;max-width:min(420px,62vw);display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px}
 .plate .pm{display:grid;gap:4px;min-width:0}
 /* Level badge: a leaf-green stitched patch, like the badges in a New Horizons passport */
-.lv-badge{position:relative;width:54px;height:54px;border-radius:50%;background:var(--accent);box-shadow:inset 0 -4px 0 var(--accent-ink),0 2px 0 rgba(122,84,52,.18);display:grid;place-items:center;align-content:center;color:#fffaf0;line-height:1}
-.lv-badge::before{content:"";position:absolute;inset:4px;border-radius:50%;border:2px dashed rgba(255,250,230,.6)}
+.lv-badge{position:relative;width:54px;height:54px;border-radius:50%;background:var(--accent);box-shadow:inset 0 -4px 0 var(--accent-ink),0 2px 0 rgba(122,84,52,.18);display:grid;place-items:center;align-content:center;color:var(--on-accent);line-height:1}
+.lv-badge::before{content:"";position:absolute;inset:4px;border-radius:50%;border:2px dashed rgba(16,48,28,.45)}
 .lv-badge small{font:900 10px var(--sans);letter-spacing:.02em}
 .lv-badge b{font:900 24px/1 var(--sans);margin-top:-1px}
 .plate h1{font:900 18px/1.15 var(--sans);margin:0;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -69,7 +73,7 @@ button{font:inherit;color:inherit}
 @keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.9)}}
 @media (prefers-reduced-motion:reduce){.toast{animation:none}}
 .bell{position:relative;width:42px;padding:0;justify-content:center}
-.badge{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fff;box-shadow:0 0 0 2.5px var(--panel);font:900 12px/22px var(--sans);text-align:center}
+.badge{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bad);color:var(--on-bad);box-shadow:0 0 0 2.5px var(--panel);font:900 12px/22px var(--sans);text-align:center}
 .bar{flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden;box-shadow:inset 0 1.5px 0 rgba(122,84,52,.15)}
 .bar>span{display:block;height:100%;background:var(--accent)}
 /* Dock */
@@ -88,7 +92,7 @@ button{font:inherit;color:inherit}
 .page{position:absolute;z-index:5;overflow-y:auto;overscroll-behavior:contain;display:grid;gap:14px;align-content:start;
   left:16px;top:122px;bottom:96px;width:min(460px,calc(100% - 32px));padding:18px 18px 22px}
 #labels .tag .chip{display:none}#labels .tag:hover .chip,#labels .tag:focus-visible .chip{display:inline}
-@media (max-width:640px){#labels .tag .nm{font-size:11px;padding:2px 7px}}
+@media (max-width:640px){#labels .tag .nm{font-size:11px;padding:6px 8px}}
 @media (max-width:440px){.greet{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2}}
 @media (max-width:440px){.dock{left:8px;right:8px;transform:none;gap:0;padding:8px 4px 6px}.dock button{flex:1;min-width:0;font-size:10.5px}.dock button::before{width:38px;height:38px;border-radius:14px}}
 @media (max-width:640px){.page{left:10px;right:10px;width:auto;top:auto;max-height:calc(100% - 220px);bottom:86px;padding:16px}}
@@ -98,13 +102,13 @@ button{font:inherit;color:inherit}
 .empty{color:var(--soft);margin:0;font-weight:600}
 ol,ul{margin:0;padding:0;list-style:none}
 .note{font-size:13px;color:var(--soft)}
-.btn{display:inline-block;font:900 13px var(--sans);text-decoration:none;padding:8px 16px;border-radius:999px;border:0;color:var(--fg);background:var(--bg);white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
-.btn.go{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-ink)}
+.btn{display:inline-grid;place-items:center;min-height:44px;font:900 13px var(--sans);text-decoration:none;padding:0 16px;border-radius:999px;border:0;color:var(--fg);background:var(--bg);white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
+.btn.go{background:var(--accent);color:var(--on-accent);box-shadow:0 3px 0 var(--accent-ink)}
 .chip{font:800 12px var(--sans);padding:1px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;background:var(--panel)}
-.chip.working,.chip.active{color:var(--accent);background:var(--accent-soft);border-color:transparent}
-.chip.blocked{color:var(--bad)}
-.chip.waiting{color:var(--warn)}
-.chip.idle,.chip.done,.chip.paused,.chip.off{color:var(--idle)}
+.chip.working,.chip.active{color:var(--ok-ink);background:var(--ok-bg)}
+.chip.blocked{color:var(--bad-ink);background:var(--bad-bg)}
+.chip.waiting{color:var(--warn-ink);background:var(--warn-bg)}
+.chip.idle,.chip.done,.chip.paused,.chip.off{color:var(--idle-ink);background:var(--idle-bg)}
 /* Company */
 /* Totals as a ledger: label, dotted leader, amount, like a page in a cash book */
 .totals{display:grid;gap:2px;padding:4px 14px;border-radius:12px;background:var(--bg);border:2px solid var(--line)}
@@ -121,7 +125,13 @@ ol,ul{margin:0;padding:0;list-style:none}
 .pn{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
 .pn b{font:900 17px var(--sans)}
 .pstats{display:flex;flex-wrap:wrap;gap:4px 14px;font:600 12px var(--mono);color:var(--soft);font-variant-numeric:tabular-nums}
-.pstats .need{color:var(--bad)}
+.pstats .need{color:var(--bad-ink)}
+.pstats .over{color:var(--bad-ink)}
+.trac{display:flex;flex-wrap:wrap;gap:4px 14px;font:800 13px var(--sans)}
+.trac b{font-weight:900}
+.stale{opacity:.6}
+.stale-note{font:700 12px var(--sans);color:var(--warn-ink)}
+.today .wait{font:700 12px var(--sans);color:var(--soft);display:block}
 .pbar{display:flex;align-items:center;gap:10px}
 .pbar .num{font:600 12px var(--mono);width:3.2em;text-align:right;font-variant-numeric:tabular-nums}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
@@ -143,7 +153,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .today .btn{display:inline-grid;place-items:center;min-height:44px;padding:0 16px;background:var(--coin);color:var(--ink);box-shadow:0 3px 0 var(--coin-ink)}
 #today-info-h[hidden]{display:none}
 #today-at{margin-top:10px}
-#today-at.warn{color:var(--bad)}
+#today-at.warn{color:var(--bad-ink)}
 .next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
 .next li:first-child{border-top:0}
 .next li::before{content:"";position:absolute;left:2px;top:14px;width:7px;height:7px;border:2px solid var(--accent);border-radius:50%}
@@ -404,17 +414,23 @@ window.HQ = (() => {
   /* Which room stays behind a page: the desk and the team office swap; other pages keep the room they were opened from. */
   const worldFor = (tab, current) => (tab === 'desk' ? 'room' : tab === 'office' || tab === 'team' ? 'office' : current || 'room')
   const eur = (v) => Math.max(0, Number(v) || 0)
+  /* Every row a manager or thread writes carries `at` (stamp(data) adds it). A row older than ROW_STALE_H hours, or without a stamp,
+     is shown grey ("seit 6 Std. nicht aktualisiert") and no longer counts as someone working. */
+  const ROW_STALE_H = 6
+  const stamp = (data, now = new Date()) => ({ ...data, at: now.toISOString() })
+  const rowAt = (row) => [row?.at, row?.updated].find((v) => typeof v === 'string' && !Number.isNaN(Date.parse(v))) || null
+  const rowFresh = (row, now = new Date()) => { const at = rowAt(row); return !!at && now - Date.parse(at) <= ROW_STALE_H * 3600000 }
+  const rowNote = (row, now = new Date()) => (rowFresh(row, now) ? '' : rowAt(row) ? `seit ${ROW_STALE_H} Std. nicht aktualisiert (Stand ${ageDe(rowAt(row), now)})` : 'ohne Zeitstempel, Stand unbekannt')
   /* What the things on yskills' desk show */
-  function deskNumbers({ projects = [], you = 0, phases = [] }) {
+  function deskNumbers({ projects = [], you = 0, phases = [], now = new Date() }) {
     const goals = phases.flatMap((p) => p.goals || [])
     const done = goals.reduce((n, g) => n + (Number(g.done) || 0), 0), total = goals.reduce((n, g) => n + (Number(g.total) || 0), 0)
-    const needs = projects.reduce((n, p) => n + (Array.isArray(p.you) ? p.you.length : 0), 0)
     return {
       month: projects.reduce((n, p) => n + eur(p.revenueMonth), 0),
       total: projects.reduce((n, p) => n + eur(p.revenueTotal), 0),
-      todos: Math.max(Number(you) || 0, needs),
+      todos: Math.max(0, Number(you) || 0),
       pct: total > 0 ? Math.round((100 * done) / total) : 0,
-      working: projects.reduce((n, p) => n + Math.max(0, Number(p.working) || 0), 0),
+      working: projects.reduce((n, p) => n + (rowFresh(p, now) ? Math.max(0, Number(p.working) || 0) : 0), 0),
       test: projects.some((p) => p.testMoney),
     }
   }
@@ -443,13 +459,17 @@ window.HQ = (() => {
     const r = moneyReport(row, now)
     if (!r.has) return project
     const left = (t) => (t.complete ? t.net : t.gross)
-    return { ...project, revenueTotal: left(r.total) / 100, revenueMonth: r.month ? left(r.month) / 100 : project.revenueMonth, revenueNet: r.total.complete, testMoney: r.test }
+    return { ...project, revenueTotal: left(r.total) / 100, revenueMonth: r.month ? left(r.month) / 100 : project.revenueMonth, revenueNet: r.total.complete, testMoney: r.test, revenueAt: r.at || project.revenueAt }
   }
-  /* The game loop: level, XP and coins come only from real events (events/<id> { kind, project, at, amount? }), never from clicks.
-     A PR merged 50 XP, the 5/5 gate passed 20, a project launched 100, each euro earned 10 XP and 1 coin, each day visited 5. */
-  const XP_OF = { pr_merged: 50, gate_passed: 20, launched: 100, visit: 5 }, XP_PER_EURO = 10, XP_PER_LEVEL = 100
-  const euros = (e) => (e?.kind === 'euro' && Number.isFinite(e.amount) && e.amount > 0 ? e.amount : 0)
-  const xpOf = (e) => XP_OF[e?.kind] || Math.round(euros(e) * XP_PER_EURO) || 0
+  /* The game loop: level, XP and coins come only from real events (events/<id> { kind, project, at, amount?, mode? }), never from clicks.
+     A product PR merged 50 XP, its 5/5 gate passed 20, a project launched 100, each LIVE euro 10 XP and 1 coin. claude-setup and hq PRs
+     (the toolkit) score nothing, visits score nothing, and Testgeld (a euro event without mode 'live') earns no coins and no XP. */
+  const XP_OF = { pr_merged: 50, gate_passed: 20, launched: 100 }, XP_PER_EURO = 10, XP_PER_LEVEL = 100
+  const NOT_PRODUCT = new Set(['claude-setup', 'hq'])
+  const amountOf = (e) => (e?.kind === 'euro' && Number.isFinite(e.amount) && e.amount > 0 ? e.amount : 0)
+  const euros = (e) => (e?.mode === 'live' ? amountOf(e) : 0)
+  const testEuros = (e) => (e?.mode === 'live' ? 0 : amountOf(e))
+  const xpOf = (e) => (NOT_PRODUCT.has(e?.project) ? 0 : XP_OF[e?.kind] || 0) || Math.round(euros(e) * XP_PER_EURO) || 0
   const levelStart = (level) => (level - 1) ** 2 * XP_PER_LEVEL
   function scoreFrom(events) {
     const seen = new Set()
@@ -461,7 +481,7 @@ window.HQ = (() => {
     })
     const xp = real.reduce((n, e) => n + xpOf(e), 0)
     const level = Math.floor(Math.sqrt(xp / XP_PER_LEVEL)) + 1, from = levelStart(level), to = levelStart(level + 1)
-    return { xp, coins: Math.floor(real.reduce((n, e) => n + euros(e), 0)), level, from, to, pct: Math.round((100 * (xp - from)) / (to - from)) }
+    return { xp, coins: Math.floor(real.reduce((n, e) => n + euros(e), 0)), test: real.reduce((n, e) => n + testEuros(e), 0), level, from, to, pct: Math.round((100 * (xp - from)) / (to - from)) }
   }
   /* The small "+50 XP" toast for events that arrived while the page was open */
   function toastFor(events) {
@@ -576,16 +596,36 @@ window.HQ = (() => {
   }
   const httpsOr = (u) => (typeof u === 'string' && /^https:\/\//.test(u) ? u : null)
   const line = (s, n) => String(s).replace(/\s+/g, ' ').trim().slice(0, n)
-  function todayFor({ today, pm } = {}, now = new Date()) {
-    const items = [], seen = new Set()
-    const add = (it) => { const k = it.what.toLowerCase(); if (it.what && !seen.has(k)) { seen.add(k); items.push(it) } }
+  /* "seit 3 Std." for how long a to-do has waited (firstSeen), as opposed to ageDe = how old the reading is */
+  const sinceDe = (iso, now = new Date()) => { const a = ageDe(iso, now); return a === 'gerade eben' ? 'seit gerade eben' : a ? `seit ${a.replace(/^vor /, '')}` : '' }
+  /* One place per to-do. The live list (today/now) comes first, then each project row's you[], then pm/now.you only as the fallback
+     when nothing else lists a to-do. Two lines are the same to-do when their text matches, or when they share a link and come from
+     different lists (the same step told twice); steps of one list that share a link stay separate. Every item keeps firstSeen (when
+     it first appeared, so the wait is real) next to at (when its source was read), and is stale when that reading is old. */
+  function todayFor({ today, pm, projects } = {}, now = new Date()) {
+    const items = [], texts = new Set(), links = new Map()
+    const add = (it, list) => {
+      const k = it.what.toLowerCase()
+      if (!it.what || texts.has(k) || (it.link && links.has(it.link) && links.get(it.link) !== list)) return
+      texts.add(k); if (it.link) links.set(it.link, list)
+      const seen = isTime(it.firstSeen) ? it.firstSeen : it.at
+      items.push({ ...it, stale: !it.at || now - Date.parse(it.at) > ROW_STALE_H * 3600000, waited: it.kind === 'you' ? sinceDe(seen, now) : '' })
+    }
     for (const x of Array.isArray(today?.items) ? today.items : []) {
       if (!x || typeof x.what !== 'string' || typeof x.source !== 'string' || !isTime(x.at)) continue
-      add({ what: line(x.what, 200), kind: x.kind === 'info' ? 'info' : 'you', source: line(x.source, 40), at: x.at, age: ageDe(x.at, now), link: httpsOr(x.link) })
+      add({ what: line(x.what, 200), kind: x.kind === 'info' ? 'info' : 'you', source: line(x.source, 40), at: x.at, firstSeen: x.firstSeen, age: ageDe(x.at, now), link: httpsOr(x.link) }, 'today')
     }
-    const pmAt = isTime(pm?.updated) ? pm.updated : null
-    for (const y of Array.isArray(pm?.you) ? pm.you : []) {
-      if (y && typeof y.what === 'string') add({ what: line(y.what, 200), kind: 'you', source: 'Claude-Team', at: pmAt, age: pmAt ? ageDe(pmAt, now) : '', link: httpsOr(y.link) })
+    for (const p of Array.isArray(projects) ? projects : []) {
+      const at = rowAt(p)
+      for (const y of Array.isArray(p?.you) ? p.you : []) {
+        if (y && typeof y.what === 'string') add({ what: line(y.what, 200), kind: 'you', source: line(p.name || p.id || 'Projekt', 40), at, firstSeen: y.firstSeen, age: at ? ageDe(at, now) : '', link: httpsOr(y.link) }, `project:${p.id}`)
+      }
+    }
+    if (!items.some((i) => i.kind === 'you')) {
+      const pmAt = rowAt(pm)
+      for (const y of Array.isArray(pm?.you) ? pm.you : []) {
+        if (y && typeof y.what === 'string') add({ what: line(y.what, 200), kind: 'you', source: 'Claude-Team', at: pmAt, firstSeen: y.firstSeen, age: pmAt ? ageDe(pmAt, now) : '', link: httpsOr(y.link) }, 'pm')
+      }
     }
     const ordered = [...items.filter((i) => i.kind === 'you'), ...items.filter((i) => i.kind === 'info')]
     const at = isTime(today?.refreshedAt) ? today.refreshedAt : null
@@ -593,9 +633,30 @@ window.HQ = (() => {
       .map((s) => ({ name: line(s.name, 40), ok: s.ok === true, note: typeof s.note === 'string' ? line(s.note, 140) : '' }))
     return { items: ordered, you: items.filter((i) => i.kind === 'you').length, at, age: at ? ageDe(at, now) : '', stale: !at || now - Date.parse(at) > TODAY_STALE_MIN * 60000, sources }
   }
+  /* What the list says about itself: the stale warning shows whenever the list is old, and "neu bei jedem Öffnen" only when a
+     refresh was asked for in the last day (today/ask.at), so the page never promises what has not happened. */
+  function todayNote(t, askedAt, now = new Date()) {
+    if (!t.at) return 'Noch kein Abgleich gelaufen.'
+    const auto = minutesSince(askedAt, now) < 1440 ? 'neu bei jedem Öffnen' : ''
+    return [t.stale ? `Stand ${t.age}, evtl. veraltet` : `Abgeglichen ${t.age}`, auto].filter(Boolean).join(' · ')
+  }
+  /* Progress that means something: what real people did (the manager writes visitors7d, signups, paying, firstEuroBy into
+     projects/<id>), and the days to the first real euro, never how much is built. */
+  function tractionOf(p, now = new Date()) {
+    const n = (v) => (Number.isInteger(v) && v >= 0 ? v : null)
+    const parts = [['Besucher (7 Tage)', n(p?.visitors7d)], ['Anmeldungen', n(p?.signups)], ['Zahlende', n(p?.paying)]].filter(([, v]) => v != null).map(([label, v]) => ({ label, value: v }))
+    const real = p?.revenueMode === 'live' && Number(p?.revenueTotal) > 0
+    const by = isTime(p?.firstEuroBy) ? Date.parse(p.firstEuroBy) : NaN
+    const days = Number.isNaN(by) ? null : Math.ceil((by - now) / 86400000)
+    const countdown = real ? 'Erster echter Euro verdient'
+      : days == null ? 'Kein Datum für den ersten Euro'
+      : days > 0 ? `Erster Euro in ${days} Tag${days === 1 ? '' : 'en'}`
+      : `Erster Euro ${-days} Tag${days === -1 ? '' : 'e'} überfällig`
+    return { parts, countdown, real, overdue: !real && days != null && days <= 0 }
+  }
   /* Opening HQ asks the refresher session (config/refresher, a thread that runs operator/hq-refresh.md) for a fresh list when the
      last one is older than REFRESH_AFTER_MIN and nobody asked in the last ASK_GAP_MIN (today/ask.at) */
-  const REFRESH_AFTER_MIN = 30, ASK_GAP_MIN = 10
+  const REFRESH_AFTER_MIN = 150, ASK_GAP_MIN = 10
   const minutesSince = (iso, now) => (isTime(iso) ? (now - Date.parse(iso)) / 60000 : Infinity)
   const refreshDue = ({ today, askedAt }, now = new Date()) => minutesSince(today?.refreshedAt, now) > REFRESH_AFTER_MIN && minutesSince(askedAt, now) > ASK_GAP_MIN
   const refresherOf = (config) => (typeof config?.session === 'string' && SESSION_ID.test(config.session) ? config.session : null)
@@ -724,7 +785,7 @@ window.HQ = (() => {
   const moodOf = (state) => ({ working: 'busy', blocked: 'stuck', waiting: 'asks', done: 'proud' })[state] || 'free'
   const WORLD_TABS = ['desk', 'office']
   const closeTo = (tab, world) => (!tab || WORLD_TABS.includes(tab) ? null : world === 'room' ? 'desk' : 'office')
-  return { ageDe, todayFor, berlinDay, greetToday, refreshDue, refresherOf, REFRESH_MESSAGE, TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, withFinance, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf }
+  return { ageDe, sinceDe, todayFor, todayNote, tractionOf, stamp, rowAt, rowFresh, rowNote, ROW_STALE_H,  berlinDay, greetToday, refreshDue, refresherOf, REFRESH_MESSAGE, TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, withFinance, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf }
 })()
 </script>
 <script id="team-3d">
