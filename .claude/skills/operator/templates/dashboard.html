@@ -131,6 +131,19 @@ ol,ul{margin:0;padding:0;list-style:none}
 .todo li.empty{display:block}
 .todo li.empty::before{display:none}
 .todo .from{font:600 11px var(--mono);color:var(--soft);display:block}
+/* Heute für dich: a notepad page, the things that need yskills first, info after; content-high, never a full-height drawer */
+.page[data-page=todo]{bottom:auto;max-height:calc(100% - 218px);border-top:10px solid var(--bad)}
+@media (max-width:640px){.page[data-page=todo]{top:auto;bottom:86px;max-height:calc(100% - 200px)}}
+.today li{grid-template-columns:18px minmax(0,1fr) auto;align-items:center;min-height:44px}
+.today li::before{width:12px;height:12px;margin:5px 0 0 2px;border:0;border-radius:50%;background:var(--bad);align-self:start}
+.today li.info::before{width:8px;height:8px;background:var(--line);margin:7px 0 0 4px}
+.today .what{font-weight:700}
+@media (min-width:641px){.today .what{font-size:15px}}
+.today .from{font:700 13px var(--sans);color:var(--fg);opacity:.85;margin-top:2px}
+.today .btn{display:inline-grid;place-items:center;min-height:44px;padding:0 16px;background:var(--coin);color:var(--ink);box-shadow:0 3px 0 var(--coin-ink)}
+#today-info-h[hidden]{display:none}
+#today-at{margin-top:10px}
+#today-at.warn{color:var(--bad)}
 .next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
 .next li:first-child{border-top:0}
 .next li::before{content:"";position:absolute;left:2px;top:14px;width:7px;height:7px;border:2px solid var(--accent);border-radius:50%}
@@ -292,7 +305,7 @@ ol,ul{margin:0;padding:0;list-style:none}
         <svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="var(--coin)" stroke="var(--ink)" stroke-width="2.2"/><circle cx="12" cy="12" r="6" fill="none" stroke="var(--coin-ink)" stroke-width="1.6"/><path d="M14.2 9.6a3 3 0 1 0 0 4.8M8.6 11.2h4M8.6 12.9h4" fill="none" stroke="var(--coin-ink)" stroke-width="1.6" stroke-linecap="round"/></svg>
         <span id="coin-val">0</span>
       </a>
-      <a class="card pill bell" href="#todo" aria-label="Your to-dos">
+      <a class="card pill bell" href="#todo" aria-label="Heute für dich">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
         <span class="badge" id="you-count" hidden>0</span>
       </a>
@@ -341,10 +354,15 @@ ol,ul{margin:0;padding:0;list-style:none}
   </section>
 
   <section class="card page" data-page="todo" aria-labelledby="todo-h" hidden>
-    <div><h2 id="todo-h">Your to-dos</h2><p class="lead">Only the things the team can't do without you.</p></div>
-    <ul class="todo" id="you"><li class="empty">Nothing right now.</li></ul>
-    <h3>Live links</h3>
-    <ul id="live" class="stack" style="gap:6px"><li class="empty">Nothing deployed yet.</li></ul>
+    <div><h2 id="todo-h">Heute für dich</h2><p class="lead">Jede Zeile sagt, woher sie kommt und wie alt sie ist.</p></div>
+    <h3>Für dich</h3>
+    <ul class="todo today" id="you"><li class="empty">Nichts zu tun. Genieß den Tag.</li></ul>
+    <h3 id="today-info-h" hidden>Zur Info</h3>
+    <ul class="todo today" id="today-info"></ul>
+    <p class="meta" id="today-at" role="status"></p>
+    <div class="row"><button type="button" class="btn" id="today-go" hidden>Jetzt abgleichen</button></div>
+    <h3>Live-Seiten</h3>
+    <ul id="live" class="stack" style="gap:6px"><li class="empty">Noch nichts live.</li></ul>
   </section>
 
   <nav class="card dock" aria-label="Pages">
@@ -353,7 +371,7 @@ ol,ul{margin:0;padding:0;list-style:none}
     <button type="button" data-tab="office"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7M5 9.5V20h14V9.5M9.5 20v-5h5v5"/></svg>Office</button>
     <button type="button" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Plan</button>
     <button type="button" data-tab="team"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M15 14.6c2.6-.3 4.6 1.2 5.2 4.4"/></svg>Team</button>
-    <button type="button" data-tab="todo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3.5h6v3H9zM8.5 12l2 2 4-4"/></svg>To-dos<span class="dot" id="todo-dot" hidden></span></button>
+    <button type="button" data-tab="todo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3.5h6v3H9zM8.5 12l2 2 4-4"/></svg>Heute<span class="dot" id="todo-dot" hidden></span></button>
   </nav>
 </div>
 
@@ -542,6 +560,48 @@ window.HQ = (() => {
       trouble: [syncTrouble('Stripe-Abgleich', row.sync), syncTrouble('Gebühren', row.feeSync), syncTrouble('Auszahlung', row.payoutSync)].filter(Boolean),
     }
   }
+  /* Heute für dich (the desk phone): today/now is written by the HQ refresh routine from live sources (GitHub, Stripe through
+     duo-test's /api/stats, Roblox, the project threads), each item with its source and when that source was read. pm/now's you[]
+     joins as "Claude-Team". kind 'you' (needs yskills) comes before 'info'. Older than TODAY_STALE_MIN minutes counts as stale. */
+  const TODAY_STALE_MIN = 150
+  function ageDe(iso, now = new Date()) {
+    const t = isTime(iso) ? Date.parse(iso) : NaN
+    if (Number.isNaN(t)) return ''
+    const m = Math.floor((now - t) / 60000)
+    if (m < 1) return 'gerade eben'
+    if (m < 60) return `vor ${m} Min.`
+    if (m < 1440) return `vor ${Math.floor(m / 60)} Std.`
+    const d = Math.floor(m / 1440)
+    return `vor ${d} Tag${d === 1 ? '' : 'en'}`
+  }
+  const httpsOr = (u) => (typeof u === 'string' && /^https:\/\//.test(u) ? u : null)
+  const line = (s, n) => String(s).replace(/\s+/g, ' ').trim().slice(0, n)
+  function todayFor({ today, pm } = {}, now = new Date()) {
+    const items = [], seen = new Set()
+    const add = (it) => { const k = it.what.toLowerCase(); if (it.what && !seen.has(k)) { seen.add(k); items.push(it) } }
+    for (const x of Array.isArray(today?.items) ? today.items : []) {
+      if (!x || typeof x.what !== 'string' || typeof x.source !== 'string' || !isTime(x.at)) continue
+      add({ what: line(x.what, 200), kind: x.kind === 'info' ? 'info' : 'you', source: line(x.source, 40), at: x.at, age: ageDe(x.at, now), link: httpsOr(x.link) })
+    }
+    const pmAt = isTime(pm?.updated) ? pm.updated : null
+    for (const y of Array.isArray(pm?.you) ? pm.you : []) {
+      if (y && typeof y.what === 'string') add({ what: line(y.what, 200), kind: 'you', source: 'Claude-Team', at: pmAt, age: pmAt ? ageDe(pmAt, now) : '', link: httpsOr(y.link) })
+    }
+    const ordered = [...items.filter((i) => i.kind === 'you'), ...items.filter((i) => i.kind === 'info')]
+    const at = isTime(today?.refreshedAt) ? today.refreshedAt : null
+    const sources = (Array.isArray(today?.sources) ? today.sources : []).filter((s) => s && typeof s.name === 'string')
+      .map((s) => ({ name: line(s.name, 40), ok: s.ok === true, note: typeof s.note === 'string' ? line(s.note, 140) : '' }))
+    return { items: ordered, you: items.filter((i) => i.kind === 'you').length, at, age: at ? ageDe(at, now) : '', stale: !at || now - Date.parse(at) > TODAY_STALE_MIN * 60000, sources }
+  }
+  /* Opening HQ asks the refresher session (config/refresher, a thread that runs operator/hq-refresh.md) for a fresh list when the
+     last one is older than REFRESH_AFTER_MIN and nobody asked in the last ASK_GAP_MIN (today/ask.at) */
+  const REFRESH_AFTER_MIN = 30, ASK_GAP_MIN = 10
+  const minutesSince = (iso, now) => (isTime(iso) ? (now - Date.parse(iso)) / 60000 : Infinity)
+  const refreshDue = ({ today, askedAt }, now = new Date()) => minutesSince(today?.refreshedAt, now) > REFRESH_AFTER_MIN && minutesSince(askedAt, now) > ASK_GAP_MIN
+  const refresherOf = (config) => (typeof config?.session === 'string' && SESSION_ID.test(config.session) ? config.session : null)
+  const REFRESH_MESSAGE = 'HQ refresh: yskills opened HQ. Fill today/now now, as .claude/skills/operator/hq-refresh.md says (main branch of yskills/claude-setup). No reply needed.'
+  /* HQ opens on Heute für dich by itself once per Europe/Berlin day, when yskills lands on the desk and something needs them */
+  const greetToday = ({ seen, you, tab }, now = new Date()) => tab === 'desk' && you > 0 && seen !== berlinDay(now)
   /* Office walking: a floor grid ({ x0, z0, size, w, h, blocked }, blocked[j * w + i] is 1 where furniture stands)
      and an 8-way A* over it. findPath gives world [x, z] points from `from` to `to`, straight runs merged, or null
      when there is no way through. The ends may sit on blocked cells (a chair, a sofa): the walk starts and ends at
@@ -664,7 +724,7 @@ window.HQ = (() => {
   const moodOf = (state) => ({ working: 'busy', blocked: 'stuck', waiting: 'asks', done: 'proud' })[state] || 'free'
   const WORLD_TABS = ['desk', 'office']
   const closeTo = (tab, world) => (!tab || WORLD_TABS.includes(tab) ? null : world === 'room' ? 'desk' : 'office')
-  return { TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, withFinance, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf }
+  return { ageDe, todayFor, berlinDay, greetToday, refreshDue, refresherOf, REFRESH_MESSAGE, TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, withFinance, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf }
 })()
 </script>
 <script id="team-3d">
@@ -1216,14 +1276,75 @@ function renderPm(d) {
   $('title').textContent = d.project || 'Project'
   document.title = `${d.project || 'Project'} HQ`
   updated = d.updated ? ago(d.updated) : ''
-  youCount = (d.you || []).length
-  $('you-count').hidden = $('todo-dot').hidden = youCount === 0; $('you-count').textContent = String(youCount)
   $('summary').textContent = d.summary || ''
   list($('next'), d.next || [], (s) => el('li', null, s), 'None yet.')
-  list($('you'), d.you || [], (y) => { const li = el('li'); li.append(link(y.what, y.link)); return li }, 'Nothing right now.')
-  list($('live'), d.live || [], (l) => { const li = el('li'); li.append(link(l.name, l.url)); if (l.note) li.append(el('span', 'note', ` · ${l.note}`)); return li }, 'Nothing deployed yet.')
-  office?.setWall(level, youCount); room?.update()
+  list($('live'), d.live || [], (l) => { const li = el('li'); li.append(link(l.name, l.url)); if (l.note) li.append(el('span', 'note', ` · ${l.note}`)); return li }, 'Noch nichts live.')
+  renderToday()
   window.onDaytime?.(document.documentElement.dataset.daytime || 'day')
+}
+/* Heute für dich: the routine's live items plus the team's own list, each with where it came from and how old it is */
+let todayRow = null
+function renderToday() {
+  const t = HQ.todayFor({ today: todayRow, pm: pmNow })
+  youCount = t.you
+  $('you-count').hidden = $('todo-dot').hidden = youCount === 0; $('you-count').textContent = String(youCount)
+  const row = (y) => {
+    const li = el('li', y.kind === 'info' ? 'info' : null)
+    const what = el('div'); what.append(el('span', 'what', y.what))
+    what.append(el('span', 'from', [y.source, y.age].filter(Boolean).join(' · ')))
+    li.append(what)
+    if (y.link) li.append(link('Öffnen', y.link, 'btn'))
+    return li
+  }
+  const info = t.items.filter((y) => y.kind === 'info')
+  list($('you'), t.items.filter((y) => y.kind !== 'info'), row, 'Nichts zu tun. Genieß den Tag.')
+  list($('today-info'), info, row, '')
+  $('today-info-h').hidden = $('today-info').hidden = info.length === 0
+  const off = t.sources.filter((x) => !x.ok).map((x) => (x.note ? `${x.name}: ${x.note}` : `${x.name} nicht erreichbar`))
+  $('today-at').textContent = !t.at ? 'Noch kein Abgleich gelaufen.'
+    : [`Abgeglichen ${t.age}`, 'neu bei jedem Öffnen und morgens um 8', ...off].join(' · ')
+  $('today-at').classList.toggle('warn', t.stale && !HQ.refresherOf(refresher))
+  office?.setWall(level, youCount); room?.update()
+  greet(t)
+}
+/* Opening HQ asks the refresher for a fresh list when it is old (only with the connector already allowed, so no prompt on
+   load); the button asks on a tap, which may show the allow prompt once */
+let refresher = null, askedAt = null, askIn = { today: false, cfg: false, ask: false }, askedOnOpen = false
+async function askRefresh(byTap) {
+  const to = HQ.refresherOf(refresher)
+  if (!to || !hqDb) return
+  if (!byTap) {
+    const perms = await window.claude?.use?.('permissions')
+    if ((await perms?.state(`mcp:${CCR}`).catch(() => 'unavailable')) !== 'granted') return
+  }
+  const said = $('today-at'), go = $('today-go'); go.disabled = true
+  try {
+    const mcp = await window.claude?.use?.('mcp')
+    if (!mcp) throw new Error('not_granted')
+    await mcp.callTool(CCR, 'send_message', { session_id: to, message: HQ.REFRESH_MESSAGE })
+    askedAt = new Date().toISOString()
+    await hqDb.doc('today/ask').set({ at: askedAt }).catch(() => {})
+    if (byTap) said.textContent = 'Abgleich läuft, die Liste aktualisiert sich gleich von selbst.'
+  } catch (e) { if (byTap) said.textContent = HQ.sendTrouble(e?.code || e?.message).replace('Gespeichert. ', '') }
+  go.disabled = false
+}
+function maybeAsk() {
+  $('today-go').hidden = !HQ.refresherOf(refresher)
+  if (askedOnOpen || !askIn.today || !askIn.cfg || !askIn.ask) return
+  askedOnOpen = true
+  if (HQ.refreshDue({ today: todayRow, askedAt })) askRefresh(false)
+}
+$('today-go').addEventListener('click', () => askRefresh(true))
+/* Once a day HQ opens on this page by itself, when yskills lands on the desk and something needs them */
+let greeted = false, pmIn = false
+function greet(t) {
+  if (greeted || !todayRow || !pmIn) return
+  greeted = true
+  let seen = null
+  try { seen = localStorage.getItem('hq-today-seen') } catch {}
+  if (!HQ.greetToday({ seen, you: t.you, tab: tabNow }, new Date())) return
+  try { localStorage.setItem('hq-today-seen', HQ.berlinDay(new Date())) } catch {}
+  location.hash = 'todo'
 }
 
 function renderPhases(phases) {
@@ -1550,11 +1671,11 @@ async function buildRoom() {
     g.fillText(`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`, w / 2, 78)
     const n = desk$.todos
     g.fillStyle = n ? coral : leaf; g.beginPath(); if (g.roundRect) g.roundRect(16, 120, w - 32, 96, 18); else g.rect(16, 120, w - 32, 96); g.fill()
-    g.fillStyle = '#fffaf0'; g.font = FONT(900, 46); g.fillText(n ? String(n) : '✓', w / 2, 172); g.font = FONT(800, 18); g.fillText(n ? 'need you' : 'all clear', w / 2, 202)
+    g.fillStyle = '#fffaf0'; g.font = FONT(900, 46); g.fillText(n ? String(n) : '✓', w / 2, 172); g.font = FONT(800, 18); g.fillText(n ? 'für dich' : 'alles erledigt', w / 2, 202)
     g.textAlign = 'left'
   })
   const glass = plane(0.088, 0.17, lock.t, true); glass.rotation.x = -Math.PI / 2; glass.position.y = 0.0075; phone.add(glass)
-  scene.add(phone); spot(phone, 'todo', 'To-dos', new T.Vector3(0.44, dt + 0.1, 1.14))
+  scene.add(phone); spot(phone, 'todo', 'Heute', new T.Vector3(0.44, dt + 0.1, 1.14))
 
   /* The yellow notepad: tap it to start a new project. Its page shows the newest request's state. */
   const pad = new T.Group(); pad.position.set(-0.4, dt + 0.006, 0.98); pad.rotation.y = 0.22; pad.scale.setScalar(1.4)
@@ -1689,7 +1810,7 @@ async function buildRoom() {
       x.el.hidden = off || !!visit
       if (!off) x.el.style.transform = `translate(${((v.x + 1) / 2) * w}px, ${((1 - v.y) / 2) * h}px) translate(-50%,-100%)`
     }
-    const n = desk$.todos; hot.find((x) => x.go === 'todo').el.firstChild.textContent = n ? `To-dos · ${n}` : 'To-dos'
+    const n = desk$.todos; hot.find((x) => x.go === 'todo').el.firstChild.textContent = n ? `Heute · ${n}` : 'Heute'
   }
   const ray = new T.Raycaster(), pt = new T.Vector2()
   const hit = (e) => {
@@ -2621,7 +2742,10 @@ renderTeam([]); renderSkinSwitch()
   $('dot').classList.add('on')
   const fail = () => { $('dot').classList.remove('on'); $('greet').textContent = 'Live updates stopped; reload the page' }
   hqDb = db
-  db.doc('pm/now').onSnapshot((s) => { pmNow = s.exists ? s.data() : null; renderPm(pmNow) }, fail)
+  db.doc('pm/now').onSnapshot((s) => { pmNow = s.exists ? s.data() : null; pmIn = true; if (pmNow) renderPm(pmNow); else renderToday() }, fail)
+  db.doc('today/now').onSnapshot((s) => { todayRow = s.exists ? s.data() : {}; renderToday(); askIn.today = true; maybeAsk() }, () => {})
+  db.doc('config/refresher').onSnapshot((s) => { refresher = s.exists ? s.data() : null; askIn.cfg = true; maybeAsk() }, () => {})
+  db.doc('today/ask').onSnapshot((s) => { askedAt = s.exists ? s.data().at : null; askIn.ask = true; maybeAsk() }, () => {})
   /* New project requests: rows still 'new' are resent once per open, only when the viewer already allowed the connector (no prompt on load) */
   let resent = false, reqsIn = false
   const resend = async () => {

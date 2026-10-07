@@ -343,3 +343,61 @@ test('Company, laptop and wall chart show the cash book amount with cents: net o
   assert.deepEqual(plain(HQ.withFinance(p, open, NOW)), { ...p, revenueTotal: 29.99, revenueMonth: 30, revenueNet: false, testMoney: false })
   assert.deepEqual(plain(HQ.withFinance(p, undefined, NOW)), p)
 })
+
+test('Heute für dich: live items with source and age, the team list joins, stale when the refresh is old', () => {
+  const now = new Date('2026-10-07T10:00:00Z')
+  const today = {
+    refreshedAt: '2026-10-07T09:48:00Z',
+    items: [
+      { what: 'duo-test: 29,99 € Testgeld eingegangen', kind: 'info', source: 'Stripe', at: '2026-10-07T09:47:00Z' },
+      { what: 'claude-setup PR 51: CI rot', kind: 'you', source: 'GitHub', at: '2026-10-07T07:00:00Z', link: 'https://github.com/yskills/claude-setup/pull/51' },
+      { what: 'no source', at: '2026-10-07T09:00:00Z' },
+      { what: 'bad link', source: 'GitHub', at: '2026-10-07T09:00:00Z', link: 'javascript:alert(1)' },
+      null,
+    ],
+    sources: [{ name: 'GitHub', ok: true }, { name: 'Roblox', ok: false, note: 'kein Schlüssel' }, { ok: true }],
+  }
+  const pm = { updated: '2026-10-05T10:00:00Z', you: [{ what: 'Kleingarten: Shop anlegen', link: 'https://create.roblox.com/x' }, { what: 'CLAUDE-SETUP PR 51: CI ROT' }] }
+  const t = HQ.todayFor({ today, pm }, now)
+  assert.deepEqual([...t.items.map((i) => i.what)], ['claude-setup PR 51: CI rot', 'bad link', 'Kleingarten: Shop anlegen', 'duo-test: 29,99 € Testgeld eingegangen'])
+  assert.equal(t.items[0].age, 'vor 3 Std.'); assert.equal(t.items[0].source, 'GitHub')
+  assert.equal(t.items[1].link, null)
+  assert.equal(t.items[2].source, 'Claude-Team'); assert.equal(t.items[2].age, 'vor 2 Tagen')
+  assert.equal(t.items[3].age, 'vor 13 Min.')
+  assert.equal(t.you, 3); assert.equal(t.age, 'vor 12 Min.'); assert.equal(t.stale, false)
+  assert.deepEqual(JSON.parse(JSON.stringify(t.sources)), [{ name: 'GitHub', ok: true, note: '' }, { name: 'Roblox', ok: false, note: 'kein Schlüssel' }])
+  assert.equal(HQ.todayFor({ today: { ...today, refreshedAt: '2026-10-07T06:00:00Z' } }, now).stale, true)
+  const empty = HQ.todayFor({}, now)
+  assert.deepEqual([empty.items.length, empty.you, empty.at, empty.stale], [0, 0, null, true])
+})
+
+test('ages read in plain German', () => {
+  const now = new Date('2026-10-07T10:00:00Z')
+  assert.equal(HQ.ageDe('2026-10-07T09:59:40Z', now), 'gerade eben')
+  assert.equal(HQ.ageDe('2026-10-07T10:05:00Z', now), 'gerade eben')
+  assert.equal(HQ.ageDe('2026-10-07T09:01:00Z', now), 'vor 59 Min.')
+  assert.equal(HQ.ageDe('2026-10-06T09:00:00Z', now), 'vor 1 Tag')
+  assert.equal(HQ.ageDe('nope', now), '')
+})
+
+test('HQ opens on Heute für dich once a day, only from the desk and only when something needs yskills', () => {
+  const now = new Date('2026-10-07T10:00:00Z')
+  assert.equal(HQ.greetToday({ seen: '2026-10-06', you: 2, tab: 'desk' }, now), true)
+  assert.equal(HQ.greetToday({ seen: '2026-10-07', you: 2, tab: 'desk' }, now), false)
+  assert.equal(HQ.greetToday({ seen: null, you: 0, tab: 'desk' }, now), false)
+  assert.equal(HQ.greetToday({ seen: null, you: 1, tab: 'money' }, now), false)
+  assert.equal(HQ.berlinDay(new Date('2026-10-06T22:30:00Z')), '2026-10-07')
+})
+
+test('opening HQ asks for a fresh Heute list only when the last one is old and nobody asked just now', () => {
+  const now = new Date('2026-10-07T10:00:00Z')
+  const fresh = { refreshedAt: '2026-10-07T09:40:00Z' }, old = { refreshedAt: '2026-10-07T09:00:00Z' }
+  assert.equal(HQ.refreshDue({ today: fresh, askedAt: null }, now), false)
+  assert.equal(HQ.refreshDue({ today: old, askedAt: null }, now), true)
+  assert.equal(HQ.refreshDue({ today: null, askedAt: null }, now), true)
+  assert.equal(HQ.refreshDue({ today: old, askedAt: '2026-10-07T09:55:00Z' }, now), false)
+  assert.equal(HQ.refreshDue({ today: old, askedAt: '2026-10-07T09:45:00Z' }, now), true)
+  assert.equal(HQ.refresherOf({ session: 'cse_01ABCDEFGHJK' }), 'cse_01ABCDEFGHJK')
+  assert.equal(HQ.refresherOf({ session: 'nope' }), null)
+  assert.match(HQ.REFRESH_MESSAGE, /^HQ refresh/)
+})
