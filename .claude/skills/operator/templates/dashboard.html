@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Claude Setup HQ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap">
@@ -6,10 +7,12 @@
    balloons sits on top: level and bells up top, a phone-like dock of round app buttons below.
    Company: every project, its money and what it needs from yskills. Plan: levels. Team: the nine roles. To-dos: what needs yskills. */
 :root{
-  --bg:#fdf0d2;--panel:#fff6c7;--fg:#6b4b32;--soft:#9a7b5f;--line:#efdcae;--ink:#6b4b32;
+  --bg:#fdf0d2;--panel:#fff6c7;--fg:#6b4b32;--soft:#7a5c43;--line:#efdcae;--ink:#6b4b32;
   --accent:#4fb36b;--accent-ink:#358a50;--accent-soft:#dff2d6;
   --ok:#4fb36b;--warn:#e89a2c;--bad:#ff7b5c;--idle:#b8a48e;--coin:#f7c948;--coin-ink:#a8780c;
   --stage:#fbe7c4;--shadow:rgba(122,84,52,.22);--sky:#bfe7f3;
+  --on-accent:#10301c;--on-bad:#3a0e04;
+  --ok-ink:#1e5c34;--ok-bg:#dff2d6;--warn-ink:#7a4a00;--warn-bg:#fbe3b8;--bad-ink:#8f2a14;--bad-bg:#ffd9cf;--idle-ink:#5e4b3a;--idle-bg:#efe3cc;
   --lift:0 4px 0 rgba(122,84,52,.16),0 12px 26px -8px rgba(122,84,52,.35);
   --sans:"M PLUS Rounded 1c",ui-rounded,"Hiragino Maru Gothic ProN",system-ui,sans-serif;
   --mono:var(--sans);
@@ -17,11 +20,13 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#3a2e3f;--panel:#4a3b4f;--fg:#fff1d6;--soft:#d8c3ae;--line:#5e4b62;--ink:#2a2030;
   --accent:#7cd08f;--accent-ink:#3f9a58;--accent-soft:#2f4a3a;--ok:#7cd08f;--warn:#f6c25f;--bad:#ff9a80;--idle:#a8949c;--coin:#f7c948;--coin-ink:#a8780c;
-  --stage:#2c2540;--shadow:rgba(10,6,20,.35);--sky:#3d4f7a;--lift:0 4px 0 rgba(10,6,20,.3),0 12px 26px -8px rgba(10,6,20,.6);color-scheme:dark}}
+  --stage:#2c2540;--shadow:rgba(10,6,20,.35);--sky:#3d4f7a;--lift:0 4px 0 rgba(10,6,20,.3),0 12px 26px -8px rgba(10,6,20,.6);
+  --ok-ink:#9fe0b0;--ok-bg:#2f4a3a;--warn-ink:#f6c25f;--warn-bg:#4d4128;--bad-ink:#ffb09c;--bad-bg:#5a3438;--idle-ink:#d8c3ae;--idle-bg:#4a3b4f;color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#3a2e3f;--panel:#4a3b4f;--fg:#fff1d6;--soft:#d8c3ae;--line:#5e4b62;--ink:#2a2030;
   --accent:#7cd08f;--accent-ink:#3f9a58;--accent-soft:#2f4a3a;--ok:#7cd08f;--warn:#f6c25f;--bad:#ff9a80;--idle:#a8949c;--coin:#f7c948;--coin-ink:#a8780c;
-  --stage:#2c2540;--shadow:rgba(10,6,20,.35);--sky:#3d4f7a;--lift:0 4px 0 rgba(10,6,20,.3),0 12px 26px -8px rgba(10,6,20,.6);color-scheme:dark}
+  --stage:#2c2540;--shadow:rgba(10,6,20,.35);--sky:#3d4f7a;--lift:0 4px 0 rgba(10,6,20,.3),0 12px 26px -8px rgba(10,6,20,.6);
+  --ok-ink:#9fe0b0;--ok-bg:#2f4a3a;--warn-ink:#f6c25f;--warn-bg:#4d4128;--bad-ink:#ffb09c;--bad-bg:#5a3438;--idle-ink:#d8c3ae;--idle-bg:#4a3b4f;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
@@ -35,8 +40,8 @@ button{font:inherit;color:inherit}
 .stage canvas{display:block;width:100%;height:100%;cursor:grab}
 .stage canvas.point{cursor:pointer}
 .labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.tag{all:unset;position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;display:grid;justify-items:center;gap:2px;transform:translate(-50%,-100%);white-space:nowrap}
-.tag .nm{font:800 12px/1.2 var(--sans);color:#6b4b32;background:#fff6c7;padding:4px 11px;border-radius:999px;box-shadow:0 3px 0 rgba(122,84,52,.25),0 6px 12px -4px rgba(122,84,52,.4)}
+.tag{all:unset;position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;display:grid;justify-items:center;align-content:end;gap:2px;min-height:44px;min-width:44px;transform:translate(-50%,-100%);white-space:nowrap}
+.tag .nm{font:800 12px/1.2 var(--sans);color:#6b4b32;background:#fff6c7;padding:8px 12px;border-radius:999px;box-shadow:0 3px 0 rgba(122,84,52,.25),0 6px 12px -4px rgba(122,84,52,.4)}
 .tag:hover .nm{background:#fffbe3}
 .tag .chip{font-size:11px;padding:0 6px}
 .tag:focus-visible .nm{outline:2px solid var(--accent)}
@@ -48,8 +53,8 @@ button{font:inherit;color:inherit}
 .plate{padding:8px 18px 8px 8px;min-width:0;max-width:min(420px,62vw);display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px}
 .plate .pm{display:grid;gap:4px;min-width:0}
 /* Level badge: a leaf-green stitched patch, like the badges in a New Horizons passport */
-.lv-badge{position:relative;width:54px;height:54px;border-radius:50%;background:var(--accent);box-shadow:inset 0 -4px 0 var(--accent-ink),0 2px 0 rgba(122,84,52,.18);display:grid;place-items:center;align-content:center;color:#fffaf0;line-height:1}
-.lv-badge::before{content:"";position:absolute;inset:4px;border-radius:50%;border:2px dashed rgba(255,250,230,.6)}
+.lv-badge{position:relative;width:54px;height:54px;border-radius:50%;background:var(--accent);box-shadow:inset 0 -4px 0 var(--accent-ink),0 2px 0 rgba(122,84,52,.18);display:grid;place-items:center;align-content:center;color:var(--on-accent);line-height:1}
+.lv-badge::before{content:"";position:absolute;inset:4px;border-radius:50%;border:2px dashed rgba(16,48,28,.45)}
 .lv-badge small{font:900 10px var(--sans);letter-spacing:.02em}
 .lv-badge b{font:900 24px/1 var(--sans);margin-top:-1px}
 .plate h1{font:900 18px/1.15 var(--sans);margin:0;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -69,7 +74,7 @@ button{font:inherit;color:inherit}
 @keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.9)}}
 @media (prefers-reduced-motion:reduce){.toast{animation:none}}
 .bell{position:relative;width:42px;padding:0;justify-content:center}
-.badge{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fff;box-shadow:0 0 0 2.5px var(--panel);font:900 12px/22px var(--sans);text-align:center}
+.badge{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bad);color:var(--on-bad);box-shadow:0 0 0 2.5px var(--panel);font:900 12px/22px var(--sans);text-align:center}
 .bar{flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden;box-shadow:inset 0 1.5px 0 rgba(122,84,52,.15)}
 .bar>span{display:block;height:100%;background:var(--accent)}
 /* Dock */
@@ -88,7 +93,7 @@ button{font:inherit;color:inherit}
 .page{position:absolute;z-index:5;overflow-y:auto;overscroll-behavior:contain;display:grid;gap:14px;align-content:start;
   left:16px;top:122px;bottom:96px;width:min(460px,calc(100% - 32px));padding:18px 18px 22px}
 #labels .tag .chip{display:none}#labels .tag:hover .chip,#labels .tag:focus-visible .chip{display:inline}
-@media (max-width:640px){#labels .tag .nm{font-size:11px;padding:2px 7px}}
+@media (max-width:640px){#labels .tag .nm{font-size:11px;padding:6px 8px}}
 @media (max-width:440px){.greet{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2}}
 @media (max-width:440px){.dock{left:8px;right:8px;transform:none;gap:0;padding:8px 4px 6px}.dock button{flex:1;min-width:0;font-size:10.5px}.dock button::before{width:38px;height:38px;border-radius:14px}}
 @media (max-width:640px){.page{left:10px;right:10px;width:auto;top:auto;max-height:calc(100% - 220px);bottom:86px;padding:16px}}
@@ -98,13 +103,13 @@ button{font:inherit;color:inherit}
 .empty{color:var(--soft);margin:0;font-weight:600}
 ol,ul{margin:0;padding:0;list-style:none}
 .note{font-size:13px;color:var(--soft)}
-.btn{display:inline-block;font:900 13px var(--sans);text-decoration:none;padding:8px 16px;border-radius:999px;border:0;color:var(--fg);background:var(--bg);white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
-.btn.go{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-ink)}
+.btn{display:inline-grid;place-items:center;min-height:44px;font:900 13px var(--sans);text-decoration:none;padding:0 16px;border-radius:999px;border:0;color:var(--fg);background:var(--bg);white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
+.btn.go{background:var(--accent);color:var(--on-accent);box-shadow:0 3px 0 var(--accent-ink)}
 .chip{font:800 12px var(--sans);padding:1px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;background:var(--panel)}
-.chip.working,.chip.active{color:var(--accent);background:var(--accent-soft);border-color:transparent}
-.chip.blocked{color:var(--bad)}
-.chip.waiting{color:var(--warn)}
-.chip.idle,.chip.done,.chip.paused,.chip.off{color:var(--idle)}
+.chip.working,.chip.active{color:var(--ok-ink);background:var(--ok-bg)}
+.chip.blocked{color:var(--bad-ink);background:var(--bad-bg)}
+.chip.waiting{color:var(--warn-ink);background:var(--warn-bg)}
+.chip.idle,.chip.done,.chip.paused,.chip.off{color:var(--idle-ink);background:var(--idle-bg)}
 /* Company */
 /* Totals as a ledger: label, dotted leader, amount, like a page in a cash book */
 .totals{display:grid;gap:2px;padding:4px 14px;border-radius:12px;background:var(--bg);border:2px solid var(--line)}
@@ -121,7 +126,13 @@ ol,ul{margin:0;padding:0;list-style:none}
 .pn{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
 .pn b{font:900 17px var(--sans)}
 .pstats{display:flex;flex-wrap:wrap;gap:4px 14px;font:600 12px var(--mono);color:var(--soft);font-variant-numeric:tabular-nums}
-.pstats .need{color:var(--bad)}
+.pstats .need{color:var(--bad-ink)}
+.pstats .over{color:var(--bad-ink)}
+.trac{display:flex;flex-wrap:wrap;gap:4px 14px;font:800 13px var(--sans)}
+.trac b{font-weight:900}
+.stale{opacity:.6}
+.stale-note{font:700 12px var(--sans);color:var(--warn-ink)}
+.today .wait{font:700 12px var(--sans);color:var(--soft);display:block}
 .pbar{display:flex;align-items:center;gap:10px}
 .pbar .num{font:600 12px var(--mono);width:3.2em;text-align:right;font-variant-numeric:tabular-nums}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
@@ -143,7 +154,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .today .btn{display:inline-grid;place-items:center;min-height:44px;padding:0 16px;background:var(--coin);color:var(--ink);box-shadow:0 3px 0 var(--coin-ink)}
 #today-info-h[hidden]{display:none}
 #today-at{margin-top:10px}
-#today-at.warn{color:var(--bad)}
+#today-at.warn{color:var(--bad-ink)}
 .next li{padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
 .next li:first-child{border-top:0}
 .next li::before{content:"";position:absolute;left:2px;top:14px;width:7px;height:7px;border:2px solid var(--accent);border-radius:50%}
@@ -292,16 +303,16 @@ ol,ul{margin:0;padding:0;list-style:none}
   </div>
   <div class="toast" id="toast" role="status" hidden></div>
   <div class="hud">
-    <a class="card plate" href="#plan" style="text-decoration:none;color:inherit" aria-label="Open the plan">
+    <a class="card plate" href="#plan" style="text-decoration:none;color:inherit" aria-label="Plan öffnen">
       <span class="lv-badge" id="lvl-label" aria-label="Level 1"><small aria-hidden="true">Lv</small><b id="lvl-num" aria-hidden="true">1</b></span>
       <div class="pm">
         <h1 id="title">Claude Setup</h1>
         <div class="lvl"><div class="bar" aria-hidden="true"><span id="lvl-bar" style="width:0%"></span></div><span class="pct" id="lvl-pct">0 XP</span></div>
-        <p class="greet"><span class="live-dot" id="dot"></span><span id="greet">Your team is here.</span></p>
+        <p class="greet"><span class="live-dot" id="dot"></span><span id="greet">Dein Team ist da.</span></p>
       </div>
     </a>
     <div class="right">
-      <a class="card pill" href="#money" id="coins" aria-label="Coins earned, one per euro" hidden>
+      <a class="card pill" href="#money" id="coins" aria-label="Coins, nur echte Euro" hidden>
         <svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="var(--coin)" stroke="var(--ink)" stroke-width="2.2"/><circle cx="12" cy="12" r="6" fill="none" stroke="var(--coin-ink)" stroke-width="1.6"/><path d="M14.2 9.6a3 3 0 1 0 0 4.8M8.6 11.2h4M8.6 12.9h4" fill="none" stroke="var(--coin-ink)" stroke-width="1.6" stroke-linecap="round"/></svg>
         <span id="coin-val">0</span>
       </a>
@@ -313,19 +324,19 @@ ol,ul{margin:0;padding:0;list-style:none}
   </div>
 
   <section class="card page" data-page="company" aria-labelledby="company-h" hidden>
-    <div><h2 id="company-h">Company</h2><p class="lead">Every project, what it earns and what it needs from you.</p></div>
-    <p class="lead" id="game-line">Level 1 · 0 XP · 0 coins</p>
+    <div><h2 id="company-h">Company</h2><p class="lead">Jedes Projekt, was es einnimmt und was es von dir braucht.</p></div>
+    <p class="lead" id="game-line">Level 1 · 0 XP · 0 Coins</p>
     <div class="acts"><button class="btn go" type="button" id="new-idea">Neues Projekt</button></div>
     <div class="totals">
-      <div class="tot"><b id="t-month">0 €</b><span>This month</span></div>
-      <div class="tot"><b id="t-all">0 €</b><span id="t-all-l">All time</span></div>
-      <div class="tot need"><b id="t-need">0</b><span>Need you</span></div>
+      <div class="tot"><b id="t-month">0 €</b><span>Diesen Monat</span></div>
+      <div class="tot"><b id="t-all">0 €</b><span id="t-all-l">Gesamt</span></div>
+      <div class="tot need"><b id="t-need">0</b><span>Brauchen dich</span></div>
     </div>
     <div class="acts"><a class="btn" href="#money">Kassenbuch öffnen</a></div>
-    <h3>Projects</h3>
-    <div class="projects" id="projects"><p class="empty">Each project's manager adds its row here on day one.</p></div>
-    <h3>Needs you, all projects</h3>
-    <ul class="todo" id="all-you"><li class="empty">Nothing right now.</li></ul>
+    <h3>Projekte</h3>
+    <div class="projects" id="projects"><p class="empty">Der Manager jedes Projekts legt hier am ersten Tag seine Zeile an.</p></div>
+    <h3>Braucht dich, alle Projekte</h3>
+    <ul class="todo" id="all-you"><li class="empty">Gerade nichts.</li></ul>
   </section>
 
   <section class="card page money" data-page="money" aria-labelledby="money-h" hidden>
@@ -335,15 +346,15 @@ ol,ul{margin:0;padding:0;list-style:none}
   </section>
 
   <section class="card page" data-page="plan" aria-labelledby="plan-h" hidden>
-    <div><h2 id="plan-h">Plan</h2><p class="lead" id="summary">The project manager writes here what the team is doing.</p></div>
+    <div><h2 id="plan-h">Plan</h2><p class="lead" id="summary">Der Projektmanager schreibt hier, woran das Team arbeitet.</p></div>
     <div class="progress"><span class="big" id="pct">0%</span><div class="bar" aria-hidden="true"><span id="pct-bar" style="width:0%"></span></div></div>
-    <div class="phases" id="phases"><p class="empty">The project manager's levels and their goals appear here.</p></div>
-    <h3>Next steps</h3>
-    <ol class="next" id="next"><li class="empty">None yet.</li></ol>
+    <div class="phases" id="phases"><p class="empty">Hier erscheinen die Level und ihre Ziele.</p></div>
+    <h3>Nächste Schritte</h3>
+    <ol class="next" id="next"><li class="empty">Noch nichts.</li></ol>
   </section>
 
   <section class="card page" data-page="team" aria-labelledby="team-h" hidden>
-    <div><h2 id="team-h">Team</h2><p class="lead">Busy at the desk means working, a dance in the lounge is done, Z is asleep, a head shake and a red ! is blocked, a wave and a ? waits on you. Tap anyone, in here or in the office.</p></div>
+    <div><h2 id="team-h">Team</h2><p class="lead">Am Schreibtisch beschäftigt = arbeitet, Tanz in der Lounge = fertig, Z = schläft, Kopfschütteln und rotes ! = blockiert, Winken und ? = wartet auf dich. Tippe jemanden an, hier oder im Büro.</p></div>
     <div class="roster" id="roster"></div>
     <div class="skin" role="group" aria-label="Figuren">
       <span>Figuren</span>
@@ -356,7 +367,7 @@ ol,ul{margin:0;padding:0;list-style:none}
   <section class="card page" data-page="todo" aria-labelledby="todo-h" hidden>
     <div><h2 id="todo-h">Heute für dich</h2><p class="lead">Jede Zeile sagt, woher sie kommt und wie alt sie ist.</p></div>
     <h3>Für dich</h3>
-    <ul class="todo today" id="you"><li class="empty">Nichts zu tun. Genieß den Tag.</li></ul>
+    <ul class="todo today" id="you"><li class="empty">Nichts zu tun.</li></ul>
     <h3 id="today-info-h" hidden>Zur Info</h3>
     <ul class="todo today" id="today-info"></ul>
     <p class="meta" id="today-at" role="status"></p>
@@ -365,10 +376,10 @@ ol,ul{margin:0;padding:0;list-style:none}
     <ul id="live" class="stack" style="gap:6px"><li class="empty">Noch nichts live.</li></ul>
   </section>
 
-  <nav class="card dock" aria-label="Pages">
-    <button type="button" data-tab="desk" id="desk-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10h18M5 10v10M19 10v10M8 6h8v4H8z"/></svg>Desk</button>
+  <nav class="card dock" aria-label="Seiten">
+    <button type="button" data-tab="desk" id="desk-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10h18M5 10v10M19 10v10M8 6h8v4H8z"/></svg>Tisch</button>
     <button type="button" data-tab="company" id="company-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V8l5-3v16M10 21V5l9 4v12M13 11h3M13 15h3"/></svg>Company</button>
-    <button type="button" data-tab="office"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7M5 9.5V20h14V9.5M9.5 20v-5h5v5"/></svg>Office</button>
+    <button type="button" data-tab="office"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7M5 9.5V20h14V9.5M9.5 20v-5h5v5"/></svg>Büro</button>
     <button type="button" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Plan</button>
     <button type="button" data-tab="team"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M15 14.6c2.6-.3 4.6 1.2 5.2 4.4"/></svg>Team</button>
     <button type="button" data-tab="todo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3.5h6v3H9zM8.5 12l2 2 4-4"/></svg>Heute<span class="dot" id="todo-dot" hidden></span></button>
@@ -377,7 +388,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 
 <div class="scrim" id="scrim" hidden></div>
 <aside class="card sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-name" hidden>
-  <button class="btn close" id="sheet-close" type="button">Close</button>
+  <button class="btn close" id="sheet-close" type="button">Schließen</button>
   <div><h3 id="sheet-name"></h3><p class="what" id="sheet-what"></p></div>
   <div id="sheet-body" class="stack"></div>
 </aside>
@@ -404,17 +415,23 @@ window.HQ = (() => {
   /* Which room stays behind a page: the desk and the team office swap; other pages keep the room they were opened from. */
   const worldFor = (tab, current) => (tab === 'desk' ? 'room' : tab === 'office' || tab === 'team' ? 'office' : current || 'room')
   const eur = (v) => Math.max(0, Number(v) || 0)
+  /* Every row a manager or thread writes carries `at` (stamp(data) adds it). A row older than ROW_STALE_H hours, or without a stamp,
+     is shown grey ("seit 6 Std. nicht aktualisiert") and no longer counts as someone working. */
+  const ROW_STALE_H = 6
+  const stamp = (data, now = new Date()) => ({ ...data, at: now.toISOString() })
+  const rowAt = (row) => [row?.at, row?.updated].find((v) => typeof v === 'string' && !Number.isNaN(Date.parse(v))) || null
+  const rowFresh = (row, now = new Date()) => { const at = rowAt(row); return !!at && now - Date.parse(at) <= ROW_STALE_H * 3600000 }
+  const rowNote = (row, now = new Date()) => (rowFresh(row, now) ? '' : rowAt(row) ? `seit ${ROW_STALE_H} Std. nicht aktualisiert (Stand ${ageDe(rowAt(row), now)})` : 'ohne Zeitstempel, Stand unbekannt')
   /* What the things on yskills' desk show */
-  function deskNumbers({ projects = [], you = 0, phases = [] }) {
+  function deskNumbers({ projects = [], you = 0, phases = [], now = new Date() }) {
     const goals = phases.flatMap((p) => p.goals || [])
     const done = goals.reduce((n, g) => n + (Number(g.done) || 0), 0), total = goals.reduce((n, g) => n + (Number(g.total) || 0), 0)
-    const needs = projects.reduce((n, p) => n + (Array.isArray(p.you) ? p.you.length : 0), 0)
     return {
       month: projects.reduce((n, p) => n + eur(p.revenueMonth), 0),
       total: projects.reduce((n, p) => n + eur(p.revenueTotal), 0),
-      todos: Math.max(Number(you) || 0, needs),
+      todos: Math.max(0, Number(you) || 0),
       pct: total > 0 ? Math.round((100 * done) / total) : 0,
-      working: projects.reduce((n, p) => n + Math.max(0, Number(p.working) || 0), 0),
+      working: projects.reduce((n, p) => n + (rowFresh(p, now) ? Math.max(0, Number(p.working) || 0) : 0), 0),
       test: projects.some((p) => p.testMoney),
     }
   }
@@ -443,13 +460,17 @@ window.HQ = (() => {
     const r = moneyReport(row, now)
     if (!r.has) return project
     const left = (t) => (t.complete ? t.net : t.gross)
-    return { ...project, revenueTotal: left(r.total) / 100, revenueMonth: r.month ? left(r.month) / 100 : project.revenueMonth, revenueNet: r.total.complete, testMoney: r.test }
+    return { ...project, revenueTotal: left(r.total) / 100, revenueMonth: r.month ? left(r.month) / 100 : project.revenueMonth, revenueNet: r.total.complete, testMoney: r.test, revenueMode: r.test ? 'test' : 'live', revenueAt: r.at || project.revenueAt }
   }
-  /* The game loop: level, XP and coins come only from real events (events/<id> { kind, project, at, amount? }), never from clicks.
-     A PR merged 50 XP, the 5/5 gate passed 20, a project launched 100, each euro earned 10 XP and 1 coin, each day visited 5. */
-  const XP_OF = { pr_merged: 50, gate_passed: 20, launched: 100, visit: 5 }, XP_PER_EURO = 10, XP_PER_LEVEL = 100
-  const euros = (e) => (e?.kind === 'euro' && Number.isFinite(e.amount) && e.amount > 0 ? e.amount : 0)
-  const xpOf = (e) => XP_OF[e?.kind] || Math.round(euros(e) * XP_PER_EURO) || 0
+  /* The game loop: level, XP and coins come only from real events (events/<id> { kind, project, at, amount?, mode? }), never from clicks.
+     A product PR merged 50 XP, its 5/5 gate passed 20, a project launched 100, each LIVE euro 10 XP and 1 coin. claude-setup and hq PRs
+     (the toolkit) score nothing, visits score nothing, and Testgeld (a euro event without mode 'live') earns no coins and no XP. */
+  const XP_OF = { pr_merged: 50, gate_passed: 20, launched: 100 }, XP_PER_EURO = 10, XP_PER_LEVEL = 100
+  const NOT_PRODUCT = new Set(['claude-setup', 'hq'])
+  const amountOf = (e) => (e?.kind === 'euro' && Number.isFinite(e.amount) && e.amount > 0 ? e.amount : 0)
+  const euros = (e) => (e?.mode === 'live' ? amountOf(e) : 0)
+  const testEuros = (e) => (e?.mode === 'live' ? 0 : amountOf(e))
+  const xpOf = (e) => (NOT_PRODUCT.has(e?.project) ? 0 : XP_OF[e?.kind] || 0) || Math.round(euros(e) * XP_PER_EURO) || 0
   const levelStart = (level) => (level - 1) ** 2 * XP_PER_LEVEL
   function scoreFrom(events) {
     const seen = new Set()
@@ -461,7 +482,7 @@ window.HQ = (() => {
     })
     const xp = real.reduce((n, e) => n + xpOf(e), 0)
     const level = Math.floor(Math.sqrt(xp / XP_PER_LEVEL)) + 1, from = levelStart(level), to = levelStart(level + 1)
-    return { xp, coins: Math.floor(real.reduce((n, e) => n + euros(e), 0)), level, from, to, pct: Math.round((100 * (xp - from)) / (to - from)) }
+    return { xp, coins: Math.floor(real.reduce((n, e) => n + euros(e), 0)), test: real.reduce((n, e) => n + testEuros(e), 0), level, from, to, pct: Math.round((100 * (xp - from)) / (to - from)) }
   }
   /* The small "+50 XP" toast for events that arrived while the page was open */
   function toastFor(events) {
@@ -576,16 +597,36 @@ window.HQ = (() => {
   }
   const httpsOr = (u) => (typeof u === 'string' && /^https:\/\//.test(u) ? u : null)
   const line = (s, n) => String(s).replace(/\s+/g, ' ').trim().slice(0, n)
-  function todayFor({ today, pm } = {}, now = new Date()) {
-    const items = [], seen = new Set()
-    const add = (it) => { const k = it.what.toLowerCase(); if (it.what && !seen.has(k)) { seen.add(k); items.push(it) } }
+  /* "seit 3 Std." for how long a to-do has waited (firstSeen), as opposed to ageDe = how old the reading is */
+  const sinceDe = (iso, now = new Date()) => { const a = ageDe(iso, now); return a === 'gerade eben' ? 'seit gerade eben' : a ? `seit ${a.replace(/^vor /, '')}` : '' }
+  /* One place per to-do. The live list (today/now) comes first, then each project row's you[], then pm/now.you only as the fallback
+     when nothing else lists a to-do. Two lines are the same to-do when their text matches, or when they share a link and come from
+     different lists (the same step told twice); steps of one list that share a link stay separate. Every item keeps firstSeen (when
+     it first appeared, so the wait is real) next to at (when its source was read), and is stale when that reading is old. */
+  function todayFor({ today, pm, projects } = {}, now = new Date()) {
+    const items = [], texts = new Set(), links = new Map()
+    const add = (it, list) => {
+      const k = it.what.toLowerCase()
+      if (!it.what || texts.has(k) || (it.link && links.has(it.link) && links.get(it.link) !== list)) return
+      texts.add(k); if (it.link) links.set(it.link, list)
+      const seen = isTime(it.firstSeen) ? it.firstSeen : it.at
+      items.push({ ...it, stale: !it.at || now - Date.parse(it.at) > ROW_STALE_H * 3600000, waited: it.kind === 'you' ? sinceDe(seen, now) : '' })
+    }
     for (const x of Array.isArray(today?.items) ? today.items : []) {
       if (!x || typeof x.what !== 'string' || typeof x.source !== 'string' || !isTime(x.at)) continue
-      add({ what: line(x.what, 200), kind: x.kind === 'info' ? 'info' : 'you', source: line(x.source, 40), at: x.at, age: ageDe(x.at, now), link: httpsOr(x.link) })
+      add({ what: line(x.what, 200), kind: x.kind === 'info' ? 'info' : 'you', source: line(x.source, 40), at: x.at, firstSeen: x.firstSeen, age: ageDe(x.at, now), link: httpsOr(x.link) }, 'today')
     }
-    const pmAt = isTime(pm?.updated) ? pm.updated : null
-    for (const y of Array.isArray(pm?.you) ? pm.you : []) {
-      if (y && typeof y.what === 'string') add({ what: line(y.what, 200), kind: 'you', source: 'Claude-Team', at: pmAt, age: pmAt ? ageDe(pmAt, now) : '', link: httpsOr(y.link) })
+    for (const p of Array.isArray(projects) ? projects : []) {
+      const at = rowAt(p)
+      for (const y of Array.isArray(p?.you) ? p.you : []) {
+        if (y && typeof y.what === 'string') add({ what: line(y.what, 200), kind: 'you', source: line(p.name || p.id || 'Projekt', 40), at, firstSeen: y.firstSeen, age: at ? ageDe(at, now) : '', link: httpsOr(y.link) }, `project:${p.id}`)
+      }
+    }
+    if (!items.some((i) => i.kind === 'you')) {
+      const pmAt = rowAt(pm)
+      for (const y of Array.isArray(pm?.you) ? pm.you : []) {
+        if (y && typeof y.what === 'string') add({ what: line(y.what, 200), kind: 'you', source: 'Claude-Team', at: pmAt, firstSeen: y.firstSeen, age: pmAt ? ageDe(pmAt, now) : '', link: httpsOr(y.link) }, 'pm')
+      }
     }
     const ordered = [...items.filter((i) => i.kind === 'you'), ...items.filter((i) => i.kind === 'info')]
     const at = isTime(today?.refreshedAt) ? today.refreshedAt : null
@@ -593,9 +634,30 @@ window.HQ = (() => {
       .map((s) => ({ name: line(s.name, 40), ok: s.ok === true, note: typeof s.note === 'string' ? line(s.note, 140) : '' }))
     return { items: ordered, you: items.filter((i) => i.kind === 'you').length, at, age: at ? ageDe(at, now) : '', stale: !at || now - Date.parse(at) > TODAY_STALE_MIN * 60000, sources }
   }
+  /* What the list says about itself: the stale warning shows whenever the list is old, and "neu bei jedem Öffnen" only when a
+     refresh was asked for in the last day (today/ask.at), so the page never promises what has not happened. */
+  function todayNote(t, askedAt, now = new Date()) {
+    if (!t.at) return 'Noch kein Abgleich gelaufen.'
+    const auto = minutesSince(askedAt, now) < 1440 ? 'neu bei jedem Öffnen' : ''
+    return [t.stale ? `Stand ${t.age}, evtl. veraltet` : `Abgeglichen ${t.age}`, auto].filter(Boolean).join(' · ')
+  }
+  /* Progress that means something: what real people did (the manager writes visitors7d, signups, paying, firstEuroBy into
+     projects/<id>), and the days to the first real euro, never how much is built. */
+  function tractionOf(p, now = new Date()) {
+    const n = (v) => (Number.isInteger(v) && v >= 0 ? v : null)
+    const parts = [['Besucher (7 Tage)', n(p?.visitors7d)], ['Anmeldungen', n(p?.signups)], ['Zahlende', n(p?.paying)]].filter(([, v]) => v != null).map(([label, v]) => ({ label, value: v }))
+    const real = p?.revenueMode === 'live' && Number(p?.revenueTotal) > 0
+    const by = isTime(p?.firstEuroBy) ? Date.parse(p.firstEuroBy) : NaN
+    const days = Number.isNaN(by) ? null : Math.ceil((by - now) / 86400000)
+    const countdown = real ? 'Erster echter Euro verdient'
+      : days == null ? 'Kein Datum für den ersten Euro'
+      : days > 0 ? `Erster Euro in ${days} Tag${days === 1 ? '' : 'en'}`
+      : `Erster Euro ${-days} Tag${days === -1 ? '' : 'e'} überfällig`
+    return { parts, countdown, real, overdue: !real && days != null && days <= 0 }
+  }
   /* Opening HQ asks the refresher session (config/refresher, a thread that runs operator/hq-refresh.md) for a fresh list when the
      last one is older than REFRESH_AFTER_MIN and nobody asked in the last ASK_GAP_MIN (today/ask.at) */
-  const REFRESH_AFTER_MIN = 30, ASK_GAP_MIN = 10
+  const REFRESH_AFTER_MIN = 150, ASK_GAP_MIN = 10
   const minutesSince = (iso, now) => (isTime(iso) ? (now - Date.parse(iso)) / 60000 : Infinity)
   const refreshDue = ({ today, askedAt }, now = new Date()) => minutesSince(today?.refreshedAt, now) > REFRESH_AFTER_MIN && minutesSince(askedAt, now) > ASK_GAP_MIN
   const refresherOf = (config) => (typeof config?.session === 'string' && SESSION_ID.test(config.session) ? config.session : null)
@@ -724,7 +786,7 @@ window.HQ = (() => {
   const moodOf = (state) => ({ working: 'busy', blocked: 'stuck', waiting: 'asks', done: 'proud' })[state] || 'free'
   const WORLD_TABS = ['desk', 'office']
   const closeTo = (tab, world) => (!tab || WORLD_TABS.includes(tab) ? null : world === 'room' ? 'desk' : 'office')
-  return { ageDe, todayFor, berlinDay, greetToday, refreshDue, refresherOf, REFRESH_MESSAGE, TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, withFinance, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf }
+  return { ageDe, sinceDe, todayFor, todayNote, tractionOf, stamp, rowAt, rowFresh, rowNote, ROW_STALE_H, berlinDay, greetToday, refreshDue, refresherOf, REFRESH_MESSAGE, REFRESH_AFTER_MIN, TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, withFinance, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf }
 })()
 </script>
 <script id="team-3d">
@@ -1089,7 +1151,17 @@ const $ = (id) => document.getElementById(id)
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n }
 const safeUrl = (u) => { if (typeof u !== 'string' || !u) return null; try { const x = new URL(u, location.href); return /^https?:$/.test(x.protocol) ? x.href : null } catch { return null } }
 const link = (text, href, cls) => { const u = safeUrl(href); if (!u) return el('span', null, text); const a = el('a', cls, text); a.href = u; a.target = '_blank'; a.rel = 'noopener'; return a }
-const STATES = { working: 'working', blocked: 'blocked', waiting: 'waiting on you', idle: 'asleep', done: 'done' }
+/* One string table for the German UI text the pages build in script (static text lives in the HTML) */
+const DE = {
+  states: { working: 'arbeitet', blocked: 'blockiert', waiting: 'wartet auf dich', idle: 'schläft', done: 'fertig' }, off: 'dienstfrei',
+  proj: { active: 'aktiv', paused: 'pausiert', done: 'fertig' },
+  greet: { day: 'Guten Tag, yskills.', dusk: 'Guten Abend, yskills.', night: 'Spätschicht, yskills.' },
+  noTask: 'Gerade keine Aufgabe', workingOn: 'Arbeitet an', next: 'Als Nächstes', worksWith: 'Arbeitet mit', watch: 'Live zusehen', open: 'Öffnen',
+  noPhases: 'Hier erscheinen die Phasen und ihre Ziele.', noPhase: 'Noch keine Phasen', cleared: 'Alle Level geschafft', level: 'Level',
+  you: 'Du bist hier', enter: 'Büro betreten', liveApp: 'Live-App', month: 'diesen Monat', total: 'gesamt', working: 'arbeiten', needYou: 'brauchen dich',
+  none: 'Gerade nichts.', todayNone: 'Nichts zu tun.', saved: 'gespeichert', stoppedLive: 'Live-Updates gestoppt, Seite neu laden', signIn: 'Bei claude.ai anmelden für Live-Stand', updated: 'Stand',
+}
+const STATES = DE.states
 const RANK = { working: 0, blocked: 1, waiting: 2, idle: 3, done: 4 }
 const stateOf = (s) => (s in STATES ? s : 'idle')
 const list = (box, items, render, emptyText) => {
@@ -1097,25 +1169,21 @@ const list = (box, items, render, emptyText) => {
   if (!items.length) { box.append(el('li', 'empty', emptyText)); return }
   for (const it of items) box.append(render(it))
 }
-const ago = (iso) => {
-  const t = Date.parse(iso); if (!t) return ''
-  const m = Math.round((Date.now() - t) / 60000)
-  return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : new Date(t).toLocaleDateString()
-}
+const ago = (iso) => HQ.ageDe(iso)
 
 /* The nine roles, one desk each. A team row lands on the desk its role word names. */
 const SEATS = [
-  { key: 'researcher', name: 'Researcher', what: 'Market, competitors, tools and APIs, before the plan.', off: 'Starts with the brainstorm.', at: [-3.8, -2.6], re: /research/i },
-  { key: 'pm', name: 'Project Manager', what: 'The project chat: plans with you, starts the others, keeps this office current.', off: 'Waits for your next idea.', at: [-8.5, -6.6], re: /project.?manager|manager|coordinat|operator|\bpm\b|lead/i },
-  { key: 'designer', name: 'Designer', what: 'Sets the look and checks every screenshot so nothing looks AI-made.', off: 'Starts once you OK the plan.', at: [-0.6, -3.4], re: /design/i },
-  { key: 'programmer', name: 'Programmer', what: 'Builds one slice or fix, opens the PR, keeps CI green. Up to three at once.', off: 'Starts once you OK the plan.', at: [2.8, -2.8], re: /program|develop|builder|engineer/i },
-  { key: 'tester', name: 'Tester', what: 'Clicks the preview and grades it against the goals. Never built what it tests.', off: 'Starts when a PR is up.', at: [-4.2, 1.2], re: /test|evaluat|qa\b|gate/i },
-  { key: 'reviewer', name: 'Reviewer', what: 'Reads the code diff for bugs and mess.', off: 'Starts when a PR is up.', at: [-1.0, 0.2], re: /review/i },
-  { key: 'security', name: 'Security', what: 'Security review and red team on login, payments and user input.', off: 'Starts on PRs that touch login, money or input.', at: [2.2, 0.6], re: /secur|red.?team/i },
-  { key: 'legal', name: 'Legal', what: 'Impressum, DSGVO, shop wording, before launch.', off: 'Starts before launch.', at: [5.6, -0.6], re: /legal|law|recht/i },
-  { key: 'marketer', name: 'Marketer', what: 'Launch, posts and weekly growth.', off: 'Starts at launch.', at: [5.0, 3.0], re: /market|growth|social|launch/i },
+  { key: 'researcher', name: 'Researcher', what: 'Markt, Konkurrenz, Tools und APIs, vor dem Plan.', off: 'Startet mit dem Brainstorm.', at: [-3.8, -2.6], re: /research/i },
+  { key: 'pm', name: 'Project Manager', what: 'Der Projekt-Chat: plant mit dir, startet die anderen, hält dieses Büro aktuell.', off: 'Wartet auf deine nächste Idee.', at: [-8.5, -6.6], re: /project.?manager|manager|coordinat|operator|\bpm\b|lead/i },
+  { key: 'designer', name: 'Designer', what: 'Legt den Look fest und prüft jeden Screenshot, damit nichts nach KI aussieht.', off: 'Startet, sobald du den Plan abnickst.', at: [-0.6, -3.4], re: /design/i },
+  { key: 'programmer', name: 'Programmer', what: 'Baut ein Stück oder einen Fix, öffnet den PR, hält CI grün. Bis zu drei gleichzeitig.', off: 'Startet, sobald du den Plan abnickst.', at: [2.8, -2.8], re: /program|develop|builder|engineer/i },
+  { key: 'tester', name: 'Tester', what: 'Klickt die Vorschau durch und misst sie an den Zielen. Hat das Getestete nie selbst gebaut.', off: 'Startet, wenn ein PR da ist.', at: [-4.2, 1.2], re: /test|evaluat|qa\b|gate/i },
+  { key: 'reviewer', name: 'Reviewer', what: 'Liest den Code-Diff auf Fehler und Unordnung.', off: 'Startet, wenn ein PR da ist.', at: [-1.0, 0.2], re: /review/i },
+  { key: 'security', name: 'Security', what: 'Sicherheitsprüfung und Red Team bei Login, Zahlung und Eingaben.', off: 'Startet bei PRs mit Login, Geld oder Eingaben.', at: [2.2, 0.6], re: /secur|red.?team/i },
+  { key: 'legal', name: 'Legal', what: 'Impressum, DSGVO, Shop-Texte, vor dem Start.', off: 'Startet vor dem Launch.', at: [5.6, -0.6], re: /legal|law|recht/i },
+  { key: 'marketer', name: 'Marketer', what: 'Launch, Posts und wöchentliches Wachstum.', off: 'Startet beim Launch.', at: [5.0, 3.0], re: /market|growth|social|launch/i },
 ]
-const PET = { pm: 'Polar bear', researcher: 'Macaw', designer: 'Tabby cat', programmer: 'Beaver', tester: 'Bunny', reviewer: 'Penguin', security: 'Shepherd dog', legal: 'Fox', marketer: 'Panda' }
+const PET = { pm: 'Eisbär', researcher: 'Ara', designer: 'Tigerkatze', programmer: 'Biber', tester: 'Hase', reviewer: 'Pinguin', security: 'Schäferhund', legal: 'Fuchs', marketer: 'Panda' }
 const ORDER = ['security', 'legal', 'designer', 'researcher', 'reviewer', 'tester', 'marketer', 'pm', 'programmer']
 const BY_KEY = Object.fromEntries(SEATS.map((s) => [s.key, s]))
 const seatIn = (t) => ORDER.find((k) => BY_KEY[k].re.test(t || '')) || null
@@ -1129,14 +1197,14 @@ const seatState = (key) => {
 
 function renderTeam(members) {
   const rank = (m) => RANK[stateOf(m.state)]
-  team = members.map((m) => ({ ...m, seat: seatOf(m) })).sort((a, b) => rank(a) - rank(b) || (a.order ?? 99) - (b.order ?? 99))
+  team = members.map((m) => ({ ...m, seat: seatOf(m), stale: !HQ.rowFresh(m), state: m.state === 'working' && !HQ.rowFresh(m) ? 'idle' : m.state })).sort((a, b) => rank(a) - rank(b) || (a.order ?? 99) - (b.order ?? 99))
   const roster = $('roster'); roster.replaceChildren()
   const tally = {}
   for (const s of SEATS) {
     const st = seatState(s.key), n = team.filter((m) => m.seat === s.key).length
     tally[st] = (tally[st] || 0) + 1
     const b = el('button', 'seat'); b.type = 'button'
-    b.append(el('b', null, n > 1 ? `${s.name} ×${n}` : s.name), el('span', `chip ${st}`, st === 'off' ? 'off duty' : STATES[st]), el('span', 'pet', `${PET[s.key]} · ${s.what}`))
+    b.append(el('b', null, n > 1 ? `${s.name} ×${n}` : s.name), el('span', `chip ${st}`, st === 'off' ? DE.off : STATES[st]), el('span', 'pet', `${PET[s.key]} · ${s.what}`))
     b.addEventListener('click', () => openSheet(s.key, b))
     roster.append(b)
   }
@@ -1166,19 +1234,19 @@ function fillSheet(key) {
     box.append(pic, info); body.append(box)
   }
   const ms = team.filter((m) => m.seat === key)
-  if (!ms.length) body.append(el('p', 'empty', `Off duty. ${s.off}`))
+  if (!ms.length) body.append(el('p', 'empty', `Dienstfrei. ${s.off}`))
   const names = Object.fromEntries(team.map((m) => [m.id, m.name]))
   for (const m of ms) {
-    const st = stateOf(m.state), box = el('div', 'member')
+    const st = stateOf(m.state), box = el('div', m.stale ? 'member stale' : 'member')
     const mh = el('div', 'mh'); mh.append(el('span', null, m.name || s.name), el('span', `chip ${st}`, STATES[st])); box.append(mh)
     const dl = el('dl')
     const row = (t, v) => { if (!v) return; const d = el('div'); d.append(el('dt', null, t), el('dd', null, v)); dl.append(d) }
-    row('Working on', m.task || 'No task right now'); row('Next', m.next)
-    row('Works with', (m.with || []).map((id) => names[id]).filter(Boolean).join(', '))
+    row(DE.workingOn, m.task || DE.noTask); row(DE.next, m.next); row('Hinweis', HQ.rowNote(m))
+    row(DE.worksWith, (m.with || []).map((id) => names[id]).filter(Boolean).join(', '))
     box.append(dl)
     const acts = el('div', 'acts')
-    if (safeUrl(m.preview)) acts.append(link('Watch live', m.preview, 'btn watch'))
-    if (safeUrl(m.link)) acts.append(link(m.linkLabel || 'Open', m.link, 'btn'))
+    if (safeUrl(m.preview)) acts.append(link(DE.watch, m.preview, 'btn watch'))
+    if (safeUrl(m.link)) acts.append(link(m.linkLabel || DE.open, m.link, 'btn'))
     if (acts.children.length) box.append(acts)
     body.append(box)
   }
@@ -1196,7 +1264,19 @@ function closeSheet() {
 }
 $('sheet-close').addEventListener('click', closeSheet)
 $('scrim').addEventListener('click', closeSheet)
-document.addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (!$('sheet').hidden) closeSheet(); else closePage() })
+/* The sheet is a dialog: Tab stays inside it while it is open, Escape closes it and focus returns to what opened it */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab' && !$('sheet').hidden) {
+    const f = [...$('sheet').querySelectorAll('a[href],button:not([disabled])')].filter((x) => x.offsetParent !== null)
+    if (!f.length) return
+    const first = f[0], last = f[f.length - 1], inside = $('sheet').contains(document.activeElement)
+    if (!inside || (e.shiftKey && document.activeElement === first)) { e.preventDefault(); last.focus() }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+    return
+  }
+  if (e.key !== 'Escape') return
+  if (!$('sheet').hidden) closeSheet(); else closePage()
+})
 
 /* ---------- New project: one line on the notepad, one tap. The row is saved first, then the coordinator gets a message. ---------- */
 const CCR = 'Claude Code Remote'
@@ -1269,15 +1349,15 @@ function openIdea(from) {
 }
 $('new-idea').addEventListener('click', (e) => openIdea(e.currentTarget))
 
-let youCount = 0, level = { label: 'PLAN', name: 'No phases yet', pct: 0 }
+let youCount = 0, level = { label: 'PLAN', name: DE.noPhase, pct: 0 }
 let updated = ''
 function renderPm(d) {
   if (!d) return
-  $('title').textContent = d.project || 'Project'
-  document.title = `${d.project || 'Project'} HQ`
-  updated = d.updated ? ago(d.updated) : ''
+  $('title').textContent = d.project || 'Projekt'
+  document.title = `${d.project || 'Projekt'} HQ`
+  updated = HQ.rowAt(d) ? ago(HQ.rowAt(d)) : ''
   $('summary').textContent = d.summary || ''
-  list($('next'), d.next || [], (s) => el('li', null, s), 'None yet.')
+  list($('next'), d.next || [], (s) => el('li', null, s), 'Noch nichts.')
   list($('live'), d.live || [], (l) => { const li = el('li'); li.append(link(l.name, l.url)); if (l.note) li.append(el('span', 'note', ` · ${l.note}`)); return li }, 'Noch nichts live.')
   renderToday()
   window.onDaytime?.(document.documentElement.dataset.daytime || 'day')
@@ -1285,25 +1365,25 @@ function renderPm(d) {
 /* Heute für dich: the routine's live items plus the team's own list, each with where it came from and how old it is */
 let todayRow = null
 function renderToday() {
-  const t = HQ.todayFor({ today: todayRow, pm: pmNow })
+  const t = HQ.todayFor({ today: todayRow, pm: pmNow, projects: projectsData })
   youCount = t.you
   $('you-count').hidden = $('todo-dot').hidden = youCount === 0; $('you-count').textContent = String(youCount)
   const row = (y) => {
-    const li = el('li', y.kind === 'info' ? 'info' : null)
+    const li = el('li', [y.kind === 'info' ? 'info' : '', y.stale ? 'stale' : ''].filter(Boolean).join(' ') || null)
     const what = el('div'); what.append(el('span', 'what', y.what))
-    what.append(el('span', 'from', [y.source, y.age].filter(Boolean).join(' · ')))
+    what.append(el('span', 'from', [y.source, y.age ? `Stand ${y.age}` : 'ohne Stand'].join(' · ')))
+    if (y.waited) what.append(el('span', 'wait', `wartet ${y.waited}`))
     li.append(what)
-    if (y.link) li.append(link('Öffnen', y.link, 'btn'))
+    if (y.link) li.append(link(DE.open, y.link, 'btn'))
     return li
   }
   const info = t.items.filter((y) => y.kind === 'info')
-  list($('you'), t.items.filter((y) => y.kind !== 'info'), row, 'Nichts zu tun. Genieß den Tag.')
+  list($('you'), t.items.filter((y) => y.kind !== 'info'), row, t.stale ? `Stand ${t.age || 'unbekannt'}, evtl. veraltet.` : DE.todayNone)
   list($('today-info'), info, row, '')
   $('today-info-h').hidden = $('today-info').hidden = info.length === 0
   const off = t.sources.filter((x) => !x.ok).map((x) => (x.note ? `${x.name}: ${x.note}` : `${x.name} nicht erreichbar`))
-  $('today-at').textContent = !t.at ? 'Noch kein Abgleich gelaufen.'
-    : [`Abgeglichen ${t.age}`, 'neu bei jedem Öffnen und morgens um 8', ...off].join(' · ')
-  $('today-at').classList.toggle('warn', t.stale && !HQ.refresherOf(refresher))
+  $('today-at').textContent = [HQ.todayNote(t, askedAt), ...off].join(' · ')
+  $('today-at').classList.toggle('warn', t.stale)
   office?.setWall(level, youCount); room?.update()
   greet(t)
 }
@@ -1352,7 +1432,7 @@ function renderPhases(phases) {
   phasesData = phases
   const box = $('phases'); box.replaceChildren()
   let done = 0, total = 0
-  if (!phases.length) box.append(el('p', 'empty', "The project manager's phases and their goals appear here."))
+  if (!phases.length) box.append(el('p', 'empty', DE.noPhases))
   phases.forEach((p, i) => {
     const state = ['done', 'active', 'next'].includes(p.state) ? p.state : 'next'
     const ph = el('div', `phase ${state}`)
@@ -1376,8 +1456,8 @@ function renderPhases(phases) {
   const cur = phases.findIndex((p) => p.state === 'active')
   const at = cur >= 0 ? cur : phases.findIndex((p) => p.state !== 'done')
   level = {
-    label: phases.length ? `Level ${at >= 0 ? at + 1 : phases.length} of ${phases.length}` : 'Plan',
-    name: phases.length ? (at >= 0 ? phases[at].name : 'All levels cleared') : 'No phases yet', pct,
+    label: phases.length ? `Level ${at >= 0 ? at + 1 : phases.length} von ${phases.length}` : 'Plan',
+    name: phases.length ? (at >= 0 ? phases[at].name : DE.cleared) : DE.noPhase, pct,
   }
   office?.setWall(level, youCount); room?.update()
 }
@@ -1388,7 +1468,7 @@ function renderGame(g) {
   game = g
   $('lvl-num').textContent = String(g.level); $('lvl-label').setAttribute('aria-label', `Level ${g.level}`); $('lvl-bar').style.width = `${g.pct}%`; $('lvl-pct').textContent = `${g.xp - g.from} / ${g.to - g.from} XP`
   $('coins').hidden = false; $('coin-val').textContent = String(g.coins)
-  $('game-line').textContent = `Level ${g.level} · ${g.xp} XP · ${g.coins} coin${g.coins === 1 ? '' : 's'}`
+  $('game-line').textContent = `Level ${g.level} · ${g.xp} XP · ${g.coins} Coin${g.coins === 1 ? '' : 's'}${g.test ? ` · Testgeld ${money(g.test)}` : ''}`
   room?.update()
 }
 let toastTimer
@@ -1407,37 +1487,41 @@ function renderProjects(rowsIn = projectRows) {
   const fin = Object.fromEntries(financeRows.map((r) => [r.id, r]))
   const projects = rowsIn.map((p) => HQ.withFinance(HQ.tagMoney(p), fin[p.id]))
   const testMoney = projects.some((p) => p.testMoney)
-  $('t-all-l').textContent = testMoney ? 'All time, Testgeld' : 'All time'
+  $('t-all-l').textContent = testMoney ? 'Gesamt, Testgeld' : 'Gesamt'
   hasProjects = projects.length > 0
   $('company-tab').hidden = !hasProjects
   projects.sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
   const sum = (k) => projects.reduce((n, p) => n + Math.max(0, Number(p[k]) || 0), 0)
-  const needs = projects.flatMap((p) => (Array.isArray(p.you) ? p.you : []).map((y) => ({ ...y, from: p.name || p.id })))
+  projectsData = projects
+  const todo = HQ.todayFor({ today: todayRow, pm: pmNow, projects })
+  const needs = todo.items.filter((y) => y.kind === 'you')
   $('t-month').textContent = money(sum('revenueMonth')); $('t-all').textContent = money(sum('revenueTotal'))
   $('t-need').textContent = String(needs.length)
-  list($('all-you'), needs, (y) => { const li = el('li'), d = el('div'); d.append(el('span', 'from', y.from), link(y.what, y.link)); li.append(d); return li }, 'Nothing right now.')
+  list($('all-you'), needs, (y) => { const li = el('li', y.stale ? 'stale' : null), d = el('div'); d.append(el('span', 'from', y.source), link(y.what, y.link)); li.append(d); return li }, DE.none)
   const box = $('projects'); box.replaceChildren()
-  if (!hasProjects) box.append(el('p', 'empty', "Each project's manager adds its row here on day one."))
+  if (!hasProjects) box.append(el('p', 'empty', 'Der Manager jedes Projekts legt hier am ersten Tag seine Zeile an.'))
   for (const p of projects) {
-    const row = el('div', p.here ? 'proj here' : 'proj')
+    const fresh = HQ.rowFresh(p)
+    const row = el('div', `${p.here ? 'proj here' : 'proj'}${fresh ? '' : ' stale'}`)
     const st = ['active', 'paused', 'done'].includes(p.state) ? p.state : 'paused'
-    const pn = el('div', 'pn'); pn.append(el('b', null, p.name || p.id), el('span', `chip ${st}`, st)); row.append(pn)
+    const pn = el('div', 'pn'); pn.append(el('b', null, p.name || p.id), el('span', `chip ${st}`, DE.proj[st])); row.append(pn)
+    if (!fresh) row.append(el('div', 'stale-note', HQ.rowNote(p)))
     if (p.note) row.append(el('div', 'note', p.note))
-    const pct = Math.max(0, Math.min(100, Math.round(Number(p.progress) || 0)))
-    const pb = el('div', 'pbar'), bar = el('div', 'bar'), fill = el('span'); fill.style.width = `${pct}%`; bar.append(fill)
-    pb.append(bar, el('span', 'num', `${pct}%`)); row.append(pb)
+    const tr = HQ.tractionOf(p), trac = el('div', 'trac')
+    for (const x of tr.parts) { const b = el('span'); b.append(el('b', null, String(x.value)), ` ${x.label}`); trac.append(b) }
+    trac.append(el('span', tr.overdue ? 'over' : null, tr.countdown)); row.append(trac)
     const stats = el('div', 'pstats')
-    stats.append(el('span', null, `${money(p.revenueMonth)} this month`), el('span', null, `${money(p.revenueTotal)} total${p.testMoney ? ' (Testgeld)' : ''}${p.revenueAt ? `, saved ${ago(p.revenueAt)}` : ''}`))
-    const w = Math.max(0, Number(p.working) || 0); if (w) stats.append(el('span', null, `${w} working`))
-    const n = Array.isArray(p.you) ? p.you.length : 0; if (n) stats.append(el('span', 'need', `${n} need you`))
+    stats.append(el('span', null, `${money(p.revenueMonth)} ${DE.month}${p.testMoney ? ' (Testgeld)' : ''}`), el('span', null, `${money(p.revenueTotal)} ${DE.total}${p.testMoney ? ' (Testgeld)' : ''}${p.revenueAt ? `, ${DE.saved} ${ago(p.revenueAt)}` : ''}`))
+    const w = Math.max(0, Number(p.working) || 0); if (w && fresh) stats.append(el('span', null, `${w} ${DE.working}`))
+    const n = needs.filter((y) => y.source === (p.name || p.id)).length; if (n) stats.append(el('span', 'need', `${n} ${DE.needYou}`))
     row.append(stats)
     const acts = el('div', 'acts')
-    if (p.here) { const b = el('button', 'btn go', 'You are here'); b.type = 'button'; b.addEventListener('click', () => { location.hash = 'office' }); acts.append(b) }
-    else if (safeUrl(p.dashboard)) acts.append(link('Enter office', p.dashboard, 'btn go'))
-    if (safeUrl(p.live)) acts.append(link('Live app', p.live, 'btn'))
+    if (p.here) { const b = el('button', 'btn go', DE.you); b.type = 'button'; b.addEventListener('click', () => { location.hash = 'office' }); acts.append(b) }
+    else if (safeUrl(p.dashboard)) acts.append(link(DE.enter, p.dashboard, 'btn go'))
+    if (safeUrl(p.live)) acts.append(link(DE.liveApp, p.live, 'btn'))
     row.append(acts); box.append(row)
   }
-  projectsData = projects; room?.update(); renderMoney()
+  room?.update(); renderMoney(); renderToday()
   showTab()
 }
 
@@ -1554,6 +1638,7 @@ function cozyPlant(T, mat, s = 1) {
     add(new T.SphereGeometry(r, 18, 14), c, x, y, z)
   g.scale.setScalar(s); return g
 }
+const IS_PHONE = matchMedia('(max-width:640px)').matches
 let roomOk = !!(window.THREE && THREE.GLTFLoader && THREE.OrbitControls && window.OFFICE_KIT)
 let room = null
 if (roomOk) buildRoom().then((r) => { room = r; room.update() }).catch((e) => { console.error(e); roomOk = false; showTab() })
@@ -1566,7 +1651,7 @@ async function buildRoom() {
   let desk$ = HQ.deskNumbers({}), mode = moodNow()
   const SKY = { day: ['#7fc8ef', '#fde9c2'], dusk: ['#f39c6b', '#f7d29a'], night: ['#1c2350', '#3d3f6e'] }
   const renderer = new T.WebGLRenderer({ canvas, antialias: true })
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2))
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, IS_PHONE ? 1.5 : 2))
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap
   renderer.outputEncoding = T.sRGBEncoding
   const scene = new T.Scene(); scene.background = new T.Color('#fbe7c4')
@@ -1648,10 +1733,10 @@ async function buildRoom() {
 
   const screen = face(512, 320, (g, w, h) => {
     g.fillStyle = paperC; g.fillRect(0, 0, w, h)
-    g.fillStyle = ink; g.font = FONT(900, 30); g.fillText('Projects', 26, 48)
-    g.font = FONT(700, 20); g.fillStyle = soft; g.fillText(`${money(desk$.month)} this month${desk$.test ? ', Testgeld' : ''}`, 26, 80)
+    g.fillStyle = ink; g.font = FONT(900, 30); g.fillText('Projekte', 26, 48)
+    g.font = FONT(700, 20); g.fillStyle = soft; g.fillText(`${money(desk$.month)} diesen Monat${desk$.test ? ', Testgeld' : ''}`, 26, 80)
     const ps = projectsData.slice(0, 4)
-    if (!ps.length) { g.fillStyle = ink; g.font = FONT(700, 22); g.fillText('No projects yet', 26, 140) }
+    if (!ps.length) { g.fillStyle = ink; g.font = FONT(700, 22); g.fillText('Noch keine Projekte', 26, 140) }
     ps.forEach((p, i) => {
       const y = 126 + i * 46, pct = Math.max(0, Math.min(100, Number(p.progress) || 0))
       g.fillStyle = ink; g.font = FONT(800, 22); g.fillText(fit(g, p.name || p.id, 250), 26, y)
@@ -1661,7 +1746,7 @@ async function buildRoom() {
   })
   const lid = plane(ls.x * 0.84, ls.y * 0.78, screen.t, true)
   lid.position.set(0, dt + ls.y * 0.56, 1.1 - ls.z / 2 + 0.1); lid.rotation.x = -0.1; scene.add(lid)
-  spot(laptop, 'company', 'Projects & money', new T.Vector3(0, dt + ls.y * 0.92, 1.1 - ls.z / 2)); spot(lid, 'company')
+  spot(laptop, 'company', 'Projekte & Geld', new T.Vector3(0, dt + ls.y * 0.92, 1.1 - ls.z / 2)); spot(lid, 'company')
 
   const phone = new T.Group(); phone.position.set(0.44, dt + 0.008, 1.14); phone.rotation.y = -0.35
   const body = new T.Mesh(new T.BoxGeometry(0.1, 0.014, 0.19), new T.MeshStandardMaterial({ color: '#ff9e8a', roughness: 0.6 })); body.castShadow = true; phone.add(body)
@@ -1703,9 +1788,9 @@ async function buildRoom() {
     g.fillStyle = ink; g.font = FONT(900, 40); g.fillText('Plan', 30, 58)
     g.fillStyle = leaf; g.font = FONT(800, 28); g.textAlign = 'right'; g.fillText(`${desk$.pct}%`, w - 30, 58); g.textAlign = 'left'
     g.fillStyle = '#efe0b0'; g.fillRect(30, 76, w - 60, 14); g.fillStyle = leaf; g.fillRect(30, 76, ((w - 60) * desk$.pct) / 100, 14)
-    g.fillStyle = soft; g.font = FONT(900, 30); g.fillText(`Lv ${game.level} · ${game.xp} XP · ${game.coins} coins`, 30, 420)
+    g.fillStyle = soft; g.font = FONT(900, 30); g.fillText(`Lv ${game.level} · ${game.xp} XP · ${game.coins} Coins`, 30, 420)
     const ph = phasesData.slice(0, 6)
-    if (!ph.length) { g.fillStyle = soft; g.font = FONT(700, 24); g.fillText('No phases yet', 30, 140) }
+    if (!ph.length) { g.fillStyle = soft; g.font = FONT(700, 24); g.fillText('Noch keine Phasen', 30, 140) }
     ph.forEach((p, i) => {
       const y = 140 + i * 48, st = p.state
       g.fillStyle = st === 'done' ? leaf : st === 'active' ? coral : '#b8a48e'
@@ -1752,12 +1837,12 @@ async function buildRoom() {
   const sign = face(256, 128, (g, w, h) => {
     g.fillStyle = paperC; g.fillRect(0, 0, w, h); g.strokeStyle = ink; g.lineWidth = 8; g.strokeRect(4, 4, w - 8, h - 8)
     g.fillStyle = ink; g.textAlign = 'center'; g.font = FONT(900, 40); g.fillText('TEAM', w / 2, 62)
-    g.font = FONT(800, 24); g.fillStyle = leaf; g.fillText(desk$.working ? `${desk$.working} working` : 'office', w / 2, 100); g.textAlign = 'left'
+    g.font = FONT(800, 24); g.fillStyle = leaf; g.fillText(desk$.working ? `${desk$.working} arbeiten` : 'Büro', w / 2, 100); g.textAlign = 'left'
   })
   const sp = plane(0.42, 0.21, sign.t); sp.position.set(0, 1.55, 0.035); door.add(sp)
   /* The door swings on its left hinge when someone from the team comes in */
   const hinge = new T.Group(); hinge.position.set(-0.49, 0, -R + 0.03); door.position.set(0.49, 0, 0); hinge.add(door)
-  scene.add(hinge); spot(door, 'office', 'Team office', new T.Vector3(0, 2.25, -R + 0.1))
+  scene.add(hinge); spot(door, 'office', 'Team-Büro', new T.Vector3(0, 2.25, -R + 0.1))
 
   /* Light: the sun through the windows, a desk lamp and a warm room light that come on in the evening */
   const hemi = new T.HemisphereLight(0xfff1d6, 0xc9a27e, 0.72); const amb = new T.AmbientLight(0xffe6c8, 0.22); scene.add(hemi, amb)
@@ -1851,14 +1936,19 @@ async function buildRoom() {
     CARDS_3D.pose(v.card, moving ? 'walk' : v.clip, moving ? v.gait : (still ? 0 : v.t), dt)
   }
 
-  let shown = false
+  /* The desk is drawn only while something changes: the camera moves, a number or face is redrawn, a visit or the door moves,
+     plus a short while after each (and the first seconds, while pieces load). Otherwise the GPU idles. */
+  let shown = false, awake = 0
+  const wake = (ms = 1200) => { awake = Math.max(awake, performance.now() + ms) }
+  controls.addEventListener('change', () => wake()); wake(10000)
   function loop() {
     requestAnimationFrame(loop)
     const dt = Math.min(clk.getDelta(), 0.05)
     if (stage.offsetParent === null) { shown = false; return }
-    if (!shown) { shown = true; layout() }
+    if (!shown) { shown = true; layout(); wake() }
     if (!still) controls.update()
-    if (visit) stepVisit(dt); else if (hinge.rotation.y) doorTo(false, dt)
+    if (visit) stepVisit(dt); else if (Math.abs(hinge.rotation.y) > 0.002) doorTo(false, dt); else hinge.rotation.y = 0
+    if (!visit && !hinge.rotation.y && performance.now() > awake) return
     renderer.render(scene, camera); placeTags()
   }
   loop()
@@ -1879,13 +1969,13 @@ async function buildRoom() {
     hotspots: () => hot.filter((x) => x.el).map((x) => ({ go: x.go, shown: !x.el.hidden })),
     update() {
       desk$ = HQ.deskNumbers({ projects: projectsData, you: youCount, phases: phasesData })
-      screen.redraw(); lock.redraw(); board.redraw(); chart.redraw(); sign.redraw(); padFace.redraw()
+      screen.redraw(); lock.redraw(); board.redraw(); chart.redraw(); sign.redraw(); padFace.redraw(); wake()
     },
   }
 }
 document.fonts?.ready.then(() => room?.update())
 
-let world = 'room'
+let world = 'room', office = null, officeTried = false, officeReady = false
 /* One panel at a time: a page opening closes the card sheet, a card opening (from the room) closes the page, and a tap
    on the room or office outside an open page closes it (HQ.closeTo) */
 let tabNow = null
@@ -1897,6 +1987,7 @@ function showTab() {
   tabNow = tab
   world = roomOk ? HQ.worldFor(tab, world) : 'office'
   $('room').hidden = world !== 'room'; $('stage').hidden = world !== 'office'; $('desk-tab').hidden = !roomOk
+  if (world === 'office' && officeReady) ensureOffice()
   for (const p of document.querySelectorAll('[data-page]')) p.hidden = p.dataset.page !== tab
   for (const b of document.querySelectorAll('[data-tab]')) {
     if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page')
@@ -1905,19 +1996,24 @@ function showTab() {
 }
 for (const b of document.querySelectorAll('[data-tab]')) b.addEventListener('click', () => { location.hash = b.dataset.tab })
 window.addEventListener('hashchange', showTab)
-showTab()
 
 /* ---------- The 3D office (three.js r147). Only static shapes and canvas-drawn text; stored text never becomes markup. ---------- */
-const office = (() => {
-  if (!window.THREE || !THREE.OrbitControls) { $('stage-msg').hidden = false; $('c').hidden = true; return null }
-  try { return buildOffice() } catch (e) { console.error(e); $('stage-msg').hidden = false; $('c').hidden = true; return null }
-})()
+/* Built on the first visit to the office or the team page (not on load), then given what the pages already know */
+function ensureOffice() {
+  if (officeTried) return
+  officeTried = true
+  const fail = () => { $('stage-msg').hidden = false; $('c').hidden = true }
+  if (!window.THREE || !THREE.OrbitControls) return fail()
+  try { office = buildOffice() } catch (e) { console.error(e); return fail() }
+  renderTeam(team); office.setWall(level, youCount); applySkin()
+}
+showTab()
 
 function buildOffice() {
   const T = THREE, stage = $('stage'), canvas = $('c')
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches
   const renderer = new T.WebGLRenderer({ canvas, antialias: true })
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2))
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, IS_PHONE ? 1.5 : 2))
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap
   renderer.outputEncoding = T.sRGBEncoding
   const scene = new T.Scene()
@@ -2111,7 +2207,7 @@ function buildOffice() {
   const sticky = canvasTex(256, 256, (g, w, h, n) => {
     g.fillStyle = '#ffd84d'; g.fillRect(0, 0, w, h)
     g.fillStyle = '#3d3200'; g.font = '800 120px "M PLUS Rounded 1c", ui-rounded, sans-serif'; g.textAlign = 'center'; g.fillText(String(n), w / 2, 140)
-    g.font = '800 34px "M PLUS Rounded 1c", ui-rounded, sans-serif'; g.fillText(n === 1 ? 'needs you' : n ? 'need you' : 'all clear', w / 2, 206)
+    g.font = '800 34px "M PLUS Rounded 1c", ui-rounded, sans-serif'; g.fillText(n === 1 ? 'braucht dich' : n ? 'brauchen dich' : 'alles klar', w / 2, 206)
   })
   const note = mesh(new T.PlaneGeometry(1.0, 1.0), new T.MeshBasicMaterial({ map: sticky.t }), 4.1, 3.4, BACK + 0.1)
   note.rotation.z = -0.08; note.userData.go = 'todo'
@@ -2230,7 +2326,7 @@ function buildOffice() {
   const tags = {}
   for (const s of SEATS) {
     const t = el('button', 'tag'); t.type = 'button'
-    const nm = el('span', 'nm', s.name), chip = el('span', 'chip off', 'off duty')
+    const nm = el('span', 'nm', s.name), chip = el('span', 'chip off', DE.off)
     t.append(nm, chip); t.addEventListener('click', () => openSheet(s.key, t)); $('labels').append(t)
     tags[s.key] = { t, nm, chip }
   }
@@ -2241,8 +2337,8 @@ function buildOffice() {
       const tg = tags[s.key], st = states[s.key] || 'off', n = counts[s.key] || 0
       const own = seats[s.key].card?.name, role = n > 1 ? `${s.name} ×${n}` : s.name, name = own ? `${own} · ${role}` : role
       if (tg.nm.textContent !== name) tg.nm.textContent = name
-      tg.t.setAttribute('aria-label', `${name}, ${st === 'off' ? 'off duty' : STATES[st]}`)
-      const cls = `chip ${st}`; if (tg.chip.className !== cls) { tg.chip.className = cls; tg.chip.textContent = st === 'off' ? 'off duty' : STATES[st] }
+      tg.t.setAttribute('aria-label', `${name}, ${st === 'off' ? DE.off : STATES[st]}`)
+      const cls = `chip ${st}`; if (tg.chip.className !== cls) { tg.chip.className = cls; tg.chip.textContent = st === 'off' ? DE.off : STATES[st] }
       seats[s.key].who.localToWorld(v.set(0, seats[s.key].h - 0.05, 0)).project(camera)
       tg.t.style.left = `${((v.x + 1) / 2) * w}px`; tg.t.style.top = `${((1 - v.y) / 2) * h}px`
       tg.t.hidden = v.z > 1
@@ -2732,15 +2828,16 @@ function endVisit() {
   visitOn = null; $('scene').hidden = true; room?.leave()
 }
 
-const GREET = { day: 'Good day, yskills.', dusk: 'Good evening, yskills.', night: 'Late shift, yskills.' }
-window.onDaytime = (m) => { const w = team.filter((x) => stateOf(x.state) === 'working').length; $('greet').textContent = `${GREET[m]}${w ? ` ${w} working.` : ''}${updated ? ` Updated ${updated}.` : ''}` }
+const GREET = DE.greet
+window.onDaytime = (m) => { const w = team.filter((x) => stateOf(x.state) === 'working').length; $('greet').textContent = `${GREET[m]}${w ? ` ${w} ${DE.working}.` : ''}${updated ? ` ${DE.updated} ${updated}.` : ''}` }
 const rows = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }))
 renderTeam([]); renderSkinSwitch()
+officeReady = true; showTab()
 ;(async () => {
   const db = await window.claude?.use?.('db')
-  if (!db) { $('greet').textContent = 'Sign in to claude.ai to see live updates'; return }
+  if (!db) { $('greet').textContent = DE.signIn; return }
   $('dot').classList.add('on')
-  const fail = () => { $('dot').classList.remove('on'); $('greet').textContent = 'Live updates stopped; reload the page' }
+  const fail = () => { $('dot').classList.remove('on'); $('greet').textContent = DE.stoppedLive }
   hqDb = db
   db.doc('pm/now').onSnapshot((s) => { pmNow = s.exists ? s.data() : null; pmIn = true; if (pmNow) renderPm(pmNow); else renderToday() }, fail)
   db.doc('today/now').onSnapshot((s) => { todayRow = s.exists ? s.data() : {}; renderToday(); askIn.today = true; maybeAsk() }, () => {})

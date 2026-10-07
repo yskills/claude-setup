@@ -36,10 +36,10 @@ test('pages keep the room they were opened from', () => {
 
 test('desk numbers add up and ignore junk', () => {
   const n = HQ.deskNumbers({
-    projects: [{ revenueMonth: 28, revenueTotal: 28, working: 2, you: [{}, {}] }, { revenueMonth: '-5', revenueTotal: 'x', you: 'no' }],
-    you: 1, phases: [{ goals: [{ done: 1, total: 4 }] }, { goals: [{ done: 3, total: 4 }] }, {}],
+    projects: [{ revenueMonth: 28, revenueTotal: 28, working: 2, at: '2026-10-07T09:00:00Z', you: [{}, {}] }, { revenueMonth: '-5', revenueTotal: 'x', working: 3, you: 'no' }],
+    you: 1, phases: [{ goals: [{ done: 1, total: 4 }] }, { goals: [{ done: 3, total: 4 }] }, {}], now: new Date('2026-10-07T10:00:00Z'),
   })
-  assert.deepEqual({ ...n }, { month: 28, total: 28, todos: 2, pct: 50, working: 2, test: false })
+  assert.deepEqual({ ...n }, { month: 28, total: 28, todos: 1, pct: 50, working: 2, test: false })
   assert.deepEqual({ ...HQ.deskNumbers({}) }, { month: 0, total: 0, todos: 0, pct: 0, working: 0, test: false })
 })
 
@@ -81,16 +81,17 @@ test('a project row in test mode is tagged Testgeld; live money is not', () => {
 
 test('score comes only from real events', () => {
   const s = (events) => ({ ...HQ.scoreFrom(events) })
-  assert.deepEqual(s([]), { xp: 0, coins: 0, level: 1, from: 0, to: 100, pct: 0 })
+  assert.deepEqual(s([]), { xp: 0, coins: 0, test: 0, level: 1, from: 0, to: 100, pct: 0 })
   assert.deepEqual(s(undefined), s([]))
   assert.equal(s([{ kind: 'pr_merged' }]).xp, 50)
   assert.equal(s([{ kind: 'gate_passed' }]).xp, 20)
-  assert.equal(s([{ kind: 'visit' }]).xp, 5)
+  assert.equal(s([{ kind: 'visit' }]).xp, 0)
   assert.equal(s([{ kind: 'launched' }]).xp, 100)
-  const euros = s([{ kind: 'euro', amount: 12 }])
+  const euros = s([{ kind: 'euro', amount: 12, mode: 'live' }])
   assert.equal(euros.xp, 120); assert.equal(euros.coins, 12)
-  assert.equal(s([{ kind: 'euro', amount: 0.6 }, { kind: 'euro', amount: 0.6 }]).coins, 1)
-  assert.equal(s([{ kind: 'euro', amount: 0.6 }, { kind: 'euro', amount: 0.6 }]).xp, 12)
+  const live = (amount) => ({ kind: 'euro', amount, mode: 'live' })
+  assert.equal(s([live(0.6), live(0.6)]).coins, 1)
+  assert.equal(s([live(0.6), live(0.6)]).xp, 12)
 })
 
 test('score ignores junk, repeats and fake money', () => {
@@ -109,10 +110,10 @@ test('levels follow floor(sqrt(xp/100)) + 1 and the bar fills toward the next', 
 
 test('a toast names what the new events earned', () => {
   assert.equal(HQ.toastFor([{ kind: 'pr_merged' }]), '+50 XP')
-  assert.equal(HQ.toastFor([{ kind: 'euro', amount: 3 }]), '+30 XP · +3 coins')
+  assert.equal(HQ.toastFor([{ kind: 'euro', amount: 3, mode: 'live' }]), '+30 XP · +3 coins')
   assert.equal(HQ.toastFor([{ kind: 'pr_merged' }, { kind: 'gate_passed' }]), '+70 XP')
   assert.equal(HQ.toastFor([{ kind: 'nope' }]), '')
-  assert.equal(HQ.toastFor([{ kind: 'euro', amount: 1 }]), '+10 XP · +1 coin')
+  assert.equal(HQ.toastFor([{ kind: 'euro', amount: 1, mode: 'live' }]), '+10 XP · +1 coin')
 })
 
 test('a visit is one event per day', () => {
@@ -338,9 +339,9 @@ test('Company, laptop and wall chart show the cash book amount with cents: net o
   const plain = (p) => JSON.parse(JSON.stringify(p))
   const p = { id: 'duo-test', revenueTotal: 30, revenueMonth: 30, revenueMode: 'test' }
   const live = { total: { grossCents: 2999, feeCents: 119, netCents: 2880, complete: true }, month: { grossCents: 2999, feeCents: 119, netCents: 2880, complete: true }, mode: 'test' }
-  assert.deepEqual(plain(HQ.withFinance(p, live, NOW)), { ...p, revenueTotal: 28.8, revenueMonth: 28.8, revenueNet: true, testMoney: true })
+  assert.deepEqual(plain(HQ.withFinance(p, live, NOW)), { ...p, revenueTotal: 28.8, revenueMonth: 28.8, revenueNet: true, testMoney: true, revenueMode: 'test' })
   const open = { ...live, total: { ...live.total, complete: false }, month: undefined, mode: 'live' }
-  assert.deepEqual(plain(HQ.withFinance(p, open, NOW)), { ...p, revenueTotal: 29.99, revenueMonth: 30, revenueNet: false, testMoney: false })
+  assert.deepEqual(plain(HQ.withFinance(p, open, NOW)), { ...p, revenueTotal: 29.99, revenueMonth: 30, revenueNet: false, testMoney: false, revenueMode: 'live' })
   assert.deepEqual(plain(HQ.withFinance(p, undefined, NOW)), p)
 })
 
@@ -358,13 +359,14 @@ test('Heute für dich: live items with source and age, the team list joins, stal
     sources: [{ name: 'GitHub', ok: true }, { name: 'Roblox', ok: false, note: 'kein Schlüssel' }, { ok: true }],
   }
   const pm = { updated: '2026-10-05T10:00:00Z', you: [{ what: 'Kleingarten: Shop anlegen', link: 'https://create.roblox.com/x' }, { what: 'CLAUDE-SETUP PR 51: CI ROT' }] }
-  const t = HQ.todayFor({ today, pm }, now)
+  const projects = [{ id: 'kleingarten', name: 'Kleingarten', at: '2026-10-05T10:00:00Z', you: [{ what: 'Kleingarten: Shop anlegen', link: 'https://create.roblox.com/x', firstSeen: '2026-10-04T10:00:00Z' }] }]
+  const t = HQ.todayFor({ today, pm, projects }, now)
   assert.deepEqual([...t.items.map((i) => i.what)], ['claude-setup PR 51: CI rot', 'bad link', 'Kleingarten: Shop anlegen', 'duo-test: 29,99 € Testgeld eingegangen'])
   assert.equal(t.items[0].age, 'vor 3 Std.'); assert.equal(t.items[0].source, 'GitHub')
   assert.equal(t.items[1].link, null)
-  assert.equal(t.items[2].source, 'Claude-Team'); assert.equal(t.items[2].age, 'vor 2 Tagen')
+  assert.equal(t.items[2].source, 'Kleingarten'); assert.equal(t.items[2].age, 'vor 2 Tagen'); assert.equal(t.items[2].stale, true); assert.equal(t.items[2].waited, 'seit 3 Tagen')
   assert.equal(t.items[3].age, 'vor 13 Min.')
-  assert.equal(t.you, 3); assert.equal(t.age, 'vor 12 Min.'); assert.equal(t.stale, false)
+  assert.equal(t.you, 3); assert.equal(t.items[0].stale, false); assert.equal(t.items[3].stale, false); assert.equal(t.age, 'vor 12 Min.'); assert.equal(t.stale, false)
   assert.deepEqual(JSON.parse(JSON.stringify(t.sources)), [{ name: 'GitHub', ok: true, note: '' }, { name: 'Roblox', ok: false, note: 'kein Schlüssel' }])
   assert.equal(HQ.todayFor({ today: { ...today, refreshedAt: '2026-10-07T06:00:00Z' } }, now).stale, true)
   const empty = HQ.todayFor({}, now)
@@ -391,13 +393,68 @@ test('HQ opens on Heute für dich once a day, only from the desk and only when s
 
 test('opening HQ asks for a fresh Heute list only when the last one is old and nobody asked just now', () => {
   const now = new Date('2026-10-07T10:00:00Z')
-  const fresh = { refreshedAt: '2026-10-07T09:40:00Z' }, old = { refreshedAt: '2026-10-07T09:00:00Z' }
+  const fresh = { refreshedAt: '2026-10-07T08:00:00Z' }, old = { refreshedAt: '2026-10-07T07:00:00Z' }
   assert.equal(HQ.refreshDue({ today: fresh, askedAt: null }, now), false)
   assert.equal(HQ.refreshDue({ today: old, askedAt: null }, now), true)
   assert.equal(HQ.refreshDue({ today: null, askedAt: null }, now), true)
   assert.equal(HQ.refreshDue({ today: old, askedAt: '2026-10-07T09:55:00Z' }, now), false)
   assert.equal(HQ.refreshDue({ today: old, askedAt: '2026-10-07T09:45:00Z' }, now), true)
+  assert.equal(HQ.REFRESH_AFTER_MIN, 150)
   assert.equal(HQ.refresherOf({ session: 'cse_01ABCDEFGHJK' }), 'cse_01ABCDEFGHJK')
   assert.equal(HQ.refresherOf({ session: 'nope' }), null)
   assert.match(HQ.REFRESH_MESSAGE, /^HQ refresh/)
+})
+
+test('rows carry a stamp and go grey after 6 hours', () => {
+  const now = new Date('2026-10-07T10:00:00Z')
+  assert.equal(HQ.stamp({ a: 1 }, now).at, '2026-10-07T10:00:00.000Z')
+  assert.equal(HQ.rowFresh({ at: '2026-10-07T04:30:00Z' }, now), true)
+  assert.equal(HQ.rowFresh({ at: '2026-10-07T03:59:00Z' }, now), false)
+  assert.equal(HQ.rowFresh({ updated: '2026-10-07T09:00:00Z' }, now), true)
+  assert.equal(HQ.rowFresh({}, now), false)
+  assert.equal(HQ.rowNote({ at: '2026-10-07T09:00:00Z' }, now), '')
+  assert.match(HQ.rowNote({ at: '2026-10-06T09:00:00Z' }, now), /seit 6 Std\. nicht aktualisiert \(Stand vor 1 Tag\)/)
+  assert.match(HQ.rowNote({}, now), /ohne Zeitstempel/)
+})
+
+test('Testgeld and toolkit PRs earn nothing', () => {
+  const s = (e) => ({ ...HQ.scoreFrom(e) })
+  const test = s([{ kind: 'euro', amount: 28.8 }, { kind: 'euro', amount: 1, mode: 'test' }])
+  assert.deepEqual([test.xp, test.coins, test.test], [0, 0, 29.8])
+  assert.equal(s([{ kind: 'pr_merged', project: 'claude-setup' }, { kind: 'gate_passed', project: 'hq' }]).xp, 0)
+  assert.equal(s([{ kind: 'pr_merged', project: 'duo-test' }]).xp, 50)
+})
+
+test('to-dos: one place each, deduped by text and by link, first seen kept', () => {
+  const now = new Date('2026-10-07T10:00:00Z')
+  const at = '2026-10-07T09:00:00Z'
+  const projects = [
+    { id: 'a', name: 'A', at, you: [{ what: 'Schritt 1', link: 'https://x.test/s' }, { what: 'Schritt 2', link: 'https://x.test/s' }] },
+    { id: 'b', name: 'B', at, you: [{ what: 'Gleicher Link, anderer Text', link: 'https://x.test/s' }, { what: 'schritt 1' }] },
+  ]
+  const t = HQ.todayFor({ projects, pm: { at, you: [{ what: 'Nur im PM' }] } }, now)
+  assert.deepEqual([...t.items.map((i) => i.what)], ['Schritt 1', 'Schritt 2'])
+  const only = HQ.todayFor({ pm: { at, you: [{ what: 'Nur im PM', firstSeen: '2026-10-07T07:00:00Z' }] } }, now)
+  assert.deepEqual([only.items[0].source, only.items[0].waited], ['Claude-Team', 'seit 3 Std.'])
+})
+
+test('Heute note and wait text', () => {
+  const now = new Date('2026-10-07T10:00:00Z')
+  const t = (refreshedAt) => HQ.todayFor({ today: { refreshedAt, items: [] } }, now)
+  assert.equal(HQ.todayNote(HQ.todayFor({}, now), null, now), 'Noch kein Abgleich gelaufen.')
+  assert.equal(HQ.todayNote(t('2026-10-07T09:48:00Z'), null, now), 'Abgeglichen vor 12 Min.')
+  assert.equal(HQ.todayNote(t('2026-10-07T09:48:00Z'), '2026-10-07T09:00:00Z', now), 'Abgeglichen vor 12 Min. · neu bei jedem Öffnen')
+  assert.equal(HQ.todayNote(t('2026-10-07T01:00:00Z'), null, now), 'Stand vor 9 Std., evtl. veraltet')
+  assert.equal(HQ.sinceDe('2026-10-04T10:00:00Z', now), 'seit 3 Tagen')
+})
+
+test('progress is traction, not build percent', () => {
+  const now = new Date('2026-10-07T10:00:00Z')
+  const a = HQ.tractionOf({ visitors7d: 12, signups: 0, paying: 0, firstEuroBy: '2026-10-17T10:00:00Z' }, now)
+  assert.deepEqual(JSON.parse(JSON.stringify(a.parts)), [{ label: 'Besucher (7 Tage)', value: 12 }, { label: 'Anmeldungen', value: 0 }, { label: 'Zahlende', value: 0 }])
+  assert.equal(a.countdown, 'Erster Euro in 10 Tagen'); assert.equal(a.overdue, false)
+  assert.equal(HQ.tractionOf({ firstEuroBy: '2026-10-05T10:00:00Z' }, now).countdown, 'Erster Euro 2 Tage überfällig')
+  assert.equal(HQ.tractionOf({}, now).countdown, 'Kein Datum für den ersten Euro')
+  assert.equal(HQ.tractionOf({ revenueMode: 'live', revenueTotal: 5 }, now).real, true)
+  assert.equal(HQ.tractionOf({ revenueTotal: 28.8 }, now).real, false)
 })

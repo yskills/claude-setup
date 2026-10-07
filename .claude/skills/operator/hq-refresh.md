@@ -6,12 +6,13 @@ Heute-Abgleich" (Sonnet), kept resolved so it stays out of the way. It:
 
 - writes `config/refresher` `{session: <its own session id>, at}` into HQ's db at start, so the page
   knows whom to ask;
-- holds one routine of its own (fires into itself): every day at 8:07 Europe/Berlin;
+- holds no routine of its own: the page asks it (below), and a hand-off deletes the old trigger (`list_triggers`, `delete_trigger`) before the new thread starts; a second daily 8:07 routine only duplicates the ~$0.90 run;
 - runs the prompt below on that routine and on every "HQ refresh" message. HQ sends that message
-  through the Claude Code Remote connector when yskills opens it and the list is older than 30 minutes
+  through the Claude Code Remote connector when yskills opens it and the list is older than 150 minutes (`REFRESH_AFTER_MIN`)
   (and nobody asked in the last 10; `today/ask`), or when they tap "Jetzt abgleichen".
 - answers with `no_reply_needed`; it never posts. When its context guard says hand off, it writes a
   short HANDOFF and the coordinator starts a fresh one, which rewrites `config/refresher`.
+- stamps every row it writes with `at`, keeps each to-do's `firstSeen` when it rewrites `today/now` (a to-do's wait counts from `firstSeen`), and backfills a missing `events/pr-<repo>-<number>` (`pr_merged`, project = repo) for each merged PR, with that fixed id, adding `mode: 'live'` to euro events only for real money.
 
 Why not hourly: a routine in a private project can only wake an existing session, and every wake
 re-reads that session's whole context, so hourly would burn most of the plan's usage on a list

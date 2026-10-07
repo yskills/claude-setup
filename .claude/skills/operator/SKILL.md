@@ -131,7 +131,7 @@ Templates in `templates/`.
   (EUR numbers, from the project's public stats route, e.g. duo-test's `/api/stats` in cents divided by
   100; Artifact pages cannot fetch other sites, so the manager copies them at every milestone),
   `revenueMode` (`test` while Stripe is in test mode, HQ then says "Testgeld"), `revenueAt` (ISO time of
-  that read), `working` (count), `you[{what, link}]` (every `what` here and in `pm/now` is one plain German sentence with a verb, because HQ shows it as-is in Heute für dich); a project's `dashboard` link, if the project has no
+  that read), `working` (count), `at` (ISO time, **every row any thread writes carries `at`; HQ greys a row after 6 hours and counts its `working` as 0**), `visitors7d, signups, paying, firstEuroBy` (traction: what real people did and the date of the first real euro; HQ shows these instead of a build percent), `you[{what, link, firstSeen}]` (a to-do lives only in its project row; `pm/now.you` is only Claude Setup's own and the fallback; the same text or link in two lists shows once; keep `firstSeen` when rewriting) (every `what` here and in `pm/now` is one plain German sentence with a verb, because HQ shows it as-is in Heute für dich); a project's `dashboard` link, if the project has no
   Artifact of its own, is its project chat thread), and keeps it current with every `pm/now` write. **A revenue source is verified against real data before any UI reads it:** call
   the route or query the table and check that the known payments show up (duo-test's `/api/stats`
   went live summing rows that were never stored and showed 0 € for 28 € of payments); a source
@@ -142,11 +142,11 @@ Templates in `templates/`.
   count twice: `pr_merged` (id `pr-<repo>-<number>`, 50 XP), `gate_passed` (`gate-<repo>-<number>`,
   20 XP, only at 5/5), `launched` (`launch-<project>`, 100 XP), `euro` (`euro-<project>-<yyyy-mm-dd>`,
   `amount` = euros newly earned since the last event, from Stripe or `/api/stats`, 10 XP and 1 coin
-  each; test money counts as it shows as Testgeld). The page writes `visit-<day>` itself. The rule is
+  each, **and `mode: 'live'`; without it the amount is Testgeld and scores nothing**; PRs of claude-setup and hq score nothing, visits score nothing; the finance row wins over the `revenue*` fields). The page writes `visit-<day>` itself. The rule is
   `HQ.scoreFrom` in the template's `hq-rules` block, tested by `scripts/hq-rules.test.mjs`.
   **Heute für dich:** the desk phone's page reads `today/now` (`{refreshedAt, items[{what, kind you|info,
   source, at, link}], sources[{name, ok, note}]}`), filled from live sources by the refresher thread
-  (`hq-refresh.md`): HQ asks it on open when the list is over 30 minutes old, plus a daily 8:07 routine.
+  (`hq-refresh.md`): HQ asks it on open when the list is over 150 minutes old; no routine of its own.
   Rule: `HQ.todayFor`, `HQ.refreshDue`.
   **New project tap:** HQ's yellow notepad saves `requests/<id>` (`{text, at, status}`: `new` saved,
   `sent` the page reached the coordinator, `relayed` a thread passed it on, `started` the brainstorm
