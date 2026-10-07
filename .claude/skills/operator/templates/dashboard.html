@@ -495,7 +495,91 @@ window.HQ = (() => {
       trouble: [syncTrouble('Stripe-Abgleich', row.sync), syncTrouble('Gebühren', row.feeSync), syncTrouble('Auszahlung', row.payoutSync)].filter(Boolean),
     }
   }
-  return { TABS, modeOf, pickTab, worldFor, deskNumbers, tagMoney, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport }
+  /* Office walking: a floor grid ({ x0, z0, size, w, h, blocked }, blocked[j * w + i] is 1 where furniture stands)
+     and an 8-way A* over it. findPath gives world [x, z] points from `from` to `to`, straight runs merged, or null
+     when there is no way through. The ends may sit on blocked cells (a chair, a sofa): the walk starts and ends at
+     the nearest free cell. */
+  const cellOf = (g, x, z) => [Math.floor((x - g.x0) / g.size), Math.floor((z - g.z0) / g.size)]
+  const isFree = (g, i, j) => i >= 0 && j >= 0 && i < g.w && j < g.h && !g.blocked[j * g.w + i]
+  const centreOf = (g, i, j) => [g.x0 + (i + 0.5) * g.size, g.z0 + (j + 0.5) * g.size]
+  function nearestFree(g, x, z, reach = 12) {
+    const [ci, cj] = cellOf(g, x, z)
+    if (isFree(g, ci, cj)) return [ci, cj]
+    for (let r = 1; r <= reach; r++) {
+      let best = null, bd = Infinity
+      for (let j = cj - r; j <= cj + r; j++) for (let i = ci - r; i <= ci + r; i++) {
+        if (Math.max(Math.abs(i - ci), Math.abs(j - cj)) !== r || !isFree(g, i, j)) continue
+        const [cx, cz] = centreOf(g, i, j), dd = (cx - x) ** 2 + (cz - z) ** 2
+        if (dd < bd) { bd = dd; best = [i, j] }
+      }
+      if (best) return best
+    }
+    return null
+  }
+  const lineClear = (g, a, b) => {
+    const n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / (g.size / 3))
+    for (let k = 0; k <= n; k++) { const [i, j] = cellOf(g, a[0] + ((b[0] - a[0]) * k) / (n || 1), a[1] + ((b[1] - a[1]) * k) / (n || 1)); if (!isFree(g, i, j)) return false }
+    return true
+  }
+  function findPath(g, from, to) {
+    const s = nearestFree(g, from[0], from[1]), e = nearestFree(g, to[0], to[1])
+    if (!s || !e) return null
+    const key = (i, j) => j * g.w + i, goal = key(e[0], e[1])
+    const cost = new Float64Array(g.w * g.h).fill(Infinity), prev = new Int32Array(g.w * g.h).fill(-1)
+    const heur = (i, j) => { const dx = Math.abs(i - e[0]), dy = Math.abs(j - e[1]); return Math.max(dx, dy) + 0.414 * Math.min(dx, dy) }
+    const heap = [], push = (f, k) => { heap.push([f, k]); let c = heap.length - 1; while (c && heap[(c - 1) >> 1][0] > heap[c][0]) { const p = (c - 1) >> 1; [heap[p], heap[c]] = [heap[c], heap[p]]; c = p } }
+    const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let c = 0; for (;;) { const l = c * 2 + 1, r = l + 1; let m = c; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === c) break; [heap[m], heap[c]] = [heap[c], heap[m]]; c = m } } return top }
+    cost[key(s[0], s[1])] = 0; push(heur(s[0], s[1]), key(s[0], s[1]))
+    while (heap.length) {
+      const [, k] = pop(); if (k === goal) break
+      const i = k % g.w, j = (k - i) / g.w
+      for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+        if ((!di && !dj) || !isFree(g, i + di, j + dj)) continue
+        if (di && dj && (!isFree(g, i + di, j) || !isFree(g, i, j + dj))) continue
+        const nk = key(i + di, j + dj), c = cost[k] + (di && dj ? 1.414 : 1)
+        if (c < cost[nk]) { cost[nk] = c; prev[nk] = k; push(c + heur(i + di, j + dj), nk) }
+      }
+    }
+    if (cost[goal] === Infinity) return null
+    const cells = []
+    for (let k = goal; k !== -1; k = prev[k]) { const i = k % g.w; cells.unshift(centreOf(g, i, (k - i) / g.w)) }
+    /* Merge straight runs: from each kept point, jump to the farthest later point in plain sight over free floor */
+    const pts = [from, ...cells, to], out = [from]
+    for (let a = 0; a < pts.length - 1;) {
+      let b = pts.length - 1
+      while (b > a + 1 && !lineClear(g, pts[a], pts[b])) b--
+      out.push(pts[b]); a = b
+    }
+    return out
+  }
+  /* One walker's step among the others ({ x, z, walking, rank, hx, hz }, h the way a walker heads): head for `aim`
+     (a unit [x, z]), queue behind a walker going the same way, wait for a crossing walker who goes first (lower
+     rank), step around anyone else close ahead, never wait longer than its patience, and get out of anyone it stands
+     inside. Returns { x, z, wait }: the direction to walk (unit, or 0 when waiting) and whether it waits. */
+  const NEAR = 1.2, REACH = 0.8
+  function giveWay(me, aim, others) {
+    let sx = 0, sz = 0, wait = false
+    for (const o of others) {
+      const rx = o.x - me.x, rz = o.z - me.z, dist = Math.hypot(rx, rz)
+      if (dist > NEAR || dist < 1e-6) continue
+      if (dist < REACH) { sx -= (rx / dist) * (REACH - dist) * 8; sz -= (rz / dist) * (REACH - dist) * 8 }
+      const ahead = (rx * aim[0] + rz * aim[1]) / dist
+      if (ahead < -0.2) continue
+      const along = (o.hx || 0) * aim[0] + (o.hz || 0) * aim[1]
+      if (o.walking && !me.impatient && ahead > 0.3 && ((along > 0.5 && ahead > 0.5) || o.rank < me.rank)) { wait = true; continue }
+      const px = -aim[1], pz = aim[0], side = rx * px + rz * pz
+      const away = Math.abs(side) < 0.05 * dist ? (me.rank < o.rank ? 1 : -1) : -Math.sign(side)
+      const k = (1 - dist / NEAR) * 1.8 * ahead
+      sx += px * away * k; sz += pz * away * k
+    }
+    const x = (wait ? 0 : aim[0]) + sx, z = (wait ? 0 : aim[1]) + sz, n = Math.hypot(x, z)
+    return n < 0.05 ? { x: 0, z: 0, wait } : { x: x / n, z: z / n, wait }
+  }
+  /* One panel at a time, like a game menu: a page (company, money, plan, team, to-dos) closes on a tap outside it,
+     back to the room it was opened from; the world views themselves have nothing to close */
+  const WORLD_TABS = ['desk', 'office']
+  const closeTo = (tab, world) => (!tab || WORLD_TABS.includes(tab) ? null : world === 'room' ? 'desk' : 'office')
+  return { TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay }
 })()
 </script>
 <script id="team-3d">
@@ -728,7 +812,15 @@ gl_FragColor.rgb += uRim * 0.22 * pow(fres, 3.0);
     if (clip === 'wave') { aR.rotation.set(-0.25, 0, -2.05 + Math.sin(t * 9) * 0.3); r.head.rotation.z = 0.14; mouth('o') }
     if (clip === 'look') r.head.rotation.set(-0.14, 0, 0.1)
     if (clip === 'dance') { const b = Math.abs(Math.sin(t * 6)); r.body.position.y = b * 0.14; r.body.rotation.z = Math.sin(t * 3) * 0.18; aL.rotation.z = 2.5 + Math.sin(t * 12) * 0.25; aR.rotation.z = -2.5 - Math.sin(t * 12) * 0.25; eyes('happy'); mouth('o') }
-    if (clip === 'walk') { const w = Math.sin(t * 8); r.body.position.y = Math.abs(w) * 0.06; r.legs[0].rotation.x = w * 0.4; r.legs[1].rotation.x = -w * 0.4; aL.rotation.x = -w * 0.4; aR.rotation.x = w * 0.4 }
+    /* Walk: t is the stride (it grows with distance walked, so feet don't slide). Legs stand down and swing, the body
+       rises on each step, waddles side to side and leans in, arms swing against the legs, the head stays level */
+    if (clip === 'walk') {
+      const w = Math.sin(t * 8), step = Math.abs(Math.cos(t * 8))
+      r.body.position.y = 0.17 + step * 0.05; r.body.rotation.set(0.07, 0, w * 0.07)
+      r.legs[0].rotation.x = 1.2 + w * 0.5; r.legs[1].rotation.x = 1.2 - w * 0.5
+      aL.rotation.set(-w * 0.5, 0, 0.2); aR.rotation.set(w * 0.5, 0, -0.2)
+      r.head.rotation.set(-0.07, w * 0.05, -w * 0.06)
+    }
   }
   /* Night: the fur's warm rim light goes dim and blue with the room, so the animals don't glow in the dark */
   const night = (on) => { RIM.value?.value.set(on ? '#5a5f8c' : '#fff1d6') }
@@ -821,6 +913,7 @@ function fillSheet(key) {
   }
 }
 function openSheet(key, from) {
+  if (!from?.closest?.('.page')) closePage()
   sheetFor = key; lastFocus = from || null; fillSheet(key)
   $('sheet').hidden = false; $('scrim').hidden = false; $('sheet-close').focus()
 }
@@ -831,7 +924,7 @@ function closeSheet() {
 }
 $('sheet-close').addEventListener('click', closeSheet)
 $('scrim').addEventListener('click', closeSheet)
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet() })
+document.addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (!$('sheet').hidden) closeSheet(); else closePage() })
 
 /* ---------- New project: one line on the notepad, one tap. The row is saved first, then the coordinator gets a message. ---------- */
 const CCR = 'Claude Code Remote'
@@ -871,6 +964,7 @@ function renderRequests() {
   }, 'Noch keine Ideen.')
 }
 function openIdea(from) {
+  if (!from?.closest?.('.page')) closePage()
   sheetFor = null; lastFocus = from || document.activeElement; ideaOpen = true
   $('sheet-name').textContent = 'Neues Projekt'
   $('sheet-what').textContent = 'Eine Zeile reicht. Claude startet dazu ein Brainstorming im Projekt-Chat.'
@@ -1389,6 +1483,7 @@ async function buildRoom() {
   canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY] })
   canvas.addEventListener('pointerup', (e) => {
     const moved = down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6; down = null
+    if (!moved && closePage()) return
     const go = !moved && hit(e); if (go) goTo(go)
   })
   canvas.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' && !down) canvas.classList.toggle('point', !!hit(e)) })
@@ -1414,8 +1509,13 @@ async function buildRoom() {
 document.fonts?.ready.then(() => room?.update())
 
 let world = 'room'
+/* One panel at a time: a page opening closes the card sheet, a card opening (from the room) closes the page, and a tap
+   on the room or office outside an open page closes it (HQ.closeTo) */
+let tabNow = null
+const closePage = () => { const back = HQ.closeTo(tabNow, world); if (back) location.hash = back; return !!back }
 function showTab() {
-  const tab = HQ.pickTab(location.hash, { hasProjects, room: roomOk })
+  const tab = HQ.pickTab(location.hash, { hasProjects, room: roomOk }); tabNow = tab
+  if (HQ.closeTo(tab, world)) closeSheet()
   world = roomOk ? HQ.worldFor(tab, world) : 'office'
   $('room').hidden = world !== 'room'; $('stage').hidden = world !== 'office'; $('desk-tab').hidden = !roomOk
   for (const p of document.querySelectorAll('[data-page]')) p.hidden = p.dataset.page !== tab
@@ -1606,8 +1706,11 @@ function buildOffice() {
   sign.redraw(); mesh(new T.PlaneGeometry(2.0, 0.5), new T.MeshBasicMaterial({ map: sign.t }), bx - 0.6, 3.3, BACK + 0.02)
   for (const x of [6.4, 7.4, 8.4]) piece('kitchenBar', x, -4.6)
   for (const x of [6.4, 7.4, 8.4]) piece('stoolBar', x, -3.55)
-  /* Where each role dances when done: its own spot on an arc in front of the lounge sofa */
-  const LOUNGE = SEATS.map((_, i) => [6.6 - Math.cos((i / 8) * Math.PI) * 1.9, 6.4 + Math.sin((i / 8) * Math.PI) * 0.8])
+  /* Where each role dances when done: its own spot on the open floor in front of the lounge, a step apart, handed
+     out left to right like the desks so nobody's way crosses through another's spot */
+  const DANCE = [[0.4, 4.6], [1.0, 5.6], [1.6, 4.6], [2.2, 5.6], [2.8, 4.6], [3.4, 5.6], [4.0, 4.6], [4.6, 5.6], [5.2, 4.6]]
+  const byX = SEATS.map((s, i) => [s.at[0], i]).sort((a, b) => a[0] - b[0]), LOUNGE = []
+  byX.forEach(([, i], k) => { LOUNGE[i] = DANCE[k] })
 
   /* Whiteboard (level and progress), kanban board and the sticky note that counts what needs you */
   const board = canvasTex(1024, 512, (g, w, h, lv) => {
@@ -1673,18 +1776,18 @@ function buildOffice() {
     cyl(0.12, 0.14, 0.05, '#6b4b32', 1.0, 1.06, 0.25, props); cyl(0.02, 0.02, 0.55, '#6b4b32', 1.0, 1.33, 0.25, props, 6)
     const shadeL = cone(0.16, 0.2, '#e0483c', 1.0, 1.62, 0.35, props); shadeL.rotation.x = -0.5
     const bulb = mesh(new T.SphereGeometry(0.07, 12, 8), bulbMat, 1.0, 1.54, 0.42, props); bulb.castShadow = false
-    const who = new T.Group(); who.position.set(0, 0.5, -0.5); root.add(who)
+    const who = new T.Group(); who.position.set(0, 0.5, -0.5); who.userData.walker = true; root.add(who)
     const bubble = sprite(TEX.working, 0.75); who.add(bubble)
     const zs = [0, 1, 2].map((i) => { const z = sprite(TEX.z, 0.32 + i * 0.07); who.add(z); return z })
     const ring = mesh(new T.RingGeometry(1.35, 1.5, 40), new T.MeshBasicMaterial({ color: '#4fb36b', transparent: true, opacity: 0.85 }), 0, 0.06, 0.1, root)
     ring.rotation.x = -Math.PI / 2; ring.visible = false
-    const slot = LOUNGE[Object.keys(seats).length]
+    const slot = LOUNGE[SEATS.indexOf(s)]
     root.updateMatrixWorld(true)
     const pet = HQ.PET_OF[s.key], rig = TEAM_3D.build(T, pet); who.add(rig.group)
     const hitBox = new T.Mesh(new T.BoxGeometry(1.1, 1.5, 1.0), new T.MeshBasicMaterial({ visible: false })); hitBox.position.y = 0.75; who.add(hitBox)
     const shadow = mesh(new T.CircleGeometry(0.42, 20), new T.MeshBasicMaterial({ color: '#6b4b32', transparent: true, opacity: 0.2, depthWrite: false }), 0, 0.02, 0, root)
     shadow.rotation.x = -Math.PI / 2; shadow.castShadow = shadow.receiveShadow = false
-    const seat = seats[s.key] = { root, who, bubble, zs, ring, screenTex, rig, shadow, pet, h: rig.height, state: 'off', phase: Math.random() * 6, home: who.position.clone(), cafe: root.worldToLocal(new T.Vector3(slot[0], 0, slot[1])) }
+    const seat = seats[s.key] = { root, who, bubble, zs, ring, screenTex, rig, shadow, pet, h: rig.height, state: 'off', phase: Math.random() * 6, home: who.position.clone(), cafe: root.worldToLocal(new T.Vector3(slot[0], 0, slot[1])), exit: new T.Vector3(0, 0, -1.4) }
     later.push(() => {
       /* The kit decides the heights: props sit on the desk top, the animal on the chair seat, the screen face on the monitor */
       const top = deskTop(); props.position.y = top - 1.04
@@ -1782,7 +1885,7 @@ function buildOffice() {
   canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY] })
   canvas.addEventListener('pointerup', (e) => {
     const moved = !down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6
-    down = null; if (moved) return
+    down = null; if (moved || closePage()) return
     const u = hit(e); if (!u) return
     if (u.go) location.hash = u.go; else openSheet(u.seat)
   })
@@ -1840,6 +1943,105 @@ function buildOffice() {
   }
   tick(); setInterval(tick, 30000)
 
+  /* Walking: a floor grid of everything that stands in the room, made once the kit furniture is in. Each animal follows
+     an A* route (HQ.findPath) from behind its chair to its own free spot by the sofa and back, steps around the
+     others and lets the earlier ones go first (HQ.giveWay), eases in and out at a calm pace, and its stride grows
+     with the distance walked so the feet don't slide */
+  const CELL = 0.25, PAD = 0.3, PACE = 1.0, EASE = 1.4, SPOT_GAP = 1.0, PATIENCE = 2.5
+  let grid = null
+  const isWalker = (o) => { for (let n = o; n; n = n.parent) if (n.userData.walker) return true; return false }
+  const blockedAt = (x, z) => { const i = Math.floor((x - grid.x0) / CELL), j = Math.floor((z - grid.z0) / CELL); return i < 0 || j < 0 || i >= grid.w || j >= grid.h || grid.blocked[j * grid.w + i] === 1 }
+  function buildGrid() {
+    scene.updateMatrixWorld(true)
+    const g = { x0: -W / 2, z0: -D / 2, size: CELL, w: Math.ceil(W / CELL), h: Math.ceil(D / CELL) }, b = new T.Box3()
+    g.blocked = new Uint8Array(g.w * g.h)
+    scene.traverse((o) => {
+      if (!o.isMesh || o.userData.noLine || !o.visible || o.material?.visible === false || isWalker(o)) return
+      if (!o.geometry.boundingBox) o.geometry.computeBoundingBox()
+      b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld)
+      if (b.max.y < 0.15 || b.min.y > 1.4) return
+      const i0 = Math.max(0, Math.floor((b.min.x - PAD - g.x0) / CELL)), i1 = Math.min(g.w - 1, Math.floor((b.max.x + PAD - g.x0) / CELL))
+      const j0 = Math.max(0, Math.floor((b.min.z - PAD - g.z0) / CELL)), j1 = Math.min(g.h - 1, Math.floor((b.max.z + PAD - g.z0) / CELL))
+      for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) g.blocked[j * g.w + i] = 1
+    })
+    grid = g
+    /* Each lounge spot moves to the nearest free floor, apart from the spots already taken */
+    const taken = []
+    for (const s of Object.values(seats)) {
+      const want = s.root.localToWorld(s.cafe.clone())
+      let best = null, bd = Infinity
+      for (let j = 0; j < g.h; j++) for (let i = 0; i < g.w; i++) {
+        if (g.blocked[j * g.w + i]) continue
+        const x = g.x0 + (i + 0.5) * CELL, z = g.z0 + (j + 0.5) * CELL, dd = (x - want.x) ** 2 + (z - want.z) ** 2
+        if (dd < bd && taken.every((p) => Math.hypot(p[0] - x, p[1] - z) >= SPOT_GAP)) { bd = dd; best = [x, z] }
+      }
+      if (!best) continue
+      taken.push(best); s.cafe = s.root.worldToLocal(new T.Vector3(best[0], 0, best[1]))
+      if (still && s.state === 'done') s.who.position.copy(s.cafe)
+    }
+  }
+  later.push(buildGrid)
+  const crew = Object.values(seats)
+  crew.forEach((s, i) => Object.assign(s, { rank: i, goal: 'home', route: [], v: 0, gait: 0, waited: 0, delay: 0 }))
+  const worldOf = (s, p) => s.root.localToWorld(p.clone())
+  /* A route; `around` also keeps clear of teammates standing away from their desks (used when a walker is stuck) */
+  function standingOut(s) {
+    const g = { ...grid, blocked: grid.blocked.slice() }
+    for (const o of crew) {
+      if (o === s || o.route.length || o.who.position.distanceTo(o.home) < 0.05) continue
+      const p = worldOf(o, o.who.position)
+      for (let j = Math.floor((p.z - 0.5 - g.z0) / CELL); j <= Math.floor((p.z + 0.5 - g.z0) / CELL); j++)
+        for (let i = Math.floor((p.x - 0.5 - g.x0) / CELL); i <= Math.floor((p.x + 0.5 - g.x0) / CELL); i++) if (i >= 0 && j >= 0 && i < g.w && j < g.h) g.blocked[j * g.w + i] = 1
+    }
+    return g
+  }
+  function plan(s, want, around = false) {
+    s.goal = want; s.stuck = 0; s.best = Infinity
+    if (still) { s.route = []; return }
+    const pos = worldOf(s, s.who.position), exit = worldOf(s, s.exit), end = worldOf(s, want === 'cafe' ? s.cafe : s.home)
+    const atHome = s.who.position.distanceTo(s.home) < 0.05
+    const from = atHome ? exit : pos, to = want === 'cafe' ? end : exit
+    const way = (grid && HQ.findPath(around ? standingOut(s) : grid, [from.x, from.z], [to.x, to.z])) || (grid && HQ.findPath(grid, [from.x, from.z], [to.x, to.z])) || [[from.x, from.z], [to.x, to.z]]
+    s.route = [...(atHome ? [exit] : []), ...way.slice(1).map(([x, z]) => new T.Vector3(x, 0, z)), ...(want === 'home' ? [end] : [])]
+    s.delay = atHome ? s.rank * 0.45 : 0
+  }
+  const left = (s, pos) => s.route.reduce((n, p, i) => n + Math.hypot(p.x - (i ? s.route[i - 1] : pos).x, p.z - (i ? s.route[i - 1] : pos).z), 0)
+  /* One step along the route; returns the world direction walked, or null when standing (arrived or giving way) */
+  function walk(s, dt) {
+    const pos = worldOf(s, s.who.position), target = s.route[0]
+    d.copy(target).sub(pos); const flat = Math.hypot(d.x, d.z)
+    if (flat < 0.06) {
+      s.route.shift(); s.best = Infinity
+      if (!s.route.length) { s.v = 0; s.who.position.copy(s.goal === 'cafe' ? s.cafe : s.home); return null }
+      return walk(s, dt)
+    }
+    const aim = [d.x / flat, d.z / flat]
+    /* Someone stands on the way to the next point (dancing by the sofa): plan round them once, before bumping in */
+    if (grid && s.dodged !== target && crew.some((o) => {
+      if (o === s || o.route.length || o.who.position.distanceTo(o.home) < 0.05) return false
+      const q = worldOf(o, o.who.position), k = Math.max(0, Math.min(1, ((q.x - pos.x) * d.x + (q.z - pos.z) * d.z) / (flat * flat)))
+      return Math.hypot(pos.x + d.x * k - q.x, pos.z + d.z * k - q.z) < 0.7 && Math.hypot(target.x - q.x, target.z - q.z) > 0.3
+    })) { plan(s, s.goal, true); if (s.route.length) s.dodged = s.route[0]; return walk(s, dt) }
+    const others = crew.filter((o) => o !== s && o.who.position.distanceTo(o.home) > 0.05).map((o) => { const p = worldOf(o, o.who.position); return { x: p.x, z: p.z, walking: o.route.length > 0 && o.delay <= 0, rank: o.rank, hx: o.heading?.[0], hz: o.heading?.[1] } })
+    const way = HQ.giveWay({ x: pos.x, z: pos.z, rank: s.rank, impatient: s.waited > PATIENCE }, aim, others)
+    s.waited = way.wait ? s.waited + dt : 0
+    s.v = way.wait ? Math.max(0, s.v - EASE * 2 * dt) : Math.min(PACE, s.v + EASE * dt, Math.sqrt(2 * EASE * left(s, pos)) + 0.05)
+    let dir = [way.x, way.z]
+    if (!dir[0] && !dir[1]) { if (!way.wait && (s.stuck += dt) > 1.5) plan(s, s.goal, true); return null }
+    const len = Math.min(flat, (way.wait ? 0.4 : s.v) * dt)
+    /* A sidestep never walks into furniture: on free floor, fall back to the plain route when it would */
+    if (grid && !blockedAt(pos.x, pos.z) && blockedAt(pos.x + dir[0] * len, pos.z + dir[1] * len)) dir = aim
+    pos.x += dir[0] * len; pos.z += dir[1] * len; pos.y += (target.y - pos.y) * Math.min(1, len / flat)
+    s.root.worldToLocal(s.who.position.copy(pos))
+    /* Hardly getting anywhere for a while (squeezed against someone standing in the way): find another way round */
+    const now = Math.hypot(target.x - pos.x, target.z - pos.z)
+    if (now < (s.best ?? Infinity) - 0.03 || way.wait) { s.best = Math.min(now, s.best ?? Infinity); s.stuck = 0 } else s.stuck += dt
+    if (s.stuck > 1.5) plan(s, s.goal, true)
+    if (way.wait) return null
+    s.gait += len * 1.12; s.heading = dir
+    return dir
+  }
+
   /* Each frame: work, doze, walk to the lounge and dance when done and back when there is work */
   const clock = new T.Clock(), d = new T.Vector3()
   let lastScreen = 0
@@ -1848,16 +2050,19 @@ function buildOffice() {
     if (stage.offsetParent === null) return
     const dt = Math.min(clock.getDelta(), 0.05), t = still ? 0 : clock.elapsedTime
     controls.update()
-    for (const s of Object.values(seats)) {
+    for (const s of crew) {
       const p = t + s.phase, asleep = s.state === 'idle' || s.state === 'off'
-      const goal = s.state === 'done' ? s.cafe : s.home
-      d.copy(goal).sub(s.who.position); const far = d.length()
-      const walking = !still && far > 0.03
-      if (walking) s.who.position.addScaledVector(d.normalize(), Math.min(far, 2.4 * dt))
+      const want = s.state === 'done' ? 'cafe' : 'home'
+      if (want !== s.goal) plan(s, want)
+      const moving = s.route.length > 0, dir = moving && (s.delay -= dt) <= 0 ? walk(s, dt) : null
+      if (moving && !dir) s.gait = Math.round((s.gait * 8) / Math.PI) * (Math.PI / 8)
+      const walking = !still && s.route.length > 0
       /* The frame for this moment: typing, dozing, a head shake or wave every few seconds, dancing, walking */
-      TEAM_3D.pose(s.rig, HQ.poseAt(s.state, walking, p, still).clip, p)
-      const yaw = walking ? Math.atan2(d.x, d.z) : 0, g = s.rig.group.rotation
-      g.y += Math.atan2(Math.sin(yaw - g.y), Math.cos(yaw - g.y)) * Math.min(1, dt * 8)
+      const clip = HQ.poseAt(s.state, walking, p, still).clip
+      TEAM_3D.pose(s.rig, clip, clip === 'walk' ? s.gait : p)
+      if (dir) s.yaw = Math.atan2(dir[0], dir[1]) - s.root.rotation.y
+      const yaw = walking ? s.yaw ?? 0 : 0, g = s.rig.group.rotation
+      g.y += Math.atan2(Math.sin(yaw - g.y), Math.cos(yaw - g.y)) * Math.min(1, dt * 5)
       s.shadow.visible = s.who.position.distanceTo(s.home) > 0.3
       if (s.shadow.visible) s.shadow.position.set(s.who.position.x, 0.02, s.who.position.z)
       if (asleep) s.zs.forEach((z, i) => {
