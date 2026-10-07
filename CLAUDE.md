@@ -122,7 +122,8 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
   auth, payments or user input.
 - Skills to reach for: `operator` (idea to live app), `legal` (German law for any app),
   `toolbox` (which plugins, APIs and skills a project needs, and adds them to that project
-  only), `onboard-project` (set up a repo for Claude), `ship-check` (verify before push),
+  only), `game-3d` (a 3D game with three.js, Electron for Steam: layout, characters, tests,
+  Steam checklist), `onboard-project` (set up a repo for Claude), `ship-check` (verify before push),
   `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD, debugging)
   and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
 - Browser: Playwright MCP for headless checks; `claude --chrome` to use yskills' own Chrome

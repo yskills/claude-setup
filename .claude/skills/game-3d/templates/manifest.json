@@ -1,0 +1,31 @@
+{
+  "assets": [
+    {
+      "name": "Vita",
+      "path": "assets/characters/vita/model.vrm",
+      "source": "https://vroid.com/en/studio",
+      "author": "pixiv (VRoid Studio sample)",
+      "licence": "VRoid sample model terms: modification and commercial use allowed",
+      "commercial": true,
+      "usedFor": "team roster"
+    },
+    {
+      "name": "Idle",
+      "path": "assets/moves/idle.vrma",
+      "source": "https://vrm.dev/en/vrma/",
+      "author": "VRM Consortium",
+      "licence": "CC0",
+      "commercial": true,
+      "usedFor": "every character"
+    },
+    {
+      "name": "Furniture Kit",
+      "path": "assets/kits/kenney-furniture/",
+      "source": "https://kenney.nl/assets/furniture-kit",
+      "author": "Kenney",
+      "licence": "CC0",
+      "commercial": true,
+      "usedFor": "office scene"
+    }
+  ]
+}

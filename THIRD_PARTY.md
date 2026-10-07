@@ -94,3 +94,20 @@ Source: https://kenney.nl/assets/furniture-kit (CC0 1.0, no attribution required
 
 The pieces HQ's desk room uses are packed into `.claude/skills/operator/templates/office-kit.js`
 by `scripts/office-kit.mjs`. Do not edit the packed file; change the script's list and re-run it.
+
+## Game-dev skill references (game-3d)
+
+Read in full before copying (2026-10-07, thread "Researcher: 3D game path"): plain SKILL.md and
+reference text, no hooks or MCP config, nothing that phones home.
+
+- https://github.com/gamedev-skills/awesome-gamedev-agent-skills (Apache-2.0, LICENSE and
+  NOTICE kept next to the copies), commit d4b0e35: `skills/web-engines/threejs-scene-setup`,
+  `threejs-gltf-loading`, `threejs-materials-lighting`, `skills/disciplines/game-feel`,
+  `level-design`, `audio-design`, `performance-optimization`, `camera-systems`,
+  `skills/workflows/steam-publish`, copied into `.claude/skills/game-3d/refs/gamedev-skills/`.
+- https://github.com/majidmanzarpour/threejs-game-skills (MIT), commit 8286774:
+  `skills/threejs-gameplay-systems` (with its Vite + TypeScript scaffold, a local copy script and
+  no npm postinstall), `threejs-aaa-graphics-builder`, `threejs-qa-release`, copied into
+  `.claude/skills/game-3d/refs/threejs-game-skills/`. Left out on purpose: the `-generator`
+  skills (Tripo, Gemini, ElevenLabs paid APIs), the `game-director` skill and its credential
+  probe script (it sources shell rc files), and `AGENTS.md`.
