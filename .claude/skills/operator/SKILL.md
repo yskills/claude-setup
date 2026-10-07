@@ -1,6 +1,6 @@
 ---
 name: operator
-description: Run a project from idea to live app with the least of yskills' time and tokens - the operator holds the goals, sizes the job, staffs the teams (research inside and outside, legal, design, build, QA, red team, launch, marketing), keeps PLAN.md, features.json and PROGRESS.md, runs the 5/5 gate on every PR and sends yskills three ok/no briefs; the gate merges every 5/5 PR itself. Use when yskills brings a new app idea, says "build", "go", "continue the project", or a project thread starts or resumes.
+description: "Run a project from idea to live app: sizes the job, staffs the roles, keeps PLAN/PROGRESS, runs the 5/5 gate. Use for a new app idea, \"build\", \"go\", \"continue the project\", or when a project thread starts."
 ---
 
 # Operator

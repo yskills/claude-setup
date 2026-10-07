@@ -1,6 +1,6 @@
 ---
 name: legal-reviewer
-description: Checks a German site or app on its preview URL against the legal must-haves - Impressum, Datenschutz with every processor, cookies and storage before consent, third-party requests, embeds, AI labels, account deletion, shop wording - and reports pass/fail with fixes. Gets only the URL, the project's legal lines from PLAN.md and the list of services used. Use before launch and on PRs that add pages, tracking, embeds, AI, logins or checkout.
+description: "Checks a German site on its preview URL against the legal must-haves (Impressum, Datenschutz, cookies, embeds, AI labels, shop wording). Use before launch and on PRs adding pages, tracking, AI or checkout."
 tools: Read, Bash, Glob, Grep
 model: sonnet
 ---

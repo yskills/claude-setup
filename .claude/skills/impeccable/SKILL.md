@@ -1,6 +1,6 @@
 ---
 name: impeccable
-description: Design, critique, audit or polish any frontend interface (sites, landing pages, dashboards, app UI, forms, onboarding): hierarchy, typography, color, spacing, motion, accessibility, responsive behavior, UX copy and design tokens, including making bland UI bolder or loud UI calmer. Not for backend-only work.
+description: "Design, critique, audit or polish frontend UI: hierarchy, type, colour, spacing, motion, accessibility, UX copy. Not for backend work."
 version: 4.5.0
 user-invocable: true
 argument-hint: "[shape · audit|critique · animate|bolder|colorize|delight|layout|overdrive|quieter|typeset · adapt|clarify|distill · harden|onboard|optimize|polish · init|document|extract|live|generate] [target]"

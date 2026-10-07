@@ -1,6 +1,6 @@
 ---
 name: evaluator
-description: Clicks through a branch's preview URL with Playwright and grades one slice against its acceptance criteria from features.json, pass or fail per criterion, with evidence. Gets only the URL and the criteria, never the builder's chat. Use once per gate round after CI is green, as check 2 of the 5/5 gate.
+description: "Grades one slice on its preview URL against its acceptance criteria, pass or fail with evidence. Gate check 2."
 tools: Read, Bash, Glob, Grep
 model: sonnet
 ---

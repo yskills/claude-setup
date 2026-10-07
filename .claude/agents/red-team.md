@@ -1,6 +1,6 @@
 ---
 name: red-team
-description: Attacks yskills' own app on its preview URL the way an outsider would - auth bypass, other users' data (IDOR), injection, XSS, secrets in the bundle, missing rate limits, payment tampering - and reports what broke with exact repro steps. Only ever targets the project's own preview, never production or third parties. Use before launch and on PRs touching auth, payments or user input, next to security-reviewer.
+description: "Attacks the project's own preview URL like an outsider (auth, IDOR, injection, XSS, secrets, payments) and reports repro steps. Never production. Use before launch and on auth, payment or input PRs."
 tools: Read, Bash, Glob, Grep
 model: sonnet
 ---

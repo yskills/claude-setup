@@ -1,6 +1,6 @@
 ---
 name: onboard-project
-description: Set up an existing repository for Claude - a short CLAUDE.md, .claude/settings.json with safe permissions and the right per-project plugins, and a verify skill that mirrors CI. Use when a repo has no CLAUDE.md or .claude folder, or when asked to "set up Claude" for a project.
+description: "Set up an existing repo for Claude: short CLAUDE.md, safe settings, verify skill. Use when a repo has no CLAUDE.md or .claude folder."
 ---
 
 # Onboard a project
