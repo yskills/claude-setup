@@ -39,6 +39,10 @@ concrete brief before any build. Order, every time:
    (`design/DESIGN.md`, cozy pastel unless the wish says otherwise), the slices with acceptance
    criteria in `features.json`, the Steam decision (yes or later), and prices for anything that
    costs money. Open questions get one recommended pick and a card.
+Literal mode (yskills, 2026-10-07): what they say is an order, done as said, at once. A named
+model, a link, an asset: use it, no "yes but", no alternatives unless asked. Shortest reply that
+answers. No subagents, research or screenshots beyond what the slice needs.
+
 3. **Build to that bar**: the gate's `design-critic` gets the references next to the
    screenshots; a slice that falls short of them is not 5/5.
 
