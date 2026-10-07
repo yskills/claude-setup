@@ -1514,8 +1514,9 @@ let world = 'room'
 let tabNow = null
 const closePage = () => { const back = HQ.closeTo(tabNow, world); if (back) location.hash = back; return !!back }
 function showTab() {
-  const tab = HQ.pickTab(location.hash, { hasProjects, room: roomOk }); tabNow = tab
-  if (HQ.closeTo(tab, world)) closeSheet()
+  const tab = HQ.pickTab(location.hash, { hasProjects, room: roomOk })
+  if (tab !== tabNow && HQ.closeTo(tab, world)) closeSheet()
+  tabNow = tab
   world = roomOk ? HQ.worldFor(tab, world) : 'office'
   $('room').hidden = world !== 'room'; $('stage').hidden = world !== 'office'; $('desk-tab').hidden = !roomOk
   for (const p of document.querySelectorAll('[data-page]')) p.hidden = p.dataset.page !== tab
@@ -2057,6 +2058,8 @@ function buildOffice() {
       const moving = s.route.length > 0, dir = moving && (s.delay -= dt) <= 0 ? walk(s, dt) : null
       if (moving && !dir) s.gait = Math.round((s.gait * 8) / Math.PI) * (Math.PI / 8)
       const walking = !still && s.route.length > 0
+      /* Dancing says done by itself: the tick bubble shows on the way, not in the crowd on the dance floor */
+      if (s.state === 'done') s.bubble.visible = walking || s.who.position.distanceTo(s.cafe) > 0.1
       /* The frame for this moment: typing, dozing, a head shake or wave every few seconds, dancing, walking */
       const clip = HQ.poseAt(s.state, walking, p, still).clip
       TEAM_3D.pose(s.rig, clip, clip === 'walk' ? s.gait : p)
