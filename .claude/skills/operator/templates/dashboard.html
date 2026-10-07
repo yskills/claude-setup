@@ -245,18 +245,26 @@ ol,ul{margin:0;padding:0;list-style:none}
 .hearts{display:inline-flex;gap:2px}
 .hearts svg{width:14px;height:14px;fill:rgba(255,255,255,.35)}
 .hearts svg.on{fill:#fff}
-.vcard .hearts svg{fill:var(--line)}.vcard .hearts svg.on{fill:#f29bb0}
 .skin{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-top:2px dashed var(--line);padding-top:12px}
 .skin span{font-weight:900;margin-right:4px}
 .skin [aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-ink)}
-.vcards{display:grid;gap:10px}
-.vcard{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;padding:10px;border-radius:16px;border:2px solid var(--line);background:var(--bg)}
-.vcard .pic{width:64px;height:84px;border-radius:12px;background:#f6dbe2;overflow:hidden;display:grid;place-items:center;font:900 28px var(--sans);color:#c66f86}
-.vcard .pic img{width:100%;height:100%;object-fit:cover}
-.vcard .info{display:grid;gap:4px;align-content:start}
-.vcard .meta{font-size:12.5px;color:var(--soft);font-weight:600}
-.vcard .ctl{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.vcard select,.add select{font:800 13px var(--sans);color:var(--fg);background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:5px 10px}
+/* Figuren: a display shelf. Every figure stands in her own box on a wooden board; the last box is free for the next file */
+.shelf-head{display:grid;gap:8px;justify-items:start}
+.btn.back{font-size:13px}
+.shelf{display:grid;gap:28px 16px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));align-items:start;padding:8px 0 10px}
+.box{position:relative;display:grid;gap:8px;padding:14px 12px 12px;border-radius:18px 18px 10px 10px;background:var(--bg);box-shadow:inset 0 0 0 2px var(--line),0 10px 0 -2px #d9b98a,0 15px 0 -2px #b98a5a}
+.box .pic{aspect-ratio:3/4;border-radius:12px;background:#f6dbe2;overflow:hidden;display:grid;place-items:center;font:900 44px var(--sans);color:#c66f86}
+.box .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.box .tag{position:absolute;top:-12px;left:14px;padding:4px 13px;border-radius:999px;background:#f29bb0;color:#fff;font:900 14px var(--sans);box-shadow:0 3px 0 rgba(122,84,52,.2)}
+.box .hearts{vertical-align:-2px;margin-right:4px}
+.box .hearts svg{fill:var(--line)}.box .hearts svg.on{fill:#f29bb0}
+.box .meta{font-size:12.5px;color:var(--soft);font-weight:600;line-height:1.35}
+.box .ctl{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.box select{font:800 13px var(--sans);color:var(--fg);background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:5px 10px;max-width:100%}
+.box.free{background:none;box-shadow:inset 0 0 0 2px var(--line),0 10px 0 -2px #d9b98a,0 15px 0 -2px #b98a5a}
+.box.free .pic{aspect-ratio:auto;min-height:72px;background:none;outline:2px dashed var(--line);outline-offset:-6px;color:var(--soft);font:800 15px var(--sans);text-align:center;padding:14px}
+.box .said:empty{display:none}
+.shelf-foot{font:600 12.5px var(--sans);color:var(--soft);margin:0}
 .btn.quiet{background:none;box-shadow:none;text-decoration:underline;color:#b5462f}
 .btn.file{position:relative;overflow:hidden}.btn.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
 </style>
@@ -336,8 +344,14 @@ ol,ul{margin:0;padding:0;list-style:none}
       <span>Figuren</span>
       <button type="button" class="btn" data-skin="animals" aria-pressed="true">Tiere</button>
       <button type="button" class="btn" data-skin="cards" aria-pressed="false">Eigene</button>
-      <button type="button" class="btn" id="skin-manage" hidden>Verwalten</button>
+      <button type="button" class="btn" id="skin-manage" hidden>Regal</button>
     </div>
+  </section>
+
+  <section class="card page" data-page="figuren" aria-labelledby="figuren-h" hidden>
+    <div class="shelf-head"><button type="button" class="btn back" id="figuren-back">Zurück zum Team</button><h2 id="figuren-h">Figuren</h2><p class="lead">Dein Regal. Jede Figur sitzt an einem Schreibtisch oder wartet auf der Bank; ein Tipp auf sie im Büro ruft sie zu dir. Neue Figuren kommen als .vrm-Datei aus VRoid Studio.</p></div>
+    <div class="shelf" id="shelf"></div>
+    <p class="shelf-foot">Die Dateien liegen im Ablagefach dieser HQ-Seite, die Liste in ihrer Datenbank. Beides bleibt bei jeder neuen Version von HQ erhalten.</p>
   </section>
 
   <section class="card page" data-page="todo" aria-labelledby="todo-h" hidden>
@@ -372,7 +386,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 <script id="hq-rules">
 /* HQ's rules as pure functions; scripts/hq-rules.test.mjs runs this block, so they never drift. */
 window.HQ = (() => {
-  const TABS = ['desk', 'company', 'money', 'office', 'plan', 'team', 'todo']
+  const TABS = ['desk', 'company', 'money', 'office', 'plan', 'team', 'figuren', 'todo']
   const ALIAS = { you: 'todo', projects: 'company', ceo: 'desk', home: 'desk', geld: 'money', kassenbuch: 'money' }
   /* Day and night on yskills' own clock */
   const modeOf = (hour) => (hour >= 7 && hour < 17 ? 'day' : (hour >= 17 && hour < 20) || (hour >= 5 && hour < 7) ? 'dusk' : 'night')
@@ -662,9 +676,16 @@ window.HQ = (() => {
   }
   /* What a called card opens with: her desk's real state, never made up */
   const moodOf = (state) => ({ working: 'busy', blocked: 'stuck', waiting: 'asks', done: 'proud' })[state] || 'free'
+  /* A card's licence in plain words for the shelf (from readMeta's `use`); a card saved before `use` existed says so */
+  function licenceLine(card) {
+    const u = card?.use
+    if (!u || typeof u !== 'object') return 'Lizenz nicht gelesen: zeig sie nur dir selbst.'
+    const who = { everyone: 'Jeder darf sie nutzen', author: 'Nur wer sie gemacht hat, darf sie nutzen' }[u.who] || 'Nutzen nur mit eigener Erlaubnis'
+    return [`${who}${u.who === 'everyone' ? (u.money ? ', auch für Geld' : ', aber nicht für Geld') : ''}.`, u.credit ? 'Name nennen.' : 'Kein Name nötig.', u.share ? 'Weitergeben erlaubt.' : 'Nicht weitergeben.'].join(' ')
+  }
   const WORLD_TABS = ['desk', 'office']
   const closeTo = (tab, world) => (!tab || WORLD_TABS.includes(tab) ? null : world === 'room' ? 'desk' : 'office')
-  return { TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, withFinance, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf }
+  return { TABS, modeOf, pickTab, closeTo, worldFor, deskNumbers, tagMoney, withFinance, PET_OF, FRAMES, poseAt, scoreFrom, toastFor, visitEvent, requestDoc, coordinatorOf, requestMessage, toResend, requestLine, sendTrouble, moneyReport, findPath, giveWay, BOND_AT, CALLS_A_DAY, bondOf, afterCall, seating, seatCard, moodOf, licenceLine }
 })()
 </script>
 <script id="team-3d">
@@ -948,9 +969,56 @@ window.CARDS_3D = (() => {
     const type = ['image/png', 'image/jpeg'].includes(img?.mimeType) ? img.mimeType : null
     const thumb = view && type ? new Blob([new Uint8Array(buf, binAt + (view.byteOffset || 0), view.byteLength)], { type }) : null
     const words = (s) => String(s || '').slice(0, 60)
+    /* Who may use her and how, in one shape for VRM 1 and VRM 0 (VRoid Hub writes VRM 0's extra terms into the
+       otherPermissionUrl query: credit, modification, redistribution) */
+    const q = new URLSearchParams(String(v0?.otherPermissionUrl || '').split('?')[1] || '')
+    const WHO = { everyone: 'everyone', Everyone: 'everyone', onlyAuthor: 'author', OnlyAuthor: 'author' }
+    const use = v1
+      ? { who: WHO[v1.avatarPermission] || 'licensed', money: !!v1.commercialUsage && v1.commercialUsage !== 'personalNonProfit', credit: v1.creditNotation !== 'unnecessary', share: v1.allowRedistribution === true, edit: v1.modification !== 'prohibited' }
+      : { who: WHO[v0.allowedUserName] || 'licensed', money: v0.commercialUssageName === 'Allow', credit: v0.licenseName === 'CC0' ? false : q.get('credit') !== 'unnecessary', share: v0.licenseName === 'CC0' || q.get('redistribution') === 'allow', edit: v0.licenseName === 'CC0' || /allow/.test(q.get('modification') || '') }
     return v1
-      ? { name: words(v1.name), author: words(v1.authors?.join(', ')), licence: words(v1.licenseUrl), share: v1.allowRedistribution === true, thumb }
-      : { name: words(v0.title), author: words(v0.author), licence: words(v0.licenseName === 'Other' ? v0.otherLicenseUrl : v0.licenseName), share: v0.licenseName === 'CC0' || /redistribution=allow/.test(v0.otherPermissionUrl || ''), thumb }
+      ? { name: words(v1.name), author: words(v1.authors?.join(', ')), licence: words(v1.licenseUrl), share: use.share, use, thumb }
+      : { name: words(v0.title), author: words(v0.author), licence: words(v0.licenseName === 'Other' ? v0.otherLicenseUrl || 'VRoid Hub' : v0.licenseName), share: use.share, use, thumb }
+  }
+
+  /* An image scaled down so its longer side is at most `max` px, as a PNG; null when it is already that small */
+  async function smaller(blob, max) {
+    const bmp = await createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })
+    const k = max / Math.max(bmp.width, bmp.height)
+    if (k >= 1) { bmp.close(); return null }
+    const cv = document.createElement('canvas'); cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k)
+    cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height); bmp.close()
+    return new Promise((ok, no) => cv.toBlob((b) => (b ? ok(b) : no(new Error('png'))), 'image/png'))
+  }
+  /* VRoid Studio exports 2048 px textures and files of 14 to 18 MB. Every texture over 1024 px is scaled to 1024 and
+     the file rebuilt around the smaller PNGs (everything else byte for byte, views kept 4-byte aligned), so a card
+     stays under the store's limit and loads faster on a phone. Returns the input when nothing needed shrinking. */
+  async function shrink(buf, max = 1024) {
+    const dv = new DataView(buf), jsonLen = dv.getUint32(12, true)
+    const json = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 20, jsonLen)))
+    const bin = new Uint8Array(buf, 20 + jsonLen + 8, dv.getUint32(20 + jsonLen, true))
+    const bytes = (v) => bin.subarray(v.byteOffset || 0, (v.byteOffset || 0) + v.byteLength)
+    const swap = new Map()
+    for (const img of json.images || []) {
+      const v = json.bufferViews?.[img.bufferView]
+      if (!v || swap.has(img.bufferView) || !/^image\/(png|jpeg)$/.test(img.mimeType)) continue
+      const b = await smaller(new Blob([bytes(v)], { type: img.mimeType }), max).catch(() => null)
+      if (b) { swap.set(img.bufferView, new Uint8Array(await b.arrayBuffer())); img.mimeType = 'image/png' }
+    }
+    if (!swap.size) return buf
+    const parts = []
+    let at = 0
+    const put = (b) => { parts.push(b); at += b.byteLength }
+    json.bufferViews.forEach((v, i) => { const b = swap.get(i) || bytes(v); if (at % 4) put(new Uint8Array(4 - (at % 4))); v.byteOffset = at; v.byteLength = b.byteLength; put(b) })
+    if (at % 4) put(new Uint8Array(4 - (at % 4)))
+    json.buffers[0].byteLength = at
+    let text = JSON.stringify(json); text += ' '.repeat((4 - (new TextEncoder().encode(text).length % 4)) % 4)
+    const head = new TextEncoder().encode(text), out = new Uint8Array(12 + 8 + head.length + 8 + at), o = new DataView(out.buffer)
+    o.setUint32(0, 0x46546c67, true); o.setUint32(4, 2, true); o.setUint32(8, out.length, true)
+    o.setUint32(12, head.length, true); o.setUint32(16, 0x4e4f534a, true); out.set(head, 20)
+    o.setUint32(20 + head.length, at, true); o.setUint32(24 + head.length, 0x004e4942, true)
+    let p = 28 + head.length; for (const b of parts) { out.set(b, p); p += b.byteLength }
+    return out.buffer
   }
 
   /* A character from a card's bytes, scaled to `height` (world units), facing +z like the animals. `group` goes in the
@@ -1021,7 +1089,7 @@ window.CARDS_3D = (() => {
     if (v.expressionManager) for (const f of FACES) v.expressionManager.setValue(f, face[f] || 0)
     v.update(dt)
   }
-  return { loadLib, readMeta, make, pose, dispose }
+  return { loadLib, readMeta, shrink, smaller, make, pose, dispose }
 })()
 </script>
 <script>
@@ -1124,14 +1192,14 @@ function fillSheet(key) {
   }
 }
 function openSheet(key, from) {
-  endVisit(); rosterOpen = false
+  endVisit()
   if (!from?.closest?.('.page')) closePage()
   sheetFor = key; lastFocus = from || null; fillSheet(key)
   $('sheet').hidden = false; $('scrim').hidden = false; $('sheet-close').focus()
 }
 function closeSheet() {
   if ($('sheet').hidden) return
-  sheetFor = null; ideaOpen = false; rosterOpen = false; $('sheet').hidden = true; $('scrim').hidden = true
+  sheetFor = null; ideaOpen = false; $('sheet').hidden = true; $('scrim').hidden = true
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus()
 }
 $('sheet-close').addEventListener('click', closeSheet)
@@ -1176,7 +1244,7 @@ function renderRequests() {
   }, 'Noch keine Ideen.')
 }
 function openIdea(from) {
-  endVisit(); rosterOpen = false
+  endVisit()
   if (!from?.closest?.('.page')) closePage()
   sheetFor = null; lastFocus = from || document.activeElement; ideaOpen = true
   $('sheet-name').textContent = 'Neues Projekt'
@@ -1777,10 +1845,14 @@ function showTab() {
   world = roomOk ? HQ.worldFor(tab, world) : 'office'
   $('room').hidden = world !== 'room'; $('stage').hidden = world !== 'office'; $('desk-tab').hidden = !roomOk
   for (const p of document.querySelectorAll('[data-page]')) p.hidden = p.dataset.page !== tab
+  /* Figuren is the Team page's shelf: the dock keeps Team lit while it is open */
+  const lit = tab === 'figuren' ? 'team' : tab
   for (const b of document.querySelectorAll('[data-tab]')) {
-    if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page')
+    if (b.dataset.tab === lit) b.setAttribute('aria-current', 'page')
     else b.removeAttribute('aria-current')
   }
+  rosterOpen = tab === 'figuren'
+  if (rosterOpen) queueMicrotask(() => fillRoster())
 }
 for (const b of document.querySelectorAll('[data-tab]')) b.addEventListener('click', () => { location.hash = b.dataset.tab })
 window.addEventListener('hashchange', showTab)
@@ -2436,20 +2508,26 @@ $('skin-manage').addEventListener('click', (e) => openRoster(e.currentTarget))
 function openPanel(from, title, what) {
   endVisit()
   if (!from?.closest?.('.page')) closePage()
-  sheetFor = null; ideaOpen = false; rosterOpen = false; lastFocus = from || document.activeElement
+  sheetFor = null; ideaOpen = false; lastFocus = from || document.activeElement
   $('sheet-name').textContent = title; $('sheet-what').textContent = what; $('sheet-body').replaceChildren()
   $('sheet').hidden = false; $('scrim').hidden = false
 }
 
-/* Figuren: the roster. Add a .vrm (VRoid Studio export), pick her desk, add outfits, remove her. */
+/* Figuren: the shelf. Add a .vrm (VRoid Studio export), pick her desk, add outfits, remove her. The file goes to the
+   artifact's assets (binary, or base64 text where binary is refused), her row to cards/<id>, her desk to roster/desks */
 const VOICE_NAMES = { warm: 'herzlich', frech: 'frech', stolz: 'stolz', ruhig: 'ruhig', scheu: 'schüchtern' }
+const RAW_MAX = 64 * 1024 * 1024
 async function storeVrm(file, assets, said) {
   if (!/\.vrm$/i.test(file.name)) throw new Error('Das ist keine .vrm-Datei.')
-  if (file.size > MAX_BYTES) throw new Error('Zu groß (über 14 MB). In VRoid Studio beim Export die Texturen auf 1024 stellen.')
-  const buf = await file.arrayBuffer()
+  if (file.size > RAW_MAX) throw new Error('Zu groß (über 64 MB).')
+  let buf = await file.arrayBuffer()
   /* Any broken or odd file (cut short, bad header) reads as "not a model", never as a raw error */
   let meta
   try { meta = CARDS_3D.readMeta(buf) } catch { throw new Error('Die Datei ist kein VRM-Modell.') }
+  /* Textures over 1024 px are scaled down first: VRoid exports 2048 px and 14 to 18 MB, which no phone needs */
+  said.textContent = 'Wird verkleinert…'
+  buf = await CARDS_3D.shrink(buf).catch(() => buf)
+  if (buf.byteLength > MAX_BYTES) throw new Error('Zu groß: über 14 MB, auch mit kleineren Texturen.')
   said.textContent = 'Wird hochgeladen…'
   let up
   try { up = await assets.upload(new Blob([buf]), { type: 'model/gltf-binary' }) } catch (e) {
@@ -2459,78 +2537,81 @@ async function storeVrm(file, assets, said) {
   }
   return { up, meta }
 }
-async function openRoster(from) {
-  openPanel(from, 'Figuren', 'Deine eigenen Figuren aus VRoid Studio. Jede sitzt an einem Schreibtisch oder wartet auf der Bank.')
-  closePage(); rosterOpen = true; fillRoster()
-}
-let rosterRun = 0
+const openRoster = () => { closeSheet(); location.hash = 'figuren' }
+$('figuren-back').addEventListener('click', () => { location.hash = 'team' })
+let rosterRun = 0, shelfNote = ''
 async function fillRoster() {
   if (!rosterOpen) return
-  const run = ++rosterRun, body = $('sheet-body')
+  const run = ++rosterRun, shelf = $('shelf')
   const assets = await window.claude?.use?.('assets').catch(() => null)
   /* Snapshots can land together: only the newest render may draw */
   if (!rosterOpen || run !== rosterRun) return
-  body.replaceChildren()
+  shelf.replaceChildren()
   const can = !!(assets && hqDb)
-  const list = el('div', 'vcards')
-  if (!cards.length) list.append(el('p', 'empty', 'Noch keine Figuren. Exportiere eine Figur in VRoid Studio als .vrm und füge sie hier hinzu.'))
-  for (const c of cards) {
-    const b = bondFor(c), item = el('div', 'vcard')
-    const pic = el('div', 'pic'); const u = thumbUrl(c); if (u) { const img = el('img'); img.src = u; img.alt = ''; pic.append(img) } else pic.textContent = (c.name || '?').slice(0, 1).toUpperCase()
-    const info = el('div', 'info')
-    const nm = el('b', null, c.name || 'Ohne Namen'); info.append(nm, hearts(b.level))
-    info.append(el('span', 'meta', `${VOICE_NAMES[c.voice] || 'herzlich'} · ${c.author ? `von ${c.author}` : 'Autor unbekannt'} · ${c.share ? 'Weitergabe erlaubt' : 'Weitergabe nicht erlaubt'}`))
-    const ctl = el('div', 'ctl')
-    const sel = el('select'); sel.setAttribute('aria-label', `Schreibtisch für ${c.name}`)
-    const seated = Object.entries(HQ.seating(desks, cards)).find(([, id]) => id === c.id)?.[0] || ''
-    sel.append(new Option('Bank', ''))
-    for (const s of SEATS) { const who = cardOf(HQ.seating(desks, cards)[s.key]); sel.append(new Option(who && who.id !== c.id ? `${s.name} (jetzt ${who.name})` : s.name, s.key)) }
-    sel.value = seated; sel.disabled = !hqDb
-    sel.addEventListener('change', () => hqDb.doc('roster/desks').set(HQ.seatCard(desks, sel.value || seated, sel.value ? c.id : null)).catch(() => fillRoster()))
-    ctl.append(sel)
-    if (can && (c.outfits?.length || 0) < 3) {
-      const add = el('label', 'btn file', `Outfit ${c.outfits.length + 1} hinzufügen`), f = el('input'); f.type = 'file'; f.accept = '.vrm'; add.append(f)
-      f.addEventListener('change', async () => {
-        const said = info.querySelector('.said') || info.appendChild(el('p', 'said'))
-        if (!f.files[0]) return
-        try { const { up } = await storeVrm(f.files[0], assets, said); await hqDb.doc(`cards/${c.id}`).update({ outfits: [...c.outfits, { asset: up.id, label: f.files[0].name.replace(/\.vrm$/i, '').slice(0, 24) }] }) } catch (e) { said.textContent = e.message || 'Hochladen hat nicht geklappt.' }
-      })
-      ctl.append(add)
-    }
-    if (can) {
-      const del = el('button', 'btn quiet', 'Entfernen'); del.type = 'button'
-      del.addEventListener('click', async () => {
-        if (del.dataset.sure !== '1') { del.dataset.sure = '1'; del.textContent = 'Wirklich entfernen?'; return }
-        await hqDb.doc('roster/desks').set(HQ.seatCard(desks, seated, null)).catch(() => {})
-        await hqDb.doc(`cards/${c.id}`).delete().catch(() => {})
-        await hqDb.doc(`bond/${c.id}`).delete().catch(() => {})
-        for (const id of [...c.outfits.map((o) => o.asset), c.thumb]) if (id) assets.delete(id).catch(() => {})
-      })
-      ctl.append(del)
-    }
-    info.append(el('span', 'meta', `Outfits: ${c.outfits?.length || 1} hochgeladen, ${b.outfits} freigespielt`), ctl)
-    item.append(pic, info); list.append(item)
+  for (const c of cards) shelf.append(figureBox(c, assets, can))
+  shelf.append(freeBox(assets, can))
+}
+function figureBox(c, assets, can) {
+  const b = bondFor(c), box = el('div', 'box')
+  const pic = el('div', 'pic'); const u = thumbUrl(c); if (u) { const img = el('img'); img.src = u; img.alt = ''; pic.append(img) } else pic.textContent = (c.name || '?').slice(0, 1).toUpperCase()
+  const bond = el('div', 'meta'); bond.append(hearts(b.level), `Bindung ${b.level} von 5 · spricht ${VOICE_NAMES[c.voice] || 'herzlich'}`)
+  const ctl = el('div', 'ctl')
+  const sel = el('select'); sel.setAttribute('aria-label', `Schreibtisch für ${c.name}`)
+  const seated = Object.entries(HQ.seating(desks, cards)).find(([, id]) => id === c.id)?.[0] || ''
+  sel.append(new Option('Bank', ''))
+  for (const s of SEATS) { const who = cardOf(HQ.seating(desks, cards)[s.key]); sel.append(new Option(who && who.id !== c.id ? `${s.name} (jetzt ${who.name})` : s.name, s.key)) }
+  sel.value = seated; sel.disabled = !hqDb
+  sel.addEventListener('change', () => hqDb.doc('roster/desks').set(HQ.seatCard(desks, sel.value || seated, sel.value ? c.id : null)).catch(() => fillRoster()))
+  ctl.append(sel)
+  const said = el('p', 'said'); said.setAttribute('role', 'status')
+  if (can && (c.outfits?.length || 0) < 3) {
+    const add = el('label', 'btn file', `Outfit ${c.outfits.length + 1} hinzufügen`), f = el('input'); f.type = 'file'; f.accept = '.vrm'; add.append(f)
+    f.addEventListener('change', async () => {
+      if (!f.files[0]) return
+      try { const { up } = await storeVrm(f.files[0], assets, said); await hqDb.doc(`cards/${c.id}`).update({ outfits: [...c.outfits, { asset: up.id, label: f.files[0].name.replace(/\.vrm$/i, '').slice(0, 24) }] }) } catch (e) { said.textContent = e.message || 'Hochladen hat nicht geklappt.' }
+    })
+    ctl.append(add)
   }
-  body.append(list)
-  if (!can) { body.append(el('p', 'empty', hqDb ? 'Figuren hinzufügen kann nur, wer HQ bearbeiten darf.' : 'Bei claude.ai anmelden, dann geht es los.')); return }
+  if (can) {
+    const del = el('button', 'btn quiet', 'Entfernen'); del.type = 'button'
+    del.addEventListener('click', async () => {
+      if (del.dataset.sure !== '1') { del.dataset.sure = '1'; del.textContent = 'Wirklich entfernen?'; return }
+      await hqDb.doc('roster/desks').set(HQ.seatCard(desks, seated, null)).catch(() => {})
+      await hqDb.doc(`cards/${c.id}`).delete().catch(() => {})
+      await hqDb.doc(`bond/${c.id}`).delete().catch(() => {})
+      for (const id of [...c.outfits.map((o) => o.asset), c.thumb]) if (id) assets.delete(id).catch(() => {})
+    })
+    ctl.append(del)
+  }
+  box.append(pic, el('b', 'tag', c.name || 'Ohne Namen'), bond, el('span', 'meta', `${c.author ? `Von ${c.author}. ` : ''}${HQ.licenceLine(c)}`), el('span', 'meta', `Outfits: ${c.outfits?.length || 1} hochgeladen, ${b.outfits} freigespielt`), ctl, said)
+  return box
+}
+/* The free box at the end of the shelf takes the next file; what the last upload said survives the shelf's redraw */
+function freeBox(assets, can) {
+  const box = el('div', 'box free')
+  if (!can) { box.append(el('div', 'pic', hqDb ? 'Figuren hinzufügen kann nur, wer HQ bearbeiten darf.' : 'Bei claude.ai anmelden, dann geht es los.')); return box }
   const form = el('form', 'idea add'); form.method = 'post'
   const voice = el('select'); voice.id = 'card-voice'; for (const [k, v] of Object.entries(VOICE_NAMES)) voice.append(new Option(v, k))
   const vl = el('label', null, 'Wie sie spricht'); vl.htmlFor = 'card-voice'
   const pick = el('label', 'btn go file', 'Figur hinzufügen (.vrm)'), f = el('input'); f.type = 'file'; f.accept = '.vrm'; pick.append(f)
-  const said = el('p', 'said'); said.setAttribute('role', 'status')
+  const said = el('p', 'said', shelfNote); said.setAttribute('role', 'status'); shelfNote = ''
   form.append(vl, voice, pick, said)
   f.addEventListener('change', async () => {
     const file = f.files[0]; if (!file) return
     try {
       const { up, meta } = await storeVrm(file, assets, said)
-      const thumb = meta.thumb ? await assets.upload(meta.thumb, { type: meta.thumb.type }).then((t) => t.id).catch(() => null) : null
+      /* Her portrait from the file, scaled to 512 px: the shelf and the seat sheet show it */
+      const small = meta.thumb ? (await CARDS_3D.smaller(meta.thumb, 512).catch(() => null)) || meta.thumb : null
+      const thumb = small ? await assets.upload(small, { type: small.type }).then((t) => t.id).catch(() => null) : null
       const id = `c${Date.now().toString(36)}`
-      await hqDb.doc(`cards/${id}`).set({ name: meta.name || file.name.replace(/\.vrm$/i, '').slice(0, 24), voice: voice.value, outfits: [{ asset: up.id, label: 'Büro' }], thumb, author: meta.author, licence: meta.licence, share: meta.share, added: new Date().toISOString() })
-      said.textContent = 'Fertig. Wähle jetzt ihren Schreibtisch.'
-    } catch (e) { said.textContent = e.message === 'not_vrm' ? 'Die Datei ist kein VRM-Modell.' : e.message || 'Hochladen hat nicht geklappt.' }
+      shelfNote = 'Fertig. Sie steht im Regal; wähle jetzt ihren Schreibtisch.'
+      await hqDb.doc(`cards/${id}`).set({ name: meta.name || file.name.replace(/\.vrm$/i, '').slice(0, 24), voice: voice.value, outfits: [{ asset: up.id, label: 'Büro' }], thumb, author: meta.author, licence: meta.licence, share: meta.share, use: meta.use, added: new Date().toISOString() })
+      said.textContent = shelfNote
+    } catch (e) { shelfNote = ''; said.textContent = e.message || 'Hochladen hat nicht geklappt.' }
     f.value = ''
   })
-  body.append(form)
+  box.append(el('div', 'pic', 'Platz frei'), form)
+  return box
 }
 
 /* The visit: greeting from her desk's real state, one scene per bond level, three replies, a reaction, the bond */

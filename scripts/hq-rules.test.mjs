@@ -343,3 +343,13 @@ test('Company, laptop and wall chart show the cash book amount with cents: net o
   assert.deepEqual(plain(HQ.withFinance(p, open, NOW)), { ...p, revenueTotal: 29.99, revenueMonth: 30, revenueNet: false, testMoney: false })
   assert.deepEqual(plain(HQ.withFinance(p, undefined, NOW)), p)
 })
+
+test('the shelf says in plain words who may use a character, and Figuren is a page of its own', () => {
+  assert.equal(HQ.licenceLine({ use: { who: 'everyone', money: true, credit: false, share: true, edit: true } }), 'Jeder darf sie nutzen, auch für Geld. Kein Name nötig. Weitergeben erlaubt.')
+  assert.equal(HQ.licenceLine({ use: { who: 'everyone', money: false, credit: true, share: false, edit: false } }), 'Jeder darf sie nutzen, aber nicht für Geld. Name nennen. Nicht weitergeben.')
+  assert.equal(HQ.licenceLine({ use: { who: 'author', money: false, credit: true, share: false } }), 'Nur wer sie gemacht hat, darf sie nutzen. Name nennen. Nicht weitergeben.')
+  assert.equal(HQ.licenceLine({ use: { who: 'licensed', money: true, credit: true, share: false } }), 'Nutzen nur mit eigener Erlaubnis. Name nennen. Nicht weitergeben.')
+  assert.equal(HQ.licenceLine({ name: 'alt' }), 'Lizenz nicht gelesen: zeig sie nur dir selbst.')
+  assert.equal(HQ.pickTab('#figuren', { hasProjects: true, room: true }), 'figuren')
+  assert.equal(HQ.closeTo('figuren', 'room'), 'desk')
+})
