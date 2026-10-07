@@ -960,7 +960,7 @@ window.CARDS_3D = (() => {
     const root = new T.Group(); root.scale.setScalar(k); root.add(vrm.scene)
     const hit = new T.Mesh(new T.BoxGeometry(0.5 / k, tall, 0.4 / k), new T.MeshBasicMaterial({ visible: false })); hit.position.y = tall / 2; root.add(hit)
     const group = new T.Group(); group.add(root)
-    return { vrm, root, group, k, hipY, height, tag: height - hipY + 0.25, blinkAt: Math.random() * 4 }
+    return { vrm, vrm0: vrm.meta?.metaVersion === '0', root, group, k, hipY, height, tag: height - hipY + 0.25, blinkAt: Math.random() * 4 }
   }
   const dispose = (c) => { if (!c) return; c.group.removeFromParent(); window.THREE_VRM?.VRMUtils.deepDispose(c.vrm.scene) }
 
@@ -972,7 +972,9 @@ window.CARDS_3D = (() => {
   function pose(c, clip, t, dt = 0) {
     const v = c.vrm, h = v.humanoid
     const b = (n) => h.getNormalizedBoneNode(n)
-    const r = (n, x = 0, y = 0, z = 0) => b(n)?.rotation.set(x, y, z)
+    /* A VRM 0 model is turned round to face +z, so its bones' x and z axes point the other way */
+    const m = c.vrm0 ? -1 : 1
+    const r = (n, x = 0, y = 0, z = 0) => b(n)?.rotation.set(x * m, y, z * m)
     for (const n of BONES) r(n)
     const face = {}
     const sit = !STAND.has(clip)
@@ -984,7 +986,7 @@ window.CARDS_3D = (() => {
     if (clip === 'doze') { const k = Math.sin(t * 1.6); r('spine', 0.18); r('neck', 0.25 + k * 0.03); r('head', 0.2, 0, 0.18); face.blink = 1; face.relaxed = 0.4 }
     if (clip === 'shake') { r('head', 0.1, Math.sin(t * 9) * 0.35, 0); face.sad = 0.7 }
     if (clip === 'fret') { r('leftUpperArm', 0, -0.6, -0.1); r('rightUpperArm', 0, 0.6, 0.1); r('leftLowerArm', 0, -2.2, 0); r('rightLowerArm', 0, 2.2, 0); r('head', 0.15); face.sad = 0.5 }
-    if (clip === 'wave' || clip === 'hello' || clip === 'bye') { r('rightUpperArm', 0, 0, -0.35); r('rightLowerArm', 0, 0, -0.4 + Math.sin(t * 9) * 0.35); r('head', 0, 0, 0.12); face.happy = 0.8 }
+    if (clip === 'wave' || clip === 'hello' || clip === 'bye') { r('rightUpperArm', -0.2, 0, 0.75); r('rightLowerArm', 0, 0, -2.1 + Math.sin(t * 9) * 0.3); r('rightHand', 0, 0, -0.2); r('head', 0, 0, 0.1); face.happy = 0.8 }
     if (clip === 'look') { r('head', -0.1, 0.35, 0.08); face.surprised = 0.25 }
     if (clip === 'walk' || clip === 'dance') {
       const w = Math.sin(t * 8), step = Math.abs(Math.cos(t * 8))
@@ -2347,7 +2349,7 @@ function buildOffice() {
    The 4-digit code only keeps the skin out of sight on a shared screen; it is a convenience, not security. Cards,
    who sits where and each card's bond live in the db (cards/<id>, roster/desks, bond/<id>), the files in the
    artifact's assets. A tap on a card's desk calls her into the desk room for a short visit. ---------- */
-const OFFICE_H = 2.0, ROOM_H = 1.62, MAX_BYTES = 15 * 1024 * 1024
+const OFFICE_H = 2.4, ROOM_H = 1.62, MAX_BYTES = 15 * 1024 * 1024
 const cardOf = (id) => cards.find((c) => c.id === id)
 const bondFor = (c) => HQ.bondOf({ ...bonds[c.id], since: c.added }, eventsAll)
 const outfitFor = (c, b = bondFor(c)) => Math.max(0, Math.min(Number(bonds[c.id]?.wear) || 0, b.outfits - 1, (c.outfits?.length || 1) - 1))
