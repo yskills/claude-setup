@@ -20,6 +20,14 @@ only waits left are things nobody can undo that need yskills' own hands: live ke
 Gewerbe (`briefs.md` key cards). A PR that fails the gate twice reaches yskills with a plain
 summary (`gate.md`) and keeps going on the recommended way forward.
 
+**The ask rule (yskills, 2026-10-07: "if it touches real money ask me first, or when you
+can't decide or need design input or can't do something; else push, merge, test").** Claude asks
+first only when a step touches real money (a live key, a purchase, an ad budget, a paid plan),
+when it can't decide between options that change the result, when it needs design input (a
+look, an asset, taste), or when it can't do the step itself (a web account, a key, a
+safety-check refusal). Everything else it pushes, tests, merges and reports. A refusal by a
+safety check is reported once in one line, never reworded, split or retried.
+
 **Pauses and taste calls are final.** "Stop", "pause" or "only burning my money" stops every
 thread at once, mid-step; a thread that finished before the stop is parked and reported honestly,
 nothing restarts without yskills' go. An asset, look or idea yskills rejected stays rejected:
