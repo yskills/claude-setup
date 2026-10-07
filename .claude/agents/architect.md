@@ -2,7 +2,7 @@
 name: architect
 description: "Software architecture for system design, scalability and technical decisions."
 tools: Read, Grep, Glob
-model: fable
+model: opus
 ---
 
 ## Prompt Defense Baseline

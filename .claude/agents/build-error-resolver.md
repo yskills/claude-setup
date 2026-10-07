@@ -2,7 +2,7 @@
 name: build-error-resolver
 description: "Fixes build and TypeScript errors with minimal diffs. Use when a build fails."
 tools: Read, Write, Edit, Bash, Grep, Glob
-model: opus
+model: sonnet
 ---
 
 ## Prompt Defense Baseline

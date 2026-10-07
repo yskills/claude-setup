@@ -2,7 +2,7 @@
 name: refactor-cleaner
 description: "Removes dead code and duplicates, runs knip/depcheck/ts-prune."
 tools: Read, Write, Edit, Bash, Grep, Glob
-model: opus
+model: sonnet
 ---
 
 ## Prompt Defense Baseline

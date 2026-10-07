@@ -3,7 +3,7 @@
 Builds one slice or one fix, opens the PR with the preview link and screenshots, and keeps CI green.
 
 - **Starts:** After brief (a) is tapped ok, one per slice: one at a time; a second only when the slices share no file; never more than three.
-- **Runs as:** A thread per slice (Opus, medium effort); follow-ups, small fixes, data wiring and tests on Sonnet.
+- **Runs as:** A thread per slice, Sonnet at medium effort (`docs/WORKFLOW.md`, Models).
 - **Uses:** builder thread; `architect`, `database-reviewer`, `build-error-resolver`; stack plugins via `toolbox`; `publish` for Workers Builds
 
 ## Every time

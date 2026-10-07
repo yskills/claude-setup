@@ -24,7 +24,7 @@ lives outside this repo.
 | Working rules | `CLAUDE.md` | How Claude works for yskills: ask rule, co-founder, merge, models, UI, stack. Short; detail lives in the homes below |
 | Front door | `README.md` | Install, what you get, cloud setup, how to change the repo |
 | This map | `docs/MAP.md` | Where things live, one home per rule |
-| Run a project | `.claude/skills/operator/` | `SKILL.md` the run (size, roles, files, steps); `gate.md` the 5/5 gate and the one merge policy; `briefs.md` the three briefs, key cards and the block every thread brief starts with; `roles/<role>.md` one playbook per role; `templates/` files copied into a project |
+| Run a project | `.claude/skills/operator/` | `SKILL.md` size, roles, files, setup loop, cost; `run.md` the nine steps (Project Manager only); `gate.md` the 5/5 gate and the one merge policy; `briefs.md` the three briefs, key cards and the block every thread brief starts with; `roles/<role>.md` one playbook per role; `templates/` files copied into a project |
 | Roadmap for yskills | `docs/WORKFLOW.md` | The phases in plain words, the models table, learning and memory check |
 | Other own skills | `.claude/skills/<name>/` | `legal`, `sell`, `market`, `store`, `publish`, `scaffold`, `onboard-project`, `ship-check`, `ui-review`, `toolbox`, `game-3d`, `watch` |
 | Vendored skills, agents, rules | `.claude/skills`, `.claude/agents`, `.claude/rules/ecc` | ECC subset (`config/ecc.json`, refreshed by `scripts/sync-ecc.mjs`), impeccable, web-interface-guidelines, ponytail, claude-video (`THIRD_PARTY.md`); never hand-edited |
@@ -33,6 +33,7 @@ lives outside this repo.
 | Cloud threads | `cloud/setup.sh` | Plugins and the context guard in a cloud environment (paste into Project settings) |
 | HQ rows | `docs/hq-rows.md` | What each Project Manager writes into HQ (the page itself lives in yskills/company-xy) |
 | After launch | `docs/LOOP.md` | Errors and feedback become issues and fix threads |
+| Setup loop | operator `SKILL.md` (Setup loop) | Friction with this repo becomes a `loop:setup` issue, then a fix thread through the gate |
 | Test runs | `docs/TEST-PROJECTS.md` | How the setup is tested end to end, and what each run taught |
 | Why it is built this way | `docs/RESEARCH.md`, `docs/research/` | Dated research notes; history, not rules |
 | Checks | `scripts/check.mjs`, `.github/workflows/ci.yml` | Frontmatter, names, models, ECC subset, plugin lists, relative links |
@@ -45,7 +46,7 @@ lives outside this repo.
 | Co-founder | `CLAUDE.md` (How to work) | `roles/*.md` (one role-specific line each) |
 | Literal mode and cost | the brief block in `briefs.md` | `roles/*.md` (one pointer each) |
 | Merge policy, 5/5 gate | `gate.md` (Merge policy) | `CLAUDE.md`, `docs/WORKFLOW.md`, `roles/tester.md` |
-| Models | `docs/WORKFLOW.md` (Models) | `CLAUDE.md`, operator `SKILL.md` §5 |
+| Models (Opus plans and designs, Sonnet the rest) | `docs/WORKFLOW.md` (Models) | `CLAUDE.md`, operator `SKILL.md` §5, agent `model:` lines |
 | Context guard numbers (warn 150k, hand off 200k) | `global/context-guard.mjs` | `CLAUDE.md`, `README.md` |
 | Remote Control on the PC | `docs/WORKFLOW.md` (PC work) | project instructions template |
 | UI rules | `CLAUDE.md` (UI) | `roles/designer.md`, `ui-review` |
