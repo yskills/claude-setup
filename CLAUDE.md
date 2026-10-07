@@ -48,16 +48,16 @@ Code on the PC, the `team` mod (`/team`: who of the team works on what, with a W
 - In cloud project threads every WebFetch of a page nobody posted in the chat makes yskills
   press Allow. Research there with WebSearch and tell subagents the same; fetch a
   page only when one fact depends on it, and say so in the thread.
-- Tokens go to re-reading context: a project thread starts at about 114k tokens and every tool
-  call re-reads all of it (98% of our usage is cache reads; output is about 2%, so terse-output
-  tools like caveman don't help). The context guard hook says when a session should slim down and
-  when to hand off; follow it.
+- Tokens: every tool call re-reads the whole context (a project thread starts near 114k), and
+  output is not free either: about 50% of the bill on Sonnet and 67% on Opus. So keep context
+  small and replies short. The context guard warns at about 150k, says hand off at 200k and
+  repeats every further 50k; follow it.
 - In project threads never call `connect_device` unless the task needs yskills' own files; the
   app's "connect your device" card can be ignored, say so if asked.
-- Keep context lean: `/clear` between unrelated tasks, `/compact` at milestones
-  (`strategic-compact`). Hand big reads to subagents. Every tool call re-reads the whole
-  context: batch independent calls, trim long output with `tail`, and start a fresh thread
-  (it reads `PROGRESS.md`) instead of resuming one idle for over an hour.
+- `/clear` between unrelated tasks, `/compact` at milestones. Batch independent calls, trim
+  output with `tail`, hand big reads to subagents (a simple reading job goes to a Haiku
+  subagent), and start a fresh thread (it reads `PROGRESS.md`) instead of resuming one idle for
+  over an hour.
 
 ## Code
 
@@ -113,13 +113,8 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 
 ## Tools you have
 
-- Agents: `planner`, `architect`, `code-reviewer`, `typescript-reviewer`, `vue-reviewer`,
-  `security-reviewer`, `database-reviewer`, `build-error-resolver`, `e2e-runner`,
-  `refactor-cleaner`, `silent-failure-hunter`, `doc-updater`, `a11y-architect`,
-  `performance-optimizer`, `seo-specialist`, `design-critic`, `evaluator`, `legal-reviewer`,
-  `red-team`.
-  Use reviewers proactively after writing code; use `security-reviewer` on anything touching
-  auth, payments or user input.
+- Agents (listed in the session): use reviewers proactively after writing code, and
+  `security-reviewer` on anything touching auth, payments or user input.
 - Skills to reach for: `operator` (idea to live app), `legal` (German law for any app),
   `toolbox` (which plugins, APIs and skills a project needs, and adds them to that project
   only), `game-3d` (a 3D game with three.js, Electron for Steam: layout, characters, tests,

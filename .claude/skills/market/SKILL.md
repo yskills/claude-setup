@@ -1,6 +1,6 @@
 ---
 name: market
-description: Plan and run marketing for a project as a solo developer in Germany - the one-page marketing plan in the PRD, positioning, channels (short video, SEO, communities, email, ads, marketplaces), launch sequence, German advertising law, budgets, tracking and a weekly routine reporting into Luna. Use when a project needs users or buyers, a launch, a marketing plan, ads, social content, a newsletter or growth.
+description: "Marketing plan and execution for a solo dev in Germany: positioning, channels, launch, ads law, budget. Use when a project needs users or buyers."
 ---
 
 # Market

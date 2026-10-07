@@ -1,6 +1,6 @@
 ---
 name: strategic-compact
-description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction. Use when a session is approaching a context limit and a task phase is a natural place to compact.
+description: "Suggest manual /compact at task-phase boundaries. Use when a session nears its context limit."
 metadata:
   origin: ECC
 ---

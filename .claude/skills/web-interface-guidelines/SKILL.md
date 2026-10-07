@@ -1,6 +1,6 @@
 ---
 name: web-interface-guidelines
-description: Review UI code against Vercel's Web Interface Guidelines - accessibility, focus, forms, motion, typography, copy, performance. Use when reviewing or finishing any UI change, alongside ui-review.
+description: "Review UI code against Vercel's Web Interface Guidelines (a11y, focus, forms, motion, copy). Use alongside ui-review."
 ---
 
 <!-- Pinned copy of vercel-labs/web-interface-guidelines command.md at e3d624b (2026-08-17), MIT, see licenses/WEB-INTERFACE-GUIDELINES-LICENSE. Pinned because the upstream skill fetches the rules at runtime, which asks for approval in cloud threads. Vue/Nuxt: read onKeyDown/Link as @keydown/NuxtLink. -->

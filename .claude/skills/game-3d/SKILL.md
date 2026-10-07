@@ -1,6 +1,6 @@
 ---
 name: game-3d
-description: Build a 3D game with the Claude team - three.js in the browser, Electron for Steam - with the engine choice, folder layout, the asset and character pipeline (VRM, VRMA, Mixamo, CC0 kits, splats from photos), the cloud test recipe (screenshots, perf budget) and the Steam checklist with costs. Use when PLAN.md says 3D game, Steam, or a world to walk around in, and for every three.js game after the HQ office test run.
+description: "Build a 3D game with three.js (Electron for Steam): engine, layout, asset and VRM pipeline, test recipe, Steam checklist. Use for any 3D game or walkable world."
 ---
 
 # 3D game

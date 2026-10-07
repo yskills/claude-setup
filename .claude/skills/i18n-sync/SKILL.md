@@ -1,6 +1,6 @@
 ---
 name: i18n-sync
-description: "Translate and synchronize application JSON locale files using source-key usage, project terminology, and focused validation. Use when adding keys or languages, updating source copy, or reviewing missing and stale translations."
+description: "Sync and translate JSON locale files with project terminology. Use when adding keys or languages."
 metadata:
   origin: community
 ---

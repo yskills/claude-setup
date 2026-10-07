@@ -1,6 +1,6 @@
 ---
 name: design-system
-description: "Generate a design system from an existing codebase or audit one for visual consistency: extract tokens (colors, typography, spacing, shadows) into design-tokens.json and CSS custom properties with DESIGN.md rationale and an interactive HTML preview, score the UI across 10 dimensions, and flag AI-slop patterns. Use when starting a design system, auditing visual consistency before a redesign, or reviewing a PR that touches styling."
+description: "Extract design tokens from a codebase or audit visual consistency and AI-slop patterns. Use when starting or auditing a design system."
 metadata:
   origin: ECC
 ---

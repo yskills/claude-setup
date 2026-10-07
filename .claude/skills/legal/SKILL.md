@@ -1,6 +1,6 @@
 ---
 name: legal
-description: The legal team for any app or site run from Germany - what the plan must include (Impressum, Datenschutz, cookies and storage, accessibility, AI features, user content, accounts, licenses, the app's name), the tools that check it (privacy-scan on a preview, license check, trademark search, Anthropic's legal plugins) and who writes the texts. Use when planning a new project, before launch, when adding tracking, embeds, AI, logins or user uploads, or when naming an app.
+description: "German law for any app: Impressum, Datenschutz, cookies, accessibility, AI, accounts, licences, naming, plus the checking tools. Use when planning, before launch, or when adding tracking, embeds, AI, logins or uploads."
 ---
 
 # Legal
