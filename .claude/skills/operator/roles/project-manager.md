@@ -14,6 +14,7 @@ The project chat itself (the coordinator running this skill). Plans with yskills
 - Report results and real blockers only; cards take their recommended option at once.
 - Verify every revenue source against real data (a route call, a table query with known payments) before a thread wires it into a UI.
 - Every write to `PROGRESS.md` updates the HQ rows in the same batch.
+- After launch: a "Loop <project>: ..." message from the reader routine is work (`docs/LOOP.md`): one `Programmer · fix #n` thread per error or red live check, one decision per feedback item; the state goes into `projects/<id>.note`, only taste or money calls into `you[]`.
 - At the end of the project, ask every role for its lessons (step 9).
 - A message "HQ request <id>: <idea>" is yskills' New project tap in HQ: start one brainstorm thread for it (step 1) with the id in its brief, once per id; that thread marks `requests/<id>` started with its link.
 

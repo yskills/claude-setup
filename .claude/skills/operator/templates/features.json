@@ -14,6 +14,17 @@
         { "id": "probe-5", "check": "No console errors or failed requests on any page", "threshold": "0", "passes": false },
         { "id": "probe-6", "check": "A visit with utm_source and a waitlist signup each record one analytics event carrying that source", "threshold": null, "passes": false }
       ]
+    },
+    {
+      "id": "launch",
+      "goal": "The loop is wired: errors and feedback from live users reach a thread without yskills carrying them (docs/LOOP.md)",
+      "risk": "low",
+      "criteria": [
+        { "id": "loop-1", "check": "The `loop` GitHub environment holds REPORT_URL and STATS_REPORT_TOKEN and a manual run of loop.yml is green", "threshold": null, "passes": false },
+        { "id": "loop-2", "check": "A forced test error on the preview appears in the owner report and, after a manual loop.yml run, as one open `loop:error` issue; a second run adds no second issue", "threshold": null, "passes": false },
+        { "id": "loop-3", "check": "The footer's Feedback link sends a text from a phone and it appears in the owner report with its page, no address in the report", "threshold": null, "passes": false },
+        { "id": "loop-4", "check": "list_triggers shows the project's daily loop reader routine and its first fire reached the coordinator", "threshold": null, "passes": false }
+      ]
     }
   ]
 }

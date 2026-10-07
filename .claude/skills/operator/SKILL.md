@@ -219,6 +219,10 @@ Templates in `templates/`.
 7. **Launch.** The last PR gets the full `red-team` and `legal-reviewer` pass. **Brief (c)** is
    posted, and the gate merges at 5/5, which goes live (auto-run: launch included); live keys
    are the one thing on it that waits for yskills' hands. Then `sell`'s go-live (§4) if it sells.
+   **The loop is wired before launch** (`docs/LOOP.md`): the app stores its errors and feedback
+   and lists them in its owner report, `loop.yml` files them as `loop` issues, the daily reader
+   routine exists; `features.json`'s `loop-1` to `loop-4` are part of the last PR's check 2. No loop,
+   no launch.
 8. **Grow.** At launch `create_trigger` a weekly routine (fresh session, jittered time): it
    collects the numbers (`market` §5) and opens one PR with the week's `metrics/` file and the best
    next step as a slice in `features.json`. That PR is the weekly report; it gets the gate with
@@ -227,10 +231,13 @@ Templates in `templates/`.
    into each `metrics/` file. A missed target sends one tap card: **kill** (stop the routine,
    archive, lessons into claude-setup), **change** (one new offer or channel, next target in 30
    days) or **keep** (one line why). Targets never move to make a miss pass.
-   **Errors fix themselves, through the gate:** the routine also reads new PostHog errors (its
-   MCP); each real one becomes a fix slice with the error as its failing test, a builder fixes it,
-   the gate checks and merges it. An error that hits paying users or checkout doesn't
-   wait for the week: PostHog's alert starts the same fix right away.
+   **Errors and feedback fix themselves, through the gate** (`docs/LOOP.md`): the app's own
+   report lands as `loop` issues every morning (`templates/loop/`), the daily reader routine
+   sends the coordinator the list, and the coordinator starts one `Programmer · fix #n` thread per
+   error (its failing test first) and decides each feedback batch (slice, answer or closed with
+   one line why). Checkout, Stripe, webhook and login errors and a red live check are
+   `loop:urgent` and go first. PostHog joins as a second source only when a project needs replay
+   or funnels.
 9. **Learn.** Every correction, every gate round that failed for a catchable reason, every test
    project lesson becomes a rule, skill line, test or check in claude-setup, in a small PR. At the
    project's end (or a kill), each role that worked adds one dated line per lesson to its
