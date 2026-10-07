@@ -45,6 +45,7 @@ gate runs the PR's build locally (`wrangler dev`) for checks 2, 4 and 5.
   - **Pull main first.** If main moved since the branch was cut, merge main into the branch and
     wait for CI again before merging: in the HQ run six slices edited one `dashboard.html`, and a
     merge without the pull would have dropped the previous slice's work.
+  - **One batch at the merge:** write the events (`pr-<repo>-<number>` `pr_merged`, `gate-<repo>-<number>` `gate_passed`) together with `projects/<id>`, the `team/*` rows and `phases`, every doc stamped `at`, so XP and rows never disagree.
   - **Every PR**, launch and live money included: the gate thread merges it (squash). If
     Claude's auto mode refuses, it doesn't try another way: it asks yskills for the tap.
   - **claude-setup PRs:** the gate thread merges them too; only when Claude Code's safety check
