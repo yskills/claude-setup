@@ -42,7 +42,8 @@ lives outside this repo.
 | Rule | Home | Others only link |
 |---|---|---|
 | Ask rule (what needs yskills) | `CLAUDE.md` (How to work) | operator `SKILL.md`, project instructions |
-| Co-founder, literal mode | `CLAUDE.md`; the brief block in `briefs.md` | `roles/*.md` (one line each) |
+| Co-founder | `CLAUDE.md` (How to work) | `roles/*.md` (one role-specific line each) |
+| Literal mode and cost | the brief block in `briefs.md` | `roles/*.md` (one pointer each) |
 | Merge policy, 5/5 gate | `gate.md` (Merge policy) | `CLAUDE.md`, `docs/WORKFLOW.md`, `roles/tester.md` |
 | Models | `docs/WORKFLOW.md` (Models) | `CLAUDE.md`, operator `SKILL.md` §5 |
 | Context guard numbers (warn 150k, hand off 200k) | `global/context-guard.mjs` | `CLAUDE.md`, `README.md` |
