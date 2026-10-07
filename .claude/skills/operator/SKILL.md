@@ -245,6 +245,7 @@ conversation can continue later; a plain chat idle for over an hour hands off to
   answering and a hand-off thread never repeats); research with many searches (one WebSearch per
   open fact); extra screenshots and subagents (only what the ask needs; simple reading jobs go to Haiku subagents).
 - Literal mode and the cost rules go into every brief (`briefs.md`, last block).
+- Remote Control (2026-10-07): yskills allows Claude Code on their PC. Anything that needs the PC (installs, local files and clones, Roblox Studio and its MCP server, screenshots of local apps, hardware reads, git with their logins) is done by a Remote Control session started on the user's message, never written out as steps for yskills. What stays with yskills: their web accounts (Cloudflare, Roblox Creator Hub, GitHub app access) and money. The PC session never reads, prints or sends keys, tokens or passwords. Briefs: PC work (a Roblox Studio run, an install, a local clone, a hardware read) goes to a Remote Control session, never to a hands list for yskills.
 - Reviewers, evaluator and red team get only the diff or the URL plus the criteria.
 - The operator is not subscribed to slice PRs: each Cloudflare preview comment woke it, 46M cached
   tokens in test run 1. Slice and gate threads report by message. The context guard

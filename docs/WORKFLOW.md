@@ -31,6 +31,10 @@ preview test and a fresh review; the project chat reports results and real block
 "stop" and your taste calls (a rejected asset or look) are final and go into every brief. Only
 what needs your own hands waits: keys, a domain, the Cloudflare import.
 
+## PC work
+
+Remote Control (2026-10-07): yskills allows Claude Code on their PC. Anything that needs the PC (installs, local files and clones, Roblox Studio and its MCP server, screenshots of local apps, hardware reads, git with their logins) is done by a Remote Control session started on the user's message, never written out as steps for yskills. What stays with yskills: their web accounts (Cloudflare, Roblox Creator Hub, GitHub app access) and money. The PC session never reads, prints or sends keys, tokens or passwords.
+
 ## Models
 
 One rule, applied by the project chat when it starts a thread (`start_thread_session`'s
