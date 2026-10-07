@@ -13,8 +13,8 @@ export const LABELS = ['loop', 'loop:error', 'loop:feedback', 'loop:urgent', 'lo
 
 // Every report field is user-reachable text (an error message echoes input, feedback is typed):
 // it is shown as data. Comments, mentions, issue refs, addresses and bearer tokens are neutralised.
-export const clean = (v) => String(v ?? '').replace(/<!--|-->/g, '').replace(/[@#](?=\w)/g, '$&\u200b')
-  .replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '[mail]').replace(/\b(?:bearer|sk|rk|pk)[_ ][\w-]{8,}/gi, '[key]')
+export const clean = (v) => String(v ?? '').replace(/<!--|-->/g, '')
+  .replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '[mail]').replace(/\b(?:bearer|sk|rk|pk)[_ ][\w-]{8,}/gi, '[key]').replace(/[@#](?=\w)/g, '$&\u200b')
 const id = (v) => String(v ?? '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64)
 const route = (v) => clean(v).replace(/[^\w /:.-]/g, '').slice(0, 80)
 const fence = (text) => `\n\`\`\`\`text\n${clean(text).slice(0, TEXT_MAX).replace(/`{4,}/g, '```')}\n\`\`\`\``
