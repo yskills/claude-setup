@@ -10,7 +10,7 @@ repo; then the next one starts.
 | 1 | **duo-test**, the language-learning app (existing repo), finished end to end | the operator taking over an existing app, slices | Briefs, Workers Builds previews, the evaluator, the 5/5 gate ending in the gate thread's merge, logins and D1 with `security-reviewer` and `red-team`, the `sell` kit in Stripe sandbox, the `legal` team, a migration PR flagged as important |
 | 2 | **Kleingarten**, a Roblox game (`yskills/kleingarten`, private) | three slices, 2026-10-07, merged at 5/5 | A build thread in the cloud (Luau, Lune tests, Rojo) plus play and screenshots through Studio's MCP server on the PC, Robux receipts, Creator Hub steps only yskills can do (icon, thumbnails, listing, go public) |
 | 3 | **A journal app probe** (new repo) | the probe slice only, then build or kill | The probe step: offer, price, waitlist (no pre-orders yet), one channel for 14 days against a go number fixed in advance, the kill/change card, probe-mode gate. On go: the `store` path up to a TestFlight build and Google's closed test, recruited from the waitlist |
-| HQ | **Claude Setup HQ game** (then in this repo, since 2026-10-07 in yskills/company-xy), run between 1 and 2 | an Architect plan, six slices in one file, one fresh thread each, auto-run | Auto-run with no taps, a Fable architect plan, Opus and Sonnet slice threads, the office reading real team state, real money from duo-test's `/api/stats`, the New project tap from a page into the project chat |
+| HQ | **Claude Setup HQ game** (then in this repo, since 2026-10-07 in yskills/company-xy), run between 1 and 2 | an Architect plan, six slices in one file, one fresh thread each, auto-run | Auto-run with no taps, an architect plan, Opus and Sonnet slice threads, the office reading real team state, real money from duo-test's `/api/stats`, the New project tap from a page into the project chat |
 
 ## Rules for a test run
 
@@ -66,8 +66,7 @@ rules. What it taught, and where it now lives:
   pixel taste (CLAUDE.md UI, Designer playbook).
 - Brainstorm first for every new project, a typed idea and an HQ request alike (`operator`,
   Project Manager playbook).
-- Model routing after the run: Fable plans, Opus builds and judges, Sonnet fills in
-  (`docs/WORKFLOW.md`, Models).
+- Model routing: the Models line in `docs/WORKFLOW.md`.
 
 duo-test stays web-only in test 1; its App Store and Google Play release (`store` skill) is a
 slice after test 1, once test 3 has proven the store path or the web version earns.

@@ -66,11 +66,10 @@ uses, its checklist and its lessons from earlier projects); a role reads its pla
 starts, and its thread or subagent prompt names it.
 
 **Starting threads.** In a Claude Project the project conversation starts threads itself (`start_thread_session`, with
-`model` by the routing rule in §5: `claude-opus-5-5` for plans, design and judgement,
-`claude-sonnet-5-5` for everything else, build slices included); each
+`model` from the Models line in `docs/WORKFLOW.md`); each
 reports back when it finishes and keeps fixing CI and review comments on its PR. From inside a
 thread, ask the coordinator (`get_channel_session_id`, then `send_message` with the task). In a
-plain claude.ai/code chat use `create_session` (`model: claude-sonnet-5-5`, `outcome_branch` = the
+plain claude.ai/code chat use `create_session` (`model` from the Models line, `outcome_branch` = the
 task's branch) and check back with `send_later` plus `subscribe_pr_activity`. Project setup once:
 **Thread model** Sonnet (the default; the coordinator passes the model per thread), **Thread
 effort** medium, and `templates/project-instructions.md` pasted into Project instructions.
@@ -136,16 +135,14 @@ friction with claude-setup itself files one issue in `yskills/claude-setup`, lab
 title one line on what happened: a refused check, a dead link, two rules that contradict, a step
 yskills had to do by hand, a complaint yskills repeats. Search open `loop:setup` issues first and
 comment on a match instead of filing twice. The daily loop reader lists them with the app's own
-items; the coordinator starts one `Programmer · setup #<n>` thread per issue (Sonnet), which fixes
+items; the coordinator starts one `Programmer · setup #<n>` thread per issue, which fixes
 it, passes `gate.md` and merges. A fix to a policy file (CLAUDE.md, `gate.md`, `global/`, `cloud/`,
 `install.mjs`) ends as exact paste text on the issue for yskills, never reworded to pass a check.
 Claude Code's safety checks are not friction to fix: only yskills' allow rules or taps pass them.
 
 ## 5. Spend little
 
-- **Model routing** (the one table: claude-setup `docs/WORKFLOW.md`, Models): **Opus** plans,
-  designs and judges; **Sonnet** does everything else, build slices included. Thread effort
-  medium. Built-in subagents default to Sonnet via `CLAUDE_CODE_SUBAGENT_MODEL`.
+- **Models:** the one line in claude-setup `docs/WORKFLOW.md` (Models). Thread effort medium.
 - Start the hand-off at the context guard's warning (150k) and finish it before its hand-off line (200k) (two long threads were 77% of usage on 2026-10-04); one brief = one slice that ends under it. A template over 2000 lines is split before the next change.
 - Where 2026-10-07 burned tokens, and the rule that stops each: hand-offs at 270k (write the
   hand-off at the guard's first warning); `dashboard.html` read whole again and again (grep the

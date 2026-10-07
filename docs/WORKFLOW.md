@@ -17,7 +17,7 @@ whole history every turn.
 | 3 | Plan | `planner` | `PLAN.md` (PRD, slices, marketing plan, keys, costs), `features.json` (acceptance criteria per slice, written before any code) | **Brief (a):** ok/no (it includes proof people pay) |
 | 4 | Scaffold + design | one scaffold thread; design team (`frontend-design`, `impeccable`, `design-critic`) | default stack, `verify`, CI, Workers Builds config (`publish`; you connect it); 2-3 directions as screenshots | **Brief (b):** pick one; do the Cloudflare import it lists. Later keys come one card at a time, when a slice needs them |
 | 5a | Probe (anything meant to earn) | one builder thread, then the marketing team | slice `probe` live: offer, price, waitlist; pushed in one channel for ~14 days against the go number from `PLAN.md` | Nothing if it hits the number; else one tap: kill, change or build anyway |
-| 5 | Build | builder threads (Opus), one per slice, the next in a fresh thread after a merge; a second only when the slices share no file, never more than three; a small site is one thread, no slices | PRs with tests, screenshots, preview link; `PROGRESS.md` updated | Nothing |
+| 5 | Build | builder threads, one per slice, the next in a fresh thread after a merge; a second only when the slices share no file, never more than three; a small site is one thread, no slices | PRs with tests, screenshots, preview link; `PROGRESS.md` updated | Nothing |
 | 6 | Gate each PR | QA: `evaluator` on the preview, fresh `code-reviewer`; security: `security-reviewer` + `red-team`; `design-critic` + `legal-reviewer` | a 5/5 table on the PR and the merge, or one review the builder fixes | nothing |
 | 7 | Launch | full `red-team` and `legal-reviewer` pass; `publish`, `sell` go-live; the loop wired (`docs/LOOP.md`: errors and feedback stored by the app, `loop.yml`, the reader routine) | live site | **Brief (c)** to read; the gate merges (auto-run); live keys when you want real money |
 | 8 | Grow | marketing team (`market` skill, `seo-specialist`); the daily loop reader and a weekly routine | posts, launch, a fix thread per error or red live check, a decision per feedback item, a weekly PR with the `metrics/` file Luna's cockpit reads and the next slice | The gate merges the weekly PR (you tap only if Claude Code's safety check blocks it); approve post batches, pay for ads |
@@ -37,23 +37,13 @@ Remote Control (2026-10-07): yskills allows Claude Code on their PC. Anything th
 
 ## Models
 
-One rule, applied by the project chat when it starts a thread (`start_thread_session`'s
-`model`), by the agent files (`model:` in `.claude/agents/*.md`, the same on your PC after
-`node install.mjs`) and by `CLAUDE_CODE_SUBAGENT_MODEL` for built-in subagents:
+The one model line (also in every project's instructions, word for word; `scripts/check.mjs`
+keeps the copies equal):
 
-| Work | Model | Where |
-|---|---|---|
-| Architecture, plans, design and judgement: the plan of a new project, a redesign, a look, anything hard to undo | **Opus** `claude-opus-5-5` | `architect`, `planner`, Architect and Designer threads, `design-critic`, the project chat while it plans |
-| Everything else: build slices, follow-ups, fixes, data wiring, tests, reviews, research | **Sonnet** `claude-sonnet-5-5` | Programmer slice threads, gate and fix threads, reviewers, `evaluator`, `red-team`, `legal-reviewer`, `build-error-resolver`, `refactor-cleaner`, research subagents, built-in subagents |
-| Bulk text with no judgement, simple reading jobs (find, list, summarise a file) | Haiku | `doc-updater`, subagents that only read and report |
-| local worker: research digests, asset scouting (links only, Claude downloads and checks), story drafts; never code, licences, taste, mail | Local Qwen via llama.cpp on the PC | repo `yskills/worker`, after its 10-job trial passes |
+Models: Opus (claude-opus-5-5) for plans, architecture, design and judgement; Sonnet (claude-sonnet-5-5) for everything else, builds included; a simple reading job goes to a Haiku subagent. Never Fable. A model yskills names is used as named.
 
-Agent files use the aliases `opus`, `sonnet`, `haiku`, which follow the newest model of each
-family; thread starts pass the full ids above. Rule of thumb: a thread that plans, designs or
-decides something hard to undo runs on Opus; one that builds or fills in what a plan already
-decided runs on Sonnet. Default is Sonnet, and simple reading jobs go to Haiku subagents.
-(yskills, 2026-10-07: Fable is out of credits, Opus plans; Sonnet builds, as the project
-instructions say.)
+Thread starts pass the full ids; agent files use the aliases `opus`, `sonnet`, `haiku`; built-in
+subagents get Sonnet through `CLAUDE_CODE_SUBAGENT_MODEL`. Every other file points here.
 
 ## The 5/5 gate
 

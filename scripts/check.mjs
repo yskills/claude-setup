@@ -26,7 +26,7 @@ const dirs = (p) => (existsSync(join(root, p)) ? readdirSync(join(root, p)).filt
 const mds = (p) => (existsSync(join(root, p)) ? readdirSync(join(root, p)).filter((n) => n.endsWith('.md')) : [])
 const seen = { skill: new Map(), agent: new Map() }
 // Agent `model:` aliases Claude Code accepts (docs/WORKFLOW.md, Models); a typo here silently falls back to inherit.
-const MODELS = new Set(['fable', 'opus', 'sonnet', 'haiku', 'inherit'])
+const MODELS = new Set(['opus', 'sonnet', 'haiku', 'inherit'])
 function check(kind, file, expected) {
   const fm = frontmatter(join(root, file))
   if (!fm) return errors.push(`${file}: missing frontmatter`)
@@ -111,6 +111,26 @@ for (const f of [...own, ...walk('.claude/rules'), ...walk('.claude/skills').fil
   for (const m of text.matchAll(/\]\((?!https?:|#|mailto:)([^)\s#]+)(?:#[^)]*)?\)/g)) {
     if (!existsSync(join(root, dirname(f), m[1]))) errors.push(`${f}: dead link ${m[1]}`)
   }
+}
+
+// One model line (docs/WORKFLOW.md, Models), copied word for word into the project-instructions
+// template; nothing else names the retired model (yskills, 2026-10-07: threads kept switching to it).
+const modelLine = readFileSync(join(root, 'docs/WORKFLOW.md'), 'utf8').match(/^Models: .*$/m)?.[0]
+if (!modelLine) errors.push('docs/WORKFLOW.md: the Models line is missing')
+else if (!readFileSync(join(root, '.claude/skills/operator/templates/project-instructions.md'), 'utf8').includes(modelLine)) errors.push('operator/templates/project-instructions.md: Models line differs from docs/WORKFLOW.md')
+const RETIRED = new RegExp(['fa', 'ble'].join(''), 'i')
+const anyText = (d) => readdirSync(join(root, d)).flatMap((n) => {
+  const rel = d === '.' ? n : `${d}/${n}`
+  if (['.git', 'node_modules', 'research'].includes(n)) return []
+  if (statSync(join(root, rel)).isDirectory()) return anyText(rel)
+  return /\.(md|mjs|js|json|sh|ya?ml|tsx?)$/.test(n) ? [rel] : []
+})
+for (const f of anyText('.')) {
+  const text = readFileSync(join(root, f), 'utf8').split(modelLine ?? '\0').join('')
+  if (!RETIRED.test(text)) continue
+  // CLAUDE.md is a policy file only yskills changes; warn until the paste lands instead of blocking every PR.
+  if (f === 'CLAUDE.md') console.warn(`! ${f}: names the retired model; paste the Models line from docs/WORKFLOW.md`)
+  else errors.push(`${f}: names the retired model; use the Models line in docs/WORKFLOW.md`)
 }
 
 if (errors.length) { console.error(errors.map((e) => `x ${e}`).join('\n')); process.exit(1) }

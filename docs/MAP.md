@@ -46,7 +46,7 @@ lives outside this repo.
 | Co-founder | `CLAUDE.md` (How to work) | `roles/*.md` (one role-specific line each) |
 | Literal mode and cost | the brief block in `briefs.md` | `roles/*.md` (one pointer each) |
 | Merge policy, 5/5 gate | `gate.md` (Merge policy) | `CLAUDE.md`, `docs/WORKFLOW.md`, `roles/tester.md` |
-| Models (Opus plans and designs, Sonnet the rest) | `docs/WORKFLOW.md` (Models) | `CLAUDE.md`, operator `SKILL.md` §5, agent `model:` lines |
+| Models | the one line in `docs/WORKFLOW.md` (Models); project instructions carry it word for word | everything else links it; CI fails on a second wording or on the old model name |
 | Context guard numbers (warn 150k, hand off 200k) | `global/context-guard.mjs` | `CLAUDE.md`, `README.md` |
 | Remote Control on the PC | `docs/WORKFLOW.md` (PC work) | project instructions template |
 | UI rules | `CLAUDE.md` (UI) | `roles/designer.md`, `ui-review` |
