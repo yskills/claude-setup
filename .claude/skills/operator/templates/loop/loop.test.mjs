@@ -45,3 +45,8 @@ test('long messages and missing lists are safe', () => {
   assert.equal(a.length, 1)
   assert.deepEqual(plan({}, []), [])
 })
+
+test('a client-reported error is never urgent, even when its path says checkout', () => {
+  const a = plan({ errors: [{ ...err, route: 'client:/checkout' }] }, [])
+  assert.ok(!a[0].labels.includes('loop:urgent'))
+})
