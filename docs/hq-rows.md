@@ -57,3 +57,11 @@ end, agents: [{label, model, state, start, end}]}]}`; states `running`, `done`, 
 written at every phase start and end and at every agent start and finish, never per tool call
 (one write per event, pinned with `if_version`, `at` = now). HQ shows the tree with durations, puts
 the role's animal at its desk while a phase runs and greys rows older than 2 hours.
+
+**Day one:** a new project writes, in the hour its plan is posted and in one batch, `projects/<id>`
+(traction fields 0, `firstEuroBy` = PLAN.md's go date, `revenueMode: 'test'`), the `<id>-` `phases` and
+`team` rows, one `work/<session>` row per thread started, and for a project meant to earn the
+**first euro list** in its `you[]` (`firstSeen` = now): Gewerbe, ELSTER tax registration, Stripe live,
+Impressum data, order-mail. Gewerbe links to the town's online form (searched, never guessed). Details:
+operator skill, step 3. `config/coordinator` also carries `tools: {create_session, send_message}`, the
+project chat's first-minute check.
