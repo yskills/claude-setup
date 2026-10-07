@@ -227,6 +227,15 @@ Templates in `templates/`.
    `roles/<role>.md` (project, type, what to do differently, which tools it needed), so the next
    project of the same kind starts with them.
 
+**Hand-over to another project.** A coordinator can't see other projects and project files
+don't cross over, so a hand-over travels through the target project's repo. Before the source
+thread resolves, its `HANDOFF.md` lists every artifact, not only code: notes, plans, TASTE lines,
+reference pictures, screenshots, generated assets (or the script that rebuilds them), artifact
+links and open asks, each with its path. All of it lands in the target repo in one PR (big or
+paid assets go where that repo's README says, never git if the licence forbids it). If a safety
+check refuses the copy, the thread asks yskills for the Allow in that thread once and does not
+split or reword it (the heroine pictures were missed on 2026-10-07).
+
 **Waiting on yskills:** write the state to `PROGRESS.md` before each brief. A project
 conversation can continue later; a plain chat idle for over an hour hands off to a fresh session.
 
@@ -241,7 +250,7 @@ conversation can continue later; a plain chat idle for over an hour hands off to
   subagents). Thread effort medium. Built-in subagents default to Sonnet via
   `CLAUDE_CODE_SUBAGENT_MODEL`. When in doubt: does the thread decide something that is hard to
   undo or that yskills will look at? Opus. Does it fill in what a plan already decided? Sonnet.
-- Hand off or finish at 150k context (two long threads were 77% of usage on 2026-10-04); one brief = one slice that ends under it. A template over 2000 lines is split before the next change.
+- Start the hand-off at the context guard's warning (150k) and finish it before its hand-off line (200k) (two long threads were 77% of usage on 2026-10-04); one brief = one slice that ends under it. A template over 2000 lines is split before the next change.
 - Where 2026-10-07 burned tokens, and the rule that stops each: hand-offs at 270k (write the
   hand-off at the guard's first warning); `dashboard.html` read whole again and again (grep the
   part, read it once); the same answer in two threads (a thread checks the timeline before
