@@ -1,0 +1,16 @@
+# electron-builder config for Steam depots: plain folders, no installer (Steam installs).
+# Build: npx electron-builder --dir --win --x64   and   --linux --x64   (CI matrix, see steam-deploy.yml)
+appId: de.yskills.<game>
+productName: <Game>
+directories:
+  output: release
+files:
+  - dist/**
+  - electron/**
+  - steam_appid.txt
+asarUnpack:
+  - node_modules/steamworks.js/**
+win:
+  target: dir
+linux:
+  target: dir
