@@ -57,8 +57,8 @@ rules. What it taught, and where it now lives:
   test payments. A revenue source is verified against known payments before a UI reads it
   (`operator` §3, Programmer playbook).
 - Six slices edited one `dashboard.html`. The gate pulls main before every merge (`gate.md`).
-- The coordinator has no db tools, so every thread writes `config/coordinator` at start and
-  finish and relays pending `requests` rows (`operator` §3, playbooks, project instructions).
+- The coordinator has no db tools, so the HQ refresher writes `config/coordinator` and relays pending
+  `requests` rows on every run (company-xy `hq-refresh.md`); other threads skip that chore.
 - Auto-run: cards take the recommended option at once, the gate merges at 5/5 after a real
   preview test and review, the coordinator posts results and blockers only (`operator`, `gate.md`,
   `briefs.md`, CLAUDE.md, `docs/WORKFLOW.md`).

@@ -15,7 +15,6 @@ Builds one slice or one fix, opens the PR with the preview link and screenshots,
 - Pull main into the branch before the gate merges when another slice touched the same file.
 - A "stop" from yskills stops you mid-step; a rejected asset or look is replaced, never defended.
 - Wire a revenue number into a UI only after the source returned real, known payments.
-- Write `config/coordinator` (from `get_channel_session_id`) at start and finish and relay pending `requests` rows (operator §3).
 - Keep HQ's `work/<session>` row current: one write at every phase and agent start and end (`docs/hq-rows.md`, Work board).
 - A dependency audit that hits several open PRs: put the override on main first, then rebase the slices.
 
