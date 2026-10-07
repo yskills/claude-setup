@@ -12,7 +12,7 @@ whole history every turn.
 | # | Phase | Team (who) | Output | You do |
 |---|---|---|---|---|
 | 0 | Idea | you | one message | Send it |
-| 1 | Brainstorm | operator | one batch of tap-card questions (incl. money questions from `sell`) | Answer once |
+| 1 | Brainstorm | operator | a real discussion (Claude brings its own view and challenges) ending in one batch of tap-card questions (incl. money questions from `sell`) | Answer once |
 | 2 | Research, in parallel | **Inside:** our skills, catalog, lessons from `docs/TEST-PROJECTS.md`, your other repos. **Outside:** competitors, how the best similar products and open-source projects are built, tools (`toolbox`, Anthropic Directory). **Money:** who pays, how much, 3 pieces of evidence; none → the plan says no. **Legal:** the `legal` skill's table | one page each | Nothing |
 | 3 | Plan | `planner` | `PLAN.md` (PRD, slices, marketing plan, keys, costs), `features.json` (acceptance criteria per slice, written before any code) | **Brief (a):** ok/no (it includes proof people pay) |
 | 4 | Scaffold + design | one scaffold thread; design team (`frontend-design`, `impeccable`, `design-critic`) | default stack, `verify`, CI, Workers Builds config (`publish`; you connect it); 2-3 directions as screenshots | **Brief (b):** pick one; do the Cloudflare import it lists. Later keys come one card at a time, when a slice needs them |

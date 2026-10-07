@@ -9,6 +9,8 @@ labels only if yskills writes German in that project.
 
 ## (a) After the plan
 
+Co-founder: the plan states Claude's own view too (what it would change or drop and why); yskills's decision is carried out as said.
+
 ```
 Plan: <name>, <one line: what it does>
 Für wen: <who>, <how many like them, source>

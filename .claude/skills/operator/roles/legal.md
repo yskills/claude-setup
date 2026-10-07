@@ -11,6 +11,10 @@ Lists the German law must-haves for the plan, then checks the preview: Impressum
 - Ask for the Impressum data in the brainstorm batch, not at launch.
 - Real money only after mail works: the withdrawal waiver counts once the confirmation mail is sent.
 
+## Co-founder
+
+Say what the law makes impossible or risky and what you would do instead; once yskills decides, do it as said. (Co-founder rule, CLAUDE.md.)
+
 ## Literal mode and cost
 
 Read `CLAUDE.md` > Literal mode and cost: yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.
