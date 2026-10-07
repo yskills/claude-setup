@@ -107,58 +107,11 @@ Templates in `templates/`.
 - `PROGRESS.md`: the handoff. Done, next, broken, decisions and why, each thread's cost. Every
   thread reads it first; only the operator writes it. Under 100 lines.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
-- **Dashboard: HQ is the only one.** yskills' live view of every project is the pinned Claude Setup HQ
-  Artifact (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT, template `templates/dashboard.html`,
-  which is HQ itself: a first-person desk, a 3D office with one chibi animal per role, Plan, Team,
-  To-dos and Company with every project's money). **A project never publishes its own office page.**
-  The Project Manager writes the project's rows into HQ's db with `ArtifactData` (viewing costs no
-  tokens, only these writes do) and republishes the template only when HQ itself changes (then
-  with `files: {"office-kit.js": "templates/office-kit.js"}`, the capabilities `db` (with its rule
-  `{path: "", read: "view", write: "admin"}`), `assets` (`{}`, for the character files) and the `mcp` send_message
-  (server "Claude Code Remote"), all three restated whenever `capabilities` is passed, because
-  a non-empty set replaces the stored one; and `if_version` pins). At project start it plans the phases (brief (a)'s plan:
-  research, plan, scaffold, one per slice or group of slices, launch, grow) and writes one batch,
-  every `phases` and `team` id prefixed `<project>-` so projects never overwrite each other (`pm/now`
-  is the Claude Setup project's own summary; any other project keeps its summary, live link and
-  needs-you list in its `projects/<id>` row): `phases/<id>` (`name, order, state` = done, active or next, `why, goals[{name,
-  done, total, link}]`; a slice's goal counts its passing criteria in `features.json`) and
-  `team/<id>` for the operator, each thread and each reviewer agent (`name, role, state` =
-  working, blocked, waiting, idle or done, `task, next, with[ids], link, linkLabel, preview,
-  order`; the desk follows the role word in `role` or the name: Project Manager, Researcher,
-  Designer, Programmer, Tester, Reviewer, Security, Legal, Marketer). Every write to `PROGRESS.md` updates the same rows in one batch (pin
-  each with `if_version`). The new project also gets a row `projects/<id>` (`name, state` = active,
-  paused or done, `progress` 0-100, `note, live, order, revenueMonth, revenueTotal`
-  (EUR numbers, from the project's public stats route, e.g. duo-test's `/api/stats` in cents divided by
-  100; Artifact pages cannot fetch other sites, so the manager copies them at every milestone),
-  `revenueMode` (`test` while Stripe is in test mode, HQ then says "Testgeld"), `revenueAt` (ISO time of
-  that read), `working` (count), `at` (ISO time, **every row any thread writes carries `at`; HQ greys a row after 6 hours and counts its `working` as 0**), `visitors7d, signups, paying, firstEuroBy` (traction: what real people did and the date of the first real euro; HQ shows these instead of a build percent), `you[{what, link, firstSeen}]` (a to-do lives only in its project row; `pm/now.you` is only Claude Setup's own and the fallback; the same text or link in two lists shows once; keep `firstSeen` when rewriting) (every `what` here and in `pm/now` is one plain German sentence with a verb, because HQ shows it as-is in Heute für dich); a project's `dashboard` link, if the project has no
-  Artifact of its own, is its project chat thread), and keeps it current with every `pm/now` write. **A revenue source is verified against real data before any UI reads it:** call
-  the route or query the table and check that the known payments show up (duo-test's `/api/stats`
-  went live summing rows that were never stored and showed 0 € for 28 € of payments); a source
-  that returns nothing yet is wired only together with its backfill. Luna's cockpit links to HQ.
-  **Game events:** HQ's level, XP and coins come only from `events/<id>` rows in HQ's db
-  (`{kind, project, at, amount?}`), nothing else counts. At each milestone, in the same batch as the
-  `PROGRESS.md` rows, the operator or gate thread writes one with a fixed id so a retry does not
-  count twice: `pr_merged` (id `pr-<repo>-<number>`, 50 XP), `gate_passed` (`gate-<repo>-<number>`,
-  20 XP, only at 5/5), `launched` (`launch-<project>`, 100 XP), `euro` (`euro-<project>-<yyyy-mm-dd>`,
-  `amount` = euros newly earned since the last event, from Stripe or `/api/stats`, 10 XP and 1 coin
-  each, **and `mode: 'live'`; without it the amount is Testgeld and scores nothing**; PRs of claude-setup and hq score nothing, visits score nothing; the finance row wins over the `revenue*` fields). The page writes `visit-<day>` itself. The rule is
-  `HQ.scoreFrom` in the template's `hq-rules` block, tested by `scripts/hq-rules.test.mjs`.
-  **Heute für dich:** the desk phone's page reads `today/now` (`{refreshedAt, items[{what, kind you|info,
-  source, at, link}], sources[{name, ok, note}]}`), filled from live sources by the refresher thread
-  (`hq-refresh.md`): HQ asks it on open when the list is over 150 minutes old; no routine of its own.
-  Rule: `HQ.todayFor`, `HQ.refreshDue`.
-  **New project tap:** HQ's yellow notepad saves `requests/<id>` (`{text, at, status}`: `new` saved,
-  `sent` the page reached the coordinator, `relayed` a thread passed it on, `started` the brainstorm
-  thread runs, with `link`) and messages the coordinator with the Claude Code Remote connector's
-  `send_message` ("HQ request <id>: <idea> ..."). The coordinator has no db tools, so threads keep
-  the address and the queue: **every project thread, at start and when it finishes,** calls
-  `get_channel_session_id` and writes HQ's `config/coordinator` (`{session, at}`,
-  pinned with `if_version`); **at start** it also lists `requests` and, for each row that is `new`
-  or `sent` with no `link`, sends the same "HQ request <id>: <text>" line to the coordinator with
-  `send_message` and sets the row to `relayed`. The coordinator answers each such message with one
-  `Researcher · <idea>` brainstorm thread whose brief names the request id, unless a thread for that
-  id already runs (a resend repeats it); that thread sets the row to `started` with its thread link.
+- **Dashboard: HQ is the only one.** yskills' live view of every project is HQ, "Company XY"
+  (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT; code in yskills/company-xy). **A project never
+  publishes its own office page.** The Project Manager writes the project's rows into HQ's db with
+  `ArtifactData`, in one batch with every `PROGRESS.md` write, exactly as `docs/hq-rows.md` says
+  (phases, team, projects, events, today, requests, config/coordinator, work board; every row carries `at`).
 
 ## 4. The run
 

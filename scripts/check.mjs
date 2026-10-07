@@ -98,7 +98,7 @@ const BANNED = [/merge tap/i, /caveman voice/i]
 const OWN_DOCS = ['README.md', 'CLAUDE.md', 'docs/WORKFLOW.md', 'docs/TEST-PROJECTS.md']
 const walk = (d) => readdirSync(join(root, d)).flatMap((n) => {
   const rel = `${d}/${n}`
-  if (statSync(join(root, rel)).isDirectory()) return rel.includes('/templates/dashboard') ? [] : walk(rel)
+  if (statSync(join(root, rel)).isDirectory()) return walk(rel)
   return rel.endsWith('.md') ? [rel] : []
 })
 const eccDirs = (ecc?.skills ?? []).map((n) => `.claude/skills/${n}/`)
