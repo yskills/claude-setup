@@ -327,3 +327,19 @@ test('seating: one card per desk, one desk per card, removed cards leave their d
   assert.deepEqual(plain(HQ.seatCard({ pm: 'a' }, 'pm', null)), {})
   assert.equal(HQ.moodOf('blocked'), 'stuck'); assert.equal(HQ.moodOf('off'), 'free')
 })
+
+test('parts with no data are named once, so the cash book shows one quiet line instead of empty headings', () => {
+  assert.deepEqual(report(row, NOW).missing, [])
+  const bare = { total: row.total, month: row.month, months: row.months, mode: 'test' }
+  assert.deepEqual(report(bare, NOW).missing, ['Einzelzahlungen', 'Abos', 'Erstattungen', 'Gutscheine', 'Auszahlung'])
+})
+
+test('Company, laptop and wall chart show the cash book amount with cents: net once every fee is known, else paid', () => {
+  const plain = (p) => JSON.parse(JSON.stringify(p))
+  const p = { id: 'duo-test', revenueTotal: 30, revenueMonth: 30, revenueMode: 'test' }
+  const live = { total: { grossCents: 2999, feeCents: 119, netCents: 2880, complete: true }, month: { grossCents: 2999, feeCents: 119, netCents: 2880, complete: true }, mode: 'test' }
+  assert.deepEqual(plain(HQ.withFinance(p, live, NOW)), { ...p, revenueTotal: 28.8, revenueMonth: 28.8, revenueNet: true, testMoney: true })
+  const open = { ...live, total: { ...live.total, complete: false }, month: undefined, mode: 'live' }
+  assert.deepEqual(plain(HQ.withFinance(p, open, NOW)), { ...p, revenueTotal: 29.99, revenueMonth: 30, revenueNet: false, testMoney: false })
+  assert.deepEqual(plain(HQ.withFinance(p, undefined, NOW)), p)
+})
