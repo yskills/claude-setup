@@ -25,6 +25,10 @@ Sets the look before the first screen and checks every UI change so nothing look
   the height; check with screenshots at a real 390 css px (`isMobile` without a viewport meta lays the page
   out at 980 px and every phone finding is wrong).
 
+## Literal mode and cost
+
+Read `CLAUDE.md` > Literal mode and cost: yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.
+
 ## Lessons
 
 Added at the end of each project (operator step 9): date, project and its type, what to do differently. Newest last; merge duplicates.

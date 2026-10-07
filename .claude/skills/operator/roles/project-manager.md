@@ -17,6 +17,10 @@ The project chat itself (the coordinator running this skill). Plans with yskills
 - At the end of the project, ask every role for its lessons (step 9).
 - A message "HQ request <id>: <idea>" is yskills' New project tap in HQ: start one brainstorm thread for it (step 1) with the id in its brief, once per id; that thread marks `requests/<id>` started with its link.
 
+## Literal mode and cost
+
+Read `CLAUDE.md` > Literal mode and cost: yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.
+
 ## Lessons
 
 Added at the end of each project (operator step 9): date, project and its type, what to do differently. Newest last; merge duplicates.

@@ -18,6 +18,10 @@ Builds one slice or one fix, opens the PR with the preview link and screenshots,
 - Write `config/coordinator` (from `get_channel_session_id`) at start and finish and relay pending `requests` rows (operator §3).
 - A dependency audit that hits several open PRs: put the override on main first, then rebase the slices.
 
+## Literal mode and cost
+
+Read `CLAUDE.md` > Literal mode and cost: yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.
+
 ## Lessons
 
 Added at the end of each project (operator step 9): date, project and its type, what to do differently. Newest last; merge duplicates.

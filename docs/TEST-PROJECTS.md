@@ -7,8 +7,8 @@ repo; then the next one starts.
 
 | # | Project | Shape | What it proves |
 |---|---|---|---|
-| 1 | **duo-test**, the language-learning app (existing repo), finished end to end | the operator taking over an existing app, slices | Briefs, Workers Builds previews, the evaluator, the 5/5 gate ending in one merge tap, logins and D1 with `security-reviewer` and `red-team`, the `sell` kit in Stripe sandbox, the `legal` team, a migration PR flagged as important |
-| 2 | **A Three.js web game** (new repo) | small: one build thread | Design directions for a game, performance on a phone, portal monetization (Poki or CrazyGames SDK) or in-game purchases via `sell`, the weekly metrics PR |
+| 1 | **duo-test**, the language-learning app (existing repo), finished end to end | the operator taking over an existing app, slices | Briefs, Workers Builds previews, the evaluator, the 5/5 gate ending in the gate thread's merge, logins and D1 with `security-reviewer` and `red-team`, the `sell` kit in Stripe sandbox, the `legal` team, a migration PR flagged as important |
+| 2 | **Kleingarten**, a Roblox game (`yskills/kleingarten`, private) | three slices, 2026-10-07, merged at 5/5 | A build thread in the cloud (Luau, Lune tests, Rojo) plus play and screenshots through Studio's MCP server on the PC, Robux receipts, Creator Hub steps only yskills can do (icon, thumbnails, listing, go public) |
 | 3 | **A journal app probe** (new repo) | the probe slice only, then build or kill | The probe step: offer, price, waitlist (no pre-orders yet), one channel for 14 days against a go number fixed in advance, the kill/change card, probe-mode gate. On go: the `store` path up to a TestFlight build and Google's closed test, recruited from the waitlist |
 | HQ | **Claude Setup HQ game** (this repo, `templates/dashboard.html`), run between 1 and 2 | an Architect plan, six slices in one file, one fresh thread each, auto-run | Auto-run with no taps, a Fable architect plan, Opus and Sonnet slice threads, the office reading real team state, real money from duo-test's `/api/stats`, the New project tap from a page into the project chat |
 
@@ -24,7 +24,7 @@ repo; then the next one starts.
 - Every test meant to earn fixes its go number in `PLAN.md` before the probe starts and logs
   whether it hit it. 30/60/90-day targets are set too, but only checked for a test that launches
   and runs the weekly routine.
-- Only test 2 runs the weekly routine, for two weeks; every trigger a test created is deleted when
+- Only the first test that launches runs the weekly routine, for two weeks; every trigger a test created is deleted when
   it ends.
 
 ## After each run
@@ -39,7 +39,7 @@ repo; then the next one starts.
 |---|---|---|---|---|---|
 | 1 duo-test | 2026-10-05 to 10-06 | 6 (design cards, a typed ok, 3 key-card rounds, "merge everything", Build settings, the live test that found bugs) | #21: 2, #20 and #22: none on a preview | 38.04 | [lessons-1.md](https://claude.ai/code/project/chan_01XKnLb2nhGBYoEt3HNp26NS) (project files `test-runs/lessons-1.md`), folded in over #23 to #28 and this PR |
 | HQ game | 2026-10-06 | 3 (a pause "only burning my money", the rejected cube animals, "merge everything, skip everything") | one per PR, #31 redid the animals after yskills' taste call | about 30 to 50 (the estimate held, one slice at a time) | #37 |
-| 2 Three.js game | | | | | |
+| 2 Kleingarten (Roblox) | 2026-10-07 | slices 1 to 3 merged at 5/5; a stalled hand-back cost six hours once | see PRs in `yskills/kleingarten` | not recorded | lessons in `roles/programmer.md` |
 | 3 Journal probe | | | | | |
 
 ## HQ game run (2026-10-06, PRs 29 to 36)
@@ -72,7 +72,7 @@ rules. What it taught, and where it now lives:
 duo-test stays web-only in test 1; its App Store and Google Play release (`store` skill) is a
 slice after test 1, once test 3 has proven the store path or the web version earns.
 
-A Roblox game (Rojo, a build thread on yskills' PC) waits until after the first real project.
+Test 2 ran as Kleingarten (Roblox), not a Three.js game; its lessons are in the Programmer, Tester and Designer playbooks and `game-3d`. A Three.js web game is optional later.
 
 ## Then
 

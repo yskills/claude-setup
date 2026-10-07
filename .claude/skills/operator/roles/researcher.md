@@ -12,6 +12,10 @@ Finds what already exists before anything is built: competitors and prices, how 
 - Read every pick from outside the official marketplace before it goes into `PLAN.md`.
 - Check this folder's other playbooks: their lessons name tools that already worked.
 
+## Literal mode and cost
+
+Read `CLAUDE.md` > Literal mode and cost: yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.
+
 ## Lessons
 
 Added at the end of each project (operator step 9): date, project and its type, what to do differently. Newest last; merge duplicates.

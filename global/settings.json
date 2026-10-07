@@ -51,7 +51,17 @@
       "Bash(npm run deploy:*)",
       "Bash(npm run ship:*)",
       "Bash(firebase deploy:*)",
-      "Bash(vercel --prod:*)"
+      "Bash(vercel --prod:*)",
+      "Bash(rm -rf:*)",
+      "Bash(wrangler delete:*)",
+      "Bash(npx wrangler delete:*)",
+      "Bash(wrangler d1 execute:*)",
+      "Bash(npx wrangler d1 execute:*)",
+      "Bash(wrangler d1 delete:*)",
+      "Bash(wrangler secret:*)",
+      "Bash(npx wrangler secret:*)",
+      "Bash(git clean:*)",
+      "Bash(git branch -D:*)"
     ],
     "deny": [
       "Read(**/.env)",
@@ -64,7 +74,17 @@
       "Read(**/*.key)",
       "Edit(**/.env)",
       "Edit(**/.env.local)",
-      "Edit(**/.env.production)"
+      "Edit(**/.env.production)",
+      "Read(**/.dev.vars)",
+      "Read(**/.env.development)",
+      "Read(**/.env.staging)",
+      "Read(~/.npmrc)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.config/.wrangler/**)",
+      "Read(~/.wrangler/**)",
+      "Edit(**/.dev.vars)",
+      "Edit(**/.env.development)",
+      "Edit(**/.env.staging)"
     ]
   },
   "effortLevel": "high",

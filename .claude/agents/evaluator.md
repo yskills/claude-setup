@@ -26,6 +26,9 @@ Each criterion looks like this:
 
 ## How
 
+Journeys include a guest who then logs into an existing account: the guest's progress must
+survive (it was lost once, duo-test 2026-10-06).
+
 1. Write one Playwright script in the scratchpad (never in the repo) that walks every criterion
    as a real user would: click, type, submit, reload, go back. Phone (390x844, touch) and
    desktop (1440x900). Launch with `executablePath: '/opt/pw-browsers/chromium'` in cloud

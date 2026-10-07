@@ -35,7 +35,11 @@ attack so it can be rerun.
    the success page without paying; a forged or unsigned webhook (expect 400).
 7. **Limits:** 30 quick requests to login, signup, checkout and any mail-sending route; expect a
    429 or a block, not 30 successes.
-8. **Headers:** `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`,
+8. **Cross-site writes:** a POST with another site's `Origin` or `Sec-Fetch-Site: cross-site`,
+   also from a sibling `*.workers.dev` Worker or PR preview (same-site, so SameSite cookies don't
+   stop it); expect a refusal. **Mail links:** a confirm link must only confirm an account signed
+   in in the same browser, never one a stranger squatted; mail to typed-in addresses is capped.
+9. **Headers:** `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`,
    cookie flags (`HttpOnly`, `Secure`, `SameSite`).
 
 ## Report

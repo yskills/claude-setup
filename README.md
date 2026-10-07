@@ -39,7 +39,7 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 | Piece | What | Where it comes from |
 |---|---|---|
 | `CLAUDE.md` | How Claude works for you: owns tasks end to end, verifies before pushing, screenshot-reviews UI, your default stack | `CLAUDE.md` |
-| Settings | Auto permission mode, safe allow list, asks before force-push and deploys, never reads `.env` files, high effort, status line with context bar | `global/settings.json` |
+| Settings | Auto permission mode, safe allow list, asks before force-push and deploys, denies reading `.env` and key files (a deny rule is not a sandbox), high effort, status line with context bar | `global/settings.json` |
 | 13 plugins on | superpowers, frontend-design, security-guidance, TypeScript and Python LSP, Context7, Playwright, commit-commands, code-simplifier, feature-dev, claude-md-management, claude-code-setup, skill-creator (`/code-review` and the `claude-api` skill are built into Claude Code now) | Anthropic's official marketplace, `config/plugins.json` |
 | 7 plugins per project | Cloudflare, Firebase, Stripe, Sentry, PostHog, Supabase, Vercel: installed but off; a repo turns one on in its `.claude/settings.json` | same |
 | 17 ECC skills | Vue, Nuxt 4, Vite, API design, security review, e2e, SEO, i18n... | `.claude/skills`, list in `config/ecc.json` |
@@ -98,7 +98,7 @@ list to the setup script would stop that is untested. Threads research with WebS
 
 ## Using it
 
-- **New idea:** just describe it. The `operator` skill sizes it, researches, plans and builds it, and sends you three ok/no briefs plus one merge tap per PR; `toolbox` adds the tools to that project only.
+- **New idea:** just describe it. The `operator` skill sizes it, researches, plans and builds it, and sends you three ok/no briefs, and the gate merges every PR at 5/5; `toolbox` adds the tools to that project only.
 - **New to a repo:** "onboard this project" runs `onboard-project`: a short `CLAUDE.md`,
   `.claude/settings.json` with the right per-project plugins, and a `verify` skill matching CI.
 - **Before every push:** Claude runs `ship-check` on its own; ask for it any time.

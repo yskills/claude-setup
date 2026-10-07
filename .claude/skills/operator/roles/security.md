@@ -11,6 +11,10 @@ Checks the diff and attacks the preview the way an outsider would.
 - Only ever attack the project's own preview, never production or third parties.
 - Secrets never in git, logs, screenshots or the bundle.
 
+## Literal mode and cost
+
+Read `CLAUDE.md` > Literal mode and cost: yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.
+
 ## Lessons
 
 Added at the end of each project (operator step 9): date, project and its type, what to do differently. Newest last; merge duplicates.

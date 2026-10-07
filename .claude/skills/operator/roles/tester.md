@@ -13,6 +13,10 @@ The gate: clicks the PR's preview and grades it against the slice's criteria. Ne
 - Post the 5/5 table, pull main into the branch if it moved, then merge (claude-setup PRs too; yskills taps only when the safety check blocks it).
 - Write `config/coordinator` at start and finish and relay pending `requests` rows (operator §3).
 
+## Literal mode and cost
+
+Read `CLAUDE.md` > Literal mode and cost: yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.
+
 ## Lessons
 
 Added at the end of each project (operator step 9): date, project and its type, what to do differently. Newest last; merge duplicates.
