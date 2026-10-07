@@ -235,3 +235,51 @@ test('the money page opens from #money and its German names', () => {
   assert.equal(HQ.pickTab('#kassenbuch', { hasProjects: true, room: false }), 'money')
   assert.equal(HQ.worldFor('money', 'office'), 'office')
 })
+
+/* A 10 x 10 floor of 1 m cells with a wall down x = 5, open only at the bottom row */
+const floor = (gap = true) => {
+  const g = { x0: 0, z0: 0, size: 1, w: 10, h: 10, blocked: new Uint8Array(100) }
+  for (let j = 0; j < 10; j++) if (!gap || j < 9) g.blocked[j * 10 + 5] = 1
+  return g
+}
+const blockedAt = (g, x, z) => g.blocked[Math.floor(z) * g.w + Math.floor(x)] === 1
+
+test('the team walks around furniture, never through it', () => {
+  const g = floor(), path = HQ.findPath(g, [1.5, 1.5], [8.5, 1.5])
+  assert.ok(path, 'a way exists through the gap')
+  assert.deepEqual([...path[0]], [1.5, 1.5]); assert.deepEqual([...path.at(-1)], [8.5, 1.5])
+  for (let k = 1; k < path.length; k++) {
+    const [a, b] = [path[k - 1], path[k]]
+    for (let s = 0; s <= 50; s++) assert.ok(!blockedAt(g, a[0] + (b[0] - a[0]) * s / 50, a[1] + (b[1] - a[1]) * s / 50), `leg ${k} crosses the wall`)
+  }
+  assert.ok(path.length <= 5, 'straight runs are merged')
+  assert.equal(HQ.findPath(floor(false), [1.5, 1.5], [8.5, 1.5]), null, 'no way when walled off')
+})
+
+test('a walk may start on a chair and end on a sofa', () => {
+  const g = floor(); g.blocked[1 * 10 + 1] = 1
+  const path = HQ.findPath(g, [1.5, 1.5], [3.5, 1.5])
+  assert.deepEqual([...path[0]], [1.5, 1.5]); assert.deepEqual([...path.at(-1)], [3.5, 1.5])
+})
+
+test('walkers give way and never stand inside each other', () => {
+  const me = { x: 0, z: 0, rank: 3 }, aim = [1, 0]
+  assert.deepEqual({ ...HQ.giveWay(me, aim, []) }, { x: 1, z: 0, wait: false })
+  assert.equal(HQ.giveWay(me, aim, [{ x: 0.8, z: 0, walking: true, rank: 1 }]).wait, true, 'waits for one who goes first')
+  assert.equal(HQ.giveWay({ ...me, impatient: true }, aim, [{ x: 0.8, z: 0.1, walking: true, rank: 1 }]).wait, false, 'not forever')
+  const round = HQ.giveWay(me, aim, [{ x: 0.7, z: 0.2, walking: false, rank: 1 }])
+  assert.equal(round.wait, false); assert.ok(round.z < -0.2, 'steps to the side away from one standing ahead'); assert.ok(round.x > 0, 'still moves on')
+  assert.deepEqual({ ...HQ.giveWay(me, aim, [{ x: -0.7, z: 0, walking: true, rank: 1 }]) }, { x: 1, z: 0, wait: false }, 'ignores who is behind')
+  assert.equal(HQ.giveWay({ x: 0, z: 0, rank: 1 }, aim, [{ x: 0.7, z: 0, walking: true, rank: 5, hx: 1, hz: 0 }]).wait, true, 'queues behind one going the same way')
+  const out = HQ.giveWay(me, aim, [{ x: 0.2, z: 0, walking: true, rank: 1 }])
+  assert.ok(out.x < 0, 'backs out of one it stands inside')
+  const a = HQ.giveWay({ x: 0, z: 0, rank: 1 }, [1, 0], [{ x: 0.8, z: 0, walking: true, rank: 2 }])
+  const b = HQ.giveWay({ x: 0.8, z: 0, rank: 2 }, [-1, 0], [{ x: 0, z: 0, walking: true, rank: 1 }])
+  assert.ok(a.z !== 0 && !a.wait, 'head on: the first one steps aside'); assert.equal(b.wait, true, 'the second waits')
+})
+
+test('one panel at a time: a tap outside a page goes back to its room', () => {
+  assert.equal(HQ.closeTo('company', 'room'), 'desk'); assert.equal(HQ.closeTo('team', 'office'), 'office')
+  assert.equal(HQ.closeTo('money', 'room'), 'desk'); assert.equal(HQ.closeTo('todo', 'office'), 'office')
+  assert.equal(HQ.closeTo('desk', 'room'), null); assert.equal(HQ.closeTo('office', 'office'), null); assert.equal(HQ.closeTo(null, 'room'), null)
+})
