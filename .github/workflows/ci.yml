@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 24
       - run: node scripts/check.mjs
-      - run: node --test scripts/hq-rules.test.mjs
+      - run: node --test scripts/hq-rules.test.mjs scripts/characters.test.mjs
       # Runs without a login (tested with an empty HOME on 2026-10-06).
       - name: team mod
         shell: bash

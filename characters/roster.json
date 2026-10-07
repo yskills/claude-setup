@@ -1,0 +1,16 @@
+{
+  "_about": "Ten originals remixed from pixiv's free VRoid samples (CC0-like VRoid Hub licence: everyone, commercial, edits, no credit). base: f = Vita (short white hair, bodysuit), g = Victoria (long hair, dress); e = Vivi is left out because she reads as a child. Body numbers: 0 = unchanged, 0.3 = a lot. Build with build.sh.",
+  "body": { "bust": 0.35, "hips": 0.3, "waist": 0.15, "thighs": 0.45, "butt": 0.25 },
+  "figures": [
+    { "id": "nyra",   "name": "Nyra",   "base": "g", "hair": "#1d1a2e", "eyes": "#3a6fd8", "dress": "#4a2a6e", "voice": "ruhig" },
+    { "id": "mira",   "name": "Mira",   "base": "g", "hair": "#f08a2c", "eyes": "#8a5a2b", "dress": "#3f8fd0", "voice": "frech" },
+    { "id": "selene", "name": "Selene", "base": "g", "hair": "#24172e", "eyes": "#3a4fd8", "dress": "#b3202f", "voice": "stolz" },
+    { "id": "rosa",   "name": "Rosa",   "base": "g", "hair": "#f2b48a", "eyes": "#6c87a8", "dress": "#2b2b34", "voice": "verspielt" },
+    { "id": "karla",  "name": "Karla",  "base": "g", "hair": "#c42a2a", "eyes": "#6b3a1e", "dress": "#25325e", "voice": "streng" },
+    { "id": "mimi",   "name": "Mimi",   "base": "g", "hair": "#f4a3c8", "eyes": "#4fae6a", "dress": "#d9c3e6", "voice": "herzlich" },
+    { "id": "helga",  "name": "Helga",  "base": "g", "hair": "#f3dc8c", "eyes": "#b07a2a", "dress": "#4f7a4a", "voice": "laut", "body": { "bust": 0.45 } },
+    { "id": "tara",   "name": "Tara",   "base": "f", "hair": "#201c22", "eyes": "#9a3a2a", "dress": "#e9e4da", "voice": "warm" },
+    { "id": "yuna",   "name": "Yuna",   "base": "f", "hair": "#18151c", "eyes": "#b5202a", "dress": "#1e1b22", "voice": "leise" },
+    { "id": "hina",   "name": "Hina",   "base": "g", "hair": "#2c2f6b", "eyes": "#c9bfe8", "dress": "#8f7fc4", "voice": "schüchtern" }
+  ]
+}

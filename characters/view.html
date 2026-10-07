@@ -1,0 +1,24 @@
+<!doctype html><meta charset="utf-8"><style>body{margin:0;background:#f3e9dc}canvas{display:block}</style>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@1.0.10/lib/three-vrm.min.js"></script>
+<body><script>
+// ?m=a.vrm,b.vrm&yaw=0 : one figure per file, side by side, front (yaw 0) or side (yaw 90)
+const q = new URLSearchParams(location.search), files = q.get('m').split(','), yaw = (180 + +(q.get('yaw') || 0)) * Math.PI / 180
+const W = innerWidth, H = innerHeight, r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
+r.setSize(W, H); r.outputEncoding = THREE.sRGBEncoding; document.body.append(r.domElement)
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#f3e9dc')
+scene.add(new THREE.HemisphereLight('#fff7ee', '#c9b8a6', 0.55)); const sun = new THREE.DirectionalLight('#fff1dd', 0.45); sun.position.set(1, 2, 2); scene.add(sun)
+const span = 0.75 * files.length, cam = new THREE.OrthographicCamera(-span / 2 * W / H * 1.0 / (W / H) * (W / H), span / 2 * W / H / (W / H) * (W / H), 0.95, -0.95, 0.1, 20)
+const aspect = W / H, half = Math.max(span / 2, 0.95 * aspect) ; cam.left = -half; cam.right = half; cam.top = half / aspect; cam.bottom = -half / aspect; cam.updateProjectionMatrix()
+const por = q.get('p'); if (por) { cam.left = -0.36; cam.right = 0.36; cam.top = 0.36; cam.bottom = -0.36; cam.updateProjectionMatrix() }
+cam.position.set(0, por ? 1.3 : 0.85, 5); cam.lookAt(0, por ? 1.3 : 0.85, 0)
+const loader = new THREE.GLTFLoader(); loader.register((p) => new THREE_VRM.VRMLoaderPlugin(p))
+let left = files.length
+files.forEach((f, i) => loader.load(f, (g) => {
+  const vrm = g.userData.vrm; THREE_VRM.VRMUtils.rotateVRM0(vrm)
+  const h = vrm.humanoid; for (const s of ['left', 'right']) { const a = h.getNormalizedBoneNode(s + 'UpperArm'); if (a) a.rotation.z = (s === 'left' ? 1 : -1) * 1.2 }
+  vrm.scene.rotation.y = yaw; vrm.scene.position.x = (i - (files.length - 1) / 2) * 0.75; vrm.update(0); scene.add(vrm.scene)
+  if (--left === 0) { r.render(scene, cam); document.title = 'ready' }
+}, undefined, (e) => { document.title = 'error ' + e }))
+</script>

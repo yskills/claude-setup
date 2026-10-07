@@ -1,0 +1,135 @@
+{
+ "_about": "Every character and move file a game may use, with its licence. A file without a row here, or with commercial false, never goes into a game (scripts/characters.test.mjs).",
+ "files": [
+  {
+   "name": "AvatarSample_F.vrm",
+   "kind": "character-source",
+   "usedFor": "remix base",
+   "built": false,
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "AvatarSample_G.vrm",
+   "kind": "character-source",
+   "usedFor": "remix base",
+   "built": false,
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "nyra.vrm",
+   "kind": "character",
+   "usedFor": "HQ Figuren shelf",
+   "built": true,
+   "recipe": "roster.json#nyra",
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "mira.vrm",
+   "kind": "character",
+   "usedFor": "HQ Figuren shelf",
+   "built": true,
+   "recipe": "roster.json#mira",
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "selene.vrm",
+   "kind": "character",
+   "usedFor": "HQ Figuren shelf",
+   "built": true,
+   "recipe": "roster.json#selene",
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "rosa.vrm",
+   "kind": "character",
+   "usedFor": "HQ Figuren shelf",
+   "built": true,
+   "recipe": "roster.json#rosa",
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "karla.vrm",
+   "kind": "character",
+   "usedFor": "HQ Figuren shelf",
+   "built": true,
+   "recipe": "roster.json#karla",
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "mimi.vrm",
+   "kind": "character",
+   "usedFor": "HQ Figuren shelf",
+   "built": true,
+   "recipe": "roster.json#mimi",
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "helga.vrm",
+   "kind": "character",
+   "usedFor": "HQ Figuren shelf",
+   "built": true,
+   "recipe": "roster.json#helga",
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "tara.vrm",
+   "kind": "character",
+   "usedFor": "HQ Figuren shelf",
+   "built": true,
+   "recipe": "roster.json#tara",
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "yuna.vrm",
+   "kind": "character",
+   "usedFor": "HQ Figuren shelf",
+   "built": true,
+   "recipe": "roster.json#yuna",
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  },
+  {
+   "name": "hina.vrm",
+   "kind": "character",
+   "usedFor": "HQ Figuren shelf",
+   "built": true,
+   "recipe": "roster.json#hina",
+   "licence": "VRoid Hub conditions in the file: everyone, commercial use (personal and corporate), edits and sharing allowed, credit not needed",
+   "commercial": true,
+   "author": "VRoidプロジェクト (pixiv)",
+   "source": "https://opengameart.org/content/vroid-studio-cc0-models"
+  }
+ ]
+}
