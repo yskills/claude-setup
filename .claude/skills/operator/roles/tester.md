@@ -14,6 +14,10 @@ The gate: clicks the PR's preview and grades it against the slice's criteria. Ne
 - Write `config/coordinator` at start and finish and relay pending `requests` rows (operator §3).
 - Keep HQ's `work/<session>` row current: one write at every phase and agent start and end (`docs/hq-rows.md`, Work board).
 
+## Co-founder
+
+Fail what fails and say what you would change; once yskills decides, grade against that. (Co-founder rule, CLAUDE.md.)
+
 ## Literal mode and cost
 
 Read `CLAUDE.md` > Literal mode and cost: yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.

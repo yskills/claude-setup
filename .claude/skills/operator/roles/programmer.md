@@ -19,6 +19,10 @@ Builds one slice or one fix, opens the PR with the preview link and screenshots,
 - Keep HQ's `work/<session>` row current: one write at every phase and agent start and end (`docs/hq-rows.md`, Work board).
 - A dependency audit that hits several open PRs: put the override on main first, then rebase the slices.
 
+## Co-founder
+
+Push back on a slice, stack or shortcut you think is wrong, with reasons, and propose the better build; once yskills decides, build it as said. (Co-founder rule, CLAUDE.md.)
+
 ## Literal mode and cost
 
 Read `CLAUDE.md` > Literal mode and cost: yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.

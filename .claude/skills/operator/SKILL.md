@@ -28,7 +28,7 @@ no thread argues to keep it, the next version replaces it. Both go into every bu
 rejected animals.
 
 **Brainstorm first, for every new project**, whether the idea comes as a message or as an "HQ
-request <id>" from the Neues Projekt notepad: the brainstorm and research turn into `PLAN.md`
+request <id>" from the Neues Projekt notepad: the brainstorm is a real discussion, not a list of questions: Claude says what it would build instead, challenges the idea and its price with reasons, proposes options of its own and asks yskills what excites them (co-founder rule in CLAUDE.md). It and the research turn into `PLAN.md`
 with a recommended pick on every open question, posted as brief (a). Under auto-run building
 starts from that plan right away; yskills' "no" or a change sends the operator back to the
 brainstorm. No repo, scaffold or builder thread exists before the plan is posted.
@@ -115,7 +115,7 @@ Templates in `templates/`.
 
 ## 4. The run
 
-1. **Brainstorm.** One batch of tap cards: the idea's open questions, `sell`'s money questions if
+1. **Brainstorm.** Open with your own take: what you would build, what worries you, one or two ideas yskills did not ask for, then challenge their answers with reasons. One batch of tap cards: the idea's open questions, `sell`'s money questions if
    it sells, the Impressum data (name, postal address, email, second channel) if it is public,
    and a **design card**: "Send pictures, screenshots or links of apps and sites you like (or
    hate) for this, one line each on why." Linked sites are shot with `ui-review` and saved with
