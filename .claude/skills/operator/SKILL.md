@@ -113,8 +113,9 @@ Templates in `templates/`.
   To-dos and Company with every project's money). **A project never publishes its own office page.**
   The Project Manager writes the project's rows into HQ's db with `ArtifactData` (viewing costs no
   tokens, only these writes do) and republishes the template only when HQ itself changes (then
-  with `files: {"office-kit.js": "templates/office-kit.js"}`, the capabilities `db`, `assets` (`{}`, for
-  the character files) and the `mcp` send_message, all three restated whenever `capabilities` is passed, because
+  with `files: {"office-kit.js": "templates/office-kit.js"}`, the capabilities `db` (with its rule
+  `{path: "", read: "view", write: "admin"}`), `assets` (`{}`, for the character files) and the `mcp` send_message
+  (server "Claude Code Remote"), all three restated whenever `capabilities` is passed, because
   a non-empty set replaces the stored one; and `if_version` pins). At project start it plans the phases (brief (a)'s plan:
   research, plan, scaffold, one per slice or group of slices, launch, grow) and writes one batch,
   every `phases` and `team` id prefixed `<project>-` so projects never overwrite each other (`pm/now`
