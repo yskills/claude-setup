@@ -144,6 +144,10 @@ Templates in `templates/`.
   `amount` = euros newly earned since the last event, from Stripe or `/api/stats`, 10 XP and 1 coin
   each; test money counts as it shows as Testgeld). The page writes `visit-<day>` itself. The rule is
   `HQ.scoreFrom` in the template's `hq-rules` block, tested by `scripts/hq-rules.test.mjs`.
+  **Heute für dich:** the desk phone's page reads `today/now` (`{refreshedAt, items[{what, kind you|info,
+  source, at, link}], sources[{name, ok, note}]}`), filled from live sources by the refresher thread
+  (`hq-refresh.md`): HQ asks it on open when the list is over 30 minutes old, plus a daily 8:07 routine.
+  Rule: `HQ.todayFor`, `HQ.refreshDue`.
   **New project tap:** HQ's yellow notepad saves `requests/<id>` (`{text, at, status}`: `new` saved,
   `sent` the page reached the coordinator, `relayed` a thread passed it on, `started` the brainstorm
   thread runs, with `link`) and messages the coordinator with the Claude Code Remote connector's
