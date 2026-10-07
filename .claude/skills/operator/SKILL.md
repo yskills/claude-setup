@@ -112,6 +112,9 @@ Templates in `templates/`.
   publishes its own office page.** The Project Manager writes the project's rows into HQ's db with
   `ArtifactData`, in one batch with every `PROGRESS.md` write, exactly as `docs/hq-rows.md` says
   (phases, team, projects, events, today, requests, config/coordinator, work board; every row carries `at`).
+  **At every merge** it brings the project's `phases` rows true in that batch (merged step `done` with `link` and
+  `testableAt`, next step `active` with `sessions` and `testableAt`, `project` and `at` on each): HQ's Roadmap tab
+  shows only those rows (`docs/hq-rows.md`, Roadmap).
 
 ## 4. The run
 

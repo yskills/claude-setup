@@ -12,8 +12,8 @@ README, pin writes with `if_version`). At project start it plans the phases (bri
 research, plan, scaffold, one per slice or group of slices, launch, grow) and writes one batch,
 every `phases` and `team` id prefixed `<project>-` so projects never overwrite each other (`pm/now`
 is the Claude Setup project's own summary; any other project keeps its summary, live link and
-needs-you list in its `projects/<id>` row): `phases/<id>` (`name, order, state` = done, active or next, `why, goals[{name,
-done, total, link}]`; a slice's goal counts its passing criteria in `features.json`) and
+needs-you list in its `projects/<id>` row): `phases/<id>` (`project` = the project id, `name, order, state` = done, active or next, `why, goals[{name,
+done, total, link}]`, `testableAt` = when yskills can try it (ISO time, or a short German phrase that follows "Testbar", e.g. "nach dem Gate-Merge"), `link` = the PR or thread, `sessions[]` = the `work/<session>` ids working on it, `at`; a slice's goal counts its passing criteria in `features.json`) and
 `team/<id>` for the operator, each thread and each reviewer agent (`name, role, state` =
 working, blocked, waiting, idle or done, `task, next, with[ids], link, linkLabel, preview,
 order`; the desk follows the role word in `role` or the name: Project Manager, Researcher,
@@ -51,6 +51,13 @@ with `send_message` and sets the row to `relayed`. The page wakes the refresher 
 coordinator, and on every open with an old list. Other threads do neither (proven end to end 2026-10-07). The coordinator answers each such message with one
 `Researcher · <idea>` brainstorm thread whose brief names the request id, unless a thread for that
 id already runs (a resend repeats it); that thread sets the row to `started` with its thread link.
+
+**Roadmap:** HQ's Roadmap tab is one quest map per project, rendered only from these `phases` rows and the
+`work` rows they name (`HQ.questMap` in company-xy's `hq-rules.js`). A step shows as current only when its row is `active`
+and carries `project` and `at`; a row without `project` lands under "Ohne Projekt" and never counts as current. **At every
+merge** the Project Manager (or the gate thread, in the same batch as its events) brings the project's rows true: the merged
+step `done` with its PR in `link` and `testableAt` = when it went live, the next step `active` with its builder's session in
+`sessions` and its `testableAt`, every touched row with a fresh `at`. A wrong roadmap is fixed in the rows, never in the page.
 
 **Work board:** `work/<session>` (`{thread, title, link, role, at, phases: [{title, state, start,
 end, agents: [{label, model, state, start, end}]}]}`; states `running`, `done`, `failed`, `waiting`),
