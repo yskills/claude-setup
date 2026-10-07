@@ -5,6 +5,9 @@ rules, skills, agents, hooks and plugins. Built on
 [Everything Claude Code](https://github.com/affaan-m/ECC) (the Anthropic hackathon winner's
 setup), curated to this stack so it costs about a fifth of the context the full version does.
 
+Lost? [`docs/MAP.md`](docs/MAP.md) says where every part lives, what loads when, and which file
+is the one home of each rule.
+
 ## Install
 
 Needs Node 20+ (24 recommended), Git and Claude Code.

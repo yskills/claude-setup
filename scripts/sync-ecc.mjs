@@ -47,6 +47,14 @@ for (const r of cfg.rules) {
   cpSync(p, join(out, 'rules', 'ecc', r), { recursive: true });
 }
 for (const x of cfg.ruleExcludes ?? []) rmSync(join(out, 'rules', 'ecc', x), { force: true });
+// A vendored file may link to an ECC file we left out (an excluded rule, a skill not in the subset).
+// Keep the link text, drop the dead target, so no session goes looking for it.
+const walkMd = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walkMd(join(d, e.name)) : e.name.endsWith('.md') ? [join(d, e.name)] : []);
+for (const f of [...walkMd(join(out, 'rules', 'ecc')), ...cfg.skills.flatMap((s) => walkMd(join(out, 'skills', s)))]) {
+  const text = readFileSync(f, 'utf8');
+  const fixed = text.replace(/\[([^\]]+)\]\((\.{1,2}\/[^)#\s]+)\)/g, (m, label, target) => existsSync(join(dirname(f), target)) ? m : label);
+  if (fixed !== text) writeFileSync(f, fixed);
+}
 mkdirSync(join(root, 'licenses'), { recursive: true });
 cpSync(join(src, 'LICENSE'), join(root, 'licenses', 'ECC-LICENSE'));
 
