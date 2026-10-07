@@ -1,6 +1,6 @@
 ---
 name: ship-check
-description: Run the checks CI runs, then have fresh code-reviewer agents review the diff until clean, before any push or PR update. Use whenever work is about to be committed, pushed, or called done.
+description: "Run what CI runs, then fresh reviewers on the diff until clean. Use before any push, PR update or \"done\"."
 ---
 
 # Ship check

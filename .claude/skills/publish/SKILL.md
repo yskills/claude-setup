@@ -1,6 +1,6 @@
 ---
 name: publish
-description: How a web app deploys - Cloudflare Workers Builds for the live site, a Worker Preview per branch, no keys in GitHub. Use when setting up, changing or debugging a project's deploys or previews.
+description: "How a web app deploys: Cloudflare Workers Builds, a Worker Preview per branch, no keys in GitHub. Use when setting up or debugging deploys."
 ---
 
 # Publish a web app

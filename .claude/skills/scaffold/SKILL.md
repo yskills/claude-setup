@@ -1,6 +1,6 @@
 ---
 name: scaffold
-description: The exact file list for a new project's skeleton, in order (node version, scripts, framework, Tailwind, Pinia, i18n, wrangler and D1, CLAUDE.md and CI, legal pages, plan files, env and gitignore, README, plugins). Use for the scaffold thread of operator step 4, so no project re-derives its skeleton.
+description: "The file list for a new project skeleton, in order. Use for the scaffold thread of operator step 4."
 ---
 
 # Scaffold

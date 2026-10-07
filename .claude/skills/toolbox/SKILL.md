@@ -1,6 +1,6 @@
 ---
 name: toolbox
-description: Pick and wire in the right tools for a project - plugins, MCP servers, APIs, libraries and extra skills - for any capability (video and audio editing, AI generation, LLM features, payments, ads, auth, email, analytics, social posting, mobile, scraping, 3D/games). Use when starting a new project or PRD, when adding a capability to an existing one, or when asked what an app needs.
+description: "Pick and wire plugins, MCP servers, APIs and libraries for a capability (video, AI, payments, email, 3D...). Use at project start or when adding a capability."
 ---
 
 # Toolbox

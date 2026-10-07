@@ -1,6 +1,6 @@
 ---
 name: store
-description: Use when a project ships to the Apple App Store or Google Play - wrapping the Vue or Nuxt app with Capacitor, in-app subscriptions with RevenueCat, paywall and free trial choices, TestFlight and Play testing tracks, App Review rejections (4.2 minimum functionality, 3.1.1 in-app purchase), store listings, or a PLAN.md that says iOS, Android or "an app in the store".
+description: "Ship to App Store or Google Play: Capacitor, RevenueCat, TestFlight, review rejections, listings. Use when PLAN.md says iOS or Android."
 ---
 
 # Store

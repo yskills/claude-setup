@@ -1,6 +1,6 @@
 ---
 name: sell
-description: Take money in a project from Germany - pages that bill (one-off or subscription), digital products, or a physical product with shipping. Covers the first-batch questions and keys, Stripe Checkout on Cloudflare Workers, orders and shipping labels, German/EU shop law, go-live and a dated re-check table. Use whenever an app or PRD sells something, has a shop, cart, checkout, pricing, billing, invoices or shipping.
+description: "Take money from Germany: Stripe Checkout, subscriptions, digital or physical products, shop law, go-live. Use for any billing, shop or pricing work."
 ---
 
 # Sell

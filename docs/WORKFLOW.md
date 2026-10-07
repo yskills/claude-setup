@@ -42,7 +42,7 @@ One rule, applied by the project chat when it starts a thread (`start_thread_ses
 | Architecture and plans: the plan of a new project, a redesign, anything decided once | **Fable** `claude-fable-5-1` | `architect` agent, Architect threads, the project chat while it plans |
 | Build slices and anything with design or judgement | **Opus** `claude-opus-5-5` | `planner`, Programmer slice threads, Designer threads, `design-critic`, `build-error-resolver`, `refactor-cleaner` |
 | Follow-ups, small fixes, data wiring, tests, reviews, research | **Sonnet** `claude-sonnet-5-5` | gate threads, fix threads, reviewers, `evaluator`, `red-team`, `legal-reviewer`, research subagents, built-in subagents |
-| Bulk text with no judgement | Haiku | `doc-updater` |
+| Bulk text with no judgement, simple reading jobs (find, list, summarise a file) | Haiku | `doc-updater`, subagents that only read and report |
 
 Agent files use the aliases `fable`, `opus`, `sonnet`, `haiku`, which follow the newest model of
 each family; thread starts pass the full ids above. Rule of thumb: a thread that decides

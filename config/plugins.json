@@ -49,26 +49,6 @@
       "tokens": 105
     },
     {
-      "id": "code-simplifier@claude-plugins-official",
-      "why": "clean up code after a feature lands",
-      "tokens": 66
-    },
-    {
-      "id": "feature-dev@claude-plugins-official",
-      "why": "guided feature workflow with explorer and architect agents",
-      "tokens": 240
-    },
-    {
-      "id": "claude-md-management@claude-plugins-official",
-      "why": "keep each repo's CLAUDE.md accurate",
-      "tokens": 177
-    },
-    {
-      "id": "claude-code-setup@claude-plugins-official",
-      "why": "recommends hooks, skills and MCP servers for a repo",
-      "tokens": 141
-    },
-    {
       "id": "skill-creator@claude-plugins-official",
       "why": "build and test new skills (PC only: cloud threads have Anthropic's skill-creator built in)",
       "tokens": 114,
@@ -128,6 +108,22 @@
     {
       "id": "claude-api@anthropic-agent-skills",
       "why": "Claude Code bundles the claude-api skill"
+    },
+    {
+      "id": "code-simplifier@claude-plugins-official",
+      "why": "rarely used; its skill listing cost ~66 tokens in every session (token diet 2026-10-07). Add per project when needed"
+    },
+    {
+      "id": "feature-dev@claude-plugins-official",
+      "why": "rarely used; its skill listing cost ~240 tokens in every session (token diet 2026-10-07). Add per project when needed"
+    },
+    {
+      "id": "claude-md-management@claude-plugins-official",
+      "why": "rarely used; its skill listing cost ~177 tokens in every session (token diet 2026-10-07). Add per project when needed"
+    },
+    {
+      "id": "claude-code-setup@claude-plugins-official",
+      "why": "rarely used; its skill listing cost ~141 tokens in every session (token diet 2026-10-07). Add per project when needed"
     }
   ]
 }

@@ -1,6 +1,6 @@
 ---
 name: seo
-description: Audit, plan, and implement SEO improvements across technical SEO, on-page optimization, structured data, Core Web Vitals, and content strategy. Use when the user wants better search visibility, SEO remediation, schema markup, sitemap/robots work, or keyword mapping.
+description: "SEO audit and fixes: technical SEO, on-page, structured data, Core Web Vitals. Use for search visibility work."
 metadata:
   origin: ECC
 ---

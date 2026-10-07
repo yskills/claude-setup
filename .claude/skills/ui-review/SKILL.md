@@ -1,6 +1,6 @@
 ---
 name: ui-review
-description: Screenshot a running web app (or any URL) at phone and desktop size with headless Chromium, look at the images, and get a design-critic review. Use after any UI change, before opening a PR, and to capture design references.
+description: "Screenshot a web app at phone and desktop size, then design-critic review. Use after any UI change, before the PR."
 ---
 
 # UI review
