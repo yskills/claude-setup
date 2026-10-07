@@ -26,6 +26,7 @@ Read only the catalog files that match (each one is a short table with picks and
 | `catalog/growth.md` | analytics, SEO, social publishing, email, marketing, A/B tests (the plan itself: the `market` skill) |
 | `catalog/app-platform.md` | auth, databases, storage, jobs, realtime, mobile and desktop, hosting, docs/PDF |
 | `catalog/data-web.md` | search, scraping, browser automation, 3D and games, maps |
+| `catalog/roblox.md` | Roblox games: tests, cloud runs, Studio MCP screenshots and play |
 | `catalog/claude-addons.md` | add-ons for Claude Code itself that videos push: token savers, model routers, rule packs |
 
 Then search live, because tools change faster than the catalog (dated at the top of each file):
