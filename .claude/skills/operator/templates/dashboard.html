@@ -1317,9 +1317,9 @@ function maybeAsk() {
 }
 $('today-go').addEventListener('click', () => askRefresh(true))
 /* Once a day HQ opens on this page by itself, when yskills lands on the desk and something needs them */
-let greeted = false
+let greeted = false, pmIn = false
 function greet(t) {
-  if (greeted || !todayRow) return
+  if (greeted || !todayRow || !pmIn) return
   greeted = true
   let seen = null
   try { seen = localStorage.getItem('hq-today-seen') } catch {}
@@ -2723,7 +2723,7 @@ renderTeam([]); renderSkinSwitch()
   $('dot').classList.add('on')
   const fail = () => { $('dot').classList.remove('on'); $('greet').textContent = 'Live updates stopped; reload the page' }
   hqDb = db
-  db.doc('pm/now').onSnapshot((s) => { pmNow = s.exists ? s.data() : null; renderPm(pmNow) }, fail)
+  db.doc('pm/now').onSnapshot((s) => { pmNow = s.exists ? s.data() : null; pmIn = true; if (pmNow) renderPm(pmNow); else renderToday() }, fail)
   db.doc('today/now').onSnapshot((s) => { todayRow = s.exists ? s.data() : {}; renderToday(); askIn.today = true; maybeAsk() }, () => {})
   db.doc('config/refresher').onSnapshot((s) => { refresher = s.exists ? s.data() : null; askIn.cfg = true; maybeAsk() }, () => {})
   db.doc('today/ask').onSnapshot((s) => { askedAt = s.exists ? s.data().at : null; askIn.ask = true; maybeAsk() }, () => {})
