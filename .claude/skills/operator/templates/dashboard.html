@@ -237,12 +237,16 @@ ol,ul{margin:0;padding:0;list-style:none}
 :root[data-theme="dark"] .slip{background:#2f4058;color:#cfe2ee}:root[data-theme="dark"] .slip b{color:#e3f1f8}
 /* Second character skin: the visit's text box (a visual-novel line under a name tab), the roster cards, the toggle */
 .scene{position:absolute;z-index:7;left:10px;right:10px;bottom:calc(96px + env(safe-area-inset-bottom,0px));padding:22px 18px 16px;border-radius:22px;display:grid;gap:12px}
-@media (min-width:760px){.scene{left:50%;right:auto;width:560px;transform:translateX(-50%);bottom:110px}}
+/* On wide screens the card stands beside her, never over her */
+@media (min-width:760px){.scene{left:auto;right:max(24px,calc(50% - 640px));width:420px;bottom:auto;top:50%;transform:translateY(-50%)}}
+.scene:focus{outline:none}
 .sc-head{position:absolute;top:-16px;left:18px;display:flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;background:#f29bb0;color:#fff;box-shadow:0 3px 0 rgba(122,84,52,.2)}
 .sc-head b{font:900 15px var(--sans)}
 .sc-line{margin:0;font:700 17px/1.5 var(--sans)}
 .sc-acts{display:flex;flex-wrap:wrap;gap:8px}
-.sc-acts .btn{white-space:normal;text-align:left}
+.sc-acts .btn{white-space:normal;text-align:left;min-height:44px}
+.sc-acts .btn.reply{flex:1 1 100%}
+.sc-acts .btn.bye{background:none;box-shadow:none;color:var(--muted,inherit);text-decoration:underline}
 .hearts{display:inline-flex;gap:2px}
 .hearts svg{width:14px;height:14px;fill:rgba(255,255,255,.35)}
 .hearts svg.on{fill:#fff}
@@ -252,12 +256,13 @@ ol,ul{margin:0;padding:0;list-style:none}
 .skin [aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-ink)}
 .vcards{display:grid;gap:10px}
 .vcard{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;padding:10px;border-radius:16px;border:2px solid var(--line);background:var(--bg)}
-.vcard .pic{width:64px;height:84px;border-radius:12px;background:#f6dbe2;overflow:hidden}
+.vcard .pic{width:64px;height:84px;border-radius:12px;background:#f6dbe2;overflow:hidden;display:grid;place-items:center;font:900 28px var(--sans);color:#c66f86}
 .vcard .pic img{width:100%;height:100%;object-fit:cover}
 .vcard .info{display:grid;gap:4px;align-content:start}
 .vcard .meta{font-size:12.5px;color:var(--soft);font-weight:600}
 .vcard .ctl{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .vcard select,.add select{font:800 13px var(--sans);color:var(--fg);background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:5px 10px}
+.btn.quiet{background:none;box-shadow:none;text-decoration:underline;color:#b5462f}
 .btn.file{position:relative;overflow:hidden}.btn.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
 </style>
 
@@ -272,7 +277,7 @@ ol,ul{margin:0;padding:0;list-style:none}
     <div class="stage-msg" id="stage-msg" hidden>The 3D office didn't load here. Team, Plan and Company still work from the dock.</div>
   </div>
 
-  <div class="card scene" id="scene" role="dialog" aria-labelledby="scene-name" hidden>
+  <div class="card scene" id="scene" role="dialog" aria-labelledby="scene-name" tabindex="-1" hidden>
     <div class="sc-head"><b id="scene-name"></b><span id="scene-bond"></span></div>
     <p class="sc-line" id="scene-line" aria-live="polite"></p>
     <div class="sc-acts" id="scene-acts"></div>
@@ -967,6 +972,7 @@ window.CARDS_3D = (() => {
   /* Clips. Sitting clips put the hips on the chair (the seat is where the animal's body sits); walking, dancing and the
      visit's standing clips keep the feet on the floor. Rotations are on the normalized bones (T-pose = 0). */
   const BONES = ['hips', 'spine', 'chest', 'neck', 'head', 'leftUpperArm', 'rightUpperArm', 'leftLowerArm', 'rightLowerArm', 'leftHand', 'rightHand', 'leftUpperLeg', 'rightUpperLeg', 'leftLowerLeg', 'rightLowerLeg', 'leftFoot', 'rightFoot']
+  const FINGERS = ['Index', 'Middle', 'Ring', 'Little']
   const FACES = ['happy', 'relaxed', 'sad', 'angry', 'surprised', 'blink', 'aa']
   const STAND = new Set(['walk', 'dance', 'stand', 'hello', 'joy', 'shy', 'pout', 'spin', 'bye'])
   function pose(c, clip, t, dt = 0) {
@@ -976,6 +982,8 @@ window.CARDS_3D = (() => {
     const m = c.vrm0 ? -1 : 1
     const r = (n, x = 0, y = 0, z = 0) => b(n)?.rotation.set(x * m, y, z * m)
     for (const n of BONES) r(n)
+    /* Fingers rest softly curled, never spread flat as in the T-pose */
+    for (const [s, side] of [[-1, 'left'], [1, 'right']]) for (const f of FINGERS) for (const j of ['Proximal', 'Intermediate', 'Distal']) r(`${side}${f}${j}`, 0, 0, s * 0.45)
     const face = {}
     const sit = !STAND.has(clip)
     c.root.position.set(0, sit ? 0.06 - c.hipY : 0, sit ? -0.08 : 0)
@@ -998,7 +1006,7 @@ window.CARDS_3D = (() => {
       const k = Math.sin(t * 1.8); r('spine', k * 0.015); r('head', -0.04, 0, k * 0.03); face.relaxed = 0.25
       if (clip === 'joy') { c.root.position.y = Math.abs(Math.sin(t * 7)) * 0.05; r('leftUpperArm', 0, 0, 0.5); r('rightUpperArm', 0, 0, -0.5); r('leftLowerArm', 0, 0, 0.9); r('rightLowerArm', 0, 0, -0.9); face.happy = 1; face.relaxed = 0 }
       if (clip === 'shy') { r('head', 0.18, 0.25, 0.15); r('leftUpperArm', 0.5, -0.5, -1.0); r('rightUpperArm', 0.5, 0.5, 1.0); r('leftLowerArm', 0, -1.2, 0); r('rightLowerArm', 0, 1.2, 0); face.happy = 0.6 }
-      if (clip === 'pout') { r('head', -0.06, -0.3, -0.05); r('leftUpperArm', 0.3, -0.7, -1.0); r('rightUpperArm', 0.3, 0.7, 1.0); r('leftLowerArm', 0, -2.0, 0); r('rightLowerArm', 0, 2.0, 0); face.angry = 0.55; face.relaxed = 0 }
+      if (clip === 'pout') { r('head', -0.06, -0.3, -0.05); r('leftUpperArm', 0.3, -0.7, -1.0); r('rightUpperArm', 0.3, 0.7, 1.0); r('leftLowerArm', 0, -2.0, 0); r('rightLowerArm', 0, 2.0, 0); face.angry = 0.75; face.relaxed = 0 }
       if (clip === 'spin') { c.root.rotation.y = (t % 1.2) / 1.2 * Math.PI * 2; face.happy = 0.8 } else c.root.rotation.y = 0
     }
     /* A blink every few seconds, unless the clip shuts the eyes */
@@ -1084,7 +1092,7 @@ function fillSheet(key) {
   const own = skinOn && cardOf(HQ.seating(desks, cards)[key])
   if (own) {
     const b = bondFor(own), box = el('div', 'vcard'), pic = el('div', 'pic'), info = el('div', 'info'), u = thumbUrl(own)
-    if (u) { const img = el('img'); img.src = u; img.alt = ''; pic.append(img) }
+    if (u) { const img = el('img'); img.src = u; img.alt = ''; pic.append(img) } else pic.textContent = (own.name || '?').slice(0, 1).toUpperCase()
     info.append(el('b', null, own.name), hearts(b.level), el('span', 'meta', b.toNext == null ? 'Bindung voll' : `Noch ${b.toNext} bis Bindung ${b.level + 1} · heute ${b.callsLeft} von ${HQ.CALLS_A_DAY} Anrufen`))
     const call = el('button', 'btn go', 'Ins Büro rufen'); call.type = 'button'; call.disabled = !room
     call.addEventListener('click', () => callIn(own.id, call)); info.append(call)
@@ -1668,7 +1676,8 @@ async function buildRoom() {
       if (!x.el) continue
       v.copy(x.anchor).project(camera)
       const off = v.z > 1 || Math.abs(v.x) > 1.02 || Math.abs(v.y) > 1.02
-      x.el.hidden = off
+      /* During a visit she is the only thing to look at: the room's labels step aside */
+      x.el.hidden = off || !!visit
       if (!off) x.el.style.transform = `translate(${((v.x + 1) / 2) * w}px, ${((1 - v.y) / 2) * h}px) translate(-50%,-100%)`
     }
     const n = desk$.todos; hot.find((x) => x.go === 'todo').el.firstChild.textContent = n ? `To-dos · ${n}` : 'To-dos'
@@ -1691,7 +1700,7 @@ async function buildRoom() {
 
   /* A visit (the second skin's call into the office): she opens the door, walks to the desk, acts out her replies
      while looking at yskills, and walks out again */
-  const DOOR_Z = -R + 0.25, STOP_Z = 0.15, WALK = 0.9, clk = new T.Clock()
+  const DOOR_Z = -R + 0.25, STOP_Z = 0.45, WALK = 0.9, clk = new T.Clock()
   let visit = null
   const doorTo = (open, dt) => { hinge.rotation.y += ((open ? -1.25 : 0) - hinge.rotation.y) * Math.min(1, dt * 4) }
   function stepVisit(dt) {
@@ -2293,7 +2302,9 @@ function buildOffice() {
   function wear(key, card, items = []) {
     const s = seats[key]
     if (s.card && s.card !== card) CARDS_3D.dispose(s.card)
-    s.extras?.removeFromParent(); s.extras = null
+    const itemsKey = card ? items.join() : null
+    if (s.card === (card || null) && s.itemsKey === itemsKey) return
+    s.extras?.traverse((o) => { o.geometry?.dispose(); o.material?.dispose() }); s.extras?.removeFromParent(); s.extras = null; s.itemsKey = itemsKey
     s.card = card || null; s.rig.group.visible = !s.card; s.h = s.card ? s.card.tag : s.rig.height
     if (!s.card) return
     s.who.add(s.card.group); s.card.group.rotation.y = s.rig.group.rotation.y
@@ -2349,7 +2360,8 @@ function buildOffice() {
    The 4-digit code only keeps the skin out of sight on a shared screen; it is a convenience, not security. Cards,
    who sits where and each card's bond live in the db (cards/<id>, roster/desks, bond/<id>), the files in the
    artifact's assets. A tap on a card's desk calls her into the desk room for a short visit. ---------- */
-const OFFICE_H = 2.4, ROOM_H = 1.62, MAX_BYTES = 15 * 1024 * 1024
+/* 14 MB: a card stored as base64 text grows by a third and must stay under the asset store's 20 MiB limit */
+const OFFICE_H = 2.4, ROOM_H = 1.62, MAX_BYTES = 14 * 1024 * 1024
 const cardOf = (id) => cards.find((c) => c.id === id)
 const bondFor = (c) => HQ.bondOf({ ...bonds[c.id], since: c.added }, eventsAll)
 const outfitFor = (c, b = bondFor(c)) => Math.max(0, Math.min(Number(bonds[c.id]?.wear) || 0, b.outfits - 1, (c.outfits?.length || 1) - 1))
@@ -2424,8 +2436,11 @@ function openPanel(from, title, what) {
 const VOICE_NAMES = { warm: 'herzlich', frech: 'frech', stolz: 'stolz', ruhig: 'ruhig', scheu: 'schüchtern' }
 async function storeVrm(file, assets, said) {
   if (!/\.vrm$/i.test(file.name)) throw new Error('Das ist keine .vrm-Datei.')
-  if (file.size > MAX_BYTES) throw new Error('Zu groß (über 15 MB). In VRoid Studio beim Export die Texturen auf 1024 stellen.')
-  const buf = await file.arrayBuffer(), meta = CARDS_3D.readMeta(buf)
+  if (file.size > MAX_BYTES) throw new Error('Zu groß (über 14 MB). In VRoid Studio beim Export die Texturen auf 1024 stellen.')
+  const buf = await file.arrayBuffer()
+  /* Any broken or odd file (cut short, bad header) reads as "not a model", never as a raw error */
+  let meta
+  try { meta = CARDS_3D.readMeta(buf) } catch { throw new Error('Die Datei ist kein VRM-Modell.') }
   said.textContent = 'Wird hochgeladen…'
   let up
   try { up = await assets.upload(new Blob([buf]), { type: 'model/gltf-binary' }) } catch (e) {
@@ -2437,19 +2452,22 @@ async function storeVrm(file, assets, said) {
 }
 async function openRoster(from) {
   openPanel(from, 'Figuren', 'Deine eigenen Figuren aus VRoid Studio. Jede sitzt an einem Schreibtisch oder wartet auf der Bank.')
-  rosterOpen = true; fillRoster()
+  closePage(); rosterOpen = true; fillRoster()
 }
+let rosterRun = 0
 async function fillRoster() {
   if (!rosterOpen) return
-  const body = $('sheet-body'); body.replaceChildren()
+  const run = ++rosterRun, body = $('sheet-body')
   const assets = await window.claude?.use?.('assets').catch(() => null)
-  if (!rosterOpen) return
+  /* Snapshots can land together: only the newest render may draw */
+  if (!rosterOpen || run !== rosterRun) return
+  body.replaceChildren()
   const can = !!(assets && hqDb)
   const list = el('div', 'vcards')
   if (!cards.length) list.append(el('p', 'empty', 'Noch keine Figuren. Exportiere eine Figur in VRoid Studio als .vrm und füge sie hier hinzu.'))
   for (const c of cards) {
     const b = bondFor(c), item = el('div', 'vcard')
-    const pic = el('div', 'pic'); const u = thumbUrl(c); if (u) { const img = el('img'); img.src = u; img.alt = ''; pic.append(img) }
+    const pic = el('div', 'pic'); const u = thumbUrl(c); if (u) { const img = el('img'); img.src = u; img.alt = ''; pic.append(img) } else pic.textContent = (c.name || '?').slice(0, 1).toUpperCase()
     const info = el('div', 'info')
     const nm = el('b', null, c.name || 'Ohne Namen'); info.append(nm, hearts(b.level))
     info.append(el('span', 'meta', `${VOICE_NAMES[c.voice] || 'herzlich'} · ${c.author ? `von ${c.author}` : 'Autor unbekannt'} · ${c.share ? 'Weitergabe erlaubt' : 'Weitergabe nicht erlaubt'}`))
@@ -2465,12 +2483,13 @@ async function fillRoster() {
       const add = el('label', 'btn file', `Outfit ${c.outfits.length + 1} hinzufügen`), f = el('input'); f.type = 'file'; f.accept = '.vrm'; add.append(f)
       f.addEventListener('change', async () => {
         const said = info.querySelector('.said') || info.appendChild(el('p', 'said'))
+        if (!f.files[0]) return
         try { const { up } = await storeVrm(f.files[0], assets, said); await hqDb.doc(`cards/${c.id}`).update({ outfits: [...c.outfits, { asset: up.id, label: f.files[0].name.replace(/\.vrm$/i, '').slice(0, 24) }] }) } catch (e) { said.textContent = e.message || 'Hochladen hat nicht geklappt.' }
       })
       ctl.append(add)
     }
     if (can) {
-      const del = el('button', 'btn', 'Entfernen'); del.type = 'button'
+      const del = el('button', 'btn quiet', 'Entfernen'); del.type = 'button'
       del.addEventListener('click', async () => {
         if (del.dataset.sure !== '1') { del.dataset.sure = '1'; del.textContent = 'Wirklich entfernen?'; return }
         await hqDb.doc('roster/desks').set(HQ.seatCard(desks, seated, null)).catch(() => {})
@@ -2532,7 +2551,7 @@ function say(c, line, buttons) {
   $('scene-bond').replaceChildren(hearts(bondFor(c).level))
   const acts = $('scene-acts'); acts.replaceChildren()
   for (const [text, fn, cls] of buttons) { const b = el('button', `btn ${cls || ''}`, text); b.type = 'button'; b.addEventListener('click', fn); acts.append(b) }
-  $('scene').hidden = false; acts.querySelector('button')?.focus()
+  $('scene').hidden = false; $('scene').focus({ preventScroll: true })
 }
 async function callIn(id, from) {
   const c = cardOf(id); if (!c || !room) return
@@ -2546,22 +2565,25 @@ async function callIn(id, from) {
   if (visitOn !== token) return
   const seat = Object.entries(HQ.seating(desks, cards)).find(([, x]) => x === id)?.[0]
   const m = team.find((x) => x.seat === seat), task = String(m?.task || '').slice(0, 80) || 'meiner Aufgabe'
-  say(c, `${OPEN[c.voice] || OPEN.warm} ${MOOD[HQ.moodOf(m ? stateOf(m.state) : 'off')](task)}`, [['Weiter', () => ask(c, token)], ['Tschüss', endVisit]])
+  say(c, `${OPEN[c.voice] || OPEN.warm} ${MOOD[HQ.moodOf(m ? stateOf(m.state) : 'off')](task)}`, [['Weiter', () => ask(c, token), 'go'], ['Tschüss', endVisit, 'bye']])
 }
 function ask(c, token) {
   const before = bondFor(c), n = sceneOf(c, before), [line, replies] = SCENES[n]
-  say(c, line, replies.map(([text, score, clip, answer]) => [text, async () => {
+  /* Replies in a new order each time, so the best one is never simply the first */
+  const mixed = [...replies].sort(() => Math.random() - 0.5)
+  say(c, line, mixed.map(([text, score, clip, answer]) => [text, async () => {
     if (visitOn !== token) return
     room.react(clip)
     const old = bonds[c.id] || {}, next = HQ.afterCall(old, score)
     const seen = [...new Set([...(Array.isArray(old.seen) ? old.seen : []), n])]
     const after = HQ.bondOf({ ...next, since: c.added }, eventsAll)
-    if (hqDb) await hqDb.doc(`bond/${c.id}`).set({ ...old, ...next, seen }).catch(() => {})
+    if (hqDb) await hqDb.doc(`bond/${c.id}`).set({ ...old, ...next, seen }).catch((e) => console.error('bond', e))
+    if (visitOn !== token) return
     const pay = next.added ? `+${next.added} Bindung.` : 'Heute zählen keine Anrufe mehr. Morgen wieder.'
     const up = after.level > before.level ? ` Bindung ${after.level}! ${GOT[after.level] || ''}` : ''
     const outfits = Math.min(after.outfits, c.outfits?.length || 1)
     say(c, `${answer} ${pay}${up}`, [...(outfits > 1 ? [['Outfit wechseln', () => wardrobe(c, token, outfits)]] : []), ['Tschüss', endVisit, 'go']])
-  }]).concat([['Tschüss', endVisit]]))
+  }, 'reply']).concat([['Tschüss', endVisit, 'bye']]))
 }
 function wardrobe(c, token, outfits) {
   say(c, 'Was soll ich anziehen?', c.outfits.slice(0, outfits).map((o, i) => [o.label || `Outfit ${i + 1}`, async () => {
@@ -2570,7 +2592,8 @@ function wardrobe(c, token, outfits) {
     const fig = await CARDS_3D.make(room.T, o.asset, ROOM_H).catch(() => null)
     if (!fig || visitOn !== token) return fig && CARDS_3D.dispose(fig)
     room.swap(fig)
-    if (hqDb) await hqDb.doc(`bond/${c.id}`).set({ ...(bonds[c.id] || {}), wear: i }).catch(() => {})
+    if (hqDb) await hqDb.doc(`bond/${c.id}`).set({ ...(bonds[c.id] || {}), wear: i }).catch((e) => console.error('bond', e))
+    if (visitOn !== token) return
     room.react('joy', 2.5); say(c, 'Und? Gefällt es dir?', [['Tschüss', endVisit, 'go']])
   }]).concat([['Tschüss', endVisit]]))
 }
