@@ -130,13 +130,31 @@ Templates in `templates/`.
      `SearchSkills` and `SearchMcpRegistry` search the Anthropic Directory (Figma, Canva, legal
      plugins...). Every pick from outside the official marketplace is read before it is used.
      Picks go into `PLAN.md`; the scaffold adds them to this project only.
-   - **Money** (if it should earn): three pieces of evidence people already pay for this. None →
-     brief (a) recommends no or a smaller first version. This shows that others earn, not that
-     yskills can find buyers; the probe (step 5) tests that.
+   - **Demand probe** (if it should earn; the `product-lens` skill, Mode 1): one page,
+     `docs/demand-probe.md`, before any repo or build slice: who pays (one specific person),
+     where they are (the channel the probe will use), three signals checked with WebSearch (people
+     already pay for this, people complain about the gap, a competitor's price), and a go or
+     no-go. No-go → brief (a) recommends no or a smaller first version. This shows that others
+     earn, not that yskills can find buyers; the probe slice (step 5) tests that.
    - **Legal:** the `legal` skill's table for this idea.
 3. **Plan.** `planner` proposes; the operator writes `PLAN.md` and `features.json`. **Brief (a).**
    Its one task for yskills: create the private repo (threads get 403 on `create_repository`);
    then `add_repo` it.
+   **Day one in HQ** (the same hour as brief (a), one `ArtifactData` batch, every row with `at`, as
+   `docs/hq-rows.md` says): the `projects/<id>` row (`state` active, `revenueMode` test, traction
+   fields 0, `firstEuroBy` = PLAN.md's go date), the `<id>-` phases and `team` rows, a `work/<session>`
+   row for every thread started (phase, agents, `at`), and, if the project should earn, the **first
+   euro list** as `you[]` with `firstSeen` = now: Gewerbe (link: the Gewerbeamt's online form for
+   yskills' town, found with WebSearch, never guessed), tax registration (https://www.elster.de),
+   Stripe live (https://dashboard.stripe.com/account/onboarding), Impressum data (the repo file that holds it,
+   as a GitHub link) and mail for the order confirmation. Each `what` is one German sentence with a
+   verb; steps are ticked off by deleting the entry. Nothing waits for them except the live key.
+   **Cross-project reach.** A project chat starts its own threads (`start_thread_session`) and
+   messages another project's chat by session id (`send_message`, id from that project's
+   `config/coordinator` row). **In its first minute** the project chat checks it has
+   `create_session` and `send_message` (a ToolSearch each) and writes the result into its own
+   `config/coordinator` row (`{session, at, tools: {create_session, send_message}}`); a missing
+   tool is one line to yskills and the threads fall back to the coordinator relay (§ Starting threads).
 4. **Scaffold + design.** Scaffold thread: "Scaffold PLAN.md's app on branch `scaffold` with
    the `scaffold` skill (its file list, in order). Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
    directions. **Brief (b)** carries only what every build needs: the Cloudflare import and the D1

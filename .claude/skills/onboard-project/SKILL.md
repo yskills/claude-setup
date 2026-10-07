@@ -59,7 +59,10 @@ Add `.shots/` to `.gitignore`.
 Setup HQ Artifact (`operator` skill, Dashboard bullet), never a page of its own. From what the repo
 shows (README, open PRs and issues, `PROGRESS.md` or `PLAN.md` if present, recent commits) write a short
 plan of 3-5 phases with goals, then write the `projects/<id>` row and the `<id>-` prefixed `phases`
-and `team` rows into HQ exactly as that bullet says. Note in the repo's `PROGRESS.md` (create it if
+and `team` rows into HQ exactly as that bullet says. Add the day-one rows (operator skill, step 3): `work/<session>` per running thread, and for a repo
+meant to earn the first euro list in `you[]`. Before the first new slice of a repo meant to earn,
+run the demand probe: `product-lens` Mode 1 on one page, `docs/demand-probe.md` (who pays, where
+they are, three signals, go or no-go). Note in the repo's `PROGRESS.md` (create it if
 missing) that HQ carries the project, so every later session updates the same rows.
 
 ## 4. Prove it and ship

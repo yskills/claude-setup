@@ -63,3 +63,11 @@ up front as `waiting`, then flip each to `running` (with `start`) and `done` or 
 a subagent the phase starts goes into its `agents` with its `label` (agent type) and `model`. Times
 are ISO from the real clock (`date -u +%FT%TZ`), never guessed. A finished thread leaves its row (it
 greys after 2 hours). Rule: `HQ.workTree` and `HQ.busyRoles` in company-xy's `hq-rules.js`.
+
+**Day one:** a new project writes, in the hour its plan is posted and in one batch, `projects/<id>`
+(traction fields 0, `firstEuroBy` = PLAN.md's go date, `revenueMode: 'test'`), the `<id>-` `phases` and
+`team` rows, one `work/<session>` row per thread started, and for a project meant to earn the
+**first euro list** in its `you[]` (`firstSeen` = now): Gewerbe, ELSTER tax registration, Stripe live,
+Impressum data, order-mail. Gewerbe links to the town's online form (searched, never guessed). Details:
+operator skill, step 3. `config/coordinator` also carries `tools: {create_session, send_message}`, the
+project chat's first-minute check.
