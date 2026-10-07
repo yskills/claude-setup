@@ -24,7 +24,7 @@ Push back on a slice, stack or shortcut you think is wrong, with reasons, and pr
 
 ## Literal mode and cost
 
-Read `CLAUDE.md` > Literal mode and cost: yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.
+The first block of every brief (`briefs.md`, "Every thread brief starts with"; CLAUDE.md has no such section): yskills' words are orders done as said (no "yes, but", no offers, no alternatives when they ask for one thing); shortest reply; no extra subagents, research, screenshots or re-reads; Sonnet unless the work is design or architecture; simple reading jobs go to Haiku subagents.
 
 ## Lessons
 
