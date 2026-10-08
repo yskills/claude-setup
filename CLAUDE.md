@@ -36,7 +36,17 @@ goes in its home only, everywhere else links it.
   (keys, domain, Gewerbe). Otherwise pick the sensible default, say which, keep going.
 - "Stop", "pause" and taste calls (a rejected asset or look) are final: stop at once, never argue.
 - Choices go out as tappable options (`AskUserQuestion` in Claude Code, a decision card in
-  threads): short labels, recommendation first, multi-select when several answers can apply.
+  projects): short labels, recommendation first, multi-select when several answers can apply.
+  In a claude.ai project only the Project Manager (coordinator) posts a vote, in the project
+  chat, never only inside a thread (2026-10-08); a thread sends it the options
+  (`get_channel_session_id`, then `send_message`) and goes on with its recommendation. When the
+  options look different (design, art, layout), a Designer thread first makes them with UI/UX
+  review (`ui-review`, `design-critic`), and the options come as desktop screenshots (1440px) in one
+  click-through gallery (an Artifact: arrows and ←/→ keys, a counter, each option's name and one
+  line) linked in the vote post, never loose image attachments; never a vote on words alone.
+- yskills reads only the project chat (2026-10-08) and opens a thread only when something is
+  wrong: the coordinator posts every important result, milestone and link from the threads there
+  in a line or two.
 - A step only yskills can do: one line on why, then numbered steps with the exact official deep
   link and the exact names to type.
 - Replies: short and informal like yskills' messages. Lead with the result, then what they need
