@@ -153,6 +153,17 @@ Claude:
   `check_run.head_sha` (`github.sha` on the weekly run). A green Workers Builds check and a 200 prove neither: on 2026-10-05
   duo-test's main builds passed for hours while a day-old version stayed live.
 
+## Delete a project
+
+`delete-project` (Actions → Run workflow, or a thread's `actions_run_trigger` `run_workflow` on
+`delete-project.yml`, ref `main`) with `name`, `confirm` (the name again) and `dry_run`. The
+default dry run only logs the plan; `dry_run: false` then removes the Worker and its Builds
+connection, D1 `<name>` and `<name>-preview`, the build token `claude-setup-builds` once no other
+Worker builds with it, the repo in `yverse-studio` (last), and a leftover branch `new/<name>`.
+Refused before anything is touched: a protected repo name (the list in `scripts/delete-project.mjs`),
+no `projects/<name>.json` on main, a repo without the description "made by claude-setup new-project".
+Irreversible: run it only when yskills said to delete that project.
+
 ## The tradeoff, decided
 
 Workers Builds runs main and branch builds with a user API token. The Builds API allows a
