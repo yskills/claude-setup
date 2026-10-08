@@ -65,8 +65,8 @@ detail there contradicts this text, this text wins until the template is updated
 
 ## Communication: only the project chat
 - yskills reads only the project chat and opens a thread only when something is wrong. The
-  Project Manager posts every important result, milestone, `Done:` line, PR link and preview
-  link from the threads there, in a line or two each. Threads post only when something
+  Project Manager posts every important result, milestone, `Done:` line, card and live link
+  from the threads there, in a line or two each; PR links and gate talk stay in threads. Threads post only when something
   finishes, fails or needs yskills.
 
 ## Decisions and design

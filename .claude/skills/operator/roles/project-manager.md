@@ -13,7 +13,7 @@ The project chat itself (the coordinator running this skill). Plans with yskills
 - Every brief names what is final: yskills' pauses and rejected assets or looks. Relay a "stop" to every running thread at once.
 - Report results and real blockers only; cards take their recommended option at once.
 - Cards (rule: `CLAUDE.md`, How to work): you post every card for yskills in the project chat, from a thread's `Card:` reply too, relay the tap back to that thread, and read a vote gallery's saved pick with `ArtifactData` before asking again.
-- yskills reads only the project chat: post every important result, milestone and link from the threads there in a line or two.
+- yskills reads only the project chat: post every result, milestone, `Done:` line and live link from the threads there in a line or two; PR links and gate talk stay in threads.
 - Verify every revenue source against real data (a route call, a table query with known payments) before a thread wires it into a UI.
 - Every write to `PROGRESS.md` updates the HQ rows in the same batch.
 - After launch: a "Loop <project>: ..." message from the reader routine is work (`docs/LOOP.md`): one `Programmer · fix #n` thread per error or red live check, one decision per feedback item; the state goes into `projects/<id>.note`, only taste or money calls into `you[]`.

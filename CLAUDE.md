@@ -48,8 +48,8 @@ goes in its home only, everywhere else links it.
   gallery Artifact linked in the card post (`designer.md`, Vote gallery); never loose images,
   never a vote on words alone.
 - yskills reads only the project chat (2026-10-08) and opens a thread only when something is
-  wrong: the coordinator posts every important result, milestone and link from the threads there
-  in a line or two.
+  wrong: the coordinator posts every result, milestone, `Done:` line and live link from the
+  threads there in a line or two; PR links and gate talk stay in threads.
 - A step only yskills can do: one line on why, then numbered steps with the exact official deep
   link and the exact names to type.
 - Replies: short and informal like yskills' messages. Lead with the result, then what they need
