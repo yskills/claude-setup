@@ -148,11 +148,12 @@ async function ensureD1(cf, name) {
   return created.json.result.uuid
 }
 
-async function ensureWorker(cf, name, previewSecret) {
+async function ensureWorker(cf, name, previewSecret, { adopt }) {
   let page = 1
   for (;;) {
     const r = await cf(`/workers/workers?per_page=100&page=${page}`)
     const hit = (r.json?.result || []).find((w) => w.name === name)
+    if (hit && !adopt) throw new Error(`a Worker named ${name} already exists but the repo is new: pick another name (a re-run adopts a Worker only when its repo exists)`)
     if (hit) { log('worker', `exists ${name} ${hit.id}`); return hit }
     if ((r.json?.result || []).length < 100) break
     page += 1
@@ -177,6 +178,7 @@ async function pickBuildToken(cf, preferredName) {
   const list = await cf('/builds/tokens')
   const tokens = list.json?.result || []
   const preferred = preferredName ? tokens.find((t) => t.build_token_name === preferredName) : null
+  if (!preferredName && tokens.length > 1) throw new Error(`${tokens.length} build tokens exist: set the variable BUILD_TOKEN_NAME to the one builds should deploy with`)
   const pick = preferred || (preferredName ? null : tokens[0])
   if (!pick) throw new Error(`no build token${preferredName ? ` named "${preferredName}"` : ''}: Cloudflare → a Worker → Settings → Builds → API token (publish skill, §A new project)`)
   log('build token', `${pick.build_token_name} ${pick.build_token_uuid}`)
@@ -233,7 +235,11 @@ function pushScaffold(dir, org, name, branch, token) {
   run(['config', 'user.email', 'noreply@anthropic.com'])
   run(['add', '-A'])
   run(['commit', '-q', '-m', `feat: day-zero site for ${name}\n\nMade by claude-setup's new-project workflow.`])
-  run(['push', '-q', `https://x-access-token:${token}@github.com/${org}/${name}.git`, `HEAD:${branch}`])
+  try {
+    run(['push', '-q', `https://x-access-token:${token}@github.com/${org}/${name}.git`, `HEAD:${branch}`])
+  } catch (err) {
+    throw new Error(`git push to ${org}/${name} failed: ${String(err.stderr || err.message).replaceAll(token, '***').slice(0, 300)}`)
+  }
 }
 
 export async function main() {
@@ -241,6 +247,7 @@ export async function main() {
   const name = fromBranch?.name || env('NAME')
   if (!validName(name)) throw new Error(`name "${name}" must be lowercase letters, digits and dashes`)
   const org = fromBranch?.org || env('ORG')
+  if (!/^[A-Za-z0-9-]{1,39}$/.test(org)) throw new Error(`org "${org}" is not a GitHub org name`)
   const d1 = fromBranch ? fromBranch.d1 : env('D1', false) !== 'false'
   const branch = 'main'
   const cfToken = env('CLOUDFLARE_API_TOKEN')
@@ -249,6 +256,7 @@ export async function main() {
   const cf = cfClient(cfToken, account)
   const gh = ghClient(ghToken)
 
+  const repoExisted = (await gh(`/repos/${org}/${name}`)).ok
   const repo = await ensureRepo(gh, org, name)
   const liveId = d1 ? await ensureD1(cf, name) : undefined
   const previewId = d1 ? await ensureD1(cf, `${name}-preview`) : undefined
@@ -262,7 +270,7 @@ export async function main() {
     log('repo', 'has commits, nothing pushed')
   }
 
-  const worker = await ensureWorker(cf, name, randomBytes(32).toString('base64url'))
+  const worker = await ensureWorker(cf, name, randomBytes(32).toString('base64url'), { adopt: repoExisted })
   const buildTokenUuid = await pickBuildToken(cf, process.env.BUILD_TOKEN_NAME)
   await ensureBuilds(cf, { tag: worker.id, repo, org, name, branch, d1, buildTokenUuid })
   const build = await firstBuild(cf, worker.id, branch)
