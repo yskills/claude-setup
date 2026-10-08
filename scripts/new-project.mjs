@@ -227,6 +227,13 @@ async function ensureBuilds(cf, { tag, repo, org, name, branch, d1, buildTokenUu
       previews_base_config: { ...commands.previews, build_token_uuid: buildTokenUuid, root_directory: '/' },
     },
   })
+  if (!created.ok || !created.json?.success || !created.json?.result) {
+    // Run 7 on 2026-10-08 answered 404 / 8000008 "This project is disconnected from your Git
+    // account" here and the run went on as if connected. Any non-success stops the run now.
+    const errors = (created.json?.errors || []).map((e) => `${e.code} ${redact(e.message)}`).join('; ') || `status ${created.status}`
+    const linkFix = 'link the GitHub org to Claude\'s Cloudflare account once: Workers & Pages > Create > Import a repository > Add account > yverse-studio > All repositories'
+    throw new Error(`Workers Builds did not connect ${org}/${name}: ${errors}. Fix: ${(created.json?.errors || []).some((e) => e.code === 8000008) ? linkFix : `check the answer above; if it names the Git account, ${linkFix}`}`)
+  }
   log('builds', `connected ${org}/${name} (${branch})`)
   return created.json.result
 }
