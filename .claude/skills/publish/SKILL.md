@@ -96,10 +96,12 @@ from a pushed branch; private repo, no outside collaborators, `yskills-claude` i
 4. Keys a slice needs (Stripe, Google, Resend) come by key card as before (`sell`, `keys.md`);
    they are Worker secrets in the dashboard, never in git or GitHub.
 5. An existing org repo (one that already has code) goes the same way: `projects/<name>.json`
-   on main names it with `"repo"` (its GitHub name), `"branch"` (production branch), `"build"`,
-   `"deploy"`, `"preview"` (Workers Builds commands; defaults are the day-zero site's) and
-   `"secret": false` for a static site; the repo's `wrangler.jsonc` `name` must equal `name`. Then
-   `run_workflow` on `new-project.yml` with that name; nothing is pushed to the repo.
+   on main names it with `"repo"` (its GitHub name in `yverse-studio`; production builds its
+   default branch), `"build"`, `"deploy"`, `"preview"` (Workers Builds commands; defaults are the
+   day-zero site's) and `"secret": false` for a static site; the repo's `wrangler.jsonc` `name`
+   must equal `name`. Then `run_workflow` on `new-project.yml` with that name. Nothing is created or
+   pushed in the repo, a missing repo stops the run, and a Worker of that name must not exist yet.
+   Only main's registry may set these keys; a pushed `new/<name>` branch sets just `d1`.
    Example: `projects/mypage.json`.
 
 Without the five steps above the workflow fails on its first line with the missing name; a

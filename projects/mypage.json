@@ -3,7 +3,6 @@
   "d1": false,
   "org": "yverse-studio",
   "repo": "MyPage",
-  "branch": "origin",
   "build": "npm run check && npm run generate",
   "secret": false
 }

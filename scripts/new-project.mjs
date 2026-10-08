@@ -6,11 +6,11 @@
 // D1 Edit, Account Settings Read), CLOUDFLARE_ACCOUNT_ID, PROJECTS_GITHUB_TOKEN (fine-grained, the
 // org only: Administration, Contents, Workflows), BUILD_TOKEN_NAME (optional: which Workers Builds
 // token deploys; default: the first one), and the project: `projects/<name>.json` (on main, or on
-// the pushed branch `new/<name>`, where only name, d1 and org count; the workflow runs main's code
+// the pushed branch `new/<name>`, where only d1 and org count; the workflow runs main's code
 // and takes only that json from the branch), else NAME, ORG, D1 from a workflow_dispatch. The json: `{ "name", "d1", "org" }` and, for
-// an existing repo, `"repo"` (its GitHub name), `"branch"` (production branch), `"build"`,
+// an existing repo, `"repo"` (its GitHub name; production builds its default branch), `"build"`,
 // `"deploy"`, `"preview"` (Workers Builds commands) and `"secret": false` (no BETTER_AUTH_SECRET,
-// e.g. a static site); a repo with commits gets no day-zero push.
+// e.g. a static site).
 import { cpSync, mkdtempSync, readFileSync, writeFileSync, rmSync, appendFileSync, existsSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
@@ -18,39 +18,44 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+export const MARKER = 'made by claude-setup new-project'
 const TEMPLATE = new URL('../.claude/skills/publish/templates/new-project/', import.meta.url)
 const BUILD = 'npm run check && npm run build'
 const BUILD_WAIT_MS = 10 * 60 * 1000
 const POLL_MS = 15 * 1000
 
 // The registry on main (`projects/<name>.json`, reviewed through the gate) may set every key; a
-// pushed branch's json (`incoming/projects/<name>.json`) only name, d1 and org, so no unreviewed
+// pushed branch's json (`incoming/projects/<name>.json`) only d1 and org (the branch names it), so no unreviewed
 // push can point a build at another repo, branch or command.
 export function projectFromBranch(branch, readJson) {
   if (!branch?.startsWith('new/')) return null
   const name = branch.slice('new/'.length)
   const registered = readJson(`projects/${name}.json`)
   if (registered) return projectConfig(name, registered)
-  const { name: n, d1, org } = readJson(`incoming/projects/${name}.json`) || {}
-  return projectConfig(name, { name: n, d1, org })
+  const { d1, org } = readJson(`incoming/projects/${name}.json`) || {}
+  return projectConfig(name, { d1, org })
 }
 
+// A branch name from GitHub, checked before it reaches Cloudflare.
 export function validBranch(branch) {
   return /^[A-Za-z0-9][A-Za-z0-9._/-]{0,100}$/.test(branch) && !branch.includes('..')
 }
 
-// One project's settings with defaults: repo and Worker share the name unless `repo` says
-// otherwise (an existing repo like MyPage), production deploys from `main` unless `branch` says
-// otherwise, and the build commands are the day-zero site's unless the json names its own.
+export const ORG = 'yverse-studio'
+
+// One project's settings with defaults. A `repo` key marks an existing repo (like MyPage): it must
+// already exist in the org, nothing is created or pushed there, production builds its GitHub
+// default branch, and a Worker of the same name is never adopted. Without it the repo is new and
+// shares the Worker's name. Build commands are the day-zero site's unless the json names its own.
 export function projectConfig(name, cfg = {}) {
   const d1 = cfg.d1 !== false
   const defaults = buildCommands(d1)
   return {
     name: cfg.name || name,
     d1,
-    org: cfg.org || 'yverse-studio',
+    org: cfg.org || ORG,
     repo: cfg.repo || cfg.name || name,
-    branch: cfg.branch || 'main',
+    existing: Boolean(cfg.repo),
     secret: cfg.secret !== false,
     commands: {
       production: { build_command: cfg.build || defaults.production.build_command, deploy_command: cfg.deploy || defaults.production.deploy_command },
@@ -180,7 +185,7 @@ function log(step, detail) { console.log(`[new-project] ${step}: ${detail}`) }
 async function ensureRepo(gh, org, name) {
   const existing = await gh(`/repos/${org}/${name}`)
   if (existing.ok) { log('repo', `exists ${existing.json.html_url}`); return existing.json }
-  const created = await gh(`/orgs/${org}/repos`, { method: 'POST', body: { name, private: true, auto_init: false, description: 'made by claude-setup new-project' } })
+  const created = await gh(`/orgs/${org}/repos`, { method: 'POST', body: { name, private: true, auto_init: false, description: MARKER } })
   if (!created.ok) throw new Error(`GitHub create repo: ${created.status} ${created.text.slice(0, 300)}`)
   log('repo', `created ${created.json.html_url}`)
   return created.json
@@ -437,22 +442,28 @@ export async function main() {
     ? projectConfig(process.env.NAME, readJson(`projects/${process.env.NAME}.json`) || { d1: env('D1', false) !== 'false', org: env('ORG', false) })
     : projectFromBranch(process.env.PROJECT_BRANCH, readJson)
   if (!project) throw new Error('NAME is not set and the branch is not new/<name>')
-  const { name, d1, org, repo: repoName, branch, commands, secret } = project
+  const { name, d1, org, repo: repoName, existing, commands, secret } = project
   if (!validName(name)) throw new Error(`name "${name}" must be lowercase letters, digits and dashes`)
   if (!validRepo(repoName)) throw new Error(`repo "${repoName}" is not a GitHub repo name`)
-  if (!validBranch(branch)) throw new Error(`branch "${branch}" is not a branch name`)
-  if (!/^[A-Za-z0-9-]{1,39}$/.test(org)) throw new Error(`org "${org}" is not a GitHub org name`)
+  if (org !== ORG) throw new Error(`org "${org}": projects live in ${ORG} only`)
   const cfToken = env('CLOUDFLARE_API_TOKEN')
   const account = env('CLOUDFLARE_ACCOUNT_ID')
   const ghToken = env('PROJECTS_GITHUB_TOKEN')
   const cf = cfClient(cfToken, account)
   const gh = ghClient(ghToken)
 
-  const repoExisted = (await gh(`/repos/${org}/${repoName}`)).ok
-  const repo = await ensureRepo(gh, org, repoName)
+  const found = await gh(`/repos/${org}/${repoName}`)
+  if (existing && !found.ok) throw new Error(`${org}/${repoName} not found (${found.status}); an existing-repo project creates nothing, so check the "repo" name in projects/${name}.json`)
+  if (!existing && found.ok && !String(found.json?.description || '').includes(MARKER)) throw new Error(`${org}/${repoName} exists and was not made by new-project; register it with "repo" in projects/${name}.json on main to deploy it`)
+  const repo = existing ? found.json : await ensureRepo(gh, org, repoName)
+  const branch = existing ? repo.default_branch : 'main'
+  if (!validBranch(branch || '')) throw new Error(`default branch "${branch}" of ${org}/${repoName} is not a branch name`)
+  // A Worker of the same name is adopted only on a re-run for a repo this workflow made.
+  const adopt = found.ok && !existing
   const liveId = d1 ? await ensureD1(cf, name) : undefined
   const previewId = d1 ? await ensureD1(cf, `${name}-preview`) : undefined
 
+  if (existing && await repoIsEmpty(gh, org, repoName)) throw new Error(`${org}/${repoName} is empty; an existing-repo project needs its code on ${branch}`)
   if (await repoIsEmpty(gh, org, repoName)) {
     const dir = mkdtempSync(join(tmpdir(), 'new-project-'))
     writeScaffold(dir, { name, d1, liveId, previewId })
@@ -462,7 +473,7 @@ export async function main() {
     log('repo', 'has commits, nothing pushed')
   }
 
-  const worker = await ensureWorker(cf, name, randomBytes(32).toString('base64url'), { adopt: repoExisted })
+  const worker = await ensureWorker(cf, name, randomBytes(32).toString('base64url'), { adopt })
   const buildTokenUuid = await pickBuildToken(cf, process.env.BUILD_TOKEN_NAME, process.env.CLOUDFLARE_BUILD_TOKEN)
   const git = await connectRepo(cf, { repo, org, name: repoName })
   await ensureBuilds(cf, { tag: worker.id, git, org, name: repoName, branch, d1, buildTokenUuid, commands })
