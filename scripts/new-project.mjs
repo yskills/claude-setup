@@ -171,6 +171,16 @@ async function ensureWorker(cf, name, previewSecret, { adopt }) {
   return created.json.result
 }
 
+async function registerBuildToken(cf, buildToken) {
+  // First project in a fresh account: no build token exists yet. CLOUDFLARE_BUILD_TOKEN is a
+  // second, narrower user token (Workers Scripts Edit, D1 Edit) that builds deploy with.
+  const verify = await api('https://api.cloudflare.com/client/v4', buildToken, '/user/tokens/verify')
+  if (!verify.ok) throw new Error(`CLOUDFLARE_BUILD_TOKEN is not a valid token: ${verify.status}`)
+  const created = await cf('/builds/tokens', { method: 'POST', body: { build_token_name: 'claude-setup-builds', build_token_secret: buildToken, cloudflare_token_id: verify.json.result.id } })
+  log('build token', `registered claude-setup-builds ${created.json.result.build_token_uuid}`)
+  return created.json.result.build_token_uuid
+}
+
 async function pickBuildToken(cf, preferredName) {
   // Never registers the setup token as a build token: every pushed branch of every project
   // would then build with Workers Builds Configuration Edit and D1 create rights. Builds use
@@ -180,7 +190,7 @@ async function pickBuildToken(cf, preferredName) {
   const preferred = preferredName ? tokens.find((t) => t.build_token_name === preferredName) : null
   if (!preferredName && tokens.length > 1) throw new Error(`${tokens.length} build tokens exist: set the variable BUILD_TOKEN_NAME to the one builds should deploy with`)
   const pick = preferred || (preferredName ? null : tokens[0])
-  if (!pick) throw new Error(`no build token${preferredName ? ` named "${preferredName}"` : ''}: Cloudflare → a Worker → Settings → Builds → API token (publish skill, §A new project)`)
+  if (!pick) throw new Error(`no build token${preferredName ? ` named "${preferredName}"` : ''}: set the secret CLOUDFLARE_BUILD_TOKEN once (publish skill, §A new project)`)
   log('build token', `${pick.build_token_name} ${pick.build_token_uuid}`)
   return pick.build_token_uuid
 }
