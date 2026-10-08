@@ -68,7 +68,7 @@ A paused project gets no new thread until yskills resumes it.
 
 **Idea whiteboard:** the staging area in yskills' office: `ideas/<slug>` (`{title, blurb, repo, parked, archived, planned,
 link, at}`, written by the refresher) for every entry not archived, as title, blurb and a derived status: Idee, Geplant (the
-file has a `## Plan`), Läuft (it has `repo:`). The card opens the file on GitHub. Its two taps write `requests/<id>`
+file has a `## Plan`), Pausiert (parked, no repo), Läuft (it has `repo:`). The card opens the file on GitHub. Its two taps write `requests/<id>`
 (`kind: 'idea'`, `slug`, `act`) and message the coordinator: Planen (Idee) starts one thread that researches and writes
 `## Plan` and `## Research notes` below yskills' own words in the file; Starten (Geplant) starts the build from that plan
 with the operator workflow (slug = project, repo and Worker name) and sets `repo:` once the repo exists.
