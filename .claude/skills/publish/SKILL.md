@@ -116,7 +116,8 @@ Accepted by yskills, knowing what it means: the gate thread merges every PR at 5
 by text from the web could deploy. It holds as long as these guards do:
 
 - Repos stay private. Cloudflare's docs don't say whether pull requests from forks get built.
-- No outside collaborators.
+- No outside collaborators. Claude's machine account `yskills-claude` is the one exception: it is
+  Claude, so it pushes no more than a cloud thread already does.
 - Before a live payment key goes in, the one dashboard click only yskills can make: Cloudflare →
   Workers & Pages → the Worker → Settings → Build → Branch control → turn off non-production
   branch builds. Previews stop, and only merged code ever runs with the key. The operator puts
