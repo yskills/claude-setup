@@ -7,7 +7,8 @@
 // org only: Administration, Contents, Workflows), BUILD_TOKEN_NAME (optional: which Workers Builds
 // token deploys; default: the first one), and the project: NAME, ORG, D1 ("true"/"false") from a
 // workflow_dispatch, or PROJECT_BRANCH `new/<name>` whose `projects/<name>.json` holds
-// `{ "name", "d1", "org" }` (a cloud thread can push a branch but not dispatch a workflow).
+// `{ "name", "d1", "org" }` (a cloud thread can push a branch but not dispatch a workflow; the
+// workflow runs main's code and takes only that json from the branch).
 import { cpSync, mkdtempSync, readFileSync, writeFileSync, rmSync, appendFileSync, existsSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'

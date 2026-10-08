@@ -59,8 +59,8 @@ What the keys can do if they leak, and why that is accepted: the Cloudflare toke
 edits any Worker on the account and creates D1 databases, the same reach as the build token
 every pushed branch already runs with (The tradeoff, below); the GitHub token creates, pushes
 to and deletes repos in `yverse-studio` only. Both are masked in Actions logs and rotate on the
-two pages above. Anyone who can push to claude-setup can run code with them: private repo, no
-outside collaborators, `yskills-claude` is Claude.
+two pages above. Code that runs with them comes only from `main` (a merge through the gate), never
+from a pushed branch; private repo, no outside collaborators, `yskills-claude` is Claude.
 
 ### Per project, Claude
 
@@ -68,8 +68,11 @@ outside collaborators, `yskills-claude` is Claude.
    403, checked 2026-10-08): in claude-setup, branch `new/<name>` off `main` with one file
    `projects/<name>.json`, `{ "name": "<name>", "d1": true, "org": "yverse-studio" }` (`name`:
    lowercase, digits, dashes; it is the repo and the Worker name; `d1` false when PLAN.md says no
-   data). The push starts `new-project.yml`, which deletes the branch when it succeeds. From the
-   PC or the Actions page the same workflow runs with Run workflow and the inputs. It creates the repo, D1 `<name>` and `<name>-preview` (EU), pushes the day-zero site from
+   data). The push runs `new-project-request.yml` (no keys), and on its completion GitHub runs
+   `new-project.yml` with the keys, from `main`'s workflow file and code (`workflow_run`), so a
+   pushed branch supplies only the json, never code that runs with the keys. The branch is deleted
+   when the run succeeds. From the PC or the Actions page the same workflow runs with Run workflow
+   and the inputs. It creates the repo, D1 `<name>` and `<name>-preview` (EU), pushes the day-zero site from
    `templates/new-project/` (`/api/config` with the built commit, `verify`, `deploy`,
    `deploy:preview`, `previews` block, CI), creates the Worker with workers.dev and preview URLs on
    and a random `BETTER_AUTH_SECRET` for Previews Base, connects Workers Builds (Build `npm run
