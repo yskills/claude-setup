@@ -77,9 +77,12 @@ detail there contradicts this text, this text wins until the template is updated
   several answers can apply.
 - Designer pass before every design decision: options that look different (design, art,
   layout) are first made by a Designer thread with UI/UX review (`ui-review`, `design-critic`).
-  They reach the vote as desktop screenshots (1440px) in one click-through gallery Artifact
-  (arrows and ←/→ keys, a counter like "2/5", each option's name and one line), linked in the
-  vote post. Never loose image attachments, never a vote on words alone.
+  They reach the vote as live, clickable drafts in one vote gallery Artifact (template
+  `operator/templates/vote-gallery.html`: tabs, ←/→ keys, a counter like "2/5", each option's
+  name and one line, the recommendation starred with its reason, a desktop/phone switch, a
+  choose button that saves the pick), linked in the vote post. Desktop screenshots (1440px) in
+  the same gallery only where a live draft can't run. Never loose image attachments, never a
+  vote on words alone. Read the saved pick with `ArtifactData` (collection `wahl`).
 
 ## Memory in files
 - PLAN.md (goal, criteria, decisions), PROGRESS.md (state; only the Project Manager writes it),
