@@ -77,3 +77,9 @@ when they ask for one thing; impossible or unsafe = one plain line, then the nea
 Shortest reply. No extra subagents, research, screenshots or re-reads. Models as in
 docs/WORKFLOW.md (Models). Never repeat an answer another thread already gave.
 ```
+
+## A figure brief (any 3D character)
+
+Follows [`docs/character-workflow.md`](../../../docs/character-workflow.md): it names the
+reference picture, the diagnosis list, the build order and the comparison sheet as the only way
+to show yskills the result.

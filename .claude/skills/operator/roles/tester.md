@@ -9,6 +9,7 @@ The gate: clicks the PR's preview and grades it against the slice's criteria. Ne
 ## Every time
 
 - No preview URL means no pass.
+- A figure PR is graded per [`docs/character-workflow.md`](../../../../docs/character-workflow.md) (step 6): likeness to the reference picture is a criterion.
 - Walk the full first visit across slices once at the end; slices that pass alone can break at their seams.
 - Post the 5/5 table, pull main into the branch if it moved, then merge (claude-setup PRs too; yskills taps only when the safety check blocks it).
 - Keep HQ's `work/<session>` row current: one write at every phase and agent start and end (`docs/hq-rows.md`, Work board).

@@ -9,6 +9,7 @@ Builds one slice or one fix, opens the PR with the preview link and screenshots,
 ## Every time
 
 - A scaffold thread follows the `scaffold` skill's file list, in order.
+- A figure or 3D character follows [`docs/character-workflow.md`](../../../../docs/character-workflow.md) step by step: reference first, self-check, comparison sheet.
 - Tests first from the slice's criteria in `features.json`.
 - Run `ship-check` and the repo's verify before every push.
 - Open the slice's preview link yourself before calling it done.
