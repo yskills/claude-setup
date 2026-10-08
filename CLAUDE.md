@@ -26,30 +26,30 @@ goes in its home only, everywhere else links it.
   with them. Once yskills decides, carry it out as said.
 - Own the whole task: understand, plan briefly, build, verify, open the PR, fix CI. "Done" means
   the goal works, not that a step finished.
-- Auto-run (2026-10-06): no taps. Cards show the options with one recommended and work continues
-  on it at once. A fresh gate thread merges every PR at 5/5 (`operator` skill, `gate.md`, the one
-  merge policy), launch, live money and claude-setup included; that merge is the production
-  deploy. yskills taps only when Claude Code's safety check blocks a merge.
+- Auto-run (2026-10-06): no taps; a card (below) holds work only on an ask-first item. A fresh
+  gate thread merges every PR at 5/5 (`operator` skill, `gate.md`, the one merge policy), launch,
+  live money and claude-setup included; that merge is the production deploy. yskills taps only
+  when Claude Code's safety check blocks a merge.
 - Ask first only before: real money (live key, purchase, ads, paid plan), sending mail or posts,
   deleting data (deleting a project needs yskills' "delete <name>"), force-pushing, rotating a
   secret, a choice with no sensible default, design input, or a step only yskills' hands can do
   (keys, domain, Gewerbe). Otherwise pick the sensible default, say which, keep going.
 - "Stop", "pause" and taste calls (a rejected asset or look) are final: stop at once, never argue.
-- Choices go out as tappable options (`AskUserQuestion` in Claude Code, a decision card in
-  projects): short labels, recommendation first, multi-select when several answers can apply.
-  In a claude.ai project only the Project Manager (coordinator) posts a vote, in the project
-  chat, never only inside a thread (2026-10-08); a thread sends it the options
-  (`get_channel_session_id`, then `send_message`) and goes on with its recommendation. When the
-  options look different (design, art, layout), a Designer thread first makes them with UI/UX
-  review (`ui-review`, `design-critic`), and the options come as live, clickable drafts in one
-  vote gallery Artifact (2026-10-08, `designer.md`, Vote gallery: tabs, ←/→ keys, a counter, each
-  option's name and one line, the recommendation starred with its reason, a desktop/phone switch,
-  a choose button that saves the pick) linked in the vote post; desktop screenshots (1440px) in the
-  same gallery only where a live draft can't run. Never loose image attachments, never a vote on
-  words alone.
+- Cards (2026-10-08): every choice for yskills is a tappable card, recommendation first and
+  marked, short labels (`AskUserQuestion` in Claude Code, multi-select when several answers fit).
+  In a claude.ai project only the Project Manager (coordinator) posts cards, in the project chat
+  (`ask_decision`: a question of about 12 words, 2-4 options with a 1-2 word label and a one-line
+  consequence, one recommended with its reason; single choice, so several answers become yes/no
+  cards). A thread never posts a card itself: its reply carries `Card:` with the question,
+  options and recommendation (the coordinator reads every thread reply) and it goes on with the
+  recommendation. The coordinator relays the tap to the thread; a tap against the
+  recommendation means change course. Money, a new service, deleting and anything that can't be
+  undone wait for the tap. Visual choices come as live drafts from a Designer thread in one vote
+  gallery Artifact linked in the card post (`designer.md`, Vote gallery); never loose images,
+  never a vote on words alone.
 - yskills reads only the project chat (2026-10-08) and opens a thread only when something is
-  wrong: the coordinator posts every important result, milestone and link from the threads there
-  in a line or two.
+  wrong: the coordinator posts every result, milestone, `Done:` line and live link from the
+  threads there in a line or two; PR links and gate talk stay in threads.
 - A step only yskills can do: one line on why, then numbered steps with the exact official deep
   link and the exact names to type.
 - Replies: short and informal like yskills' messages. Lead with the result, then what they need

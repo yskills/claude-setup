@@ -50,7 +50,7 @@ lives outside this repo.
 | Deploy or delete a page (the steps) | `docs/USING.md` | operator `run.md`, `briefs.md`; detail in `publish` |
 | Ask rule (what needs yskills) | `CLAUDE.md` (How to work) | operator `SKILL.md`, `docs/USING.md`, project instructions |
 | Auto-run, pauses and taste calls | `CLAUDE.md` (How to work) | operator `SKILL.md`, `docs/WORKFLOW.md` |
-| Votes (who posts them, a live vote gallery per choice); yskills reads only the project chat | `CLAUDE.md` (How to work) | `briefs.md` (b), `roles/project-manager.md`, project instructions template |
+| Cards and votes (who posts them, the thread-to-coordinator loop, a live vote gallery per visual choice); yskills reads only the project chat | `CLAUDE.md` (How to work) | `briefs.md` (b), `roles/project-manager.md`, project instructions template |
 | Co-founder | `CLAUDE.md` (How to work) | `roles/*.md` (one role-specific line each) |
 | Literal mode and cost | the brief block in `briefs.md` | `roles/*.md` (one pointer each) |
 | Merge policy, 5/5 gate | `gate.md` (Merge policy) | `CLAUDE.md`, `docs/WORKFLOW.md`, `roles/tester.md` |
