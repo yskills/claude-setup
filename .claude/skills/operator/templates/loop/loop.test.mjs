@@ -54,10 +54,10 @@ test('a client-reported error is never urgent, even when its path says checkout'
 test('secrets in error text never reach an issue', () => {
   const leaks = ['eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.abcdefghijklmnop', 'ghp_' + 'a'.repeat(36), 'github_pat_11ABCDEFG0abcdefghijklmn',
     'whsec_abcdefghijklmnop', 'rk_live_abcdefghijklmnop', 'postgres://admin:hunter2@db.local/x', '/cb?token=s3cr3tvalue&x=1',
-    'password: hunter22', 'access_token=hunter2b', 'DB_PASSWORD=hunter2c', 'client_secret: hunter2d', 'Authorization: Basic dXNlcjpwYXNz', 'DE89370400440532013000', 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0']
+    'password: hunter22', 'access_token=hunter2b', 'DB_PASSWORD=hunter2c', 'client_secret: hunter2d', 'Authorization: Basic dXNlcjpwYXNz', 'Basic dXNlcj+wYXNzd29yZA==', 'DE89370400440532013000', 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0']
   for (const s of leaks) {
     const body = errorBody({ ...err, message: `failed with ${s}`, stack: `at x (${s})` })
-    for (const part of [s, 'hunter2', 'dXNlcjpwYXNz', 's3cr3tvalue', '370400440532']) if (s.includes(part)) assert.ok(!body.includes(part), `${part} leaked`)
+    for (const part of [s, 'hunter2', 'dXNlcjpwYXNz', 'wYXNzd29yZA', 's3cr3tvalue', '370400440532']) if (s.includes(part)) assert.ok(!body.includes(part), `${part} leaked`)
   }
   assert.ok(clean('TypeError: x is undefined at /app/server/api/progress.ts:12').includes('progress.ts:12'))
   assert.ok(clean('at /app/node_modules/nuxt/dist/app/entry').includes('nuxt/dist/app/entry'))
