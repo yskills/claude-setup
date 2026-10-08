@@ -28,7 +28,8 @@ goes in its home only, everywhere else links it.
   the goal works, not that a step finished.
 - Auto-run (2026-10-06): no taps; a card (below) holds work only on an ask-first item. A fresh
   gate thread merges every PR at 5/5 (`operator` skill, `gate.md`, the one merge policy), launch,
-  live money and claude-setup included; that merge is the production deploy. yskills taps only when Claude Code's safety check blocks a merge.
+  live money and claude-setup included; that merge is the production deploy. yskills taps only
+  when Claude Code's safety check blocks a merge.
 - Ask first only before: real money (live key, purchase, ads, paid plan), sending mail or posts,
   deleting data (deleting a project needs yskills' "delete <name>"), force-pushing, rotating a
   secret, a choice with no sensible default, design input, or a step only yskills' hands can do
