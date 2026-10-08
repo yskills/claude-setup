@@ -69,6 +69,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           PROJECTS_GITHUB_TOKEN: ${{ secrets.PROJECTS_GITHUB_TOKEN }}
+          CLOUDFLARE_BUILD_TOKEN: ${{ secrets.CLOUDFLARE_BUILD_TOKEN }}
           BUILD_TOKEN_NAME: ${{ vars.BUILD_TOKEN_NAME }}
 
   cleanup:
