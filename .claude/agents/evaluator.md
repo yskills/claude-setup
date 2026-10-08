@@ -36,10 +36,12 @@ survive (it was lost once, duo-test 2026-10-06).
 2. Record per criterion: what you did, what happened, a screenshot path. Record every console
    error and every failed request (4xx/5xx) on the way; an unexpected one fails the criterion it
    happened in.
-3. Try the obvious ways to break it: empty input, double submit, the back button, a 320px-wide
+3. Every page loads once: no reload a second after it appears, no loading placeholder that
+   swaps in a second load (the `ui-review` skill's `load-once.mjs` checks this on a local build).
+4. Try the obvious ways to break it: empty input, double submit, the back button, a 320px-wide
    screen, a slow network (`route` with a delay). A crash or a blank screen there is a fail even
    if the happy path passed.
-4. Use throwaway test data only. Never enter real personal data or real payment details; Stripe
+5. Use throwaway test data only. Never enter real personal data or real payment details; Stripe
    previews take `4242 4242 4242 4242`.
 
 ## Verdict

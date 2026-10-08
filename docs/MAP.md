@@ -57,7 +57,7 @@ lives outside this repo.
 | Models | the one line in `docs/WORKFLOW.md` (Models); project instructions carry it word for word | everything else links it; CI fails on a second wording or on the old model name |
 | Context guard numbers (warn 150k, hand off 200k) | `global/context-guard.mjs` | `CLAUDE.md`, `README.md` |
 | Remote Control on the PC | `docs/WORKFLOW.md` (PC work) | operator `SKILL.md`, project instructions template |
-| UI rules | `CLAUDE.md` (UI) | `roles/designer.md`, `ui-review` (screenshots, run videos via `desktop.sh`) |
+| UI rules | `CLAUDE.md` (UI) | `roles/designer.md`, `ui-review` (screenshots, the load-once check, run videos via `desktop.sh`) |
 | Character workflow (reference, sheet, likeness gate) | `docs/character-workflow.md` | `roles/programmer.md`, `roles/tester.md`, `roles/designer.md`, `briefs.md` |
 | Deploys, the workflows' detail | `publish` skill | `CLAUDE.md`, `docs/USING.md` |
 | Money and shop law | `sell` skill | `docs/WORKFLOW.md` (Selling) |
