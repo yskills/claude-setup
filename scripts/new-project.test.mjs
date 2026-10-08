@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, readFileSync, existsSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold } from './new-project.mjs'
+import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold, describe, redact, hookIdFrom } from './new-project.mjs'
 
 test('names are workers.dev safe', () => {
   assert.ok(validName('duo-test'))
@@ -47,4 +47,16 @@ test('a pushed new/<name> branch names the project, its json the options', () =>
   assert.deepEqual(projectFromBranch('new/shop', () => null), { name: 'shop', d1: true, org: 'yverse-studio' })
   assert.deepEqual(projectFromBranch('new/shop', () => ({ d1: false, org: 'other' })), { name: 'shop', d1: false, org: 'other' })
   assert.equal(projectFromBranch('main', () => null), null)
+})
+
+test('API answers are logged without secrets or hook ids, and hook ids are read from any known shape', () => {
+  const body = '{"result":{"deploy_hook_uuid":"abc-123","build_token_secret":"s3cret","ok":"x"},"success":true}'
+  const line = describe({ status: 200, json: JSON.parse(body), text: body })
+  assert.match(line, /^200 keys=\[result,success\] result=\[deploy_hook_uuid,build_token_secret,ok\]/)
+  assert.doesNotMatch(line, /abc-123|s3cret/)
+  assert.doesNotMatch(redact('x'.repeat(40)), /x{40}/)
+  assert.equal(hookIdFrom({ deploy_hook_uuid: 'a' }), 'a')
+  assert.equal(hookIdFrom({ hook_id: 'b' }), 'b')
+  assert.equal(hookIdFrom({ deploy_hook: { uuid: 'c' } }), 'c')
+  assert.equal(hookIdFrom(null), null)
 })
