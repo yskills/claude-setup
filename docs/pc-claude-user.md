@@ -16,6 +16,8 @@ in `install.mjs` works as on yskills' own user (`C:\Users\Ich`); this page lists
 | Python 3.13, ffmpeg, uv, fnm | winget `--scope user` (all in `%LOCALAPPDATA%`) | the tools `install.mjs` reports as missing |
 | pwsh 7 | Microsoft Store package via `winget install --id 9MZ1SNWT0N5D --source msstore` | the MSI needs admin; `live-shot.ps1` needs pwsh |
 | Blender | 5.1, machine-wide (`C:\Program Files\Blender Foundation`) | shared with yskills' user |
+| GitHub | `gh` logged in as `yskills-claude`; commits are authored as `Claude <339700673+yskills-claude@users.noreply.github.com>` | Claude's own account, collaborator on the repos |
+| Claude in Chrome | extension installed in this user's Chrome profile | a session only has the tools it started with, so the next session there drives it |
 | Roblox Studio | not installed | installs per user and needs a Roblox login Claude does not have yet |
 | Environment variables | always set for the user, never machine-wide; no admin | standard user |
 
@@ -24,11 +26,6 @@ Control session) after installs.
 
 ## What still needs yskills' hands
 
-- **GitHub:** Claude gets its own GitHub account (based on its own Google account). yskills signs
-  it in in Chrome on this user, then `gh auth login --web`; afterwards
-  `git config --global user.name Claude` and the account's `@users.noreply.github.com` address as
-  `user.email`.
-- **Claude in Chrome:** the extension and its sign-in in Chrome on this user.
 - **Blender connector:** the official Blender extension in the Claude desktop app plus its add-on
   in Blender (see the `studio` skill). The Blender user profile exists only after Blender was
   opened once on this user.
