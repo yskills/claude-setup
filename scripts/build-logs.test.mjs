@@ -25,3 +25,12 @@ test('scrub hides secret-looking pairs, URL credentials and bearer headers', () 
   assert.equal(scrub('Authorization: Bearer abc.def'), 'Authorization: *** ***')
   assert.equal(scrub('npm run build ok'), 'npm run build ok')
 })
+
+test('scrub hides vendor tokens and flag or keyword values after a space', () => {
+  assert.equal(scrub('key sk_live_51Habcdefghijklmnopqrst and whsec_abc1 and xoxb-12-ab'), 'key *** and *** and ***')
+  assert.equal(scrub('AKIAABCDEFGHIJKLMNOP github_pat_11abc ghp_abc'), '*** *** ***')
+  assert.equal(scrub('npx wrangler --api-token abcdef1234567890 deploy'), 'npx wrangler --api-token *** deploy')
+  assert.equal(scrub('--secret abcdef1234'), '--secret ***')
+  assert.equal(scrub('npm warn config token abc123'), 'npm warn config token ***')
+  assert.equal(scrub('password abc'), 'password ***')
+})

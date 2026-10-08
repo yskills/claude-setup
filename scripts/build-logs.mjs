@@ -14,7 +14,9 @@ export const TAIL = 120
 // URL credentials and bearer headers. The repo is public, so its Actions logs are too.
 export function scrub(text) {
   return redact(text)
+    .replace(/\b(?:sk|rk|pk)_(?:live|test)_\w+|\bwhsec_\w+|\bgithub_pat_\w+|\bgh[pousr]_\w+|\bAKIA[0-9A-Z]{16}\b|\bxox[abprs]-[\w-]+/g, '***')
     .replace(/\b(bearer|basic)\s+\S+/gi, '$1 ***')
+    .replace(/(--?[\w-]*(?:token|secret|key|password)[\w-]*|\b(?:token|secret|password))\s+(?![=:])\S+/gi, '$1 ***')
     .replace(/\b([A-Za-z0-9_.-]*(?:token|secret|key|password|passwd|auth|credential|cookie|session|dsn)[A-Za-z0-9_.-]*)(\s*[=:]\s*)("[^"]*"|'[^']*'|\S+)/gi, '$1$2***')
     .replace(/(\w+:\/\/)[^/\s:@]+:[^/\s@]+@/g, '$1***@')
 }
