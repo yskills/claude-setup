@@ -312,12 +312,20 @@ async function firstBuild(cf, tag, name, branch) {
   while (Date.now() < until) {
     await new Promise((r) => setTimeout(r, POLL_MS))
     const b = await cf(`/builds/builds/${uuid}`)
-    const status = b.json?.result?.status
-    log('build', status)
-    const stillRunning = !status || ['queued', 'pending', 'initializing', 'running', 'in_progress'].includes(status)
-    if (!stillRunning) return { uuid, status }
+    const state = buildState(b.json?.result)
+    log('build', state.running ? state.status : `${state.status}, outcome ${state.outcome}`)
+    if (!state.running) return { uuid, status: state.outcome }
   }
   return { uuid, status: 'timeout' }
+}
+
+// A build's status says whether it still runs (queued, initializing, running, stopped), its
+// build_outcome how it ended (success, fail, skipped, cancelled, terminated). Run 9 on
+// 2026-10-08 deployed fine and was reported red because "stopped" was read as a failure.
+export function buildState(result) {
+  const status = result?.status || 'unknown'
+  const running = !result || ['queued', 'pending', 'initializing', 'running', 'in_progress'].includes(status)
+  return { status, running, outcome: running ? null : result.build_outcome || status }
 }
 
 async function ensureSecret(cf, name, key, text) {
