@@ -61,7 +61,7 @@ $small.Save($jpgPath, $codec, $params); $small.Dispose()
 $row = [ordered]@{
   image   = 'data:image/jpeg;base64,' + [Convert]::ToBase64String([IO.File]::ReadAllBytes($jpgPath))
   app     = $App
-  title   = $process.MainWindowTitle
+  title   = $process.MainWindowTitle -replace '[A-Za-z]:\\(?:[^\\\[\]]*\\)*', ''  # Blender shows the .blend path; keep only the file name
   caption = $Caption
   link    = $Link
   at      = (Get-Date).ToUniversalTime().ToString('o')
