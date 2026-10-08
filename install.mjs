@@ -133,6 +133,8 @@ for (const n of listDirs(join(ROOT, '.claude/rules/ecc'))) items.push([join('.cl
 items.push(['licenses/ECC-LICENSE', join('rules', 'ecc', 'LICENSE')])
 items.push(['global/statusline.mjs', join('claude-setup', 'statusline.mjs')])
 items.push(['global/context-guard.mjs', join('claude-setup', 'context-guard.mjs')])
+items.push(['global/live-hook.mjs', join('claude-setup', 'live-hook.mjs')])
+items.push(['global/live-shot.ps1', join('claude-setup', 'live-shot.ps1')])
 
 const now = new Set(items.map(([, dest]) => dest))
 for (const old of prev.files) {
@@ -189,6 +191,9 @@ settings.hooks ??= {}
 const guard = `node "${join(CLAUDE_DIR, 'claude-setup', 'context-guard.mjs')}"`
 settings.hooks.PostToolUse = (settings.hooks.PostToolUse ?? []).filter((h) => !JSON.stringify(h).includes('context-guard.mjs'))
 settings.hooks.PostToolUse.push({ matcher: '*', hooks: [{ type: 'command', command: guard, timeout: 5 }] })
+// Live frames of Roblox Studio and Blender for HQ (global/live-hook.mjs, studio skill): one entry, replaced on every install.
+settings.hooks.PostToolUse = settings.hooks.PostToolUse.filter((h) => !JSON.stringify(h).includes('live-hook.mjs'))
+settings.hooks.PostToolUse.push({ matcher: 'mcp__Roblox_Studio__.*|mcp__Blender__.*', hooks: [{ type: 'command', command: `node "${join(CLAUDE_DIR, 'claude-setup', 'live-hook.mjs')}"`, timeout: 5 }] })
 settings.env ??= {}
 if (!SKIP_HOOKS) {
   settings.env.ECC_HOOK_PROFILE = ecc.hooks.profile
