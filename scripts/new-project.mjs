@@ -236,7 +236,7 @@ async function startBuild(cf, tag, name, branch) {
     log('build', 'started through a deploy hook')
     return json.result.build_uuid
   } finally {
-    await cf(`/builds/workers/${name}/deploy_hooks/${hookUuid}`, { method: 'DELETE' }).catch((err) => log('deploy hook', `not deleted: ${err.message}`))
+    await cf(`/builds/workers/${name}/deploy_hooks/${hookUuid}`, { method: 'DELETE' }).catch(() => log('deploy hook', 'not deleted; remove it in the dashboard (Settings > Build > Deploy hooks)'))
   }
 }
 
