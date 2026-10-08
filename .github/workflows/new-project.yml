@@ -1,0 +1,50 @@
+name: new-project
+
+# Makes a new project live with no hands: the repo in the org, its D1 databases (EU), the Worker,
+# the Workers Builds connection (main deploys, other branches get Previews) and the first build.
+# A cloud thread starts it (GitHub `run_workflow`, inputs below) and then `add_repo`s the result.
+# Keys: secrets CLOUDFLARE_API_TOKEN and PROJECTS_GITHUB_TOKEN, variable CLOUDFLARE_ACCOUNT_ID
+# (publish skill, §A new project).
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Repo and Worker name (lowercase letters, digits, dashes)'
+        required: true
+        type: string
+      d1:
+        description: 'With a D1 database (live + preview, EU)'
+        required: false
+        type: boolean
+        default: true
+      org:
+        description: 'GitHub org that owns the repo'
+        required: false
+        type: string
+        default: yverse-studio
+
+permissions:
+  contents: read
+
+concurrency:
+  group: new-project-${{ inputs.name }}
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - run: node --test scripts/new-project.test.mjs
+      - run: node scripts/new-project.mjs
+        env:
+          NAME: ${{ inputs.name }}
+          D1: ${{ inputs.d1 }}
+          ORG: ${{ inputs.org }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECTS_GITHUB_TOKEN: ${{ secrets.PROJECTS_GITHUB_TOKEN }}
+          BUILD_TOKEN_NAME: ${{ vars.BUILD_TOKEN_NAME }}
