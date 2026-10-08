@@ -143,6 +143,16 @@ Claude:
   `check_run.head_sha` (`github.sha` on the weekly run). A green Workers Builds check and a 200 prove neither: on 2026-10-05
   duo-test's main builds passed for hours while a day-old version stayed live.
 
+## Delete a project
+
+`delete-project` (Actions → Run workflow, or a thread's `actions_run_trigger` `run_workflow` on
+`delete-project.yml`, ref `main`) with `name` and `confirm` (the name again) removes the org repo,
+the Worker and its Builds connection, D1 `<name>` and `<name>-preview`, the build token
+`claude-setup-builds` once no other Worker builds with it, and a leftover branch `new/<name>`.
+It refuses a repo whose description lacks "made by claude-setup new-project", so only projects the
+workflow made can go. Deleting is irreversible: run it only when yskills said to delete that
+project.
+
 ## The tradeoff, decided
 
 Workers Builds runs main and branch builds with a user API token. The Builds API allows a
