@@ -42,7 +42,12 @@ Code on the PC, the `team` mod (`/team`: who of the team works on what, with a W
   In projects every decision card is shown by the coordinator in the project chat, never only
   inside a thread (yskills, 2026-10-08): a thread that needs a choice sends the question and its
   options to the coordinator (`get_channel_session_id`, then `send_message`) and keeps working on
-  the recommended one.
+  the recommended one. Show the options as pictures or screenshots whenever the choice is visual
+  (a look, a layout, an asset); a design choice first goes through a Designer thread (UI/UX
+  review with `ui-review`, `design-critic` and the design skills) that makes those pictures.
+- yskills reads only the project chat (2026-10-08) and opens a thread only when something is
+  wrong. The coordinator posts every important result, milestone and link from the threads there
+  in a line or two; nothing yskills needs lives only inside a thread.
 - When yskills has to do something themselves: one line on why Claude can't, then numbered
   steps, each with the exact official deep link (the right settings page, not a homepage or a
   blog) and the exact names to use (secret names, field values), so they only follow it.
