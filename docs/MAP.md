@@ -21,7 +21,7 @@ lives outside this repo.
 
 | Part | Path | Owes |
 |---|---|---|
-| Working rules | `CLAUDE.md` | How Claude works for yskills: ask rule, co-founder, merge, models, UI, stack. Short; detail lives in the homes below |
+| Working rules | `CLAUDE.md` | The world (org, accounts, secrets, the one deploy path), how Claude works for yskills (ask rule, co-founder, auto-run), code, UI, stack. Short; detail lives in the homes below |
 | Front door | `README.md` | Install, what you get, cloud setup, how to change the repo |
 | This map | `docs/MAP.md` | Where things live, one home per rule |
 | Run a project | `.claude/skills/operator/` | `SKILL.md` size, roles, files, setup loop, cost; `run.md` the nine steps (Project Manager only); `gate.md` the 5/5 gate and the one merge policy; `briefs.md` the three briefs, key cards and the block every thread brief starts with; `roles/<role>.md` one playbook per role; `templates/` files copied into a project (`loop/` the feedback inbox, `mailbox/` Claude's own e-mail inbox Worker) |
@@ -34,7 +34,8 @@ lives outside this repo.
 | Cloud threads | `cloud/setup.sh` | Plugins and the context guard in a cloud environment (paste into Project settings) |
 | HQ rows | `docs/hq-rows.md` | What each Project Manager writes into HQ (the page itself lives in yverse-studio/company-xy) |
 | Characters | `docs/character-workflow.md` | The one way to make a 3D character and show it to yskills: reference, build, self-check, comparison sheet, gate, library |
-| Using it (for yskills) | `docs/USING.md` | One phone page: how to start an app, what you see, when Claude asks, what it costs |
+| Using it (for yskills) | `docs/USING.md` | One phone page: how to start an app, deploy or delete a page in one shot, what you see, what it costs |
+| Project registry | `projects/` | One `<name>.json` per project the `new-project` workflow made; `delete-project` needs it |
 | After launch | `docs/LOOP.md` | Errors and feedback become issues and fix threads |
 | Setup loop | operator `SKILL.md` (Setup loop) | Friction with this repo becomes a `loop:setup` issue, then a fix thread through the gate |
 | Test runs | `docs/TEST-PROJECTS.md` | How the setup is tested end to end, and what each run taught |
@@ -45,16 +46,20 @@ lives outside this repo.
 
 | Rule | Home | Others only link |
 |---|---|---|
-| Ask rule (what needs yskills) | `CLAUDE.md` (How to work) | operator `SKILL.md`, project instructions |
+| Org, accounts, where secrets live | `CLAUDE.md` (The world) | `publish` skill, `docs/WORKFLOW.md` (PC work) |
+| Deploy or delete a page (the steps) | `docs/USING.md` | operator `run.md`, `briefs.md`; detail in `publish` |
+| Ask rule (what needs yskills) | `CLAUDE.md` (How to work) | operator `SKILL.md`, `docs/USING.md`, project instructions |
+| Auto-run, pauses and taste calls | `CLAUDE.md` (How to work) | operator `SKILL.md`, `docs/WORKFLOW.md` |
+| Votes (who posts them, screenshots per option); yskills reads only the project chat | `CLAUDE.md` (How to work) | `briefs.md` (b), `roles/project-manager.md`, project instructions template |
 | Co-founder | `CLAUDE.md` (How to work) | `roles/*.md` (one role-specific line each) |
 | Literal mode and cost | the brief block in `briefs.md` | `roles/*.md` (one pointer each) |
 | Merge policy, 5/5 gate | `gate.md` (Merge policy) | `CLAUDE.md`, `docs/WORKFLOW.md`, `roles/tester.md` |
 | Models | the one line in `docs/WORKFLOW.md` (Models); project instructions carry it word for word | everything else links it; CI fails on a second wording or on the old model name |
 | Context guard numbers (warn 150k, hand off 200k) | `global/context-guard.mjs` | `CLAUDE.md`, `README.md` |
-| Remote Control on the PC | `docs/WORKFLOW.md` (PC work) | project instructions template |
+| Remote Control on the PC | `docs/WORKFLOW.md` (PC work) | operator `SKILL.md`, project instructions template |
 | UI rules | `CLAUDE.md` (UI) | `roles/designer.md`, `ui-review` (screenshots, run videos via `desktop.sh`) |
 | Character workflow (reference, sheet, likeness gate) | `docs/character-workflow.md` | `roles/programmer.md`, `roles/tester.md`, `roles/designer.md`, `briefs.md` |
-| Deploys | `publish` skill | `CLAUDE.md` (stack) |
+| Deploys, the workflows' detail | `publish` skill | `CLAUDE.md`, `docs/USING.md` |
 | Money and shop law | `sell` skill | `docs/WORKFLOW.md` (Selling) |
 | Project instructions text | `operator/templates/project-instructions.md` | the live text in each project's settings |
 | Reply style, say done, notify, talk first, honesty, hand-off at 200k | `operator/templates/project-instructions.md` | the live text in each project's settings |

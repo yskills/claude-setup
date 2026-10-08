@@ -13,8 +13,8 @@ files, tools or models.
 1. **Brainstorm.** Claude says what it would build instead, pushes back with reasons, then sends
    one batch of tap cards. Answer once.
 2. **Research, plan.** Market, prices, law, tools. Result: `PLAN.md` and the acceptance criteria.
-3. **Brief (a): ok or no.** The first thing you get. Your one job there: create the private repo
-   (threads cannot).
+3. **Brief (a): ok or no.** The first thing you get. Nothing to set up: Claude makes the repo,
+   the Worker and the first deploy itself (below).
 4. **Build.** One thread per slice. Every change is a PR that a separate gate thread checks
    (CI, a live test of the preview, a fresh review, security, design and law). At 5/5 it **merges
    itself**, and the thread says `Done: <what changed>`.
@@ -23,12 +23,42 @@ files, tools or models.
 You see threads, cards, PR links, `Done:` lines and the HQ rows (`docs/hq-rows.md`).
 Cards show options with one recommended; work continues on it at once.
 
+## Deploy a page in one shot
+
+What you do: write the idea. A thread does the rest.
+
+1. Pick the name: lowercase letters, digits, dashes. It is the repo and the Worker name.
+2. Start `new-project.yml` in `yverse-studio/claude-setup`: GitHub MCP `actions_run_trigger`
+   `run_workflow`, ref `main`, inputs `name` and `d1` (false when the page stores no data). Or
+   push branch `new/<name>` with one file `projects/<name>.json`:
+   `{ "name": "<name>", "d1": true, "org": "yverse-studio" }`.
+3. Register it: `projects/<name>.json` lands on claude-setup's `main` in a small PR (for an
+   existing org repo the file also names `"repo"`). Delete refuses names without it.
+4. Wait for the run (`actions_list` `list_workflow_runs`, then `actions_get`). Its summary has
+   the repo, `https://<name>.yverse.workers.dev` and the first build's status.
+5. `add_repo` the new repo, then build on branches: every branch gets a Preview, every merge to
+   `main` goes live. Post the live link.
+
+Detail and failures: `publish` skill (A new project).
+
+## Delete a page
+
+What you do: say "delete <name>". Deleting is the one step Claude asks for first.
+
+1. Run `delete-project.yml` (`actions_run_trigger` `run_workflow`, ref `main`) with `name`,
+   `confirm` = the name again, `dry_run` true. Read the plan in the log.
+2. Run it again with `dry_run` false. It removes the Worker and its builds, D1 `<name>` and
+   `<name>-preview`, the repo and a leftover `new/<name>` branch.
+3. Remove `projects/<name>.json` from `main` in a small PR, and say it is gone.
+
+It refuses protected names, names without `projects/<name>.json` on `main`, and repos the
+workflow did not make. Detail: `publish` skill (Delete a project).
+
 ## When Claude asks you
 
-Only for: real money (live key, purchase, ads), mail or posts sent, deleting data, force-push,
-rotating a secret, a choice with no clear default, design input (a look, an asset), or a step
-only you can do. Everything else it just does and tells you.
-Home of the rule: `CLAUDE.md` (How to work).
+Only for real money, mail or posts, deleting data, force-push, rotating a secret, a choice with
+no clear default, design input, or a step only you can do. The full list: `CLAUDE.md` (How to
+work). Everything else it just does and tells you.
 
 You get a notification only when needed, plus big milestones.
 Say "stop" or "pause" and everything stops; a look you reject stays rejected.
@@ -37,9 +67,8 @@ Say "stop" or "pause" and everything stops; a look you reject stays rejected.
 
 | Step | Why Claude can't |
 |---|---|
-| Once: the org, two tokens and two secrets for the `new-project` workflow (publish skill, 15 min) | After that Claude makes repo, databases, Worker and deploy itself; threads still can't create repos directly (403) |
 | Delete a branch, re-run Actions, CLAUDE.md edits | Cloud threads get a 403 on branch deletes and Actions re-runs, and the safety check refuses CLAUDE.md edits and secret reads (rechecked 2026-10-08); a PC session deletes branches; CLAUDE.md edits need your Allow |
-| Keys and tokens | They live in GitHub and the Worker, never in chat |
+| Keys and tokens | They live in claude-setup's GitHub Actions and the Worker, never in chat |
 | Real money: Stripe live, ads, Gewerbe, domain | Legal and money steps need your name and hands |
 | Owner settings of your accounts (who gets access, app installs, billing) and passwords | Claude never types a password or solves a CAPTCHA; it works in Cloudflare and GitHub through its own member logins (`docs/pc-claude-user.md`, decided 2026-10-08) |
 | The laptop | It must be on; Remote Control only runs while it is |

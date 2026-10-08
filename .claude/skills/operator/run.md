@@ -26,8 +26,8 @@ before each step; builder, gate and fix threads read their `roles/<role>.md` ins
      earn, not that yskills can find buyers; the probe slice (step 5) tests that.
    - **Legal:** the `legal` skill's table for this idea.
 3. **Plan.** `planner` proposes; the operator writes `PLAN.md` and `features.json`. **Brief (a).**
-   No task for yskills: the operator runs claude-setup's `new-project` workflow (publish skill,
-   §Per project) and `add_repo`s the repo it made; the day-zero site is live before the scaffold.
+   No task for yskills: the operator deploys the day-zero site in one shot
+   ([`docs/USING.md`](../../../docs/USING.md), Deploy a page in one shot) before the scaffold.
    **Day one in HQ** (the same hour as brief (a), one `ArtifactData` batch, every row with `at`, as
    `docs/hq-rows.md` says): the `projects/<id>` row (`state` active, `revenueMode` test, traction
    fields 0, `firstEuroBy` = PLAN.md's go date), the `<id>-` phases and `team` rows, a `work/<session>`
