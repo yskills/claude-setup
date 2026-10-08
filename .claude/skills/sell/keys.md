@@ -36,6 +36,21 @@ Use these secret names exactly; the Worker expects them (`server/utils/env.ts`).
 `BETTER_AUTH_SECRET` (apps with logins): yskills sets 32+ random characters
 (`openssl rand -hex 32`) in Production, and a different one in Previews Base (`publish` skill).
 
+## No Stripe account yet
+
+The key card then starts with these steps (asked 2026-10-08, workflow-tests):
+
+1. [Register](https://dashboard.stripe.com/register): email, name, country Deutschland. Skip
+   "activate account" and business details; a sandbox needs neither.
+2. Account picker (top left) → the sandbox, or **Create sandbox**. The sandbox banner shows at
+   the top; every later step happens inside it.
+3. Optional: [Payment methods](https://dashboard.stripe.com/settings/payment_methods) → PayPal,
+   Klarna, SEPA, Apple Pay / Google Pay on.
+4. Test: `/api/config` shows the key is set; pay with `4242 4242 4242 4242`, any future date, CVC
+   `123`; payments show under [test payments](https://dashboard.stripe.com/test/payments).
+
+A filled-in example for one Worker: `stripe/ANLEITUNG.md` in the "Tests" project files.
+
 ## Message template for the first batch
 
 Fill in the project, and drop the rows it doesn't need. Ask for test keys only; live keys come at
