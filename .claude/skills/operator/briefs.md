@@ -21,7 +21,7 @@ Größe: <small site: 1 build | app: n slices, riskiest first: <slice 1>>
 Slices: 1. <name> 2. <name> ...
 Rechtliches: <must-haves from the legal team, e.g. Impressum, Datenschutz, no cookie banner needed>
 Keys: <none | what will be needed, each asked by a key card when its slice gets there>
-Repo: `yverse-studio/<name>`, made by the `new-project` workflow (publish skill), live at <url>
+Repo: `yverse-studio/<name>`, made by the `new-project` workflow, live at https://<name>.yverse.workers.dev
 Kosten: ~<€/month to run> + ~<tokens or $ to build>, estimate
 Risiko: <the one thing most likely to fail>
 
