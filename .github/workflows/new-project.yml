@@ -37,7 +37,7 @@ concurrency:
 
 jobs:
   setup:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository && startsWith(github.event.workflow_run.head_branch, 'new/'))
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -74,7 +74,7 @@ jobs:
   cleanup:
     # Only this job may write to the repo, and it runs no repo code.
     needs: setup
-    if: github.event_name == 'workflow_run'
+    if: github.event_name == 'workflow_run' && startsWith(github.event.workflow_run.head_branch, 'new/')
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
