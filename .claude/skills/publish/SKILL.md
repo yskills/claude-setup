@@ -95,6 +95,12 @@ from a pushed branch; private repo, no outside collaborators, `yskills-claude` i
    proves the wiring.
 4. Keys a slice needs (Stripe, Google, Resend) come by key card as before (`sell`, `keys.md`);
    they are Worker secrets in the dashboard, never in git or GitHub.
+5. An existing org repo (one that already has code) goes the same way: `projects/<name>.json`
+   on main names it with `"repo"` (its GitHub name), `"branch"` (production branch), `"build"`,
+   `"deploy"`, `"preview"` (Workers Builds commands; defaults are the day-zero site's) and
+   `"secret": false` for a static site; the repo's `wrangler.jsonc` `name` must equal `name`. Then
+   `run_workflow` on `new-project.yml` with that name; nothing is pushed to the repo.
+   Example: `projects/mypage.json`.
 
 Without the five steps above the workflow fails on its first line with the missing name; a
 thread then sends yskills the step with its link, once.

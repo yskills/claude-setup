@@ -44,8 +44,9 @@ test('the scaffold is written with the name filled in and runs its own verify', 
 })
 
 test('a pushed new/<name> branch names the project, its json the options', () => {
-  assert.deepEqual(projectFromBranch('new/shop', () => null), { name: 'shop', d1: true, org: 'yverse-studio' })
-  assert.deepEqual(projectFromBranch('new/shop', () => ({ d1: false, org: 'other' })), { name: 'shop', d1: false, org: 'other' })
+  const pick = (p) => ({ name: p.name, d1: p.d1, org: p.org, repo: p.repo, branch: p.branch })
+  assert.deepEqual(pick(projectFromBranch('new/shop', () => null)), { name: 'shop', d1: true, org: 'yverse-studio', repo: 'shop', branch: 'main' })
+  assert.deepEqual(pick(projectFromBranch('new/shop', () => ({ d1: false, org: 'other' }))), { name: 'shop', d1: false, org: 'other', repo: 'shop', branch: 'main' })
   assert.equal(projectFromBranch('main', () => null), null)
 })
 
@@ -110,4 +111,27 @@ test('a build is judged by its outcome once it has stopped', () => {
   assert.equal(buildState({ status: 'stopped', build_outcome: 'fail' }).outcome, 'fail')
   assert.equal(buildState({ status: 'failure' }).outcome, 'failure')
   assert.equal(buildState(null).running, true)
+})
+
+test('an existing repo keeps its own name, branch and commands', async () => {
+  const { projectConfig, validRepo } = await import('./new-project.mjs')
+  const fresh = projectConfig('app')
+  assert.deepEqual([fresh.repo, fresh.branch, fresh.d1, fresh.secret, fresh.org], ['app', 'main', true, true, 'yverse-studio'])
+  assert.equal(fresh.commands.production.deploy_command, 'npm run deploy')
+  const page = projectConfig('mypage', { d1: false, repo: 'MyPage', branch: 'origin', build: 'npm run check && npm run generate', secret: false })
+  assert.deepEqual([page.repo, page.branch, page.secret], ['MyPage', 'origin', false])
+  assert.equal(page.commands.production.build_command, 'npm run check && npm run generate')
+  assert.equal(page.commands.production.deploy_command, 'npx wrangler deploy')
+  assert.equal(page.commands.previews.deploy_command, 'npx wrangler preview')
+  assert.ok(validRepo('MyPage') && !validRepo('../x') && !validRepo('a/b'))
+})
+
+test('every registered project is a valid config', async () => {
+  const { readdirSync, readFileSync: read } = await import('node:fs')
+  const { projectConfig, validName, validRepo } = await import('./new-project.mjs')
+  for (const file of readdirSync(new URL('../projects/', import.meta.url)).filter((f) => f.endsWith('.json'))) {
+    const cfg = projectConfig(file.slice(0, -5), JSON.parse(read(new URL(`../projects/${file}`, import.meta.url), 'utf8')))
+    assert.equal(`${cfg.name}.json`, file)
+    assert.ok(validName(cfg.name) && validRepo(cfg.repo), file)
+  }
 })
