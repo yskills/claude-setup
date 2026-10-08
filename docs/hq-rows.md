@@ -52,6 +52,25 @@ coordinator, and on every open with an old list. Other threads do neither (prove
 `Researcher · <idea>` brainstorm thread whose brief names the request id, unless a thread for that
 id already runs (a resend repeats it); that thread sets the row to `started` with its thread link.
 
+**Projects mirror the repos (yskills 2026-10-08):** a project in HQ is a yskills GitHub repo Claude can reach that was pushed
+in the last 30 days, or one that already has a `projects/<id>` row; ideas promoted from the idea board become projects when
+their repo exists. Nothing else belongs on the Company page. The HQ refresher (company-xy `hq-refresh.md`) keeps this true on
+every run: it creates a row for a new repo (`by: 'mirror'`) and writes only the `mirror` field
+(`{repo, url, pushedAt, reachable, about, lastCommit, openPrs, progress, at}`) into a row a Project Manager owns. A PM keeps
+writing `name, note, you[], money` as before and never writes `mirror`. **States are `active`, `paused` and `archived`**
+(`done` reads as archived); only yskills sets them, with the taps on the project card (one confirm each): pause, archive,
+delete. Delete removes every HQ row of the project (`projects`, `finance`, its `phases`, `team` and `events`) and leaves one
+`ignore/<id>` row so the mirror never brings it back. Every tap also writes a `requests/<id>` row (`kind: 'lifecycle'`,
+`project, act, repo`) and messages the coordinator, which confirms anything on GitHub (archive or delete the repo) with
+yskills in words and acts only on their yes; no thread archives or deletes a repo from a tap alone. A paused project gets no
+new thread until yskills resumes it.
+
+**Idea board:** the pinboard in yskills' office shows `ideas/<slug>`, mirrored by the refresher from ideaWorld's
+`content/ideas/<slug>.md` (the capture schema there). The state is derived, never written: Verworfen (parked), Gestartet (a
+project or repo named like the slug exists), Geplant (the file has a First slice), else Idee. Its Starten tap writes
+`requests/<id>` (`kind: 'idea'`, `slug`) and messages the coordinator, which starts the normal operator workflow with the slug
+as project, repo and Worker name; that thread sets the request `started` with its link.
+
 **Roadmap:** HQ's Roadmap tab is one quest map per project, rendered only from these `phases` rows and the
 `work` rows they name (`HQ.questMap` in company-xy's `hq-rules.js`). A step shows as current only when its row is `active`
 and carries `project` and `at`; a row without `project` lands under "Ohne Projekt" and never counts as current. **At every
