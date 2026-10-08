@@ -101,7 +101,7 @@ function env(key, required = true) {
 async function api(base, token, path, init = {}) {
   const res = await fetch(base + path, {
     ...init,
-    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'claude-setup new-project', ...(init.headers || {}) },
+    headers: { ...(token ? { authorization: `Bearer ${token}` } : {}), 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'claude-setup new-project', ...(init.headers || {}) },
     body: init.body === undefined ? undefined : JSON.stringify(init.body),
   })
   const text = await res.text()
@@ -110,11 +110,28 @@ async function api(base, token, path, init = {}) {
   return { status: res.status, ok: res.ok, json, text }
 }
 
+// Hides anything secret-like in an API body before it reaches a log: values of keys named
+// token/secret/key/password/authorization/hook/uuid/id, every uuid or 32-hex id, and long
+// dash-free strings (tokens, hashes). A deploy hook id alone starts builds, so ids count.
+export function redact(text) {
+  return String(text ?? '')
+    .replace(/("(?:[^"]*(?:token|secret|key|password|authorization|hook|uuid)[^"]*|id)"\s*:\s*)"[^"]*"/gi, '$1"***"')
+    .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32}/gi, '***')
+    .replace(/[A-Za-z0-9_=+/.]{40,}/g, '***')
+}
+
+// One line that says what an API call really answered, safe to print in a public log.
+export function describe(r) {
+  const keys = (o) => (o && typeof o === 'object' ? (Array.isArray(o) ? `array(${o.length})` : Object.keys(o).join(',') || '{}') : String(o))
+  return `${r.status} keys=[${keys(r.json)}] result=[${keys(r.json?.result)}] body=${JSON.stringify(redact(r.text).slice(0, 300))}`
+}
+
 function cfClient(token, account) {
   const base = 'https://api.cloudflare.com/client/v4'
   return async (path, init) => {
     const r = await api(base, token, `/accounts/${account}${path}`, init)
-    if (!r.ok && r.status !== 404) throw new Error(`Cloudflare ${init?.method || 'GET'} ${path}: ${r.status} ${r.text.slice(0, 400)}`)
+    if (path.startsWith('/builds/')) log('api', `${init?.method || 'GET'} ${path.replace(/\/deploy_hooks\/[^/]+/, '/deploy_hooks/<hook>')} → ${describe(r)}`)
+    if (!r.ok && r.status !== 404) throw new Error(`Cloudflare ${init?.method || 'GET'} ${path}: ${r.status} ${redact(r.text).slice(0, 400)}`)
     return r
   }
 }
@@ -214,6 +231,44 @@ async function ensureBuilds(cf, { tag, repo, org, name, branch, d1, buildTokenUu
   return created.json.result
 }
 
+const HOOK_NAME = 'claude-setup first build'
+
+// The hook id, whatever the answer calls it (the schema says deploy_hook_uuid; runs showed
+// answers the schema did not predict, so the other names seen in Cloudflare docs count too).
+export function hookIdFrom(result) {
+  const r = result?.deploy_hook || result || {}
+  return r.deploy_hook_uuid || r.hook_id || r.uuid || r.id || null
+}
+
+async function listHooks(cf, name) {
+  const list = await cf(`/builds/workers/${name}/deploy_hooks`)
+  const result = list.json?.result
+  return Array.isArray(result) ? result : Array.isArray(result?.deploy_hooks) ? result.deploy_hooks : []
+}
+
+async function deleteHook(cf, name, id) {
+  await cf(`/builds/workers/${name}/deploy_hooks/${id}`, { method: 'DELETE' }).catch(() => log('deploy hook', 'not deleted; remove it in the dashboard (Settings > Build > Deploy hooks)'))
+}
+
+// Hooks an earlier run left behind (its uuid alone starts builds) go first.
+async function removeOldHooks(cf, name) {
+  for (const hook of await listHooks(cf, name)) {
+    const id = hookIdFrom(hook)
+    if (hook.deploy_hook_name === HOOK_NAME && id) { log('deploy hook', 'removing one left by an earlier run'); await deleteHook(cf, name, id) }
+  }
+}
+
+async function makeHook(cf, name, branch) {
+  const made = await cf(`/builds/workers/${name}/deploy_hooks`, { method: 'POST', body: { deploy_hook_name: HOOK_NAME, branch } })
+  const direct = made.ok ? hookIdFrom(made.json?.result) : null
+  if (direct) return direct
+  // An empty or unexpected answer: the hook may still exist, so the list is the second source.
+  const listed = (await listHooks(cf, name)).find((h) => h.deploy_hook_name === HOOK_NAME && h.branch === branch)
+  const fromList = hookIdFrom(listed)
+  if (fromList) return fromList
+  throw new Error(`deploy hook not made: POST answered ${describe(made)}`)
+}
+
 async function startBuild(cf, tag, name, branch) {
   // A config made with POST /builds/workers lists no legacy trigger (run 5 on 2026-10-08:
   // "status 200, 0 listed"), so a trigger is used when one exists and a deploy hook otherwise:
@@ -224,19 +279,21 @@ async function startBuild(cf, tag, name, branch) {
   const production = (triggers.json?.result || []).find((t) => (t.branch_includes || []).includes(branch)) || (triggers.json?.result || [])[0]
   if (production) {
     const started = await cf(`/builds/triggers/${production.trigger_uuid}/builds`, { method: 'POST', body: { branch } })
-    return started.json.result.build_uuid
+    const uuid = started.json?.result?.build_uuid
+    if (!uuid) throw new Error(`trigger answered without a build uuid: ${describe(started)}`)
+    return uuid
   }
-  const hook = await cf(`/builds/workers/${name}/deploy_hooks`, { method: 'POST', body: { deploy_hook_name: 'claude-setup first build', branch } })
-  const hookUuid = hook.json?.result?.deploy_hook_uuid || hook.json?.result?.uuid || hook.json?.result?.id
-  if (!hookUuid) throw new Error(`deploy hook made but no uuid in the answer (keys: ${Object.keys(hook.json?.result || {}).join(',')})`)
+  await removeOldHooks(cf, name)
+  const hookId = await makeHook(cf, name, branch)
   try {
-    const res = await fetch(`https://api.cloudflare.com/client/v4/workers/builds/deploy_hooks/${hookUuid}`, { method: 'POST' })
-    const json = await res.json().catch(() => null)
-    if (!res.ok || !json?.result?.build_uuid) throw new Error(`deploy hook answered ${res.status}: ${JSON.stringify(json?.errors || json).slice(0, 300)}`)
+    const fired = await api('https://api.cloudflare.com/client/v4', null, `/workers/builds/deploy_hooks/${hookId}`, { method: 'POST' })
+    log('api', `POST /workers/builds/deploy_hooks/<hook> → ${describe(fired)}`)
+    const uuid = fired.json?.result?.build_uuid
+    if (!fired.ok || !uuid) throw new Error(`deploy hook did not start a build: ${describe(fired)}`)
     log('build', 'started through a deploy hook')
-    return json.result.build_uuid
+    return uuid
   } finally {
-    await cf(`/builds/workers/${name}/deploy_hooks/${hookUuid}`, { method: 'DELETE' }).catch(() => log('deploy hook', 'not deleted; remove it in the dashboard (Settings > Build > Deploy hooks)'))
+    await deleteHook(cf, name, hookId)
   }
 }
 
