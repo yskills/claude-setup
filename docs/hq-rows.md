@@ -105,7 +105,7 @@ base64 text; the page decodes it); a row with any outfit lacking a valid id is n
 row: the office poses every figure with the shared clips in code. Desk and bond live in `roster/desks` and
 `bond/<id>` (`wear` = worn outfit index). Switch after a figure merge: upload the new exports, then one `update`
 on `cards/<id>` that replaces the ids in place (same order and labels), pinned with `if_version` (the db's
-document `version` is the only versioning); the old assets stay until the new row renders, then may be deleted.
+document `version` is the only versioning); the old assets stay (deleting them is a data delete and needs yskills).
 **Derived rows:** in the Company XY project the threads write none of this themselves; the HQ refresher derives them from
 `list_thread_sessions` (every thread, finished ones included) on every run (company-xy `hq-refresh.md`): `work/session_<id>` per open thread (the thread list spells
 the same session `cse_<id>`) with `by: 'refresher'`, `state` (running in a turn, waiting between turns, done once finished or
