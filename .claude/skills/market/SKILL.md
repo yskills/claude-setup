@@ -25,7 +25,9 @@ Markers: **[S]** search results and legal publishers agree; **[K]** known but no
 Marketing changes what gets built: the landing page, a waitlist, share features, tracking
 events. So the plan is part of the PRD, not an afterthought.
 
-1. **Buyer.** Who buys, in one sentence, and the moment they need it.
+1. **Buyer.** Who buys, in one sentence, and the moment they need it. Run `customer-panel`
+   (20 simulated buyers, their top objections and a price range) before the probe goes live;
+   the panel is an upper bound, the probe is the real test.
 2. **Positioning.** "[Product] helps [audience] [outcome] by [mechanism]". Name 3 competitors and
    what we do differently.
 3. **Goal.** The 90-day goal in numbers, e.g. 300 on the waitlist and 50 paid. Pick one metric
