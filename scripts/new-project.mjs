@@ -5,10 +5,12 @@
 // Reads: CLOUDFLARE_API_TOKEN (user token: Workers Builds Configuration Edit, Workers Scripts Edit,
 // D1 Edit, Account Settings Read), CLOUDFLARE_ACCOUNT_ID, PROJECTS_GITHUB_TOKEN (fine-grained, the
 // org only: Administration, Contents, Workflows), BUILD_TOKEN_NAME (optional: which Workers Builds
-// token deploys; default: the first one), and the project: NAME, ORG, D1 ("true"/"false") from a
-// workflow_dispatch, or PROJECT_BRANCH `new/<name>` whose `projects/<name>.json` holds
-// `{ "name", "d1", "org" }` (a cloud thread can push a branch but not dispatch a workflow; the
-// workflow runs main's code and takes only that json from the branch).
+// token deploys; default: the first one), and the project: `projects/<name>.json` (on main, or on
+// the pushed branch `new/<name>`, where only d1 and org count; the workflow runs main's code
+// and takes only that json from the branch), else NAME, ORG, D1 from a workflow_dispatch. The json: `{ "name", "d1", "org" }` and, for
+// an existing repo, `"repo"` (its GitHub name; production builds its default branch), `"build"`,
+// `"deploy"`, `"preview"` (Workers Builds commands) and `"secret": false` (no BETTER_AUTH_SECRET,
+// e.g. a static site).
 import { cpSync, mkdtempSync, readFileSync, writeFileSync, rmSync, appendFileSync, existsSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
@@ -16,16 +18,54 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+export const MARKER = 'made by claude-setup new-project'
 const TEMPLATE = new URL('../.claude/skills/publish/templates/new-project/', import.meta.url)
 const BUILD = 'npm run check && npm run build'
 const BUILD_WAIT_MS = 10 * 60 * 1000
 const POLL_MS = 15 * 1000
 
+// The registry on main (`projects/<name>.json`, reviewed through the gate) may set every key; a
+// pushed branch's json (`incoming/projects/<name>.json`) only d1 and org (the branch names it), so no unreviewed
+// push can point a build at another repo, branch or command.
 export function projectFromBranch(branch, readJson) {
   if (!branch?.startsWith('new/')) return null
   const name = branch.slice('new/'.length)
-  const cfg = readJson(`projects/${name}.json`) || {}
-  return { name: cfg.name || name, d1: cfg.d1 !== false, org: cfg.org || 'yverse-studio' }
+  const registered = readJson(`projects/${name}.json`)
+  if (registered) return projectConfig(name, registered)
+  const { d1, org } = readJson(`incoming/projects/${name}.json`) || {}
+  return projectConfig(name, { d1, org })
+}
+
+// A branch name from GitHub, checked before it reaches Cloudflare.
+export function validBranch(branch) {
+  return /^[A-Za-z0-9][A-Za-z0-9._/-]{0,100}$/.test(branch) && !branch.includes('..')
+}
+
+export const ORG = 'yverse-studio'
+
+// One project's settings with defaults. A `repo` key marks an existing repo (like MyPage): it must
+// already exist in the org, nothing is created or pushed there, production builds its GitHub
+// default branch, and a Worker of the same name is never adopted. Without it the repo is new and
+// shares the Worker's name. Build commands are the day-zero site's unless the json names its own.
+export function projectConfig(name, cfg = {}) {
+  const d1 = cfg.d1 !== false
+  const defaults = buildCommands(d1)
+  return {
+    name: cfg.name || name,
+    d1,
+    org: cfg.org || ORG,
+    repo: cfg.repo || cfg.name || name,
+    existing: Boolean(cfg.repo),
+    secret: cfg.secret !== false,
+    commands: {
+      production: { build_command: cfg.build || defaults.production.build_command, deploy_command: cfg.deploy || defaults.production.deploy_command },
+      previews: { build_command: cfg.build || defaults.previews.build_command, deploy_command: cfg.preview || defaults.previews.deploy_command },
+    },
+  }
+}
+
+export function validRepo(repo) {
+  return /^[A-Za-z0-9._-]{1,100}$/.test(repo) && !repo.startsWith('.')
 }
 
 export function validName(name) {
@@ -101,7 +141,7 @@ function env(key, required = true) {
 async function api(base, token, path, init = {}) {
   const res = await fetch(base + path, {
     ...init,
-    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'claude-setup new-project', ...(init.headers || {}) },
+    headers: { ...(token ? { authorization: `Bearer ${token}` } : {}), 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'claude-setup new-project', ...(init.headers || {}) },
     body: init.body === undefined ? undefined : JSON.stringify(init.body),
   })
   const text = await res.text()
@@ -110,11 +150,28 @@ async function api(base, token, path, init = {}) {
   return { status: res.status, ok: res.ok, json, text }
 }
 
+// Hides anything secret-like in an API body before it reaches a log: values of keys named
+// token/secret/key/password/authorization/hook/uuid/id, every uuid or 32-hex id, and long
+// dash-free strings (tokens, hashes). A deploy hook id alone starts builds, so ids count.
+export function redact(text) {
+  return String(text ?? '')
+    .replace(/("(?:[^"]*(?:token|secret|key|password|authorization|hook|uuid)[^"]*|id)"\s*:\s*)"[^"]*"/gi, '$1"***"')
+    .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32}/gi, '***')
+    .replace(/[A-Za-z0-9_=+/.]{40,}/g, '***')
+}
+
+// One line that says what an API call really answered, safe to print in a public log.
+export function describe(r) {
+  const keys = (o) => (o && typeof o === 'object' ? (Array.isArray(o) ? `array(${o.length})` : Object.keys(o).join(',') || '{}') : String(o))
+  return `${r.status} keys=[${keys(r.json)}] result=[${keys(r.json?.result)}] body=${JSON.stringify(redact(r.text).slice(0, 300))}`
+}
+
 function cfClient(token, account) {
   const base = 'https://api.cloudflare.com/client/v4'
   return async (path, init) => {
     const r = await api(base, token, `/accounts/${account}${path}`, init)
-    if (!r.ok && r.status !== 404) throw new Error(`Cloudflare ${init?.method || 'GET'} ${path}: ${r.status} ${r.text.slice(0, 400)}`)
+    if (path.startsWith('/builds/')) log('api', `${init?.method || 'GET'} ${path.replace(/\/deploy_hooks\/[^/]+/, '/deploy_hooks/<hook>')} → ${describe(r)}`)
+    if (!r.ok && r.status !== 404) throw new Error(`Cloudflare ${init?.method || 'GET'} ${path}: ${r.status} ${redact(r.text).slice(0, 400)}`)
     return r
   }
 }
@@ -128,7 +185,7 @@ function log(step, detail) { console.log(`[new-project] ${step}: ${detail}`) }
 async function ensureRepo(gh, org, name) {
   const existing = await gh(`/repos/${org}/${name}`)
   if (existing.ok) { log('repo', `exists ${existing.json.html_url}`); return existing.json }
-  const created = await gh(`/orgs/${org}/repos`, { method: 'POST', body: { name, private: true, auto_init: false, description: 'made by claude-setup new-project' } })
+  const created = await gh(`/orgs/${org}/repos`, { method: 'POST', body: { name, private: true, auto_init: false, description: MARKER } })
   if (!created.ok) throw new Error(`GitHub create repo: ${created.status} ${created.text.slice(0, 300)}`)
   log('repo', `created ${created.json.html_url}`)
   return created.json
@@ -196,46 +253,166 @@ async function pickBuildToken(cf, preferredName, newToken) {
   return pick.build_token_uuid
 }
 
-async function ensureBuilds(cf, { tag, repo, org, name, branch, d1, buildTokenUuid }) {
+const CONNECT_TRIES = 6
+const CONNECT_WAIT_MS = 20 * 1000
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+const errorsOf = (r) => (r.json?.errors || []).map((e) => `${e.code} ${redact(e.message)}`).join('; ') || `status ${r.status}`
+
+// The git identifiers Workers Builds may want. The script sent GitHub's numeric ids; the schema's
+// examples name the account and repo ("cloudflare", "workers-sdk"). Both are tried, the accepted
+// one goes into the build configuration.
+export function repoIdForms(repo, org, name) {
+  return [
+    { label: 'numeric ids', provider_account_id: String(repo.owner.id), repo_id: String(repo.id) },
+    { label: 'names', provider_account_id: org, repo_id: name },
+  ]
+}
+
+export const REFRESH_FIX = `Cloudflare learns of new repositories from the GitHub app; when a repo made after the link stays unknown (2026-10-08: runs 7 and 8 answered 8000008 "disconnected from your Git account" until the app was saved again), open https://github.com/organizations/<org>/settings/installations > Cloudflare Workers and Pages > Configure, switch Repository access to "Only select repositories" and back to "All repositories", press Save, then push the branch again`
+
+// Saves the repository connection Workers Builds needs before a build configuration can exist
+// (PUT /builds/repos/connections, "the repository connection required by build triggers").
+// The public API lists neither connected Git accounts nor their repositories and offers no
+// re-sync, so this upsert is the only way to see whether Cloudflare knows the repo yet: it is
+// retried while Cloudflare catches up with a repo created moments ago, with every answer logged.
+export async function connectRepo(cf, { repo, org, name, tries = CONNECT_TRIES, waitMs = CONNECT_WAIT_MS }) {
+  const forms = repoIdForms(repo, org, name)
+  let refused = []
+  for (let attempt = 1; attempt <= tries; attempt += 1) {
+    refused = []
+    for (const { label, ...ids } of forms) {
+      const git = { provider_type: 'github', provider_account_name: org, repo_name: name, ...ids }
+      const r = await cf('/builds/repos/connections', { method: 'PUT', body: git })
+      if (r.ok && r.json?.success && r.json?.result) {
+        log('repo connection', `Cloudflare knows ${org}/${name} by ${label}`)
+        return git
+      }
+      // Only "disconnected from your Git account" means Cloudflare has not seen the repo yet;
+      // every other answer (cfClient already throws on 401, 403 and 5xx) stops the run at once.
+      const unknownRepo = r.status === 404 && (r.json?.errors || []).some((e) => e.code === 8000008)
+      if (!unknownRepo) throw new Error(`Cloudflare PUT /builds/repos/connections (${label}): ${errorsOf(r)}`)
+      refused.push(`${label}: ${errorsOf(r)}`)
+    }
+    if (attempt < tries) {
+      log('repo connection', `Cloudflare does not know ${org}/${name} yet (${refused.join('; ')}); try ${attempt + 1} of ${tries} in ${waitMs / 1000} s`)
+      await sleep(waitMs)
+    }
+  }
+  throw new Error(`Workers Builds does not see ${org}/${name} through the GitHub app after ${tries} tries: ${refused.join('; ')}. Fix: ${REFRESH_FIX.replaceAll('<org>', org)}`)
+}
+
+export async function ensureBuilds(cf, { tag, git, org, name, branch, d1, buildTokenUuid, commands = buildCommands(d1) }) {
   const existing = await cf(`/builds/workers/${tag}`)
   if (existing.ok) { log('builds', 'already connected'); return existing.json.result }
-  const commands = buildCommands(d1)
   const created = await cf('/builds/workers', {
     method: 'POST',
     body: {
       script_tag: tag,
-      git_repository: { provider_type: 'github', provider_account_id: String(repo.owner.id), provider_account_name: org, repo_id: String(repo.id), repo_name: name, branch },
+      git_repository: { ...git, branch },
       production_settings: { ...commands.production, build_token_uuid: buildTokenUuid, root_directory: '/' },
       previews_enabled: true,
       previews_base_config: { ...commands.previews, build_token_uuid: buildTokenUuid, root_directory: '/' },
     },
   })
+  if (!created.ok || !created.json?.success || !created.json?.result) {
+    // Run 7 on 2026-10-08 answered 404 / 8000008 "This project is disconnected from your Git
+    // account" here and the run went on as if connected. Any non-success stops the run now.
+    const errors = errorsOf(created)
+    const linkFix = `link the GitHub org to Claude's Cloudflare account once (Workers & Pages > Create > Import a repository > Add account > ${org} > All repositories); if it is linked, ${REFRESH_FIX.replaceAll('<org>', org)}`
+    throw new Error(`Workers Builds did not connect ${org}/${name}: ${errors}. Fix: ${(created.json?.errors || []).some((e) => e.code === 8000008) ? linkFix : `check the answer above; if it names the Git account, ${linkFix}`}`)
+  }
   log('builds', `connected ${org}/${name} (${branch})`)
   return created.json.result
 }
 
-async function firstBuild(cf, tag, branch) {
-  // The trigger can appear a moment after the repo is connected, so look a few times.
-  let triggers, production
-  for (let i = 0; i < 6 && !production; i++) {
-    if (i) await new Promise((r) => setTimeout(r, POLL_MS))
-    triggers = await cf(`/builds/workers/${tag}/triggers`)
-    production = (triggers.json?.result || []).find((t) => (t.branch_includes || []).includes(branch)) || (triggers.json?.result || [])[0]
+const HOOK_NAME = 'claude-setup first build'
+
+// The hook id, whatever the answer calls it (the schema says deploy_hook_uuid; runs showed
+// answers the schema did not predict, so the other names seen in Cloudflare docs count too).
+export function hookIdFrom(result) {
+  const r = result?.deploy_hook || result || {}
+  return r.deploy_hook_uuid || r.hook_id || r.uuid || r.id || null
+}
+
+// Workers Builds paths take the script tag, not the name (a 404 comes back as an empty answer).
+async function listHooks(cf, tag) {
+  const list = await cf(`/builds/workers/${tag}/deploy_hooks`)
+  const result = list.json?.result
+  return Array.isArray(result) ? result : Array.isArray(result?.deploy_hooks) ? result.deploy_hooks : []
+}
+
+async function deleteHook(cf, tag, id) {
+  await cf(`/builds/workers/${tag}/deploy_hooks/${id}`, { method: 'DELETE' }).catch(() => log('deploy hook', 'not deleted; remove it in the dashboard (Settings > Build > Deploy hooks)'))
+}
+
+// Hooks an earlier run left behind (its uuid alone starts builds) go first.
+async function removeOldHooks(cf, tag) {
+  for (const hook of await listHooks(cf, tag)) {
+    const id = hookIdFrom(hook)
+    if (hook.deploy_hook_name === HOOK_NAME && id) { log('deploy hook', 'removing one left by an earlier run'); await deleteHook(cf, tag, id) }
   }
-  if (!production) throw new Error(`no build trigger found after connecting (status ${triggers.status}, ${(triggers.json?.result || []).length} listed, keys: ${Object.keys(triggers.json || {}).join(',')})`)
-  const started = await cf(`/builds/triggers/${production.trigger_uuid}/builds`, { method: 'POST', body: { branch } })
-  const uuid = started.json.result.build_uuid
+}
+
+async function makeHook(cf, tag, branch) {
+  const made = await cf(`/builds/workers/${tag}/deploy_hooks`, { method: 'POST', body: { deploy_hook_name: HOOK_NAME, branch } })
+  const direct = made.ok ? hookIdFrom(made.json?.result) : null
+  if (direct) return direct
+  // An empty or unexpected answer: the hook may still exist, so the list is the second source.
+  const listed = (await listHooks(cf, tag)).find((h) => h.deploy_hook_name === HOOK_NAME && h.branch === branch)
+  const fromList = hookIdFrom(listed)
+  if (fromList) return fromList
+  throw new Error(`deploy hook not made: POST answered ${describe(made)}`)
+}
+
+async function startBuild(cf, tag, name, branch) {
+  // A config made with POST /builds/workers lists no legacy trigger (run 5 on 2026-10-08:
+  // "status 200, 0 listed"), so a trigger is used when one exists and a deploy hook otherwise:
+  // POST /builds/workers/{tag}/deploy_hooks makes a hook for the branch, an unauthenticated
+  // POST to /workers/builds/deploy_hooks/{uuid} starts the build (Cloudflare docs, Deploy Hooks),
+  // and the hook is deleted again because its uuid alone can start builds.
+  const triggers = await cf(`/builds/workers/${tag}/triggers`)
+  const production = (triggers.json?.result || []).find((t) => (t.branch_includes || []).includes(branch)) || (triggers.json?.result || [])[0]
+  if (production) {
+    const started = await cf(`/builds/triggers/${production.trigger_uuid}/builds`, { method: 'POST', body: { branch } })
+    const uuid = started.json?.result?.build_uuid
+    if (!uuid) throw new Error(`trigger answered without a build uuid: ${describe(started)}`)
+    return uuid
+  }
+  await removeOldHooks(cf, tag)
+  const hookId = await makeHook(cf, tag, branch)
+  try {
+    const fired = await api('https://api.cloudflare.com/client/v4', null, `/workers/builds/deploy_hooks/${hookId}`, { method: 'POST' })
+    log('api', `POST /workers/builds/deploy_hooks/<hook> → ${describe(fired)}`)
+    const uuid = fired.json?.result?.build_uuid
+    if (!fired.ok || !uuid) throw new Error(`deploy hook did not start a build: ${describe(fired)}`)
+    log('build', 'started through a deploy hook')
+    return uuid
+  } finally {
+    await deleteHook(cf, tag, hookId)
+  }
+}
+
+async function firstBuild(cf, tag, name, branch) {
+  const uuid = await startBuild(cf, tag, name, branch)
   log('build', `started ${uuid}`)
   const until = Date.now() + BUILD_WAIT_MS
   while (Date.now() < until) {
-    await new Promise((r) => setTimeout(r, POLL_MS))
+    await sleep(POLL_MS)
     const b = await cf(`/builds/builds/${uuid}`)
-    const status = b.json?.result?.status
-    log('build', status)
-    const stillRunning = !status || ['queued', 'pending', 'initializing', 'running', 'in_progress'].includes(status)
-    if (!stillRunning) return { uuid, status }
+    const state = buildState(b.json?.result)
+    log('build', state.running ? state.status : `${state.status}, outcome ${state.outcome}`)
+    if (!state.running) return { uuid, status: state.outcome }
   }
   return { uuid, status: 'timeout' }
+}
+
+// A build's status says whether it still runs (queued, initializing, running, stopped), its
+// build_outcome how it ended (success, fail, skipped, cancelled, terminated). Run 9 on
+// 2026-10-08 deployed fine and was reported red because "stopped" was read as a failure.
+export function buildState(result) {
+  const status = result?.status || 'unknown'
+  const running = !result || ['queued', 'pending', 'initializing', 'running', 'in_progress'].includes(status)
+  return { status, running, outcome: running ? null : result.build_outcome || status }
 }
 
 async function ensureSecret(cf, name, key, text) {
@@ -260,38 +437,48 @@ function pushScaffold(dir, org, name, branch, token) {
 }
 
 export async function main() {
-  const fromBranch = process.env.NAME ? null : projectFromBranch(process.env.PROJECT_BRANCH, (file) => (existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null))
-  const name = fromBranch?.name || env('NAME')
+  const readJson = (file) => (existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null)
+  const project = process.env.NAME
+    ? projectConfig(process.env.NAME, readJson(`projects/${process.env.NAME}.json`) || { d1: env('D1', false) !== 'false', org: env('ORG', false) })
+    : projectFromBranch(process.env.PROJECT_BRANCH, readJson)
+  if (!project) throw new Error('NAME is not set and the branch is not new/<name>')
+  const { name, d1, org, repo: repoName, existing, commands, secret } = project
   if (!validName(name)) throw new Error(`name "${name}" must be lowercase letters, digits and dashes`)
-  const org = fromBranch?.org || env('ORG')
-  if (!/^[A-Za-z0-9-]{1,39}$/.test(org)) throw new Error(`org "${org}" is not a GitHub org name`)
-  const d1 = fromBranch ? fromBranch.d1 : env('D1', false) !== 'false'
-  const branch = 'main'
+  if (!validRepo(repoName)) throw new Error(`repo "${repoName}" is not a GitHub repo name`)
+  if (org !== ORG) throw new Error(`org "${org}": projects live in ${ORG} only`)
   const cfToken = env('CLOUDFLARE_API_TOKEN')
   const account = env('CLOUDFLARE_ACCOUNT_ID')
   const ghToken = env('PROJECTS_GITHUB_TOKEN')
   const cf = cfClient(cfToken, account)
   const gh = ghClient(ghToken)
 
-  const repoExisted = (await gh(`/repos/${org}/${name}`)).ok
-  const repo = await ensureRepo(gh, org, name)
+  const found = await gh(`/repos/${org}/${repoName}`)
+  if (existing && !found.ok) throw new Error(`${org}/${repoName} not found (${found.status}); an existing-repo project creates nothing, so check the "repo" name in projects/${name}.json`)
+  if (!existing && found.ok && !String(found.json?.description || '').includes(MARKER)) throw new Error(`${org}/${repoName} exists and was not made by new-project; register it with "repo" in projects/${name}.json on main to deploy it`)
+  const repo = existing ? found.json : await ensureRepo(gh, org, repoName)
+  const branch = existing ? repo.default_branch : 'main'
+  if (!validBranch(branch || '')) throw new Error(`default branch "${branch}" of ${org}/${repoName} is not a branch name`)
+  // A Worker of the same name is adopted only on a re-run for a repo this workflow made.
+  const adopt = found.ok && !existing
   const liveId = d1 ? await ensureD1(cf, name) : undefined
   const previewId = d1 ? await ensureD1(cf, `${name}-preview`) : undefined
 
-  if (await repoIsEmpty(gh, org, name)) {
+  if (existing && await repoIsEmpty(gh, org, repoName)) throw new Error(`${org}/${repoName} is empty; an existing-repo project needs its code on ${branch}`)
+  if (await repoIsEmpty(gh, org, repoName)) {
     const dir = mkdtempSync(join(tmpdir(), 'new-project-'))
     writeScaffold(dir, { name, d1, liveId, previewId })
-    pushScaffold(dir, org, name, branch, ghToken)
+    pushScaffold(dir, org, repoName, branch, ghToken)
     log('repo', `pushed the day-zero site to ${branch}`)
   } else {
     log('repo', 'has commits, nothing pushed')
   }
 
-  const worker = await ensureWorker(cf, name, randomBytes(32).toString('base64url'), { adopt: repoExisted })
+  const worker = await ensureWorker(cf, name, randomBytes(32).toString('base64url'), { adopt })
   const buildTokenUuid = await pickBuildToken(cf, process.env.BUILD_TOKEN_NAME, process.env.CLOUDFLARE_BUILD_TOKEN)
-  await ensureBuilds(cf, { tag: worker.id, repo, org, name, branch, d1, buildTokenUuid })
-  const build = await firstBuild(cf, worker.id, branch)
-  if (build.status === 'success') await ensureSecret(cf, name, 'BETTER_AUTH_SECRET', randomBytes(32).toString('base64url'))
+  const git = await connectRepo(cf, { repo, org, name: repoName })
+  await ensureBuilds(cf, { tag: worker.id, git, org, name: repoName, branch, d1, buildTokenUuid, commands })
+  const build = await firstBuild(cf, worker.id, name, branch)
+  if (build.status === 'success' && secret) await ensureSecret(cf, name, 'BETTER_AUTH_SECRET', randomBytes(32).toString('base64url'))
 
   const sub = await cf('/workers/subdomain')
   const url = `https://${name}.${sub.json?.result?.subdomain}.workers.dev`

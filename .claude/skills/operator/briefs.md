@@ -21,7 +21,7 @@ Größe: <small site: 1 build | app: n slices, riskiest first: <slice 1>>
 Slices: 1. <name> 2. <name> ...
 Rechtliches: <must-haves from the legal team, e.g. Impressum, Datenschutz, no cookie banner needed>
 Keys: <none | what will be needed, each asked by a key card when its slice gets there>
-Repo: `yverse-studio/<name>`, made by the `new-project` workflow (publish skill), live at <url>
+Repo: `yverse-studio/<name>`, made by the `new-project` workflow, live at https://<name>.yverse.workers.dev
 Kosten: ~<€/month to run> + ~<tokens or $ to build>, estimate
 Risiko: <the one thing most likely to fail>
 
@@ -30,7 +30,8 @@ ok / no
 
 ## (b) Design pick
 
-Send 2-3 directions, each as one phone and one desktop screenshot (attach the images), each with
+The Project Manager posts it in the project chat (vote rule in CLAUDE.md, How to work). Send 2-3
+directions as live drafts in one vote gallery (`roles/designer.md`, Vote gallery), each with
 a two-word name and one line on the feel, built from yskills' references and the `ui-review`
 skill's `TASTE.md`. Then tap options: the directions, plus "none, try again". yskills can also
 answer in words or pictures ("this one but darker", a screenshot): the design team revises and
@@ -77,3 +78,9 @@ when they ask for one thing; impossible or unsafe = one plain line, then the nea
 Shortest reply. No extra subagents, research, screenshots or re-reads. Models as in
 docs/WORKFLOW.md (Models). Never repeat an answer another thread already gave.
 ```
+
+## A figure brief (any 3D character)
+
+Follows [`docs/character-workflow.md`](../../../docs/character-workflow.md): it names the
+reference picture, the diagnosis list, the build order and the comparison sheet as the only way
+to show yskills the result.

@@ -1,0 +1,8 @@
+{
+  "name": "mypage",
+  "d1": false,
+  "org": "yverse-studio",
+  "repo": "MyPage",
+  "build": "npm run check && npm run generate",
+  "secret": false
+}

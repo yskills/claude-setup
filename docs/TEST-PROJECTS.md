@@ -40,6 +40,7 @@ repo; then the next one starts.
 | 1 duo-test | 2026-10-05 to 10-06 | 6 (design cards, a typed ok, 3 key-card rounds, "merge everything", Build settings, the live test that found bugs) | #21: 2, #20 and #22: none on a preview | 38.04 | [lessons-1.md](https://claude.ai/code/project/chan_01XKnLb2nhGBYoEt3HNp26NS) (project files `test-runs/lessons-1.md`), folded in over #23 to #28 and this PR |
 | HQ game | 2026-10-06 | 3 (a pause "only burning my money", the rejected cube animals, "merge everything, skip everything") | one per PR, #31 redid the animals after yskills' taste call | about 30 to 50 (the estimate held, one slice at a time) | #37 |
 | 2 Kleingarten (Roblox) | 2026-10-07 | slices 1 to 3 merged at 5/5; a stalled hand-back cost six hours once | see PRs in `yverse-studio/kleingarten` | not recorded | lessons in `roles/programmer.md` |
+| Sofa-Shop (`yverse-studio/workflow-tests`) | 2026-10-08 | 3 ("alles hässlich", the missing team, the missing screenshots) | none, built as Artifacts | not recorded | `LESSONS.md` in workflow-tests; vote rule in CLAUDE.md |
 | 3 Journal probe | | | | | |
 
 ## HQ game run (2026-10-06, PRs 29 to 36)

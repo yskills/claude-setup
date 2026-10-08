@@ -38,6 +38,10 @@ the two keys. Research and the routes weighed: `research/auto-deploy.md` in the 
    https://github.com/apps/cloudflare-workers-and-pages/installations/select_target.
    Then connect the org in Cloudflare once (the API needs it): Workers & Pages → Create →
    **Import a repository** → **Add account** → pick `yverse-studio`, 2 min.
+   When a run fails with "Workers Builds does not see <org>/<name>" (Cloudflare missed a repo made
+   after the link), open https://github.com/organizations/yverse-studio/settings/installations →
+   Cloudflare Workers and Pages → Configure, switch Repository access to **Only select
+   repositories** and back to **All repositories**, Save, then push the branch again, 1 min.
 3. Cloudflare token, 4 min: https://dash.cloudflare.com/profile/api-tokens → Create Token →
    Custom. Permissions (Account): **Workers Builds Configuration · Edit**, **Workers Scripts ·
    Edit**, **D1 · Edit**, **Account Settings · Read**. Account Resources: only your account.
@@ -67,8 +71,9 @@ from a pushed branch; private repo, no outside collaborators, `yskills-claude` i
 
 ### Per project, Claude
 
-1. Start the workflow from the thread by pushing a branch (threads can't dispatch a workflow,
-   403, checked 2026-10-08): in claude-setup, branch `new/<name>` off `main` with one file
+1. Start the workflow from the thread: dispatch `new-project.yml` on `main` with inputs `name`,
+   `d1`, `org` (GitHub MCP `actions_run_trigger` `run_workflow`; threads can, checked 2026-10-08
+   19:50), or push a branch: in claude-setup, branch `new/<name>` off `main` with one file
    `projects/<name>.json`, `{ "name": "<name>", "d1": true, "org": "yverse-studio" }` (`name`:
    lowercase, digits, dashes; it is the repo and the Worker name; `d1` false when PLAN.md says no
    data). The push runs `new-project-request.yml` (no keys), and on its completion GitHub runs
@@ -84,13 +89,21 @@ from a pushed branch; private repo, no outside collaborators, `yskills-claude` i
    `BETTER_AUTH_SECRET`. A re-run skips what exists.
 2. Wait for the run (`actions_list` `list_workflow_runs` with `new-project.yml`, then
    `actions_get` `get_workflow_run`); its summary has the repo, the live URL
-   and the first build's status. Build logs: Cloudflare → Workers & Pages → the Worker → Builds
-   (or `GET /builds/builds/{uuid}/logs` from the workflow).
+   and the first build's status. Build logs: dispatch `build-logs.yml` with the Worker name (a
+   registered project); it prints the latest build's redacted log tail.
 3. `add_repo` the new repo with `access: push` and `save_to_project: true`, then the scaffold
    thread replaces the day-zero site (`scaffold` skill) on branch `scaffold`; its Preview URL
    proves the wiring.
 4. Keys a slice needs (Stripe, Google, Resend) come by key card as before (`sell`, `keys.md`);
    they are Worker secrets in the dashboard, never in git or GitHub.
+5. An existing org repo (one that already has code) goes the same way: `projects/<name>.json`
+   on main names it with `"repo"` (its GitHub name in `yverse-studio`; production builds its
+   default branch), `"build"`, `"deploy"`, `"preview"` (Workers Builds commands; defaults are the
+   day-zero site's) and `"secret": false` for a static site; the repo's `wrangler.jsonc` `name`
+   must equal `name`. Then `run_workflow` on `new-project.yml` with that name. Nothing is created or
+   pushed in the repo, a missing repo stops the run, and a Worker of that name must not exist yet.
+   Only main's registry may set these keys; a pushed `new/<name>` branch sets just `d1`.
+   Example: `projects/mypage.json`.
 
 Without the five steps above the workflow fails on its first line with the missing name; a
 thread then sends yskills the step with its link, once.
@@ -142,6 +155,17 @@ Claude:
   `/api/config`; a static site: a generated `version.txt`), and the test compares it with
   `check_run.head_sha` (`github.sha` on the weekly run). A green Workers Builds check and a 200 prove neither: on 2026-10-05
   duo-test's main builds passed for hours while a day-old version stayed live.
+
+## Delete a project
+
+`delete-project` (Actions → Run workflow, or a thread's `actions_run_trigger` `run_workflow` on
+`delete-project.yml`, ref `main`) with `name`, `confirm` (the name again) and `dry_run`. The
+default dry run only logs the plan; `dry_run: false` then removes the Worker and its Builds
+connection, D1 `<name>` and `<name>-preview`, the build token `claude-setup-builds` once no other
+Worker builds with it, the repo in `yverse-studio` (last), and a leftover branch `new/<name>`.
+Refused before anything is touched: a protected repo name (the list in `scripts/delete-project.mjs`),
+no `projects/<name>.json` on main, a repo without the description "made by claude-setup new-project".
+Irreversible: run it only when yskills said to delete that project.
 
 ## The tradeoff, decided
 

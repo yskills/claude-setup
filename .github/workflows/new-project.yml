@@ -2,8 +2,8 @@ name: new-project
 
 # Makes a new project live with no hands: the repo in the org, its D1 databases (EU), the Worker,
 # the Workers Builds connection (main deploys, other branches get Previews) and the first build.
-# Started by new-project-request.yml (a cloud thread pushes a branch `new/<name>`; threads can't
-# dispatch workflows, 403) or by Run workflow from the PC or the Actions page. On `workflow_run`
+# Started by Run workflow (a cloud thread's workflow dispatch, the PC or the Actions page) or by
+# new-project-request.yml (a pushed branch `new/<name>`). On `workflow_run`
 # GitHub runs this file and the checked-out code from `main`; the pushed branch supplies only
 # `projects/<name>.json`. The branch is deleted when the run succeeds. Then `add_repo` the result.
 # Keys: secrets CLOUDFLARE_API_TOKEN and PROJECTS_GITHUB_TOKEN, variable CLOUDFLARE_ACCOUNT_ID
@@ -52,10 +52,6 @@ jobs:
           path: incoming
           persist-credentials: false
           sparse-checkout: projects
-      - if: github.event_name == 'workflow_run'
-        run: |
-          mkdir -p projects
-          cp incoming/projects/*.json projects/ 2>/dev/null || echo "no projects/<name>.json on the branch, defaults apply"
       - uses: actions/setup-node@v5
         with:
           node-version: 24

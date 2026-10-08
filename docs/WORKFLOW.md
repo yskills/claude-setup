@@ -25,11 +25,7 @@ whole history every turn.
 
 After launch, phases 5-6 repeat for every improvement the weekly numbers suggest.
 
-**Auto-run** (your choice, 2026-10-06): no taps. Every card shows its options with the
-recommended one marked and work continues on it at once; the gate merges at 5/5 after a real
-preview test and a fresh review; the project chat reports results and real blockers only. Your
-"stop" and your taste calls (a rejected asset or look) are final and go into every brief. Only
-what needs your own hands waits: keys, a domain.
+Auto-run, pauses and taste calls: `CLAUDE.md` (How to work).
 
 ## PC work
 
@@ -48,13 +44,8 @@ subagents get Sonnet through `CLAUDE_CODE_SUBAGENT_MODEL`. Every other file poin
 ## The 5/5 gate
 
 Five pass/fail checks by agents that didn't write the code: CI, evaluator on the preview, fresh
-code review, security + red team, design + legal. 5/5 → the gate thread merges it, launch and claude-setup included (you tap **Merge it** only when
-Claude Code's safety check blocks a thread's merge). 2 failed rounds → you get a
-plain summary of what's wrong and tap options; the recommended one is taken at once. Until the first paying user the gate runs in
-probe mode: no fresh code reviewer (the builder's ship-check counts), design review only on the
-probe page and before launch, security whenever a PR stores what users type. Important PRs (auth, payments, migrations, secrets)
-come with three lines: what changes, what could break, how to undo it.
-claude-setup PRs go through the same gate. Details: `operator` skill, `gate.md`.
+code review, security + red team, design + legal. At 5/5 the gate thread merges, claude-setup
+included. The rules, probe mode and the two-failed-rounds summary: `operator` skill, `gate.md`.
 
 ## Learning
 

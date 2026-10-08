@@ -29,6 +29,11 @@ PATH of the process that hosts them. After installs, restart that host (not just
 - **Remote Control host restart:** the running `claude remote-control` still has the PATH from
   before the installs. In a fresh terminal on this user: `cd C:\Users\Claude\Documents\GitHub`,
   then `C:\Users\Claude\.local\bin\claude.exe remote-control`.
+- **One folder approval, once per claude.ai project:** every repo is cloned under
+  `C:\Users\Claude\Documents\GitHub`, so approving that one folder in the project's settings
+  (Resources > Devices) covers every current and future project there; nothing is needed per
+  repo. A thread cannot approve it itself (it is yskills' consent), so a new claude.ai project
+  asks once, on its first Remote Control start, and never again.
 - **Repo access:** `yskills-claude` gets Write on each repo at
   `https://github.com/yverse-studio/<repo>/settings/access`.
 - **Mail and Cloudflare:** the Gmail connector signed in as Claude's Gmail

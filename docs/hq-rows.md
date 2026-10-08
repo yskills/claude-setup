@@ -92,13 +92,27 @@ up front as `waiting`, then flip each to `running` (with `start`) and `done` or 
 a subagent the phase starts goes into its `agents` with its `label` (agent type) and `model`. Times
 are ISO from the real clock (`date -u +%FT%TZ`), never guessed. A finished thread leaves its row (it
 greys after 2 hours). Rule: `HQ.workTree` and `HQ.busyRoles` in company-xy's `hq-rules.js`.
+**Figures (cards):** `cards/<roster id>` (e.g. `cards/mira`), one per figure, read live by HQ
+(`db.collection('cards')` in company-xy `main.js`; rules `HQ.cardOk`, `HQ.officeLookOf`, `HQ.canUndress` in
+`hq-rules.js`; drawn by `figures.js` and `cards-3d.js`). Fields: `name` (display name, the character's, e.g.
+"Hinata"), `outfits: [{asset, label, what}]` in unlock order (index 0 Büro is worn from the start, the next ones
+open at the bond levels in `HQ.OUTFIT_AT`; `label` is the button text, `what` a short German description; optional
+`underWhat` + `under` only where an outfit may be taken down to its lingerie or swimwear layer), `chibi` (the
+office chibi, always dressed; without it the office shows the worn outfit at full size), `thumb` (portrait),
+`voice`, `personality {about, likes, hello, move}`, `author`, `licence`, `share`, `added`. Every
+`asset`, `chibi`, `thumb` and `under` is a 32-hex asset id in the artifact's asset store (a `.vrm` is uploaded as
+base64 text; the page decodes it); a row with any outfit lacking a valid id is not drawn. Clips are not in the
+row: the office poses every figure with the shared clips in code. Desk and bond live in `roster/desks` and
+`bond/<id>` (`wear` = worn outfit index). Switch after a figure merge: upload the new exports, then one `update`
+on `cards/<id>` that replaces the ids in place (same order and labels), pinned with `if_version` (the db's
+document `version` is the only versioning); the old assets stay (deleting them is a data delete and needs yskills).
 **Derived rows:** in the Company XY project the threads write none of this themselves; the HQ refresher derives them from
 `list_thread_sessions` (every thread, finished ones included) on every run (company-xy `hq-refresh.md`): `work/session_<id>` per open thread (the thread list spells
 the same session `cse_<id>`) with `by: 'refresher'`, `state` (running in a turn, waiting between turns, done once finished or
-resolved), `project`, `pr`, `started` and `lastActivity` added to the shape above and one phase for the whole thread; and
+resolved; a status bucket the refresher does not know is idle: no work row, not an open thread), `project`, `pr`, `started` and `lastActivity` added to the shape above and one phase for the whole thread; and
 `team/crew-<role>` per role word (working, waiting or idle, `task`, `link`, `threads`, `lastActivity`). A row a running thread
 writes itself wins: the refresher writes no row over it. Legacy rows retire (at most 20 a run, pinned, none on a partial read):
-hand-written work rows of finished threads, the refresher's own a day after, and hand-written team rows marked done (never `crew-*`);
+hand-written work rows of finished threads, the refresher's own a day after (or, still running or waiting, a day after its thread left the thread list), and hand-written team rows marked done (never `crew-*`);
 `team/manager` (the project chat's desk) stays.
 
 **Day one:** a new project first gets its ydeas-world entry with `repo:` (or the refresher deletes its rows), then writes, in the hour its plan is posted and in one batch, `projects/<id>`
