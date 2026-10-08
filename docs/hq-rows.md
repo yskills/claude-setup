@@ -55,7 +55,8 @@ id already runs (a resend repeats it); that thread sets the row to `started` wit
 **Projects come from ideaWorld (yskills 2026-10-08):** yskills' one project list is ideaWorld's `content/ideas/<slug>.md`.
 An entry is an idea until it has `repo:`; then it is a project, and only those are on HQ's Company page. A project that should
 show in HQ gets an entry there first (the operator's day one does it, slug = project id); a `projects/<id>` row no entry names
-is stale and the HQ refresher (company-xy `hq-refresh.md`) deletes it with its `phases`, `team`, `events` and `finance`. The
+is stale and the HQ refresher (company-xy `hq-refresh.md`) deletes it with its `phases`, `team` and `events` (a renamed repo keeps
+its row; no deletes on an empty or broken ideaWorld read or when over half would go; `finance` only on yskills' delete tap). The
 refresher owns `state` (from the file: `archived: true` = archived, `parked: true` = paused, else active), `stateAt`,
 `mirror` (repo, last commit, open PRs, PROGRESS.md, status by ideaWorld's own rules) and `working` (this project's working
 threads naming the repo); a PM keeps writing `name, note, you[], money` and never those. A repo pushed in the last 30 days
