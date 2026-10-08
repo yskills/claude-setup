@@ -33,7 +33,7 @@ what needs your own hands waits: keys, a domain, the Cloudflare import.
 
 ## PC work
 
-Remote Control (2026-10-07): yskills allows Claude Code on their PC. Anything that needs the PC (installs, local files and clones, Roblox Studio and its MCP server, screenshots of local apps, hardware reads, git with their logins) is done by a Remote Control session started on the user's message, never written out as steps for yskills. What stays with yskills: their web accounts (Cloudflare, Roblox Creator Hub, GitHub app access) and money. The PC session never reads, prints or sends keys, tokens or passwords.
+Remote Control (2026-10-07): yskills allows Claude Code on their PC. Anything that needs the PC (installs, local files and clones, Roblox Studio and its MCP server, screenshots of local apps, hardware reads, git with their logins) is done by a Remote Control session started on the user's message, never written out as steps for yskills. What stays with yskills: their web accounts (Cloudflare, Roblox Creator Hub, GitHub app access) and money. The PC session never reads, prints or sends keys, tokens or passwords. Checked 2026-10-08: a fresh PC session commits, pushes, merges, deletes remote branches and installs tools; its safety check still refuses reading browser cookies. A session keeps the permissions it started with, so after yskills changes them, start a fresh one.
 
 ## Models
 
