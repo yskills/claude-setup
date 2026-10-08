@@ -41,9 +41,12 @@ goes in its home only, everywhere else links it.
   chat, never only inside a thread (2026-10-08); a thread sends it the options
   (`get_channel_session_id`, then `send_message`) and goes on with its recommendation. When the
   options look different (design, art, layout), a Designer thread first makes them with UI/UX
-  review (`ui-review`, `design-critic`), and the options come as desktop screenshots (1440px) in one
-  click-through gallery (an Artifact: arrows and ←/→ keys, a counter, each option's name and one
-  line) linked in the vote post, never loose image attachments; never a vote on words alone.
+  review (`ui-review`, `design-critic`), and the options come as live, clickable drafts in one
+  vote gallery Artifact (2026-10-08, `designer.md`, Vote gallery: tabs, ←/→ keys, a counter, each
+  option's name and one line, the recommendation starred with its reason, a desktop/phone switch,
+  a choose button that saves the pick) linked in the vote post; desktop screenshots (1440px) in the
+  same gallery only where a live draft can't run. Never loose image attachments, never a vote on
+  words alone.
 - yskills reads only the project chat (2026-10-08) and opens a thread only when something is
   wrong: the coordinator posts every important result, milestone and link from the threads there
   in a line or two.
