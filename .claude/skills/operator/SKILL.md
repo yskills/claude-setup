@@ -11,26 +11,12 @@ checks the result against fixed criteria and keeps pushing until the goal in `PL
 Shape from Anthropic's long-running-agent harness (planner, generator, evaluator; progress in
 files; a fresh context per job) and the ECC hackathon winner's flow (`docs/RESEARCH.md`).
 
-**Auto-run (yskills, 2026-10-06 17:07: "just merge after test, skip everything, keep running
-till everything is done").** No taps anywhere. Every card still shows the options with the
-recommended one marked, but work continues on that option at once; a later tap or message
-changes course. The gate merges every PR at 5/5 itself, launch and live money included, after a
-real preview test and a fresh review. The coordinator posts results and real blockers only. The
-only waits left are things nobody can undo that need yskills' own hands: live keys, a domain, a
-Gewerbe (`briefs.md` key cards). A PR that fails the gate twice reaches yskills with a plain
-summary (`gate.md`) and keeps going on the recommended way forward.
+**Auto-run, the ask rule, pauses and taste calls** have their home in CLAUDE.md (How to work).
+Operator specifics: a PR that fails the gate twice reaches yskills with a plain summary
+(`gate.md`) and keeps going on the recommended way forward; key cards are in `briefs.md`. A
+refusal by a safety check is reported once in one line, never reworded, split or retried.
 
-**The ask rule (yskills, 2026-10-07: "if it touches real money ask me first, or when you
-can't decide or need design input or can't do something; else push, merge, test").** Claude asks
-first only when a step touches real money (a live key, a purchase, an ad budget, a paid plan),
-sends mail or posts, deletes data, force-pushes or rotates a secret (CLAUDE.md's list), when a
-choice changes the result and no option is clearly the sensible default (then it's a card, and
-auto-run keeps working on the recommended one), when it needs design input (a look, an asset,
-taste), or when it can't do the step itself (a web account, a key). Everything else it pushes, tests,
-merges and reports. A refusal by a
-safety check is reported once in one line, never reworded, split or retried.
-
-**Pauses and taste calls are final.** "Stop", "pause" or "only burning my money" stops every
+**Pauses in practice.** "Stop", "pause" or "only burning my money" stops every
 thread at once, mid-step; a thread that finished before the stop is parked and reported honestly,
 nothing restarts without yskills' go. An asset, look or idea yskills rejected stays rejected:
 no thread argues to keep it, the next version replaces it. Both go into every builder brief
@@ -41,7 +27,8 @@ rejected animals.
 request <id>" from the Neues Projekt notepad: the brainstorm is a real discussion, not a list of questions: Claude says what it would build instead, challenges the idea and its price with reasons, proposes options of its own and asks yskills what excites them (co-founder rule in CLAUDE.md). It and the research turn into `PLAN.md`
 with a recommended pick on every open question, posted as brief (a). Under auto-run building
 starts from that plan right away; yskills' "no" or a change sends the operator back to the
-brainstorm. No repo, scaffold or builder thread exists before the plan is posted.
+brainstorm. No repo, scaffold or builder thread exists before the plan is posted; then the
+`new-project` workflow makes the repo and the live site (`docs/USING.md`, Deploy a page in one shot).
 
 **One role per thread, named by it.** Thread titles and dashboard rows read `<Role> · <what>`,
 so yskills sees at a glance who does what. Roles (the shape Anthropic recommends for long-running
@@ -150,7 +137,7 @@ Claude Code's safety checks are not friction to fix: only yskills' allow rules o
   answering and a hand-off thread never repeats); research with many searches (one WebSearch per
   open fact); extra screenshots and subagents (only what the ask needs; simple reading jobs go to Haiku subagents).
 - Literal mode and the cost rules go into every brief (`briefs.md`, last block).
-- Remote Control (2026-10-07): yskills allows Claude Code on their PC. Anything that needs the PC (installs, local files and clones, Roblox Studio and its MCP server, screenshots of local apps, hardware reads, git with their logins) is done by a Remote Control session started on the user's message, never written out as steps for yskills. Project work runs on the Windows user `Claude` with Claude's own logins (GitHub `yskills-claude`, Cloudflare as Administrator member once invited; `docs/pc-claude-user.md`). What stays with yskills: the owner side of their accounts (repo access, Cloudflare members, GitHub app installs, Roblox Creator Hub), passwords, CAPTCHAs, phone codes and money. The PC session never reads, prints or sends keys, tokens or passwords. Briefs: PC work (a Roblox Studio run, an install, a local clone, a hardware read) goes to a Remote Control session, never to a hands list for yskills.
+- PC work (a Roblox Studio run, an install, a local clone, a hardware read) goes to a Remote Control session, never to a hands list for yskills (`docs/WORKFLOW.md`, PC work).
 - Reviewers, evaluator and red team get only the diff or the URL plus the criteria.
 - The operator is not subscribed to slice PRs: each Cloudflare preview comment woke it, 46M cached
   tokens in test run 1. Slice and gate threads report by message. The context guard
