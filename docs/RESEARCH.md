@@ -110,7 +110,7 @@ Added from these sources:
   managed Claude Code Review (Team/Enterprise only, $15-25 per PR; `ship-check` covers it);
   `/ultraplan` was removed in September 2026; memory plugins and Obsidian (the repo is the
   memory; ECC hooks from the PC install don't run in cloud threads).
-- **For the later video project** (yverse-studio/autocut):
+- **For the later video project** (autocut, no repo yet):
   [FireRed-OpenStoryline](https://github.com/FireRedTeam/FireRed-OpenStoryline) (Apache-2.0,
   style skills) and [VideoDB Director](https://github.com/video-db/Director) (MIT, agent
   structure; don't depend on its paid cloud).
