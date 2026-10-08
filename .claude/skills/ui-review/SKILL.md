@@ -44,3 +44,12 @@ credentials.
    its final text (a report "delivered as a message" can get lost). Fix every **blocking** finding and
    the cheap **polish** ones, then shoot again.
 4. Attach the final phone and desktop screenshots to the PR description.
+
+## 4. Record (when yskills should see it run)
+
+- Web flow: set `video: 'on'` (or `recordVideo` on the context) in Playwright; it records headless.
+- Anything with its own window (Electron, a game, a native app): run it on the thread's own virtual
+  screen and record it with
+  `bash <ui-review skill folder>/scripts/desktop.sh .shots/run.webm <command>`.
+  Look at a few frames (`ffmpeg -ss 5 -i run.webm -frames:v 1 f.png`), then attach the WebM to the
+  PR or thread. WebM only: the cloud Chromium has no H.264.
