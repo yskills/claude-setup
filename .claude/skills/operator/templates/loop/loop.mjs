@@ -21,8 +21,7 @@ const SECRETS = [
   [/\b[a-z][\w+.-]*:\/\/[^\s/@:]+:[^\s/@]+@/gi, '[url-login]@'],
   [/\beyJ[\w-]+\.[\w-]+\.[\w-]+/g, '[jwt]'],
   [/\b(?:bearer|basic|sk|rk|pk|ghp|gho|ghs|ghu|github_pat|whsec|xox[abp])[_ -][\w+/=.~-]{8,}/gi, '[key]'],
-  [/(?<![\w-])([\w-]+)(["']?\s*[:=]\s*["']?)[^\s&"',;]+/g, // whole names, so no length cap and no backtracking
-    (m, name, sep) => (/key|token|secret|passw(?:or)?d|pwd|auth|session|signature/i.test(name) ? `${name}${sep}[secret]` : m)],
+  [/(?<![\w-])([\w-]*?(?:key|token|secret|passw(?:or)?d|pwd|auth|session|signature)[\w-]*)(["']?\s*[:=]\s*["']?)[^\s&"',;]+/gi, '$1$2[secret]'],
   [/\b[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){3,7}(?:\s?[A-Z0-9]{1,3})?\b/g, '[iban]'],
   [/\b(?=[\w+-]*\d)(?=[\w+-]*[A-Za-z])[\w+-]{32,}={0,2}/g, '[long]'], // letters and digits, so a long path stays
 ]
