@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, readFileSync, existsSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold, describe, redact, hookIdFrom } from './new-project.mjs'
+import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold, describe, redact, hookIdFrom, buildState } from './new-project.mjs'
 
 test('names are workers.dev safe', () => {
   assert.ok(validName('duo-test'))
@@ -60,4 +60,12 @@ test('API answers are logged without secrets or hook ids, and hook ids are read 
   assert.equal(hookIdFrom({ hook_id: 'b' }), 'b')
   assert.equal(hookIdFrom({ deploy_hook: { uuid: 'c' } }), 'c')
   assert.equal(hookIdFrom(null), null)
+})
+
+test('a build is judged by its outcome once it has stopped', () => {
+  assert.deepEqual(buildState({ status: 'running', build_outcome: null }), { status: 'running', running: true, outcome: null })
+  assert.deepEqual(buildState({ status: 'stopped', build_outcome: 'success' }), { status: 'stopped', running: false, outcome: 'success' })
+  assert.equal(buildState({ status: 'stopped', build_outcome: 'fail' }).outcome, 'fail')
+  assert.equal(buildState({ status: 'failure' }).outcome, 'failure')
+  assert.equal(buildState(null).running, true)
 })
