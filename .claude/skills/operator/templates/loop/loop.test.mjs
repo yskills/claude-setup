@@ -50,3 +50,22 @@ test('a client-reported error is never urgent, even when its path says checkout'
   const a = plan({ errors: [{ ...err, route: 'client:/checkout' }] }, [])
   assert.ok(!a[0].labels.includes('loop:urgent'))
 })
+
+test('secrets in error text never reach an issue', () => {
+  const leaks = ['eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.abcdefghijklmnop', 'ghp_' + 'a'.repeat(36), 'github_pat_11ABCDEFG0abcdefghijklmn',
+    'whsec_abcdefghijklmnop', 'rk_live_abcdefghijklmnop', 'postgres://admin:hunter2@db.local/x', '/cb?token=s3cr3tvalue&x=1',
+    'password: hunter22', 'access_token=hunter2b', 'DB_PASSWORD=hunter2c', 'Error: password=hunter2f', 'url=https://h/?token=hunter2g', 'MY_VERY_LONG_APPLICATION_PREFIX_NAME_api_key_for_the_production_stripe_account=hunter2e', 'client_secret: hunter2d', 'Authorization: Basic dXNlcjpwYXNz', 'Basic dXNlcj+wYXNzd29yZA==', 'DE89370400440532013000', 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0']
+  for (const s of leaks) {
+    const body = errorBody({ ...err, message: `failed with ${s}`, stack: `at x (${s})` })
+    for (const part of [s, 'hunter2', 'dXNlcjpwYXNz', 'wYXNzd29yZA', 's3cr3tvalue', '370400440532']) if (s.includes(part)) assert.ok(!body.includes(part), `${part} leaked`)
+  }
+  assert.ok(clean('TypeError: x is undefined at /app/server/api/progress.ts:12').includes('progress.ts:12'))
+  assert.ok(clean('at /app/node_modules/nuxt/dist/app/entry').includes('nuxt/dist/app/entry'))
+  assert.ok(clean('x'.repeat(1e6)).length <= 5000)
+  const t = Date.now(); clean('_key'.repeat(1250) + '!'); assert.ok(Date.now() - t < 100, 'redaction is linear')
+})
+
+test('a client route is never urgent however it is spelled', () => {
+  for (const r of [' client:checkout', 'CLIENT:checkout', '​client:pay', 'client :auth']) assert.ok(!isUrgent({ route: r }), r)
+  assert.ok(isUrgent({ route: 'POST /api/checkout' }))
+})

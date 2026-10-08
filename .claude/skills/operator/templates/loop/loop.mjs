@@ -9,13 +9,24 @@ import { execFileSync } from 'node:child_process'
 const MESSAGE_MAX = 60
 const TEXT_MAX = 1000
 const MAX_CREATES = 20
+const CLEAN_MAX = 5000 // bounds the redaction work; every output is shorter anyway
 const URGENT = /checkout|stripe|webhook|auth|anmelden|login|pay/i
 export const LABELS = ['loop', 'loop:error', 'loop:feedback', 'loop:urgent', 'loop:live']
 
 // Every report field is user-reachable text (an error message echoes input, feedback is typed):
 // it is shown as data. Comments, mentions, issue refs, addresses and bearer tokens are neutralised.
-export const clean = (v) => String(v ?? '').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  .replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '[mail]').replace(/\b(?:bearer|sk|rk|pk)[_ ][\w-]{8,}/gi, '[key]').replace(/[@#](?=\w)/g, '$&\u200b')
+// Error text can carry secrets too (a URL with a password, a token in a query), so known key shapes,
+// key=value pairs for secret-looking names, IBANs and long random strings become placeholders.
+const SECRETS = [
+  [/\b[a-z][\w+.-]*:\/\/[^\s/@:]+:[^\s/@]+@/gi, '[url-login]@'],
+  [/\beyJ[\w-]+\.[\w-]+\.[\w-]+/g, '[jwt]'],
+  [/\b(?:bearer|basic|sk|rk|pk|ghp|gho|ghs|ghu|github_pat|whsec|xox[abp])[_ -][\w+/=.~-]{8,}/gi, '[key]'],
+  [/(?<![\w-])([\w-]*?(?:key|token|secret|passw(?:or)?d|pwd|auth|session|signature)[\w-]*)(["']?\s*[:=]\s*["']?)[^\s&"',;]+/gi, '$1$2[secret]'],
+  [/\b[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){3,7}(?:\s?[A-Z0-9]{1,3})?\b/g, '[iban]'],
+  [/\b(?=[\w+-]*\d)(?=[\w+-]*[A-Za-z])[\w+-]{32,}={0,2}/g, '[long]'], // letters and digits, so a long path stays
+]
+export const clean = (v) => SECRETS.reduce((t, [re, to]) => t.replace(re, to), String(v ?? '').slice(0, CLEAN_MAX))
+  .replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '[mail]').replace(/[@#](?=\w)/g, '$&\u200b')
 const id = (v) => String(v ?? '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64)
 const route = (v) => clean(v).replace(/[^\w /:.-]/g, '').slice(0, 80)
 const when = (v) => (/^\d{4}-\d\d-\d\dT[\d:.]+Z?$/.test(String(v)) ? String(v) : '?')
@@ -24,7 +35,9 @@ const fence = (text) => `\n\`\`\`\`text\n${clean(text).slice(0, TEXT_MAX).replac
 export const fingerprintTitle = (e) => `loop: error ${id(e.fingerprint).slice(0, 8)} ${route(e.route)}: ${clean(e.message).replace(/\s+/g, ' ').slice(0, MESSAGE_MAX)}`
 export const feedbackTitle = (f) => `loop: feedback ${id(f.id)}`
 // Client reports are public input: never urgent, so anyone typing "checkout" can't jump the queue.
-export const isUrgent = (e) => !String(e.route).startsWith('client:') && URGENT.test(route(e.route))
+// One canonical form for both checks (no spaces or hidden characters, lower case), so " CLIENT:pay" can't pass.
+const canonical = (v) => String(v ?? '').replace(/[^\x21-\x7e]/g, '').toLowerCase()
+export const isUrgent = (e) => !canonical(e.route).startsWith('client:') && URGENT.test(canonical(e.route))
 // The marker is the first line of a body loop.mjs wrote; user text never reaches that line.
 export const marker = (kind, key, count) => `<!-- loop:${kind}:${id(key)}${count == null ? '' : `:${Number(count)}`} -->`
 const readMarker = (body) => String(body ?? '').split('\n')[0].match(/^<!-- loop:(error|feedback):([A-Za-z0-9_-]+)(?::(\d+))? -->$/)
