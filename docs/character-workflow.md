@@ -53,7 +53,7 @@ and yskills had to say it twice. This page is the fix.
    picture says yes or no on face, hair, body and outfits). Merge at 5/5; builders never merge.
 7. **After the merge.**
    - The game exports go to the artifact's asset store; the `cards/<id>` row points at the new
-     asset ids (company-xy `PROGRESS.md`, Mira in game; `docs/hq-rows.md`).
+     asset ids ([`docs/hq-rows.md`](hq-rows.md), Figures (cards)).
    - New reusable parts (a garment, a hair, a clip, a tool) get a library entry
      (`library.json` via `make_library.py`), so the next figure starts from them.
    - Republish HQ per company-xy `README.md` (Publish) and post the live shots.
