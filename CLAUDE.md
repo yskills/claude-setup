@@ -102,9 +102,9 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 - API: Nuxt server routes or a small Express service. SQLite or Postgres with prepared statements.
 - Tests: Vitest, Playwright for e2e. Typecheck with `vue-tsc`.
 - New apps (yskills, 2026-10-07): threads in the claude.ai project "Company XY", never a new
-  project (its coordinator is every app's Project Manager). The repo comes from a Remote Control
-  session on the PC (`gh repo create yskills/<name> --private`, then `add_repo`; PC offline:
-  brief (a) asks for github.com/new).
+  project (its coordinator is every app's Project Manager). The repo, its D1 databases, the
+  Worker and the deploy come from claude-setup's `new-project` workflow (`publish` skill, §Per
+  project), started from the thread; then `add_repo`.
 - Ship: Cloudflare Workers Builds (Workers + D1) deploys the default branch and gives every other
   branch a Worker Preview; GitHub Actions runs one `verify` script and holds no keys (`publish`
   skill). The preview link goes in the PR reply. Only an app that needs a long-running server
