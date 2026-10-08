@@ -49,7 +49,7 @@ Say "stop" or "pause" and everything stops; a look you reject stays rejected.
 | Item | Number | Source |
 |---|---|---|
 | Claude itself | your Max plan (about 90 €/month); no per-message euros. When the usage window fills, threads wait and resume by themselves | memory, 2026-10-07 |
-| API calls (the laptop worker's Haiku) | billed apart from the plan; set a monthly limit | `yskills/worker` PR 4 |
+| API calls (the laptop worker's Haiku) | billed apart from the plan; set a monthly limit | `yverse-studio/worker` PR 4 |
 | Always loaded in a session | ~6k tokens from this repo | STRUCTURE.md |
 | A project thread starts at | ~110k tokens, ~104k of it harness and memory outside this repo | STRUCTURE.md |
 | Hand-off | warns at 150k, hand off by 200k | `global/context-guard.mjs` |

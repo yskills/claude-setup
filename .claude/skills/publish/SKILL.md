@@ -48,9 +48,9 @@ the two keys. Research and the routes weighed: `research/auto-deploy.md` in the 
    write** (Metadata comes with it). If the org asks for approval, allow it at
    https://github.com/organizations/yverse-studio/settings/personal-access-tokens-onboarding.
 5. Put them into claude-setup, 2 min:
-   https://github.com/yskills/claude-setup/settings/secrets/actions → secrets
+   https://github.com/yverse-studio/claude-setup/settings/secrets/actions → secrets
    `CLOUDFLARE_API_TOKEN` (step 3) and `PROJECTS_GITHUB_TOKEN` (step 4);
-   https://github.com/yskills/claude-setup/settings/variables/actions → variable
+   https://github.com/yverse-studio/claude-setup/settings/variables/actions → variable
    `CLOUDFLARE_ACCOUNT_ID` (Workers & Pages → the id on the right, not a secret). Builds deploy
    with a build token, never with the setup token: in an account that has none yet (Claude's own
    account, made 2026-10-08), a second user token with only **Workers Scripts · Edit** and

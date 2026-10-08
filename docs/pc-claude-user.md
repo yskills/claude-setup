@@ -30,7 +30,7 @@ PATH of the process that hosts them. After installs, restart that host (not just
   before the installs. In a fresh terminal on this user: `cd C:\Users\Claude\Documents\GitHub`,
   then `C:\Users\Claude\.local\bin\claude.exe remote-control`.
 - **Repo access:** `yskills-claude` gets Write on each repo at
-  `https://github.com/yskills/<repo>/settings/access`.
+  `https://github.com/yverse-studio/<repo>/settings/access`.
 - **Mail and Cloudflare:** the Gmail connector signed in as Claude's Gmail
   (claude.ai/settings/connectors), and a Cloudflare member invite (Administrator) to that Gmail.
 - **context7:** the plugin's MCP server asks for authentication once (`/mcp` in an interactive

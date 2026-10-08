@@ -16,7 +16,7 @@ The templates in `templates/` were checked on 2026-10-03:
 - stripe-mock checks parameter names, not every business rule. The first sandbox checkout with
   a real test key is the final check (SKILL.md, go-live).
 
-The digital-product variant below ran green in yskills/duo-test.
+The digital-product variant below ran green in yverse-studio/duo-test.
 
 ## The flow
 

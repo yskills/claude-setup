@@ -1,7 +1,7 @@
 # HQ rows: what every Project Manager writes
 
 HQ is Company XY: https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT (code, tests, publish recipe
-and refresher in the private repo yskills/company-xy). This file is the row contract each
+and refresher in the private repo yverse-studio/company-xy). This file is the row contract each
 project's Project Manager writes into HQ's db with `ArtifactData`. Every write carries `at`.
 
 **HQ is the only dashboard:** a first-person desk, a 3D office with one chibi animal per role, Plan, Team,
@@ -52,17 +52,17 @@ coordinator, and on every open with an old list. Other threads do neither (prove
 `Researcher · <idea>` brainstorm thread whose brief names the request id, unless a thread for that
 id already runs (a resend repeats it); that thread sets the row to `started` with its thread link.
 
-**Projects come from ideaWorld (yskills 2026-10-08):** yskills' one project list is ideaWorld's `content/ideas/<slug>.md`.
+**Projects come from ydeas-world (yskills 2026-10-08):** yskills' one project list is ydeas-world's `content/ideas/<slug>.md`.
 An entry is an idea until it has `repo:`; then it is a project, and only those are on HQ's Company page. A project that should
 show in HQ gets an entry there first (the operator's day one does it, slug = project id); a `projects/<id>` row no entry names
 is stale and the HQ refresher (company-xy `hq-refresh.md`) deletes it with its `phases`, `team` and `events` (a renamed repo keeps
-its row; no deletes on an empty or broken ideaWorld read or when over half would go; `finance` only on yskills' delete tap). The
+its row; no deletes on an empty or broken ydeas-world read or when over half would go; `finance` only on yskills' delete tap). The
 refresher owns `state` (from the file: `archived: true` = archived, `parked: true` = paused, else active), `stateAt`,
-`mirror` (repo, last commit, open PRs, PROGRESS.md, status by ideaWorld's own rules) and `working` (this project's working
+`mirror` (repo, last commit, open PRs, PROGRESS.md, status by ydeas-world's own rules) and `working` (this project's working
 threads naming the repo); a PM keeps writing `name, note, you[], money` and never those. A repo pushed in the last 30 days
 without an entry shows in one "Unbetreute Repos" list (`unclaimed/now`) until yskills says keep (add an entry) or drop.
 **Pause, archive, delete:** the card's taps (one confirm) only write `requests/<id>` (`kind: 'lifecycle'`, `project, slug,
-act, repo`) and message the coordinator, which edits the ideaWorld file: pause = `parked: true`, archive (done or dropped) =
+act, repo`) and message the coordinator, which edits the ydeas-world file: pause = `parked: true`, archive (done or dropped) =
 `archived: true`, delete = remove the file after yskills' yes in words. Delete also removes every HQ row of it at once and
 writes `ignore/<id>`, which the refresher drops once the file is gone. The GitHub repo changes only on yskills' explicit yes.
 A paused project gets no new thread until yskills resumes it.
@@ -101,7 +101,7 @@ writes itself wins: the refresher writes no row over it. Legacy rows retire (at 
 hand-written work rows of finished threads, the refresher's own a day after, and hand-written team rows marked done (never `crew-*`);
 `team/manager` (the project chat's desk) stays.
 
-**Day one:** a new project first gets its ideaWorld entry with `repo:` (or the refresher deletes its rows), then writes, in the hour its plan is posted and in one batch, `projects/<id>`
+**Day one:** a new project first gets its ydeas-world entry with `repo:` (or the refresher deletes its rows), then writes, in the hour its plan is posted and in one batch, `projects/<id>`
 (traction fields 0, `firstEuroBy` = PLAN.md's go date, `revenueMode: 'test'`), the `<id>-` `phases` and
 `team` rows, one `work/<session>` row per thread started, and for a project meant to earn the
 **first euro list** in its `you[]` (`firstSeen` = now): Gewerbe, ELSTER tax registration, Stripe live,

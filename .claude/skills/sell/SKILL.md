@@ -7,7 +7,7 @@ description: "Take money from Germany: Stripe Checkout, subscriptions, digital o
 
 What works, as of 2026-10-03:
 
-- **Digital payments** were proven in yskills/duo-test.
+- **Digital payments** were proven in yverse-studio/duo-test.
 - **The shop templates** (`templates/`) are tested; `stripe-workers.md` (Verified) says how.
 - **The legal and tax facts** were researched and fact-checked.
 
@@ -189,4 +189,4 @@ with test card `4242 4242 4242 4242`, webhook, email. stripe-mock only checks pa
   - get 200 from the legal pages.
   A failed run emails yskills.
 - Stripe emails yskills when a webhook endpoint keeps failing. PostHog alerts on errors.
-- When a rule or a price in this kit turns out wrong, fix it in yskills/claude-setup.
+- When a rule or a price in this kit turns out wrong, fix it in yverse-studio/claude-setup.

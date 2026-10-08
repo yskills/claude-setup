@@ -1,6 +1,6 @@
 # __NAME__
 
-Made by claude-setup's `new-project` workflow. Rules live in yskills/claude-setup (`CLAUDE.md`,
+Made by claude-setup's `new-project` workflow. Rules live in yverse-studio/claude-setup (`CLAUDE.md`,
 `publish` skill): a thread without that repo adds it with `add_repo` and reads its `CLAUDE.md` first.
 
 - Deploys: Workers Builds builds every push with `npm run check && npm run build`; `main` runs

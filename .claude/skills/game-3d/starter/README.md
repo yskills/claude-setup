@@ -15,15 +15,15 @@ project needs. Then follow `../SKILL.md` for engine, layout, tests and Steam.
 
 | What | Where |
 |---|---|
-| Pipeline scripts and their README | `yskills/company-xy` → `tools/vrm/` ([README](https://github.com/yskills/company-xy/blob/main/tools/vrm/README.md), [chibi notes](https://github.com/yskills/company-xy/blob/main/tools/vrm/chibi-notes.md)) |
-| Mira's build, state and open flaws | `yskills/company-xy` → `characters/mira/HANDOFF.md` |
+| Pipeline scripts and their README | `yverse-studio/company-xy` → `tools/vrm/` ([README](https://github.com/yverse-studio/company-xy/blob/main/tools/vrm/README.md), [chibi notes](https://github.com/yverse-studio/company-xy/blob/main/tools/vrm/chibi-notes.md)) |
+| Mira's build, state and open flaws | `yverse-studio/company-xy` → `characters/mira/HANDOFF.md` |
 | Asset library (635 MB, outside git) | CompanyXY project share `/mnt/project-files/companyxy/vrm-library/`, indexed by `tools/vrm/library.json` |
 | Research originals | CompanyXY project share `/mnt/project-files/companyxy/research/` (only for detail; [learnings.md](learnings.md) has the conclusions) |
 
 Until company-xy PR 12 merges, `tools/vrm/` and `characters/mira/` exist only on its branch
 `slice/mira-7ltb6b`; read them there.
 
-**In another project** the share is not mounted. Clone `yskills/company-xy` next to the new repo
+**In another project** the share is not mounted. Clone `yverse-studio/company-xy` next to the new repo
 and run `tools/vrm/fetch-library.sh <root>` (pinned URLs, sha256-checked; `ONLY=<folder>` for one
 source). The Koban chibi base is a manual Gumroad download: ask yskills for the zip once, or copy
 it from the CompanyXY share. Copy only the assets the game ships into its `assets/`, each with a
