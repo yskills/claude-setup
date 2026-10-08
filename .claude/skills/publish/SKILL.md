@@ -71,8 +71,9 @@ from a pushed branch; private repo, no outside collaborators, `yskills-claude` i
 
 ### Per project, Claude
 
-1. Start the workflow from the thread by pushing a branch (threads can't dispatch a workflow,
-   403, checked 2026-10-08): in claude-setup, branch `new/<name>` off `main` with one file
+1. Start the workflow from the thread: dispatch `new-project.yml` on `main` with inputs `name`,
+   `d1`, `org` (GitHub MCP `actions_run_trigger` `run_workflow`; threads can, checked 2026-10-08
+   19:50), or push a branch: in claude-setup, branch `new/<name>` off `main` with one file
    `projects/<name>.json`, `{ "name": "<name>", "d1": true, "org": "yverse-studio" }` (`name`:
    lowercase, digits, dashes; it is the repo and the Worker name; `d1` false when PLAN.md says no
    data). The push runs `new-project-request.yml` (no keys), and on its completion GitHub runs
@@ -88,8 +89,8 @@ from a pushed branch; private repo, no outside collaborators, `yskills-claude` i
    `BETTER_AUTH_SECRET`. A re-run skips what exists.
 2. Wait for the run (`actions_list` `list_workflow_runs` with `new-project.yml`, then
    `actions_get` `get_workflow_run`); its summary has the repo, the live URL
-   and the first build's status. Build logs: Cloudflare → Workers & Pages → the Worker → Builds
-   (or `GET /builds/builds/{uuid}/logs` from the workflow).
+   and the first build's status. Build logs: dispatch `build-logs.yml` with the Worker name (a
+   registered project); it prints the latest build's redacted log tail.
 3. `add_repo` the new repo with `access: push` and `save_to_project: true`, then the scaffold
    thread replaces the day-zero site (`scaffold` skill) on branch `scaffold`; its Preview URL
    proves the wiring.
