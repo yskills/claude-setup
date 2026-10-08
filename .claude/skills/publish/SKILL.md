@@ -38,6 +38,10 @@ the two keys. Research and the routes weighed: `research/auto-deploy.md` in the 
    https://github.com/apps/cloudflare-workers-and-pages/installations/select_target.
    Then connect the org in Cloudflare once (the API needs it): Workers & Pages → Create →
    **Import a repository** → **Add account** → pick `yverse-studio`, 2 min.
+   When a run fails with "Workers Builds does not see <org>/<name>" (Cloudflare missed a repo made
+   after the link), open https://github.com/organizations/yverse-studio/settings/installations →
+   Cloudflare Workers and Pages → Configure, switch Repository access to **Only select
+   repositories** and back to **All repositories**, Save, then push the branch again, 1 min.
 3. Cloudflare token, 4 min: https://dash.cloudflare.com/profile/api-tokens → Create Token →
    Custom. Permissions (Account): **Workers Builds Configuration · Edit**, **Workers Scripts ·
    Edit**, **D1 · Edit**, **Account Settings · Read**. Account Resources: only your account.
