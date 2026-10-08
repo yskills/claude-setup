@@ -111,10 +111,12 @@ async function api(base, token, path, init = {}) {
 }
 
 // Hides anything secret-like in an API body before it reaches a log: values of keys named
-// token/secret/key/password/authorization, and long dash-free strings (tokens, hashes).
+// token/secret/key/password/authorization/hook/uuid/id, every uuid or 32-hex id, and long
+// dash-free strings (tokens, hashes). A deploy hook id alone starts builds, so ids count.
 export function redact(text) {
   return String(text ?? '')
-    .replace(/("[^"]*(?:token|secret|key|password|authorization|hook)[^"]*"\s*:\s*)"[^"]*"/gi, '$1"***"')
+    .replace(/("(?:[^"]*(?:token|secret|key|password|authorization|hook|uuid)[^"]*|id)"\s*:\s*)"[^"]*"/gi, '$1"***"')
+    .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32}/gi, '***')
     .replace(/[A-Za-z0-9_=+/.]{40,}/g, '***')
 }
 
@@ -128,7 +130,7 @@ function cfClient(token, account) {
   const base = 'https://api.cloudflare.com/client/v4'
   return async (path, init) => {
     const r = await api(base, token, `/accounts/${account}${path}`, init)
-    if (path.startsWith('/builds/')) log('api', `${init?.method || 'GET'} ${path} → ${describe(r)}`)
+    if (path.startsWith('/builds/')) log('api', `${init?.method || 'GET'} ${path.replace(/\/deploy_hooks\/[^/]+/, '/deploy_hooks/<hook>')} → ${describe(r)}`)
     if (!r.ok && r.status !== 404) throw new Error(`Cloudflare ${init?.method || 'GET'} ${path}: ${r.status} ${redact(r.text).slice(0, 400)}`)
     return r
   }

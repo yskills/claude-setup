@@ -55,6 +55,7 @@ test('API answers are logged without secrets or hook ids, and hook ids are read 
   assert.match(line, /^200 keys=\[result,success\] result=\[deploy_hook_uuid,build_token_secret,ok\]/)
   assert.doesNotMatch(line, /abc-123|s3cret/)
   assert.doesNotMatch(redact('x'.repeat(40)), /x{40}/)
+  assert.doesNotMatch(redact('{"id":"h1","uuid":"h2","x":"0f8fad5b-d9cb-469f-a165-70867728950e","y":"6729db15516a425d985bd27ff6dc179e"}'), /h1|h2|0f8fad5b|6729db15/)
   assert.equal(hookIdFrom({ deploy_hook_uuid: 'a' }), 'a')
   assert.equal(hookIdFrom({ hook_id: 'b' }), 'b')
   assert.equal(hookIdFrom({ deploy_hook: { uuid: 'c' } }), 'c')
