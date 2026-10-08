@@ -4,7 +4,7 @@ Besides the gate's summaries (2 failed rounds) and a probe that
 misses its go number, yskills reads three
 messages per project. Under auto-run (2026-10-06) each is posted with its recommended
 pick and work continues at once; yskills' ok, no or a tap changes course, nothing waits for it
-except the steps only their hands can do (keys, domain, Cloudflare import). Fixed templates, so they read the same every time. Short lines, no prose. German
+except the steps only their hands can do (keys, domain). Fixed templates, so they read the same every time. Short lines, no prose. German
 labels only if yskills writes German in that project.
 
 ## (a) After the plan
@@ -21,7 +21,7 @@ Größe: <small site: 1 build | app: n slices, riskiest first: <slice 1>>
 Slices: 1. <name> 2. <name> ...
 Rechtliches: <must-haves from the legal team, e.g. Impressum, Datenschutz, no cookie banner needed>
 Keys: <none | what will be needed, each asked by a key card when its slice gets there>
-Repo: create `<name>` (private) at https://github.com/new, then reply ok
+Repo: `yverse-studio/<name>`, made by the `new-project` workflow (publish skill), live at <url>
 Kosten: ~<€/month to run> + ~<tokens or $ to build>, estimate
 Risiko: <the one thing most likely to fail>
 
@@ -36,11 +36,9 @@ skill's `TASTE.md`. Then tap options: the directions, plus "none, try again". ys
 answer in words or pictures ("this one but darker", a screenshot): the design team revises and
 sends the next round. Each lasting like or dislike becomes a line in `TASTE.md`.
 
-Below the pick (the gate has merged the scaffold PR, which the import builds), then,
-once per project, the setup only yskills can do (numbered steps with deep links
-and exact names, from the `publish` skill and `sell`'s `keys.md`): Cloudflare import, D1 ids,
-Previews Base secrets. Test keys come later by key card, when the slice that uses them
-starts. Building starts when yskills replies "done".
+Below the pick: nothing to set up. The `new-project` workflow (publish skill) made the repo,
+the databases and the deploy before the scaffold; test keys come later by key card, when the
+slice that uses them starts. Building starts at once (auto-run).
 
 ## (c) Before launch
 

@@ -1,0 +1,23 @@
+name: CI
+
+# Tests only. Cloudflare Workers Builds builds every branch itself: main goes live,
+# every other branch gets a Worker Preview. No keys here.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+      - run: npm install
+      - run: npm run verify

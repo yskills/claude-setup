@@ -26,8 +26,8 @@ before each step; builder, gate and fix threads read their `roles/<role>.md` ins
      earn, not that yskills can find buyers; the probe slice (step 5) tests that.
    - **Legal:** the `legal` skill's table for this idea.
 3. **Plan.** `planner` proposes; the operator writes `PLAN.md` and `features.json`. **Brief (a).**
-   Its one task for yskills: create the private repo (threads get 403 on `create_repository`);
-   then `add_repo` it.
+   No task for yskills: the operator runs claude-setup's `new-project` workflow (publish skill,
+   §Per project) and `add_repo`s the repo it made; the day-zero site is live before the scaffold.
    **Day one in HQ** (the same hour as brief (a), one `ArtifactData` batch, every row with `at`, as
    `docs/hq-rows.md` says): the `projects/<id>` row (`state` active, `revenueMode` test, traction
    fields 0, `firstEuroBy` = PLAN.md's go date), the `<id>-` phases and `team` rows, a `work/<session>`
@@ -45,9 +45,8 @@ before each step; builder, gate and fix threads read their `roles/<role>.md` ins
    tool is one line to yskills and the threads fall back to the coordinator relay (§ Starting threads).
 4. **Scaffold + design.** Scaffold thread: "Scaffold PLAN.md's app on branch `scaffold` with
    the `scaffold` skill (its file list, in order). Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
-   directions. **Brief (b)** carries only what every build needs: the Cloudflare import and the D1
-   ids. The gate merges the scaffold PR once CI is green, before brief (b), because the Cloudflare
-   import builds the default branch and needs the scaffold's `wrangler.jsonc` there. Building starts once
+   directions. **Brief (b)** carries the design pick only: the deploy exists since the workflow. The gate
+   merges the scaffold PR at 5/5 like any other (its branch has a Preview URL from the start). Building starts once
    brief (b) is answered.
 
    **Keys and accounts just in time.** Every other key or account is asked for by a **key card**

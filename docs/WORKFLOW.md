@@ -15,7 +15,7 @@ whole history every turn.
 | 1 | Brainstorm | operator | a real discussion (Claude brings its own view and challenges) ending in one batch of tap-card questions (incl. money questions from `sell`) | Answer once |
 | 2 | Research, in parallel | **Inside:** our skills, catalog, lessons from `docs/TEST-PROJECTS.md`, your other repos. **Outside:** competitors, how the best similar products and open-source projects are built, tools (`toolbox`, Anthropic Directory). **Money:** who pays, how much, 3 pieces of evidence; none → the plan says no. **Legal:** the `legal` skill's table | one page each | Nothing |
 | 3 | Plan | `planner` | `PLAN.md` (PRD, slices, marketing plan, keys, costs), `features.json` (acceptance criteria per slice, written before any code) | **Brief (a):** ok/no (it includes proof people pay) |
-| 4 | Scaffold + design | one scaffold thread; design team (`frontend-design`, `impeccable`, `design-critic`) | default stack, `verify`, CI, Workers Builds config (`publish`; you connect it); 2-3 directions as screenshots | **Brief (b):** pick one; do the Cloudflare import it lists. Later keys come one card at a time, when a slice needs them |
+| 4 | Scaffold + design | one scaffold thread; design team (`frontend-design`, `impeccable`, `design-critic`) | default stack, `verify`, CI; the repo and its deploy already exist from the `new-project` workflow (`publish`); 2-3 directions as screenshots | **Brief (b):** pick one. Later keys come one card at a time, when a slice needs them |
 | 5a | Probe (anything meant to earn) | one builder thread, then the marketing team | slice `probe` live: offer, price, waitlist; pushed in one channel for ~14 days against the go number from `PLAN.md` | Nothing if it hits the number; else one tap: kill, change or build anyway |
 | 5 | Build | builder threads, one per slice, the next in a fresh thread after a merge; a second only when the slices share no file, never more than three; a small site is one thread, no slices | PRs with tests, screenshots, preview link; `PROGRESS.md` updated | Nothing |
 | 6 | Gate each PR | QA: `evaluator` on the preview, fresh `code-reviewer`; security: `security-reviewer` + `red-team`; `design-critic` + `legal-reviewer` | a 5/5 table on the PR and the merge, or one review the builder fixes | nothing |
@@ -29,7 +29,7 @@ After launch, phases 5-6 repeat for every improvement the weekly numbers suggest
 recommended one marked and work continues on it at once; the gate merges at 5/5 after a real
 preview test and a fresh review; the project chat reports results and real blockers only. Your
 "stop" and your taste calls (a rejected asset or look) are final and go into every brief. Only
-what needs your own hands waits: keys, a domain, the Cloudflare import.
+what needs your own hands waits: keys, a domain.
 
 ## PC work
 
