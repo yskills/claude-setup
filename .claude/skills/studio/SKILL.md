@@ -42,8 +42,10 @@ the last frame, a caption and a link to the thread.
   every 15 minutes while working, send the frame with a caption:
   1. `pwsh ~/.claude/claude-setup/live-shot.ps1 -App studio -Caption "Zaun um Parzelle 3 gebaut" -Link <thread link>`
      (German caption, what changed for yskills);
-  2. `ArtifactData` `update`, `url` https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT, collection
-     `live`, doc `studio` or `blender`, `file_path` the `.json` above. The image stays out of
-     the context; never paste it.
+  2. `ArtifactData` `set`, `url` https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT, collection
+     `live`, doc `studio` or `blender`, `file_path` the `.json` above, `if_version` from your last
+     write's result (first push of a session: `get` it with `out_dir` for the version). The image
+     stays out of the context; never paste it. Two docs overwritten in place keep the database
+     small, so no asset uploads.
 - HQ shows a frame up to 12 hours old, with a green "live" chip for the first 10 minutes.
 - On the PC itself yskills just looks at the windows; the frames are for the phone and for later.
