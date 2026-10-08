@@ -41,7 +41,7 @@ Say "stop" or "pause" and everything stops; a look you reject stays rejected.
 | Delete a branch, re-run Actions, CLAUDE.md edits | Cloud threads get a 403 on branch deletes and Actions re-runs, and the safety check refuses CLAUDE.md edits and secret reads (rechecked 2026-10-08); a PC session deletes branches; CLAUDE.md edits need your Allow |
 | Keys and tokens | They live in GitHub and the Worker, never in chat |
 | Real money: Stripe live, ads, Gewerbe, domain | Legal and money steps need your name and hands |
-| Web accounts (Roblox, Cloudflare) | Claude Code's safety check blocks them |
+| Owner settings of your accounts (who gets access, app installs, billing) and passwords | Claude never types a password or solves a CAPTCHA; it works in Cloudflare and GitHub through its own member logins (`docs/pc-claude-user.md`, decided 2026-10-08) |
 | The laptop | It must be on; Remote Control only runs while it is |
 
 ## What it costs

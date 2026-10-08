@@ -16,8 +16,8 @@ in `install.mjs` works as on yskills' own user (`C:\Users\Ich`); this page lists
 | Python 3.13, ffmpeg, uv, fnm | winget `--scope user` (all in `%LOCALAPPDATA%`) | the tools `install.mjs` reports as missing |
 | pwsh 7 | Microsoft Store package via `winget install --id 9MZ1SNWT0N5D --source msstore` | the MSI needs admin; `live-shot.ps1` needs pwsh |
 | Blender | 5.1, machine-wide (`C:\Program Files\Blender Foundation`); Blender Lab MCP add-on 1.0.3 with Auto Start, server `Blender` in `~/.claude.json` (`studio` skill) | shared with yskills' user; add-on and server are per user |
-| GitHub | `gh` logged in as `yskills-claude`; commits are authored as `Claude <339700673+yskills-claude@users.noreply.github.com>` | Claude's own account, collaborator on the repos |
-| Claude in Chrome | extension installed in this user's Chrome profile | a session only has the tools it started with, so the next session there drives it |
+| GitHub | `gh` logged in as `yskills-claude`; commits are authored as `Claude <339700673+yskills-claude@users.noreply.github.com>` | Claude's own account; Write on claude-setup (tested 2026-10-08), the other repos once yskills adds it |
+| Claude in Chrome | extension installed in this user's Chrome profile | untested: a session only has the tools it started with, so the first fresh session there tests it with a screenshot |
 | Roblox Studio | not installed | installs per user and needs a Roblox login Claude does not have yet |
 | Environment variables | always set for the user, never machine-wide; no admin | standard user |
 
@@ -26,6 +26,13 @@ PATH of the process that hosts them. After installs, restart that host (not just
 
 ## What still needs yskills' hands
 
+- **Remote Control host restart:** the running `claude remote-control` still has the PATH from
+  before the installs. In a fresh terminal on this user: `cd C:\Users\Claude\Documents\GitHub`,
+  then `C:\Users\Claude\.local\bin\claude.exe remote-control`.
+- **Repo access:** `yskills-claude` gets Write on each repo at
+  `https://github.com/yskills/<repo>/settings/access`.
+- **Mail and Cloudflare:** the Gmail connector signed in as Claude's Gmail
+  (claude.ai/settings/connectors), and a Cloudflare member invite (Administrator) to that Gmail.
 - **context7:** the plugin's MCP server asks for authentication once (`/mcp` in an interactive
   session).
 - **Roblox Studio:** later, once Claude has a Roblox login.
