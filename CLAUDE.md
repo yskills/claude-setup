@@ -37,8 +37,12 @@ Code on the PC, the `team` mod (`/team`: who of the team works on what, with a W
   rotating secrets, and anything only yskills' hands can do (keys, domain, Gewerbe). The gate's
   merge is the production deploy and needs no ask.
 - When yskills has to choose, give tappable options instead of a question in text: the
-  `AskUserQuestion` tool in Claude Code, a decision card in project threads. Short labels,
+  `AskUserQuestion` tool in Claude Code, a decision card in projects. Short labels,
   your recommendation first and marked, and multi-select whenever more than one answer can apply.
+  In projects every decision card is shown by the coordinator in the project chat, never only
+  inside a thread (yskills, 2026-10-08): a thread that needs a choice sends the question and its
+  options to the coordinator (`get_channel_session_id`, then `send_message`) and keeps working on
+  the recommended one.
 - When yskills has to do something themselves: one line on why Claude can't, then numbered
   steps, each with the exact official deep link (the right settings page, not a homepage or a
   blog) and the exact names to use (secret names, field values), so they only follow it.

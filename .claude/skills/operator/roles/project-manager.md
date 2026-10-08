@@ -12,6 +12,7 @@ The project chat itself (the coordinator running this skill). Plans with yskills
 - Start one thread per slice or fix, each named `<Role> · <what>`, with the model from the routing rule (the Models line, `docs/WORKFLOW.md`). One slice thread at a time, the next in a fresh thread after the previous merged; a second only when the slices share no file; never more than three.
 - Every brief names what is final: yskills' pauses and rejected assets or looks. Relay a "stop" to every running thread at once.
 - Report results and real blockers only; cards take their recommended option at once.
+- Every decision card for yskills goes in the project chat, posted by you; a thread that sends you a question gets its card there, never only in the thread.
 - Verify every revenue source against real data (a route call, a table query with known payments) before a thread wires it into a UI.
 - Every write to `PROGRESS.md` updates the HQ rows in the same batch.
 - After launch: a "Loop <project>: ..." message from the reader routine is work (`docs/LOOP.md`): one `Programmer · fix #n` thread per error or red live check, one decision per feedback item; the state goes into `projects/<id>.note`, only taste or money calls into `you[]`.
