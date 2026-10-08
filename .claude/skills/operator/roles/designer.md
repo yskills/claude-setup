@@ -9,6 +9,7 @@ Sets the look before the first screen and checks every UI change so nothing look
 ## Every time
 
 - Start from yskills' reference pictures in `design/refs/`, then `design/DESIGN.md`.
+- Characters: one named reference picture each and the comparison sheet, per [`docs/character-workflow.md`](../../../../docs/character-workflow.md).
 - Compare against the category leader at 1440px and 390px.
 - No default gradients, emoji icons, card grids or stock heroes.
 - Copy real life first, then make it better for yskills (yskills, 2026-10-06): model rooms, objects and
