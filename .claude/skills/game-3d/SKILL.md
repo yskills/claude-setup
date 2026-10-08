@@ -9,6 +9,9 @@ Decided 2026-10-07 (plan: `/mnt/project-files/game-dev/PLAN.md` in the Claude Se
 The HQ office is the test run; the first real game turns yskills' vacation photos and stories
 into a cozy walk-around game that can go to Steam.
 
+**Starter kit, read once at project start:** [`starter/README.md`](starter/README.md): chibi
+roadmap, figure pipeline, standard models with licences, and the learnings from Company XY's figures.
+
 ## 1. Engine: three.js, Electron for Steam
 
 Threads run in cloud Linux containers with Chromium and no screen, so the engine must run and
