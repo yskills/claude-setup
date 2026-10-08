@@ -106,6 +106,14 @@ row: the office poses every figure with the shared clips in code. Desk and bond 
 `bond/<id>` (`wear` = worn outfit index). Switch after a figure merge: upload the new exports, then one `update`
 on `cards/<id>` that replaces the ids in place (same order and labels), pinned with `if_version` (the db's
 document `version` is the only versioning); the old assets stay (deleting them is a data delete and needs yskills).
+**Story (figure chapters):** `story/<roster id>` (e.g. `story/mira`), written by HQ's story player (company-xy
+`story.js`, rules `STORY.finish` in `story-rules.js`) when a chapter ends; no thread writes it. Fields: `done` (chapter
+numbers played), `flags` (answers that change later lines), `facts[{kind promise|told|gift|joke, text, at}]` (max 30),
+`items[{item, label}]` (desk items a chapter gave), `texts[{text, at}]` (her messages, max 12), `heart` (answer scores),
+`last {chapter, at}`. Chapters open by real work only (`STORY.bondOf`, from `events/*`: `pr_merged` 1, `launched` 5,
+live `euro` 3); a chapter's `favour` waits for its event kind (`pr_merged`, `launched`, and once a source writes them
+`ci_failed`, `ci_green`, `pr_stale`, ids `ci-<repo>-<sha>` / `stale-<repo>-<number>`, 0 XP) since the last chapter.
+The chapters themselves are content in company-xy `content/story/<roster id>/`, not rows.
 **Derived rows:** in the Company XY project the threads write none of this themselves; the HQ refresher derives them from
 `list_thread_sessions` (every thread, finished ones included) on every run (company-xy `hq-refresh.md`): `work/session_<id>` per open thread (the thread list spells
 the same session `cse_<id>`) with `by: 'refresher'`, `state` (running in a turn, waiting between turns, done once finished or
