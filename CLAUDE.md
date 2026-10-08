@@ -16,19 +16,22 @@ Code on the PC, the `team` mod (`/team`: who of the team works on what, with a W
   record the lesson (project `CLAUDE.md`, or a test/lint rule/hook if it can be caught
   automatically) so it doesn't repeat. Auto-memory is only a scratchpad: the monthly memory
   check (`docs/WORKFLOW.md`, Learning) moves lasting notes into the repo and deletes the rest.
+  Friction with this setup itself becomes a `loop:setup` issue in claude-setup (operator skill,
+  Setup loop), which a fix thread closes through the gate.
+- Where things live: `docs/MAP.md` (every part, what loads when, the one home of each rule). A
+  rule goes in its home only; elsewhere, link it.
 - New app idea or "continue the project": follow the `operator` skill. It sizes the job, writes
   acceptance criteria before building, and sends yskills three ok/no briefs.
-- Merging: a fresh gate thread posts the `operator` skill's 5/5 table and merges every PR at 5/5
-  itself, launch and live money included (yskills chose "merge everything", 2026-10-06); that
-  merge is the approved production deploy, claude-setup PRs included; yskills taps only when
-  Claude Code's safety check blocks a thread's merge. One thread per plan or PR, closed when done (`docs/WORKFLOW.md`).
-- Models (`docs/WORKFLOW.md`, Models): Fable for architecture and plans, Opus for build slices
-  and anything with design or judgement, Sonnet for follow-ups, small fixes, data wiring, tests
-  and reviews; reviewers get only the diff or URL plus the criteria.
-- Auto-run (yskills, 2026-10-06): no taps. A card still shows the options, but work continues on
-  the recommended one at once; the gate merges at 5/5 after a real preview test and review; the
-  coordinator reports results and real blockers only. yskills' pauses ("stop", "pause") and
-  taste calls (an asset or look they rejected) are final: stop at once, never argue for them.
+- Auto-run and merging (yskills, 2026-10-06): no taps. Cards show the options but work continues
+  on the recommended one at once. A fresh gate thread runs the `operator` skill's 5/5 gate
+  (`gate.md`, the one merge policy) after a real preview test and review and merges every PR at
+  5/5, launch, live money and claude-setup included; that merge is the approved production
+  deploy. yskills taps only when Claude Code's safety check blocks a merge. The coordinator
+  reports results and real blockers only. Pauses ("stop", "pause") and taste calls (a rejected
+  asset or look) are final: stop at once, never argue. One thread per plan or PR, closed when
+  done (`docs/WORKFLOW.md`).
+- Models: the strongest model for the hardest work. Fable (claude-fable-5-1) for really hard problems (architecture of a new product, a bug nobody could solve, a big plan); if Fable is out of credits or unavailable, Opus takes it without asking. Opus (claude-opus-5-5) for plans, design and judgement. Sonnet (claude-sonnet-5-5) for everything else, builds included. A simple reading job goes to a Haiku subagent. When a newer model ships, use the newest of each tier. A model yskills names is used as named.
+- Reviewers get only the diff or URL plus the criteria.
 - When a detail is unspecified, pick the sensible default, say which one, and keep going. Ask only
   before spending money (ads, purchases), sending mail or posts, deleting data, force-pushing,
   rotating secrets, and anything only yskills' hands can do (keys, domain, Gewerbe). The gate's
@@ -49,16 +52,12 @@ Code on the PC, the `team` mod (`/team`: who of the team works on what, with a W
 - In cloud project threads every WebFetch of a page nobody posted in the chat makes yskills
   press Allow. Research there with WebSearch and tell subagents the same; fetch a
   page only when one fact depends on it, and say so in the thread.
-- Tokens: every tool call re-reads the whole context (a project thread starts near 114k), and
-  output is not free either: about 50% of the bill on Sonnet and 67% on Opus. So keep context
-  small and replies short. The context guard warns at about 150k, says hand off at 200k and
-  repeats every further 50k; follow it.
+- Tokens: every tool call re-reads the whole context and output is half or more of the bill,
+  so keep context small and replies short; follow the context guard (warns at 150k, hand-off at
+  200k). `/clear` between tasks, batch calls, trim output, hand big reads to Haiku subagents, and
+  start a fresh thread (it reads `PROGRESS.md`) instead of resuming one idle for over an hour.
 - In project threads never call `connect_device` unless the task needs yskills' own files; the
   app's "connect your device" card can be ignored, say so if asked.
-- `/clear` between unrelated tasks, `/compact` at milestones. Batch independent calls, trim
-  output with `tail`, hand big reads to subagents (a simple reading job goes to a Haiku
-  subagent), and start a fresh thread (it reads `PROGRESS.md`) instead of resuming one idle for
-  over an hour.
 
 ## Code
 
@@ -102,10 +101,15 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 - Web: Nuxt 4 (SSR/static) or Vue 3 + Vite (SPA/PWA), Pinia, Tailwind v4, `@nuxtjs/i18n` (de, en).
 - API: Nuxt server routes or a small Express service. SQLite or Postgres with prepared statements.
 - Tests: Vitest, Playwright for e2e. Typecheck with `vue-tsc`.
-- Ship: Cloudflare Workers Builds deploys the default branch and gives every other branch a
-  Worker Preview with its own data and keys; GitHub Actions runs one `verify` script and holds no
-  keys. The `publish` skill has the per-project setup and its rules. Put the preview link in the PR
-  reply. Services that need a server (like Luna): Docker + Caddy on a small VPS.
+- New apps (yskills, 2026-10-07): threads in the claude.ai project "Company XY", never a new
+  project (its coordinator is every app's Project Manager). The repo comes from a Remote Control
+  session on the PC (`gh repo create yskills/<name> --private`, then `add_repo`; PC offline:
+  brief (a) asks for github.com/new).
+- Ship: Cloudflare Workers Builds (Workers + D1) deploys the default branch and gives every other
+  branch a Worker Preview; GitHub Actions runs one `verify` script and holds no keys (`publish`
+  skill). The preview link goes in the PR reply. Only an app that needs a long-running server
+  may use Render or Docker + Caddy on a small VPS (like Luna), after yskills says yes (it costs
+  money every month).
 - Anything beyond this (video, AI generation, payments, ads, analytics, email, mobile...) comes
   from the `toolbox` skill, added to that project only. Anything that takes money (checkout,
   shop, subscriptions, shipping) follows the `sell` skill, an app for the App Store or Google
@@ -116,12 +120,8 @@ Inferred from MyPage, luna-monorepo and TiktokIsland; follow an existing repo's 
 
 - Agents (listed in the session): use reviewers proactively after writing code, and
   `security-reviewer` on anything touching auth, payments or user input.
-- Skills to reach for: `operator` (idea to live app), `legal` (German law for any app),
-  `toolbox` (which plugins, APIs and skills a project needs, and adds them to that project
-  only), `game-3d` (a 3D game with three.js, Electron for Steam: layout, characters, tests,
-  Steam checklist), `onboard-project` (set up a repo for Claude), `ship-check` (verify before push),
-  `ui-review` (screenshots + critique), plus superpowers (brainstorming, plans, TDD, debugging)
-  and the ECC stack skills (vue, nuxt4, vite, api-design, security-review, seo...).
+- Skills are listed in the session; `operator` runs app work, and `docs/MAP.md` says where each
+  part and rule lives.
 - Browser: Playwright MCP for headless checks; `claude --chrome` to use yskills' own Chrome
   when a page needs their login. In cloud threads launch Playwright with
   `executablePath: '/opt/pw-browsers/chromium'`; that Chromium has no H.264, so test video as WebM. Stop a dev server by
