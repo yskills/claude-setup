@@ -2,6 +2,23 @@
 
 One page, made for a phone. Every number has its source; "not measured yet" means nobody has.
 
+## Start a project
+
+Once per new claude.ai project, before the first message. The project chat loads no repo, so
+the rules reach it only through this text. A global `~/.claude/CLAUDE.md` from `cloud/setup.sh`
+does not help: the project chat runs in a fixed environment without your setup script (checked
+2026-10-08: no setup plugins, its own environment id), and threads already get the rules from
+this text and the repo.
+
+1. Open [`operator/templates/project-instructions.md`](../.claude/skills/operator/templates/project-instructions.md)
+   and copy everything below the `---` line.
+2. In the project: **Project settings > Memory > Project instructions**, paste, replace `<app>`
+   with one line on what the project is, save.
+3. **Project settings > Repositories**: add `yverse-studio/claude-setup` (threads load the
+   details from it).
+
+When a rule changes, the template changes in the same PR; paste it again into running projects.
+
 ## Start an app
 
 Write **one message** in the Company XY project, as short as you like: what it is, who it is for,

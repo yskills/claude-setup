@@ -70,7 +70,7 @@ Per project, once: install the Claude GitHub App on
 repos are reachable, then in Project settings set **Thread model** Sonnet and **Thread effort** medium
 (the default is Opus at high effort), and paste
 [`operator/templates/project-instructions.md`](.claude/skills/operator/templates/project-instructions.md)
-into Project instructions.
+into Project instructions (steps: [`docs/USING.md`](docs/USING.md#start-a-project)).
 
 Plugins and network need a [cloud environment](https://code.claude.com/docs/en/cloud-environments)
 (Project settings > Cloud environment > Add cloud environment). Pick the same one in every

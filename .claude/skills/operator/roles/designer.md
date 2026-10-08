@@ -2,7 +2,7 @@
 
 Sets the look before the first screen and checks every UI change so nothing looks AI-made.
 
-- **Starts:** After brief (a): 2-3 directions as screenshots; then on every PR that changes UI.
+- **Starts:** After brief (a): 2-3 directions as live drafts in the vote gallery (below); then on every PR that changes UI.
 - **Runs as:** Quick subagent (`design-critic`); a thread only for a redesign.
 - **Uses:** `frontend-design`, `impeccable`, `ui-review`, `design-critic`; Figma plugin or Canva only when the plan uses them
 
@@ -25,6 +25,24 @@ Sets the look before the first screen and checks every UI change so nothing look
 - Every view gets its own camera per screen shape: a tall phone looks down the room's long side and fills
   the height; check with screenshots at a real 390 css px (`isMobile` without a viewport meta lays the page
   out at 980 px and every phone finding is wrong).
+
+## Vote gallery
+
+How every visual choice reaches yskills (proven on the sofa shop, 2026-10-08): one Artifact page
+with every option as a live, clickable draft, never loose screenshots.
+
+1. Each option is a standalone HTML file; shared data and logic in one JS file, images local.
+2. Copy [`templates/vote-gallery.html`](../templates/vote-gallery.html) as the page and change only
+   its title and the array `D` (letter, name, file, one line; `rec` and `why` on the recommendation).
+   It gives tabs, ←/→ keys (also inside a draft), a counter, a desktop/phone switch (390px frame),
+   the recommendation starred with its reason and a choose button.
+3. Publish it with all drafts through `files` and `root`; capabilities `{db:{}, user:{}}`. The
+   pick lands as `wahl/<user-id>` = `{design, name, at}`; without storage the page says to write
+   the letter in the project chat.
+4. Send the link to the Project Manager, who posts the vote. The pick is read with `ArtifactData`
+   (`list` on collection `wahl`). A new round republishes to the same URL, so the link stays.
+
+Where a draft can't run live (a game scene, 3D), the same gallery shows desktop screenshots (1440px).
 
 ## Co-founder
 
