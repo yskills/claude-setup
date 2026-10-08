@@ -33,6 +33,21 @@ node <ui-review skill folder>/scripts/shoot.mjs --base http://localhost:3000 --o
 For a page behind a login, log in with a throwaway local account; never use or print real
 credentials.
 
+## 2b. Load once
+
+Every page must load once per visit. A double load slipped past screenshots once (Yland
+2026-10-08: a PWA reloaded itself after every deploy, and the server sent "Loading…" before the
+real page), so run this on the production build of any app with a service worker or SSR data:
+
+```
+node <ui-review skill folder>/scripts/load-once.mjs http://localhost:8787/ 15
+```
+
+It visits three times in one profile (first, second, first after a simulated deploy) and fails
+on any second page load. Also open the server's HTML (`curl`): it must already hold the page's
+data, not a loading placeholder that the browser fills in a second time. A PWA follows
+the `toolbox` skill's PWA row (`registerType: 'prompt'`).
+
 ## 3. Review
 
 1. Open every PNG yourself first.

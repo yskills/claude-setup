@@ -51,7 +51,7 @@ lives outside this repo.
 | Models | the one line in `docs/WORKFLOW.md` (Models); project instructions carry it word for word | everything else links it; CI fails on a second wording or on the old model name |
 | Context guard numbers (warn 150k, hand off 200k) | `global/context-guard.mjs` | `CLAUDE.md`, `README.md` |
 | Remote Control on the PC | `docs/WORKFLOW.md` (PC work) | project instructions template |
-| UI rules | `CLAUDE.md` (UI) | `roles/designer.md`, `ui-review` (screenshots, run videos via `desktop.sh`) |
+| UI rules | `CLAUDE.md` (UI) | `roles/designer.md`, `ui-review` (screenshots, the load-once check, run videos via `desktop.sh`) |
 | Deploys | `publish` skill | `CLAUDE.md` (stack) |
 | Money and shop law | `sell` skill | `docs/WORKFLOW.md` (Selling) |
 | Project instructions text | `operator/templates/project-instructions.md` | the live text in each project's settings |

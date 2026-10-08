@@ -18,7 +18,7 @@ global CLAUDE.md (Nuxt 4 / Vue + Vite, Cloudflare Workers).
 | Heavy compute (FFmpeg, Python, ML) | **Cloudflare Containers** or a VPS | | `cloudflare` plugin |
 | Realtime (multiplayer, live chat) | **Durable Objects** + WebSockets | | wrangler binding |
 | Cache / rate limits | Workers KV, Durable Objects; Redis off-Cloudflare | | `redis-development` plugin |
-| Installable app from the web | **PWA** (`@vite-pwa/nuxt`), Play Store via **TWA** (Bubblewrap) | TellMeY's choice; cheapest path to "an app" | npm |
+| Installable app from the web | **PWA** (`@vite-pwa/nuxt`), Play Store via **TWA** (Bubblewrap) | TellMeY's choice; cheapest path to "an app". `registerType: 'prompt'`, never `'autoUpdate'` (reloads the page after every deploy) | npm |
 | Native iOS + Android from the Vue app | **Capacitor** | Reuses the web code; shipping to the stores: the `store` skill | npm |
 | Native app, React | **Expo** | | `expo` plugin |
 | Desktop app | **Tauri 2** | Small binaries, web UI | cargo/npm |
