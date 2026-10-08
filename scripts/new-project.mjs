@@ -181,7 +181,7 @@ async function registerBuildToken(cf, buildToken) {
   return created.json.result.build_token_uuid
 }
 
-async function pickBuildToken(cf, preferredName) {
+async function pickBuildToken(cf, preferredName, newToken) {
   // Never registers the setup token as a build token: every pushed branch of every project
   // would then build with Workers Builds Configuration Edit and D1 create rights. Builds use
   // the existing build token (duo-test's, Workers Scripts + D1 Edit), named by BUILD_TOKEN_NAME.
@@ -190,6 +190,7 @@ async function pickBuildToken(cf, preferredName) {
   const preferred = preferredName ? tokens.find((t) => t.build_token_name === preferredName) : null
   if (!preferredName && tokens.length > 1) throw new Error(`${tokens.length} build tokens exist: set the variable BUILD_TOKEN_NAME to the one builds should deploy with`)
   const pick = preferred || (preferredName ? null : tokens[0])
+  if (!pick && newToken) return registerBuildToken(cf, newToken)
   if (!pick) throw new Error(`no build token${preferredName ? ` named "${preferredName}"` : ''}: set the secret CLOUDFLARE_BUILD_TOKEN once (publish skill, §A new project)`)
   log('build token', `${pick.build_token_name} ${pick.build_token_uuid}`)
   return pick.build_token_uuid
@@ -282,7 +283,7 @@ export async function main() {
   }
 
   const worker = await ensureWorker(cf, name, randomBytes(32).toString('base64url'), { adopt: repoExisted })
-  const buildTokenUuid = await pickBuildToken(cf, process.env.BUILD_TOKEN_NAME)
+  const buildTokenUuid = await pickBuildToken(cf, process.env.BUILD_TOKEN_NAME, process.env.CLOUDFLARE_BUILD_TOKEN)
   await ensureBuilds(cf, { tag: worker.id, repo, org, name, branch, d1, buildTokenUuid })
   const build = await firstBuild(cf, worker.id, branch)
   if (build.status === 'success') await ensureSecret(cf, name, 'BETTER_AUTH_SECRET', randomBytes(32).toString('base64url'))
