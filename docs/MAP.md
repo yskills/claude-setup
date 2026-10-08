@@ -54,6 +54,7 @@ lives outside this repo.
 | Deploys | `publish` skill | `CLAUDE.md` (stack) |
 | Money and shop law | `sell` skill | `docs/WORKFLOW.md` (Selling) |
 | Project instructions text | `operator/templates/project-instructions.md` | the live text in each project's settings |
+| Reply style, say done, notify, talk first, honesty, hand-off at 200k | `operator/templates/project-instructions.md` | the live text in each project's settings |
 
 ## Keeping it clean
 

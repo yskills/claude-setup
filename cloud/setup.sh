@@ -104,7 +104,10 @@ GUARD
 node -e '
 const fs = require("fs"), p = require("os").homedir() + "/.claude/settings.json"
 const s = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, "utf8")) : {}
-const cmd = `node "${require("os").homedir()}/.claude/claude-setup/context-guard.mjs"`
+// Prefer the guard from a claude-setup checkout in the thread, so a change to it reaches every
+// thread without pasting this script again; the copy above is the fallback.
+const home = require("os").homedir()
+const cmd = `for f in /home/user/claude-setup/global/context-guard.mjs /home/claude/claude-setup/global/context-guard.mjs "${home}/.claude/claude-setup/context-guard.mjs"; do [ -f "$f" ] && exec node "$f"; done`
 s.hooks = s.hooks || {}
 s.hooks.PostToolUse = (s.hooks.PostToolUse || []).filter((h) => !JSON.stringify(h).includes("context-guard.mjs"))
 s.hooks.PostToolUse.push({ matcher: "*", hooks: [{ type: "command", command: cmd, timeout: 5 }] })
