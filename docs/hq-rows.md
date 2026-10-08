@@ -66,9 +66,12 @@ act, repo`) and message the coordinator, which edits the ideaWorld file: pause =
 writes `ignore/<id>`, which the refresher drops once the file is gone. The GitHub repo changes only on yskills' explicit yes.
 A paused project gets no new thread until yskills resumes it.
 
-**Idea whiteboard:** the board in yskills' office shows `ideas/<slug>` (`{title, blurb, repo, parked, archived, at}`, written by
-the refresher) for entries without a repo and not archived: title and blurb, nothing else. Starting one is a normal ask in
-chat (operator workflow, slug = project, repo and Worker name).
+**Idea whiteboard:** the staging area in yskills' office: `ideas/<slug>` (`{title, blurb, repo, parked, archived, planned,
+link, at}`, written by the refresher) for every entry not archived, as title, blurb and a derived status: Idee, Geplant (the
+file has a `## Plan`), Läuft (it has `repo:`). The card opens the file on GitHub. Its two taps write `requests/<id>`
+(`kind: 'idea'`, `slug`, `act`) and message the coordinator: Planen (Idee) starts one thread that researches and writes
+`## Plan` and `## Research notes` below yskills' own words in the file; Starten (Geplant) starts the build from that plan
+with the operator workflow (slug = project, repo and Worker name) and sets `repo:` once the repo exists.
 
 **Roadmap:** HQ's Roadmap tab is one quest map per project, rendered only from these `phases` rows and the
 `work` rows they name (`HQ.questMap` in company-xy's `hq-rules.js`). A step shows as current only when its row is `active`
