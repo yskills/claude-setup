@@ -20,8 +20,10 @@ files, tools or models.
    itself**, and the thread says `Done: <what changed>`.
 5. **Launch and after.** The loop reads errors and feedback every day (`docs/LOOP.md`).
 
-You see threads, cards, PR links, `Done:` lines and the HQ rows (`docs/hq-rows.md`).
-Cards show options with one recommended; work continues on it at once.
+You read only the project chat: the coordinator posts every result, `Done:` line, PR link and
+vote there (rule in `CLAUDE.md`, How to work), and you open a thread only when something is
+wrong. Plus the HQ rows (`docs/hq-rows.md`). Cards show options with one recommended; work
+continues on it at once.
 
 ## Deploy a page in one shot
 
