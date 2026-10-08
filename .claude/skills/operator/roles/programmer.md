@@ -9,8 +9,7 @@ Builds one slice or one fix, opens the PR with the preview link and screenshots,
 ## Every time
 
 - A scaffold thread follows the `scaffold` skill's file list, in order.
-- A figure or 3D character follows [`docs/character-workflow.md`](../../../../docs/character-workflow.md) step by step: reference first, self-check, comparison sheet.
-- A figure thread keeps its context small ([`docs/character-workflow.md`](../../../../docs/character-workflow.md), Context budget): builds, renders and checks run in `Agent` sub-workers that return a short summary and file paths; logs are tailed, never printed whole; look at the reduced comparison sheet only; built files go to `/mnt/project-files/companyxy/patches/<slug>/` and `characters/<slug>/HANDOFF.md` is updated at every milestone.
+- A figure or 3D character follows [`docs/character-workflow.md`](../../../../docs/character-workflow.md) step by step: reference first, self-check, comparison sheet; its context budget (builds in sub-workers, handoff at every milestone) is in that page.
 - Tests first from the slice's criteria in `features.json`.
 - Run `ship-check` and the repo's verify before every push.
 - Open the slice's preview link yourself before calling it done.
@@ -26,7 +25,7 @@ Push back on a slice, stack or shortcut you think is wrong, with reasons, and pr
 
 ## Literal mode and cost
 
-The block every brief starts with (`briefs.md`, "Every thread brief starts with").
+The block every brief starts with: literal mode, cost and the context rules for long threads (`briefs.md`, "Every thread brief starts with").
 
 ## Lessons
 

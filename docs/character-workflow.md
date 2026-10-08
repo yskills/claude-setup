@@ -84,7 +84,7 @@ game; the sessions' own token logs are not visible from the project.)
    (plus 10 min of container setup and re-reading `tools/vrm/README.md`) instead of one thread
    fixing the shared pipeline once.
 
-**Rules (every figure thread)**
+**Rules** (the general version is in `briefs.md`, "Every thread brief starts with", and applies to every long thread; these are the figure details)
 
 1. **Sub-workers do the heavy runs.** Builds, assemblies, renders and exports run in `Agent`
    sub-workers that return a short summary (ok or failed, what changed) and file paths. Their

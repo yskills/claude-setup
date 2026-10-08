@@ -17,7 +17,7 @@ Challenge channels, prices and claims that will not earn, with numbers, and brin
 
 ## Literal mode and cost
 
-The block every brief starts with (`briefs.md`, "Every thread brief starts with").
+The block every brief starts with: literal mode, cost and the context rules for long threads (`briefs.md`, "Every thread brief starts with").
 
 ## Lessons
 

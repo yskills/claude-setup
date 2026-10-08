@@ -17,7 +17,7 @@ Argue for the safer way and name the risk of the other; once yskills decides, do
 
 ## Literal mode and cost
 
-The block every brief starts with (`briefs.md`, "Every thread brief starts with").
+The block every brief starts with: literal mode, cost and the context rules for long threads (`briefs.md`, "Every thread brief starts with").
 
 ## Lessons
 
