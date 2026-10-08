@@ -3,8 +3,9 @@ name: delete-project
 # Removes a project new-project made: the org repo, the Worker (with its Workers Builds
 # connection), D1 `<name>` and `<name>-preview`, the shared build token once no other Worker uses
 # it, and a leftover branch `new/<name>` here. Run workflow only (Actions page, the PC, or a thread's
-# run_workflow), never a push. `confirm` must repeat the name, and a repo without new-project's
-# description is refused, so real repos can't go this way (publish skill, §Delete a project).
+# run_workflow), never a push. Refused before anything is touched: `confirm` not repeating the name,
+# a protected repo name, no `projects/<name>.json` on main, a repo in yverse-studio without
+# new-project's description. `dry_run` (default) only logs the plan (publish skill, §Delete a project).
 on:
   workflow_dispatch:
     inputs:
@@ -16,11 +17,11 @@ on:
         description: 'Type the name again to confirm'
         required: true
         type: string
-      org:
-        description: 'GitHub org that owns the repo'
+      dry_run:
+        description: 'Only print what would be deleted'
         required: false
-        type: string
-        default: yverse-studio
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -46,7 +47,7 @@ jobs:
         env:
           NAME: ${{ inputs.name }}
           CONFIRM: ${{ inputs.confirm }}
-          ORG: ${{ inputs.org }}
+          DRY_RUN: ${{ inputs.dry_run }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           PROJECTS_GITHUB_TOKEN: ${{ secrets.PROJECTS_GITHUB_TOKEN }}
@@ -54,12 +55,19 @@ jobs:
   branch:
     # Only this job may write here, and it runs no repo code.
     needs: delete
+    if: inputs.dry_run == false
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
       contents: write
     steps:
-      - run: gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/new/$NAME" || echo "no branch new/$NAME"
+      - run: |
+          if gh api "repos/$GITHUB_REPOSITORY/branches/new/$NAME" --silent 2>/dev/null; then
+            gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/new/$NAME"
+            echo "deleted branch new/$NAME"
+          else
+            echo "no branch new/$NAME"
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
           NAME: ${{ inputs.name }}

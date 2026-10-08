@@ -150,12 +150,13 @@ Claude:
 ## Delete a project
 
 `delete-project` (Actions → Run workflow, or a thread's `actions_run_trigger` `run_workflow` on
-`delete-project.yml`, ref `main`) with `name` and `confirm` (the name again) removes the org repo,
-the Worker and its Builds connection, D1 `<name>` and `<name>-preview`, the build token
-`claude-setup-builds` once no other Worker builds with it, and a leftover branch `new/<name>`.
-It refuses a repo whose description lacks "made by claude-setup new-project", so only projects the
-workflow made can go. Deleting is irreversible: run it only when yskills said to delete that
-project.
+`delete-project.yml`, ref `main`) with `name`, `confirm` (the name again) and `dry_run`. The
+default dry run only logs the plan; `dry_run: false` then removes the Worker and its Builds
+connection, D1 `<name>` and `<name>-preview`, the build token `claude-setup-builds` once no other
+Worker builds with it, the repo in `yverse-studio` (last), and a leftover branch `new/<name>`.
+Refused before anything is touched: a protected repo name (the list in `scripts/delete-project.mjs`),
+no `projects/<name>.json` on main, a repo without the description "made by claude-setup new-project".
+Irreversible: run it only when yskills said to delete that project.
 
 ## The tradeoff, decided
 
