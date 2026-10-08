@@ -3,7 +3,8 @@
 import { writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
-let commit = process.env.WORKERS_CI_COMMIT_SHA || ''
+// A build started from the trigger API (new-project's first build) gets the branch name here.
+let commit = /^[0-9a-f]{40}$/.test(process.env.WORKERS_CI_COMMIT_SHA || '') ? process.env.WORKERS_CI_COMMIT_SHA : ''
 if (!commit) {
   try { commit = execSync('git rev-parse HEAD', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() } catch { commit = 'dev' }
 }
