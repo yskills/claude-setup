@@ -98,7 +98,7 @@ the same session `cse_<id>`) with `by: 'refresher'`, `state` (running in a turn,
 resolved), `project`, `pr`, `started` and `lastActivity` added to the shape above and one phase for the whole thread; and
 `team/crew-<role>` per role word (working, waiting or idle, `task`, `link`, `threads`, `lastActivity`). A row a running thread
 writes itself wins: the refresher writes no row over it. Legacy rows retire (at most 20 a run, pinned, none on a partial read):
-hand-written work rows of finished threads, the refresher's own a day after, and hand-written team rows marked done;
+hand-written work rows of finished threads, the refresher's own a day after, and hand-written team rows marked done (never `crew-*`);
 `team/manager` (the project chat's desk) stays.
 
 **Day one:** a new project first gets its ideaWorld entry with `repo:` (or the refresher deletes its rows), then writes, in the hour its plan is posted and in one batch, `projects/<id>`
