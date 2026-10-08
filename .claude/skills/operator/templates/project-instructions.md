@@ -70,19 +70,15 @@ detail there contradicts this text, this text wins until the template is updated
   finishes, fails or needs yskills.
 
 ## Decisions and design
-- Every decision card for yskills is posted by the Project Manager in the project chat, never
-  only in a thread. A thread with a question sends the options to the Project Manager
-  (`get_channel_session_id`, then `send_message`) and continues on its recommendation.
-- Choices are tappable: short labels, the recommendation first and marked, multi-select when
-  several answers can apply.
-- Designer pass before every design decision: options that look different (design, art,
-  layout) are first made by a Designer thread with UI/UX review (`ui-review`, `design-critic`).
-  They reach the vote as live, clickable drafts in one vote gallery Artifact (template
-  `operator/templates/vote-gallery.html`: tabs, ←/→ keys, a counter like "2/5", each option's
-  name and one line, the recommendation starred with its reason, a desktop/phone switch, a
-  choose button that saves the pick), linked in the vote post. Desktop screenshots (1440px) in
-  the same gallery only where a live draft can't run. Never loose image attachments, never a
-  vote on words alone. Read the saved pick with `ArtifactData` (collection `wahl`).
+- Cards: every choice for yskills is a tappable card, posted only by the Project Manager in the
+  project chat (`ask_decision`, recommendation first with its reason; single choice, so several
+  answers become yes/no cards). A thread never posts a card: its reply carries `Card:` with the
+  question, options and recommendation, and it goes on with the recommendation. The Project
+  Manager relays the tap to the thread. Money, a new service, deleting and anything that can't
+  be undone wait for the tap.
+- Visual choices: a Designer thread makes them as live drafts with UI/UX review in one vote
+  gallery Artifact (`roles/designer.md`, Vote gallery), linked in the card post. Never loose
+  images, never a vote on words alone. Read the saved pick with `ArtifactData` (collection `wahl`).
 
 ## Memory in files
 - PLAN.md (goal, criteria, decisions), PROGRESS.md (state; only the Project Manager writes it),
