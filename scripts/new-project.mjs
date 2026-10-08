@@ -214,17 +214,34 @@ async function ensureBuilds(cf, { tag, repo, org, name, branch, d1, buildTokenUu
   return created.json.result
 }
 
-async function firstBuild(cf, tag, branch) {
-  // The trigger can appear a moment after the repo is connected, so look a few times.
-  let triggers, production
-  for (let i = 0; i < 6 && !production; i++) {
-    if (i) await new Promise((r) => setTimeout(r, POLL_MS))
-    triggers = await cf(`/builds/workers/${tag}/triggers`)
-    production = (triggers.json?.result || []).find((t) => (t.branch_includes || []).includes(branch)) || (triggers.json?.result || [])[0]
+async function startBuild(cf, tag, name, branch) {
+  // A config made with POST /builds/workers lists no legacy trigger (run 5 on 2026-10-08:
+  // "status 200, 0 listed"), so a trigger is used when one exists and a deploy hook otherwise:
+  // POST /builds/workers/{name}/deploy_hooks makes a hook for the branch, an unauthenticated
+  // POST to /workers/builds/deploy_hooks/{uuid} starts the build (Cloudflare docs, Deploy Hooks),
+  // and the hook is deleted again because its uuid alone can start builds.
+  const triggers = await cf(`/builds/workers/${tag}/triggers`)
+  const production = (triggers.json?.result || []).find((t) => (t.branch_includes || []).includes(branch)) || (triggers.json?.result || [])[0]
+  if (production) {
+    const started = await cf(`/builds/triggers/${production.trigger_uuid}/builds`, { method: 'POST', body: { branch } })
+    return started.json.result.build_uuid
   }
-  if (!production) throw new Error(`no build trigger found after connecting (status ${triggers.status}, ${(triggers.json?.result || []).length} listed, keys: ${Object.keys(triggers.json || {}).join(',')})`)
-  const started = await cf(`/builds/triggers/${production.trigger_uuid}/builds`, { method: 'POST', body: { branch } })
-  const uuid = started.json.result.build_uuid
+  const hook = await cf(`/builds/workers/${name}/deploy_hooks`, { method: 'POST', body: { deploy_hook_name: 'claude-setup first build', branch } })
+  const hookUuid = hook.json?.result?.deploy_hook_uuid || hook.json?.result?.uuid || hook.json?.result?.id
+  if (!hookUuid) throw new Error(`deploy hook made but no uuid in the answer (keys: ${Object.keys(hook.json?.result || {}).join(',')})`)
+  try {
+    const res = await fetch(`https://api.cloudflare.com/client/v4/workers/builds/deploy_hooks/${hookUuid}`, { method: 'POST' })
+    const json = await res.json().catch(() => null)
+    if (!res.ok || !json?.result?.build_uuid) throw new Error(`deploy hook answered ${res.status}: ${JSON.stringify(json?.errors || json).slice(0, 300)}`)
+    log('build', 'started through a deploy hook')
+    return json.result.build_uuid
+  } finally {
+    await cf(`/builds/workers/${name}/deploy_hooks/${hookUuid}`, { method: 'DELETE' }).catch((err) => log('deploy hook', `not deleted: ${err.message}`))
+  }
+}
+
+async function firstBuild(cf, tag, name, branch) {
+  const uuid = await startBuild(cf, tag, name, branch)
   log('build', `started ${uuid}`)
   const until = Date.now() + BUILD_WAIT_MS
   while (Date.now() < until) {
@@ -290,7 +307,7 @@ export async function main() {
   const worker = await ensureWorker(cf, name, randomBytes(32).toString('base64url'), { adopt: repoExisted })
   const buildTokenUuid = await pickBuildToken(cf, process.env.BUILD_TOKEN_NAME, process.env.CLOUDFLARE_BUILD_TOKEN)
   await ensureBuilds(cf, { tag: worker.id, repo, org, name, branch, d1, buildTokenUuid })
-  const build = await firstBuild(cf, worker.id, branch)
+  const build = await firstBuild(cf, worker.id, name, branch)
   if (build.status === 'success') await ensureSecret(cf, name, 'BETTER_AUTH_SECRET', randomBytes(32).toString('base64url'))
 
   const sub = await cf('/workers/subdomain')
