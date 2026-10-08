@@ -242,12 +242,16 @@ export async function connectRepo(cf, { repo, org, name, tries = CONNECT_TRIES, 
     refused = []
     for (const { label, ...ids } of forms) {
       const git = { provider_type: 'github', provider_account_name: org, repo_name: name, ...ids }
-      const r = await cf('/builds/repos/connections', { method: 'PUT', body: git }).catch((err) => ({ ok: false, status: 0, json: null, text: err.message }))
+      const r = await cf('/builds/repos/connections', { method: 'PUT', body: git })
       if (r.ok && r.json?.success && r.json?.result) {
         log('repo connection', `Cloudflare knows ${org}/${name} by ${label}`)
         return git
       }
-      refused.push(`${label}: ${r.status === 0 ? redact(r.text).slice(0, 200) : errorsOf(r)}`)
+      // Only "disconnected from your Git account" means Cloudflare has not seen the repo yet;
+      // every other answer (cfClient already throws on 401, 403 and 5xx) stops the run at once.
+      const unknownRepo = r.status === 404 && (r.json?.errors || []).some((e) => e.code === 8000008)
+      if (!unknownRepo) throw new Error(`Cloudflare PUT /builds/repos/connections (${label}): ${errorsOf(r)}`)
+      refused.push(`${label}: ${errorsOf(r)}`)
     }
     if (attempt < tries) {
       log('repo connection', `Cloudflare does not know ${org}/${name} yet (${refused.join('; ')}); try ${attempt + 1} of ${tries} in ${waitMs / 1000} s`)

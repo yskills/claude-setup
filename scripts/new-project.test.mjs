@@ -94,3 +94,12 @@ test('a repo Cloudflare does not know is retried, then the run stops with the an
   const builds = fakeCf(() => refused)
   await assert.rejects(ensureBuilds(builds.cf, { tag: 't', git: {}, org: 'o', name: 'n', branch: 'main', d1: false, buildTokenUuid: 'b' }), /did not connect o\/n: 8000008/)
 })
+
+test('only "repo unknown" is retried; any other answer stops the run at once', async () => {
+  const forbidden = fakeCf(() => { throw new Error('Cloudflare PUT /builds/repos/connections: 403 {"errors":[{"code":10000}]}') })
+  await assert.rejects(connectRepo(forbidden.cf, { repo, org: 'o', name: 'n', tries: 3, waitMs: 0 }), /403/)
+  assert.equal(forbidden.calls.length, 1)
+  const otherNotFound = fakeCf(() => ({ ok: false, status: 404, json: { success: false, errors: [{ code: 12040, message: 'no such thing' }], result: null }, text: '' }))
+  await assert.rejects(connectRepo(otherNotFound.cf, { repo, org: 'o', name: 'n', tries: 3, waitMs: 0 }), /12040 no such thing/)
+  assert.equal(otherNotFound.calls.length, 1)
+})
