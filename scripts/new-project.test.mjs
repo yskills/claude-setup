@@ -102,6 +102,8 @@ test('only "repo unknown" is retried; any other answer stops the run at once', a
   const otherNotFound = fakeCf(() => ({ ok: false, status: 404, json: { success: false, errors: [{ code: 12040, message: 'no such thing' }], result: null }, text: '' }))
   await assert.rejects(connectRepo(otherNotFound.cf, { repo, org: 'o', name: 'n', tries: 3, waitMs: 0 }), /12040 no such thing/)
   assert.equal(otherNotFound.calls.length, 1)
+})
+
 test('a build is judged by its outcome once it has stopped', () => {
   assert.deepEqual(buildState({ status: 'running', build_outcome: null }), { status: 'running', running: true, outcome: null })
   assert.deepEqual(buildState({ status: 'stopped', build_outcome: 'success' }), { status: 'stopped', running: false, outcome: 'success' })
