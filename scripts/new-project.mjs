@@ -215,9 +215,14 @@ async function ensureBuilds(cf, { tag, repo, org, name, branch, d1, buildTokenUu
 }
 
 async function firstBuild(cf, tag, branch) {
-  const triggers = await cf(`/builds/workers/${tag}/triggers`)
-  const production = (triggers.json?.result || []).find((t) => (t.branch_includes || []).includes(branch)) || (triggers.json?.result || [])[0]
-  if (!production) throw new Error('no build trigger found after connecting')
+  // The trigger can appear a moment after the repo is connected, so look a few times.
+  let triggers, production
+  for (let i = 0; i < 6 && !production; i++) {
+    if (i) await new Promise((r) => setTimeout(r, POLL_MS))
+    triggers = await cf(`/builds/workers/${tag}/triggers`)
+    production = (triggers.json?.result || []).find((t) => (t.branch_includes || []).includes(branch)) || (triggers.json?.result || [])[0]
+  }
+  if (!production) throw new Error(`no build trigger found after connecting (status ${triggers.status}, ${(triggers.json?.result || []).length} listed, keys: ${Object.keys(triggers.json || {}).join(',')})`)
   const started = await cf(`/builds/triggers/${production.trigger_uuid}/builds`, { method: 'POST', body: { branch } })
   const uuid = started.json.result.build_uuid
   log('build', `started ${uuid}`)
