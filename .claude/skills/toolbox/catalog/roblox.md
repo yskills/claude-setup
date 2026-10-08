@@ -18,6 +18,7 @@ yskills' PC with Studio open: no Roblox API renders a place in the cloud.
 2. Design and feel: a Remote Control session on the PC (CLAUDE.md, Remote Control) with
    Studio open on the test place: play, walk, use the shop, `screen_capture` at phone-like and
    wide views, read the output log, fix, play again.
+   The `studio` skill has the loop and sends live frames to HQ so yskills can watch.
 3. Taste calls go to yskills with those screenshots; "done" carries a screenshot from step 2.
 
 Skip community Studio MCPs (they need a Creator Store plugin and HTTP requests on; the official
