@@ -3,16 +3,26 @@
 // cannot open the Cloudflare dashboard) can read why a build failed. Run by
 // .github/workflows/build-logs.yml (workflow_dispatch). Every line goes through new-project's
 // redact(): ids, uuids and token-like strings never reach the public Actions log.
-// Reads CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, read-only calls only.
+// Only registered projects (`projects/<name>.json` on main). Reads CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, read-only calls only.
+import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { validName, redact, describe } from './new-project.mjs'
 
 export const TAIL = 120
 
+// redact() plus what a build log adds: KEY=value and KEY: value pairs whose key sounds secret,
+// URL credentials and bearer headers. The repo is public, so its Actions logs are too.
+export function scrub(text) {
+  return redact(text)
+    .replace(/\b(bearer|basic)\s+\S+/gi, '$1 ***')
+    .replace(/\b([A-Za-z0-9_.-]*(?:token|secret|key|password|passwd|auth|credential|cookie|session|dsn)[A-Za-z0-9_.-]*)(\s*[=:]\s*)("[^"]*"|'[^']*'|\S+)/gi, '$1$2***')
+    .replace(/(\w+:\/\/)[^/\s:@]+:[^/\s@]+@/g, '$1***@')
+}
+
 // Workers Builds answers lines as [timestamp, text] pairs; older answers used plain strings.
 export function logLines(json, tail = TAIL) {
   const lines = json?.result?.lines || []
-  return lines.slice(-tail).map((l) => redact(Array.isArray(l) ? l[l.length - 1] : l))
+  return lines.slice(-tail).map((l) => scrub(Array.isArray(l) ? l[l.length - 1] : l))
 }
 
 // Newest first by created_on, whatever order the API used.
@@ -23,6 +33,7 @@ export function latestBuild(builds) {
 async function main() {
   const name = process.env.NAME || ''
   if (!validName(name)) throw new Error(`name "${name}" must be lowercase letters, digits and dashes`)
+  if (!existsSync(`projects/${name}.json`)) throw new Error(`projects/${name}.json is not on main; build-logs reads only registered projects`)
   const token = process.env.CLOUDFLARE_API_TOKEN
   const account = process.env.CLOUDFLARE_ACCOUNT_ID
   if (!token || !account) throw new Error('CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are required')
