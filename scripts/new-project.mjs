@@ -240,30 +240,31 @@ export function hookIdFrom(result) {
   return r.deploy_hook_uuid || r.hook_id || r.uuid || r.id || null
 }
 
-async function listHooks(cf, name) {
-  const list = await cf(`/builds/workers/${name}/deploy_hooks`)
+// Workers Builds paths take the script tag, not the name (a 404 comes back as an empty answer).
+async function listHooks(cf, tag) {
+  const list = await cf(`/builds/workers/${tag}/deploy_hooks`)
   const result = list.json?.result
   return Array.isArray(result) ? result : Array.isArray(result?.deploy_hooks) ? result.deploy_hooks : []
 }
 
-async function deleteHook(cf, name, id) {
-  await cf(`/builds/workers/${name}/deploy_hooks/${id}`, { method: 'DELETE' }).catch(() => log('deploy hook', 'not deleted; remove it in the dashboard (Settings > Build > Deploy hooks)'))
+async function deleteHook(cf, tag, id) {
+  await cf(`/builds/workers/${tag}/deploy_hooks/${id}`, { method: 'DELETE' }).catch(() => log('deploy hook', 'not deleted; remove it in the dashboard (Settings > Build > Deploy hooks)'))
 }
 
 // Hooks an earlier run left behind (its uuid alone starts builds) go first.
-async function removeOldHooks(cf, name) {
-  for (const hook of await listHooks(cf, name)) {
+async function removeOldHooks(cf, tag) {
+  for (const hook of await listHooks(cf, tag)) {
     const id = hookIdFrom(hook)
-    if (hook.deploy_hook_name === HOOK_NAME && id) { log('deploy hook', 'removing one left by an earlier run'); await deleteHook(cf, name, id) }
+    if (hook.deploy_hook_name === HOOK_NAME && id) { log('deploy hook', 'removing one left by an earlier run'); await deleteHook(cf, tag, id) }
   }
 }
 
-async function makeHook(cf, name, branch) {
-  const made = await cf(`/builds/workers/${name}/deploy_hooks`, { method: 'POST', body: { deploy_hook_name: HOOK_NAME, branch } })
+async function makeHook(cf, tag, branch) {
+  const made = await cf(`/builds/workers/${tag}/deploy_hooks`, { method: 'POST', body: { deploy_hook_name: HOOK_NAME, branch } })
   const direct = made.ok ? hookIdFrom(made.json?.result) : null
   if (direct) return direct
   // An empty or unexpected answer: the hook may still exist, so the list is the second source.
-  const listed = (await listHooks(cf, name)).find((h) => h.deploy_hook_name === HOOK_NAME && h.branch === branch)
+  const listed = (await listHooks(cf, tag)).find((h) => h.deploy_hook_name === HOOK_NAME && h.branch === branch)
   const fromList = hookIdFrom(listed)
   if (fromList) return fromList
   throw new Error(`deploy hook not made: POST answered ${describe(made)}`)
@@ -272,7 +273,7 @@ async function makeHook(cf, name, branch) {
 async function startBuild(cf, tag, name, branch) {
   // A config made with POST /builds/workers lists no legacy trigger (run 5 on 2026-10-08:
   // "status 200, 0 listed"), so a trigger is used when one exists and a deploy hook otherwise:
-  // POST /builds/workers/{name}/deploy_hooks makes a hook for the branch, an unauthenticated
+  // POST /builds/workers/{tag}/deploy_hooks makes a hook for the branch, an unauthenticated
   // POST to /workers/builds/deploy_hooks/{uuid} starts the build (Cloudflare docs, Deploy Hooks),
   // and the hook is deleted again because its uuid alone can start builds.
   const triggers = await cf(`/builds/workers/${tag}/triggers`)
@@ -283,8 +284,8 @@ async function startBuild(cf, tag, name, branch) {
     if (!uuid) throw new Error(`trigger answered without a build uuid: ${describe(started)}`)
     return uuid
   }
-  await removeOldHooks(cf, name)
-  const hookId = await makeHook(cf, name, branch)
+  await removeOldHooks(cf, tag)
+  const hookId = await makeHook(cf, tag, branch)
   try {
     const fired = await api('https://api.cloudflare.com/client/v4', null, `/workers/builds/deploy_hooks/${hookId}`, { method: 'POST' })
     log('api', `POST /workers/builds/deploy_hooks/<hook> → ${describe(fired)}`)
@@ -293,7 +294,7 @@ async function startBuild(cf, tag, name, branch) {
     log('build', 'started through a deploy hook')
     return uuid
   } finally {
-    await deleteHook(cf, name, hookId)
+    await deleteHook(cf, tag, hookId)
   }
 }
 
