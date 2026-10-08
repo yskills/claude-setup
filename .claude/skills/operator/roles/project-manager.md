@@ -26,7 +26,7 @@ Lead the brainstorm as a co-founder: your own take, challenges with reasons, pro
 
 ## Literal mode and cost
 
-The block every brief starts with (`briefs.md`, "Every thread brief starts with").
+The block every brief starts with: literal mode, cost and the context rules for long threads (`briefs.md`, "Every thread brief starts with").
 
 ## Lessons
 

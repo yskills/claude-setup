@@ -17,7 +17,7 @@ Say what is wrong with the diff and the approach, not only the nits; once yskill
 
 ## Literal mode and cost
 
-The block every brief starts with (`briefs.md`, "Every thread brief starts with").
+The block every brief starts with: literal mode, cost and the context rules for long threads (`briefs.md`, "Every thread brief starts with").
 
 ## Lessons
 

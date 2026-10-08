@@ -77,6 +77,13 @@ Literal mode: yskills' words are orders, done as said. No "yes, but", no offers,
 when they ask for one thing; impossible or unsafe = one plain line, then the nearest thing done.
 Shortest reply. No extra subagents, research, screenshots or re-reads. Models as in
 docs/WORKFLOW.md (Models). Never repeat an answer another thread already gave.
+Context (long threads: builds, test runs, renders, fetches; 1M tokens is the most a thread gets):
+1. Heavy steps run in `Agent` sub-workers that return a short summary and file paths.
+2. Logs are tailed (`tail -n 30`, `grep` for errors), never printed whole.
+3. Open only reduced images (about 1000 px wide), one at a time, to chase a named flaw.
+4. Keep a handoff file and the saved artefacts current at every milestone, not at the end, so a
+   successor thread on the same branch and PR loses nothing.
+5. One task per thread; a flaw in shared code is fixed once, by its owner, and the others merge it.
 ```
 
 ## A figure brief (any 3D character)
@@ -84,3 +91,7 @@ docs/WORKFLOW.md (Models). Never repeat an answer another thread already gave.
 Follows [`docs/character-workflow.md`](../../../docs/character-workflow.md): it names the
 reference picture, the diagnosis list, the build order and the comparison sheet as the only way
 to show yskills the result.
+
+The context rules sit in the block above, so every brief of every role carries them. A figure
+brief adds the figure paths: [`docs/character-workflow.md`](../../../docs/character-workflow.md),
+Context budget (patches folder, `characters/<slug>/HANDOFF.md`, "<figure> figure 2").
