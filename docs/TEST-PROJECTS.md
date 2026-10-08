@@ -8,9 +8,9 @@ repo; then the next one starts.
 | # | Project | Shape | What it proves |
 |---|---|---|---|
 | 1 | **duo-test**, the language-learning app (existing repo), finished end to end | the operator taking over an existing app, slices | Briefs, Workers Builds previews, the evaluator, the 5/5 gate ending in the gate thread's merge, logins and D1 with `security-reviewer` and `red-team`, the `sell` kit in Stripe sandbox, the `legal` team, a migration PR flagged as important |
-| 2 | **Kleingarten**, a Roblox game (`yskills/kleingarten`, private) | three slices, 2026-10-07, merged at 5/5 | A build thread in the cloud (Luau, Lune tests, Rojo) plus play and screenshots through Studio's MCP server on the PC, Robux receipts, Creator Hub steps only yskills can do (icon, thumbnails, listing, go public) |
+| 2 | **Kleingarten**, a Roblox game (`yverse-studio/kleingarten`, private) | three slices, 2026-10-07, merged at 5/5 | A build thread in the cloud (Luau, Lune tests, Rojo) plus play and screenshots through Studio's MCP server on the PC, Robux receipts, Creator Hub steps only yskills can do (icon, thumbnails, listing, go public) |
 | 3 | **A journal app probe** (new repo) | the probe slice only, then build or kill | The probe step: offer, price, waitlist (no pre-orders yet), one channel for 14 days against a go number fixed in advance, the kill/change card, probe-mode gate. On go: the `store` path up to a TestFlight build and Google's closed test, recruited from the waitlist |
-| HQ | **Claude Setup HQ game** (then in this repo, since 2026-10-07 in yskills/company-xy), run between 1 and 2 | an Architect plan, six slices in one file, one fresh thread each, auto-run | Auto-run with no taps, an architect plan, Opus and Sonnet slice threads, the office reading real team state, real money from duo-test's `/api/stats`, the New project tap from a page into the project chat |
+| HQ | **Claude Setup HQ game** (then in this repo, since 2026-10-07 in yverse-studio/company-xy), run between 1 and 2 | an Architect plan, six slices in one file, one fresh thread each, auto-run | Auto-run with no taps, an architect plan, Opus and Sonnet slice threads, the office reading real team state, real money from duo-test's `/api/stats`, the New project tap from a page into the project chat |
 
 ## Rules for a test run
 
@@ -39,7 +39,7 @@ repo; then the next one starts.
 |---|---|---|---|---|---|
 | 1 duo-test | 2026-10-05 to 10-06 | 6 (design cards, a typed ok, 3 key-card rounds, "merge everything", Build settings, the live test that found bugs) | #21: 2, #20 and #22: none on a preview | 38.04 | [lessons-1.md](https://claude.ai/code/project/chan_01XKnLb2nhGBYoEt3HNp26NS) (project files `test-runs/lessons-1.md`), folded in over #23 to #28 and this PR |
 | HQ game | 2026-10-06 | 3 (a pause "only burning my money", the rejected cube animals, "merge everything, skip everything") | one per PR, #31 redid the animals after yskills' taste call | about 30 to 50 (the estimate held, one slice at a time) | #37 |
-| 2 Kleingarten (Roblox) | 2026-10-07 | slices 1 to 3 merged at 5/5; a stalled hand-back cost six hours once | see PRs in `yskills/kleingarten` | not recorded | lessons in `roles/programmer.md` |
+| 2 Kleingarten (Roblox) | 2026-10-07 | slices 1 to 3 merged at 5/5; a stalled hand-back cost six hours once | see PRs in `yverse-studio/kleingarten` | not recorded | lessons in `roles/programmer.md` |
 | 3 Journal probe | | | | | |
 
 ## HQ game run (2026-10-06, PRs 29 to 36)

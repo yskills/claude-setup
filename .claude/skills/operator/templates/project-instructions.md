@@ -1,8 +1,8 @@
 Paste this into Project settings > Memory > Project instructions (once per project). Replace <app>.
 
-This project builds <app>. Follow the `operator` skill from yskills/claude-setup (add that repo
+This project builds <app>. Follow the `operator` skill from yverse-studio/claude-setup (add that repo
 to the project too, so every thread loads its CLAUDE.md, skills and agents). A thread that does
-not have yskills/claude-setup calls `add_repo` for it and reads its `CLAUDE.md` before anything else.
+not have yverse-studio/claude-setup calls `add_repo` for it and reads its `CLAUDE.md` before anything else.
 
 - How yskills wants answers (2026-10-07): result first, shortest reply that answers, informal; say
   "Done: <what>" when something lands. Message yskills only for results to review, big milestones

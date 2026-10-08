@@ -116,7 +116,7 @@ Templates in `templates/`.
   thread reads it first; only the operator writes it. Under 100 lines.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
 - **Dashboard: HQ is the only one.** yskills' live view of every project is HQ, "Company XY"
-  (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT; code in yskills/company-xy). **A project never
+  (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT; code in yverse-studio/company-xy). **A project never
   publishes its own office page.** The Project Manager writes the project's rows into HQ's db with
   `ArtifactData`, in one batch with every `PROGRESS.md` write, exactly as `docs/hq-rows.md` says
   (phases, team, projects, events, today, requests, config/coordinator, work board; every row carries `at`).
@@ -131,7 +131,7 @@ reads it at project start and before each step; builder, gate and fix threads on
 `roles/<role>.md`, so they skip it.
 
 **Setup loop (yskills, 2026-10-07: "be your own system").** Any thread, in any project, that hits
-friction with claude-setup itself files one issue in `yskills/claude-setup`, labelled `loop:setup`,
+friction with claude-setup itself files one issue in `yverse-studio/claude-setup`, labelled `loop:setup`,
 title one line on what happened: a refused check, a dead link, two rules that contradict, a step
 yskills had to do by hand, a complaint yskills repeats. Search open `loop:setup` issues first and
 comment on a match instead of filing twice. The daily loop reader lists them with the app's own

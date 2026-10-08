@@ -81,5 +81,5 @@ env vars it needs. Start a new session (or `/reload-plugins`) so the additions l
 
 ## 5. Keep it current
 
-When a pick turns out wrong or a better tool appears, fix the catalog file in yskills/claude-setup
+When a pick turns out wrong or a better tool appears, fix the catalog file in yverse-studio/claude-setup
 (`.claude/skills/toolbox/catalog/`) so the next project starts from the better answer.

@@ -8,7 +8,7 @@ description: "German law for any app: Impressum, Datenschutz, cookies, accessibi
 Not legal advice. This team says what must exist, writes the texts and checks them. Claude
 writes Impressum and Datenschutz in-house from the plan's data and processor list, and uses
 official model texts word for word where they exist (Widerrufsbelehrung, Muster-
-Widerrufsformular), as in yskills/duo-test. A paid legal-text service (eRecht24, IT-Recht Kanzlei)
+Widerrufsformular), as in yverse-studio/duo-test. A paid legal-text service (eRecht24, IT-Recht Kanzlei)
 that keeps texts current and helps with warning letters (Abmahnungen) comes in once sales do.
 Markers: **[S]** search
 results and legal publishers agree, **[K]** known but not re-read. Checked 2026-10-05.

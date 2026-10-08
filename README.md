@@ -15,14 +15,14 @@ Needs Node 20+ (24 recommended), Git and Claude Code.
 Windows (PowerShell; use `$HOME`, never `~`, which PowerShell passes through as a folder named "~"):
 
 ```powershell
-git clone https://github.com/yskills/claude-setup $HOME/claude-setup
+git clone https://github.com/yverse-studio/claude-setup $HOME/claude-setup
 node $HOME/claude-setup/install.mjs
 ```
 
 Mac or Linux:
 
 ```bash
-git clone https://github.com/yskills/claude-setup ~/claude-setup && node ~/claude-setup/install.mjs
+git clone https://github.com/yverse-studio/claude-setup ~/claude-setup && node ~/claude-setup/install.mjs
 ```
 
 Update later (Windows: run the two commands one after the other, with `$HOME` instead of `~`):
@@ -55,7 +55,7 @@ tools that are missing (gh, ffmpeg, docker, python, uv, fnm) with the install co
 | Design taste | `impeccable` (design skill plus a local `detect` linter for AI-look patterns) and `web-interface-guidelines` (Vercel's UI checklist); `ui-review` runs both | `.claude/skills` (Apache-2.0 and MIT, see `THIRD_PARTY.md`) |
 | Context guard | A hook after every tool call: at 150k tokens of context it tells Claude to work leaner, at 200k to wrap up and hand off, then again every further 50k (re-reading long contexts is most of the bill). Runs on the PC and in cloud threads | `global/context-guard.mjs`, `cloud/setup.sh` |
 | `team` mod | Your digital team inside Claude Code (terminal or desktop app, not cloud threads): a band above the prompt shows which roles are working (the nine roles: Project Manager, Researcher, Designer, Programmer, Tester, Reviewer, Security, Legal, Marketer) and what the last turn cost; `/team` opens a pane with each role's task and a Watch link to the dev server or page being tested. Claude's test browser (Playwright) opens as a visible Chrome window on the PC | `mods/team` |
-| HQ dashboard | One live page for all projects (Company XY, https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT): level, money, what needs you, who works on what with whom, progress per part, Watch links. Each project's Project Manager writes its rows into it; no project has a page of its own | [`docs/hq-rows.md`](docs/hq-rows.md) (the page lives in yskills/company-xy) |
+| HQ dashboard | One live page for all projects (Company XY, https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT): level, money, what needs you, who works on what with whom, progress per part, Watch links. Each project's Project Manager writes its rows into it; no project has a page of its own | [`docs/hq-rows.md`](docs/hq-rows.md) (the page lives in yverse-studio/company-xy) |
 | Ponytail | Write the least code that works: reuse, standard library, platform, installed dependency, one line, then new code | `.claude/skills/ponytail` (MIT, see `THIRD_PARTY.md`) |
 
 
