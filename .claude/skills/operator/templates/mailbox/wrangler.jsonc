@@ -1,0 +1,29 @@
+{
+  "name": "mailbox",
+  "main": "worker.mjs",
+  "compatibility_date": "2025-07-15",
+  "workers_dev": true,
+  "preview_urls": true,
+  "observability": { "enabled": true },
+  // Create both databases with `wrangler d1 create mailbox` and `... mailbox-preview`, paste the ids
+  // (they are not secrets; Workers Builds needs them committed).
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mailbox",
+      "migrations_dir": "migrations",
+      "database_id": "REPLACE-WITH-LIVE-ID",
+      "preview_database_id": "REPLACE-WITH-PREVIEW-ID"
+    }
+  ],
+  "previews": {
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "mailbox-preview",
+        "migrations_dir": "migrations",
+        "database_id": "REPLACE-WITH-PREVIEW-ID"
+      }
+    ]
+  }
+}

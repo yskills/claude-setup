@@ -1,0 +1,16 @@
+{
+  "name": "mailbox",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test",
+    "secrets": "! git grep -nIE '(sk|rk)_live_[A-Za-z0-9]|whsec_[A-Za-z0-9]{16}|re_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{30}' -- . ':(exclude)*.md' ':(exclude)package-lock.json'",
+    "check": "npm test",
+    "verify": "npm run secrets && npm run check",
+    "deploy": "wrangler d1 migrations apply DB --remote && wrangler deploy && (wrangler d1 migrations apply DB --remote --preview || echo \"Live is deployed, but the preview database was not migrated.\")",
+    "deploy:preview": "wrangler d1 migrations apply DB --remote --preview && wrangler preview"
+  },
+  "dependencies": { "postal-mime": "^2.4.0" },
+  "devDependencies": { "wrangler": "^4.0.0" }
+}
