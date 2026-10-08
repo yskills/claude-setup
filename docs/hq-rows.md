@@ -99,7 +99,7 @@ greys after 2 hours). Rule: `HQ.workTree` and `HQ.busyRoles` in company-xy's `hq
 open at the bond levels in `HQ.OUTFIT_AT`; `label` is the button text, `what` a short German description; optional
 `underWhat` + `under` only where an outfit may be taken down to its lingerie or swimwear layer), `chibi` (the
 office chibi, always dressed; without it the office shows the worn outfit at full size), `thumb` (portrait),
-`voice`, `personality {about, likes, hello, bye, move}`, `author`, `licence`, `use`, `share`, `added`. Every
+`voice`, `personality {about, likes, hello, move}`, `author`, `licence`, `share`, `added`. Every
 `asset`, `chibi`, `thumb` and `under` is a 32-hex asset id in the artifact's asset store (a `.vrm` is uploaded as
 base64 text; the page decodes it); a row with any outfit lacking a valid id is not drawn. Clips are not in the
 row: the office poses every figure with the shared clips in code. Desk and bond live in `roster/desks` and
