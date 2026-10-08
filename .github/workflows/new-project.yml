@@ -2,10 +2,14 @@ name: new-project
 
 # Makes a new project live with no hands: the repo in the org, its D1 databases (EU), the Worker,
 # the Workers Builds connection (main deploys, other branches get Previews) and the first build.
-# A cloud thread starts it (GitHub `run_workflow`, inputs below) and then `add_repo`s the result.
+# A cloud thread starts it by pushing a branch `new/<name>` with `projects/<name>.json`
+# (threads can't dispatch workflows, 403); the branch is deleted when the run succeeds. From the
+# PC or the Actions page: Run workflow with the inputs below. Then `add_repo` the result.
 # Keys: secrets CLOUDFLARE_API_TOKEN and PROJECTS_GITHUB_TOKEN, variable CLOUDFLARE_ACCOUNT_ID
 # (publish skill, §A new project).
 on:
+  push:
+    branches: ['new/**']
   workflow_dispatch:
     inputs:
       name:
@@ -24,10 +28,10 @@ on:
         default: yverse-studio
 
 permissions:
-  contents: read
+  contents: write # only to delete the new/<name> branch at the end
 
 concurrency:
-  group: new-project-${{ inputs.name }}
+  group: new-project-${{ inputs.name || github.ref_name }}
 
 jobs:
   setup:
@@ -41,6 +45,7 @@ jobs:
       - run: node --test scripts/new-project.test.mjs
       - run: node scripts/new-project.mjs
         env:
+          PROJECT_BRANCH: ${{ github.ref_name }}
           NAME: ${{ inputs.name }}
           D1: ${{ inputs.d1 }}
           ORG: ${{ inputs.org }}
@@ -48,3 +53,5 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           PROJECTS_GITHUB_TOKEN: ${{ secrets.PROJECTS_GITHUB_TOKEN }}
           BUILD_TOKEN_NAME: ${{ vars.BUILD_TOKEN_NAME }}
+      - if: github.event_name == 'push'
+        run: git push origin --delete "$GITHUB_REF_NAME"

@@ -4,8 +4,10 @@
 // Every step is skipped when the thing already exists, so a re-run finishes what a failed run left.
 // Reads: CLOUDFLARE_API_TOKEN (user token: Workers Builds Configuration Edit, Workers Scripts Edit,
 // D1 Edit, Account Settings Read), CLOUDFLARE_ACCOUNT_ID, PROJECTS_GITHUB_TOKEN (fine-grained, the
-// org only: Administration, Contents, Workflows), NAME, ORG, D1 ("true"/"false"), BUILD_TOKEN_NAME
-// (optional: which Workers Builds token deploys; default: the first one).
+// org only: Administration, Contents, Workflows), BUILD_TOKEN_NAME (optional: which Workers Builds
+// token deploys; default: the first one), and the project: NAME, ORG, D1 ("true"/"false") from a
+// workflow_dispatch, or PROJECT_BRANCH `new/<name>` whose `projects/<name>.json` holds
+// `{ "name", "d1", "org" }` (a cloud thread can push a branch but not dispatch a workflow).
 import { cpSync, mkdtempSync, readFileSync, writeFileSync, rmSync, appendFileSync, existsSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
@@ -17,6 +19,13 @@ const TEMPLATE = new URL('../.claude/skills/publish/templates/new-project/', imp
 const BUILD = 'npm run check && npm run build'
 const BUILD_WAIT_MS = 10 * 60 * 1000
 const POLL_MS = 15 * 1000
+
+export function projectFromBranch(branch, readJson) {
+  if (!branch?.startsWith('new/')) return null
+  const name = branch.slice('new/'.length)
+  const cfg = readJson(`projects/${name}.json`) || {}
+  return { name: cfg.name || name, d1: cfg.d1 !== false, org: cfg.org || 'yverse-studio' }
+}
 
 export function validName(name) {
   return /^[a-z0-9][a-z0-9-]{1,62}$/.test(name)
@@ -226,10 +235,11 @@ function pushScaffold(dir, org, name, branch, token) {
 }
 
 export async function main() {
-  const name = env('NAME')
+  const fromBranch = process.env.NAME ? null : projectFromBranch(process.env.PROJECT_BRANCH, (file) => (existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null))
+  const name = fromBranch?.name || env('NAME')
   if (!validName(name)) throw new Error(`name "${name}" must be lowercase letters, digits and dashes`)
-  const org = env('ORG')
-  const d1 = env('D1', false) !== 'false'
+  const org = fromBranch?.org || env('ORG')
+  const d1 = fromBranch ? fromBranch.d1 : env('D1', false) !== 'false'
   const branch = 'main'
   const cfToken = env('CLOUDFLARE_API_TOKEN')
   const account = env('CLOUDFLARE_ACCOUNT_ID')

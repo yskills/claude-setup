@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, readFileSync, existsSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { validName, wranglerConfig, packageJson, buildCommands, writeScaffold } from './new-project.mjs'
+import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold } from './new-project.mjs'
 
 test('names are workers.dev safe', () => {
   assert.ok(validName('duo-test'))
@@ -41,4 +41,10 @@ test('the scaffold is written with the name filled in and runs its own verify', 
   const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
   assert.equal(pkg.name, 'probe')
   rmSync(dir, { recursive: true, force: true })
+})
+
+test('a pushed new/<name> branch names the project, its json the options', () => {
+  assert.deepEqual(projectFromBranch('new/shop', () => null), { name: 'shop', d1: true, org: 'yverse-studio' })
+  assert.deepEqual(projectFromBranch('new/shop', () => ({ d1: false, org: 'other' })), { name: 'shop', d1: false, org: 'other' })
+  assert.equal(projectFromBranch('main', () => null), null)
 })

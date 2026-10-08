@@ -62,17 +62,20 @@ outside collaborators, `yskills-claude` is Claude.
 
 ### Per project, Claude
 
-1. Start the workflow from the thread: GitHub `actions_run_trigger`, `run_workflow`,
-   `new-project.yml`, ref `main`, inputs `name` (lowercase, digits, dashes; it is the repo and
-   the Worker name), `d1` (`true` unless PLAN.md says no data), `org` (default `yverse-studio`).
-   It creates the repo, D1 `<name>` and `<name>-preview` (EU), pushes the day-zero site from
+1. Start the workflow from the thread by pushing a branch (threads can't dispatch a workflow,
+   403, checked 2026-10-08): in claude-setup, branch `new/<name>` off `main` with one file
+   `projects/<name>.json`, `{ "name": "<name>", "d1": true, "org": "yverse-studio" }` (`name`:
+   lowercase, digits, dashes; it is the repo and the Worker name; `d1` false when PLAN.md says no
+   data). The push starts `new-project.yml`, which deletes the branch when it succeeds. From the
+   PC or the Actions page the same workflow runs with Run workflow and the inputs. It creates the repo, D1 `<name>` and `<name>-preview` (EU), pushes the day-zero site from
    `templates/new-project/` (`/api/config` with the built commit, `verify`, `deploy`,
    `deploy:preview`, `previews` block, CI), creates the Worker with workers.dev and preview URLs on
    and a random `BETTER_AUTH_SECRET` for Previews Base, connects Workers Builds (Build `npm run
    check && npm run build`; Deploy `npm run deploy` or `npx wrangler deploy`; Previews `npm run
    deploy:preview` or `npx wrangler preview`), runs the first build and sets a random production
    `BETTER_AUTH_SECRET`. A re-run skips what exists.
-2. Wait for the run (`actions_get` `get_workflow_run`); its summary has the repo, the live URL
+2. Wait for the run (`actions_list` `list_workflow_runs` with `new-project.yml`, then
+   `actions_get` `get_workflow_run`); its summary has the repo, the live URL
    and the first build's status. Build logs: Cloudflare → Workers & Pages → the Worker → Builds
    (or `GET /builds/builds/{uuid}/logs` from the workflow).
 3. `add_repo` the new repo with `access: push` and `save_to_project: true`, then the scaffold
