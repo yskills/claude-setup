@@ -62,3 +62,50 @@ and yskills had to say it twice. This page is the fix.
 
 The reference file, the diagnosis list, the order (head and hair, body, outfits, chibi, exports),
 the deliverables of step 5, and a pointer to this page.
+
+## Context budget (2026-10-08)
+
+Why figure threads fill up after about 35 minutes of Blender work and need a handoff. Facts: a thread
+runs on `claude-opus-5-5` with a 1M-token window, the largest there is; the effort level does not
+change it. More tokens for one thread cannot be bought, so the spending is what goes down. (The
+three consumers below are read off the handoffs of Hinata, Rangiku, Mitsuri, Rias and Mira in the
+game; the sessions' own token logs are not visible from the project.)
+
+**The three biggest consumers**
+
+1. **Builds run in the thread.** `build.sh` (8-9 min), `assemble.py` (8-45 min), exports and the
+   three-vrm check each print long Blender logs into the thread, and the thread waits and polls.
+   A rebuild after each fix repeats all of it (Mitsuri: 25 min per rebuild; Hinata: a re-assembly
+   per fix).
+2. **Renders opened at full size.** Every pass makes about 12 stills (3 outfits, face, chibi,
+   expressions), and each was opened one by one at full resolution, again after every rebuild.
+3. **The same flaws found five times.** Skin through a tight blouse, skin shards at the gown slit,
+   brow streaks, a sleepy resting face: each thread rediscovered them with its own rebuild cycles
+   (plus 10 min of container setup and re-reading `tools/vrm/README.md`) instead of one thread
+   fixing the shared pipeline once.
+
+**Rules (every figure thread)**
+
+1. **Sub-workers do the heavy runs.** Builds, assemblies, renders and exports run in `Agent`
+   sub-workers that return a short summary (ok or failed, what changed) and file paths. Their
+   logs stay with them.
+2. **Logs are tailed, never printed whole.** `tail -n 30` of a log file, `grep` for errors; a
+   long run goes to the background with output to a file.
+3. **Look at the comparison sheet only, reduced.** One sheet (reference beside render) at
+   most 1000 px wide per check; full-size stills only to chase one named flaw, one at a time.
+4. **Save and write down at every milestone.** Built files (`.blend`, `build/`, exports, renders)
+   go to `/mnt/project-files/companyxy/patches/<slug>/`; `characters/<slug>/HANDOFF.md` (setup
+   line, branch, PR, state, open flaws, next command) is updated at each milestone, not at the
+   end. A thread that fills up hands off to "<figure> figure 2" on the same branch and PR and
+   loses nothing.
+5. **One figure per thread, shared flaws once.** A flaw in `tools/vrm` is fixed by the pipeline
+   owner's thread; the other threads merge it in and meanwhile keep their own branch clean.
+
+**Where practice differed from the written rules**
+
+- Builds, logs and stills ran inside the figure thread; nothing above said otherwise, and
+  `tools/vrm/README.md` gives commands only.
+- The HANDOFF.md was written when the context was already full (Hinata, Rangiku, Mitsuri, Rias),
+  not at milestones; Mira in the game wrote it at hand-off and lost its shot harness with the
+  container.
+- Each figure rebuilt the shared flaws on its own branch. The rule from now on is rule 5.

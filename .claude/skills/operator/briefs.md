@@ -84,3 +84,9 @@ docs/WORKFLOW.md (Models). Never repeat an answer another thread already gave.
 Follows [`docs/character-workflow.md`](../../../docs/character-workflow.md): it names the
 reference picture, the diagnosis list, the build order and the comparison sheet as the only way
 to show yskills the result.
+
+Every figure brief also carries the context rules (character-workflow.md, Context budget):
+builds, renders and checks in `Agent` sub-workers that return a short summary and file paths;
+logs tailed, never printed whole; the reduced comparison sheet is the only picture opened;
+built files to `/mnt/project-files/companyxy/patches/<slug>/`; `characters/<slug>/HANDOFF.md`
+kept current at every milestone so "<figure> figure 2" (same branch and PR) loses nothing.
