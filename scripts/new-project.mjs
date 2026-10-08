@@ -213,7 +213,55 @@ async function pickBuildToken(cf, preferredName, newToken) {
   return pick.build_token_uuid
 }
 
-async function ensureBuilds(cf, { tag, repo, org, name, branch, d1, buildTokenUuid }) {
+const CONNECT_TRIES = 6
+const CONNECT_WAIT_MS = 20 * 1000
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+const errorsOf = (r) => (r.json?.errors || []).map((e) => `${e.code} ${redact(e.message)}`).join('; ') || `status ${r.status}`
+
+// The git identifiers Workers Builds may want. The script sent GitHub's numeric ids; the schema's
+// examples name the account and repo ("cloudflare", "workers-sdk"). Both are tried, the accepted
+// one goes into the build configuration.
+export function repoIdForms(repo, org, name) {
+  return [
+    { label: 'numeric ids', provider_account_id: String(repo.owner.id), repo_id: String(repo.id) },
+    { label: 'names', provider_account_id: org, repo_id: name },
+  ]
+}
+
+export const REFRESH_FIX = `Cloudflare learns of new repositories from the GitHub app; when a repo made after the link stays unknown (2026-10-08: runs 7 and 8 answered 8000008 "disconnected from your Git account" until the app was saved again), open https://github.com/organizations/<org>/settings/installations > Cloudflare Workers and Pages > Configure, switch Repository access to "Only select repositories" and back to "All repositories", press Save, then push the branch again`
+
+// Saves the repository connection Workers Builds needs before a build configuration can exist
+// (PUT /builds/repos/connections, "the repository connection required by build triggers").
+// The public API lists neither connected Git accounts nor their repositories and offers no
+// re-sync, so this upsert is the only way to see whether Cloudflare knows the repo yet: it is
+// retried while Cloudflare catches up with a repo created moments ago, with every answer logged.
+export async function connectRepo(cf, { repo, org, name, tries = CONNECT_TRIES, waitMs = CONNECT_WAIT_MS }) {
+  const forms = repoIdForms(repo, org, name)
+  let refused = []
+  for (let attempt = 1; attempt <= tries; attempt += 1) {
+    refused = []
+    for (const { label, ...ids } of forms) {
+      const git = { provider_type: 'github', provider_account_name: org, repo_name: name, ...ids }
+      const r = await cf('/builds/repos/connections', { method: 'PUT', body: git })
+      if (r.ok && r.json?.success && r.json?.result) {
+        log('repo connection', `Cloudflare knows ${org}/${name} by ${label}`)
+        return git
+      }
+      // Only "disconnected from your Git account" means Cloudflare has not seen the repo yet;
+      // every other answer (cfClient already throws on 401, 403 and 5xx) stops the run at once.
+      const unknownRepo = r.status === 404 && (r.json?.errors || []).some((e) => e.code === 8000008)
+      if (!unknownRepo) throw new Error(`Cloudflare PUT /builds/repos/connections (${label}): ${errorsOf(r)}`)
+      refused.push(`${label}: ${errorsOf(r)}`)
+    }
+    if (attempt < tries) {
+      log('repo connection', `Cloudflare does not know ${org}/${name} yet (${refused.join('; ')}); try ${attempt + 1} of ${tries} in ${waitMs / 1000} s`)
+      await sleep(waitMs)
+    }
+  }
+  throw new Error(`Workers Builds does not see ${org}/${name} through the GitHub app after ${tries} tries: ${refused.join('; ')}. Fix: ${REFRESH_FIX.replaceAll('<org>', org)}`)
+}
+
+export async function ensureBuilds(cf, { tag, git, org, name, branch, d1, buildTokenUuid }) {
   const existing = await cf(`/builds/workers/${tag}`)
   if (existing.ok) { log('builds', 'already connected'); return existing.json.result }
   const commands = buildCommands(d1)
@@ -221,7 +269,7 @@ async function ensureBuilds(cf, { tag, repo, org, name, branch, d1, buildTokenUu
     method: 'POST',
     body: {
       script_tag: tag,
-      git_repository: { provider_type: 'github', provider_account_id: String(repo.owner.id), provider_account_name: org, repo_id: String(repo.id), repo_name: name, branch },
+      git_repository: { ...git, branch },
       production_settings: { ...commands.production, build_token_uuid: buildTokenUuid, root_directory: '/' },
       previews_enabled: true,
       previews_base_config: { ...commands.previews, build_token_uuid: buildTokenUuid, root_directory: '/' },
@@ -230,8 +278,8 @@ async function ensureBuilds(cf, { tag, repo, org, name, branch, d1, buildTokenUu
   if (!created.ok || !created.json?.success || !created.json?.result) {
     // Run 7 on 2026-10-08 answered 404 / 8000008 "This project is disconnected from your Git
     // account" here and the run went on as if connected. Any non-success stops the run now.
-    const errors = (created.json?.errors || []).map((e) => `${e.code} ${redact(e.message)}`).join('; ') || `status ${created.status}`
-    const linkFix = 'link the GitHub org to Claude\'s Cloudflare account once: Workers & Pages > Create > Import a repository > Add account > yverse-studio > All repositories'
+    const errors = errorsOf(created)
+    const linkFix = `link the GitHub org to Claude's Cloudflare account once (Workers & Pages > Create > Import a repository > Add account > ${org} > All repositories); if it is linked, ${REFRESH_FIX.replaceAll('<org>', org)}`
     throw new Error(`Workers Builds did not connect ${org}/${name}: ${errors}. Fix: ${(created.json?.errors || []).some((e) => e.code === 8000008) ? linkFix : `check the answer above; if it names the Git account, ${linkFix}`}`)
   }
   log('builds', `connected ${org}/${name} (${branch})`)
@@ -310,7 +358,7 @@ async function firstBuild(cf, tag, name, branch) {
   log('build', `started ${uuid}`)
   const until = Date.now() + BUILD_WAIT_MS
   while (Date.now() < until) {
-    await new Promise((r) => setTimeout(r, POLL_MS))
+    await sleep(POLL_MS)
     const b = await cf(`/builds/builds/${uuid}`)
     const state = buildState(b.json?.result)
     log('build', state.running ? state.status : `${state.status}, outcome ${state.outcome}`)
@@ -379,7 +427,8 @@ export async function main() {
 
   const worker = await ensureWorker(cf, name, randomBytes(32).toString('base64url'), { adopt: repoExisted })
   const buildTokenUuid = await pickBuildToken(cf, process.env.BUILD_TOKEN_NAME, process.env.CLOUDFLARE_BUILD_TOKEN)
-  await ensureBuilds(cf, { tag: worker.id, repo, org, name, branch, d1, buildTokenUuid })
+  const git = await connectRepo(cf, { repo, org, name })
+  await ensureBuilds(cf, { tag: worker.id, git, org, name, branch, d1, buildTokenUuid })
   const build = await firstBuild(cf, worker.id, name, branch)
   if (build.status === 'success') await ensureSecret(cf, name, 'BETTER_AUTH_SECRET', randomBytes(32).toString('base64url'))
 

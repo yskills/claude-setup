@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, readFileSync, existsSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold, describe, redact, hookIdFrom, buildState } from './new-project.mjs'
+import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold, describe, redact, hookIdFrom, connectRepo, ensureBuilds, buildState } from './new-project.mjs'
 
 test('names are workers.dev safe', () => {
   assert.ok(validName('duo-test'))
@@ -60,6 +60,48 @@ test('API answers are logged without secrets or hook ids, and hook ids are read 
   assert.equal(hookIdFrom({ hook_id: 'b' }), 'b')
   assert.equal(hookIdFrom({ deploy_hook: { uuid: 'c' } }), 'c')
   assert.equal(hookIdFrom(null), null)
+})
+
+function fakeCf(answer) {
+  const calls = []
+  const cf = async (path, init) => { calls.push({ path, init }); return answer(path, init, calls.length) }
+  return { cf, calls }
+}
+const refused = { ok: false, status: 404, json: { success: false, errors: [{ code: 8000008, message: 'This project is disconnected from your Git account' }], result: null }, text: '' }
+const saved = { ok: true, status: 200, json: { success: true, errors: [], result: { repo_connection_uuid: 'c1' } }, text: '' }
+const repo = { id: 123, owner: { id: 456 } }
+
+test('the repo connection is saved first, with the identifiers Cloudflare accepts, and the build configuration uses them', async () => {
+  const { cf, calls } = fakeCf((path, init) => (init.body.repo_id === 'deploy-test' ? saved : refused))
+  const git = await connectRepo(cf, { repo, org: 'yverse-studio', name: 'deploy-test', tries: 1 })
+  assert.deepEqual(calls.map((c) => c.path), ['/builds/repos/connections', '/builds/repos/connections'])
+  assert.equal(calls[0].init.body.provider_account_id, '456')
+  assert.equal(calls[0].init.body.repo_id, '123')
+  assert.deepEqual(git, { provider_type: 'github', provider_account_name: 'yverse-studio', repo_name: 'deploy-test', provider_account_id: 'yverse-studio', repo_id: 'deploy-test' })
+
+  const builds = fakeCf((path) => (path === '/builds/workers' ? saved : refused))
+  await ensureBuilds(builds.cf, { tag: 't', git, org: 'yverse-studio', name: 'deploy-test', branch: 'main', d1: false, buildTokenUuid: 'b' })
+  assert.deepEqual(builds.calls[1].init.body.git_repository, { ...git, branch: 'main' })
+})
+
+test('a repo Cloudflare does not know is retried, then the run stops with the answers and the fix', async () => {
+  const { cf, calls } = fakeCf(() => refused)
+  await assert.rejects(
+    connectRepo(cf, { repo, org: 'yverse-studio', name: 'deploy-test', tries: 3, waitMs: 0 }),
+    (err) => /after 3 tries: numeric ids: 8000008 .*; names: 8000008 .*github\.com\/organizations\/yverse-studio\/settings\/installations/.test(err.message),
+  )
+  assert.equal(calls.length, 6)
+  const builds = fakeCf(() => refused)
+  await assert.rejects(ensureBuilds(builds.cf, { tag: 't', git: {}, org: 'o', name: 'n', branch: 'main', d1: false, buildTokenUuid: 'b' }), /did not connect o\/n: 8000008/)
+})
+
+test('only "repo unknown" is retried; any other answer stops the run at once', async () => {
+  const forbidden = fakeCf(() => { throw new Error('Cloudflare PUT /builds/repos/connections: 403 {"errors":[{"code":10000}]}') })
+  await assert.rejects(connectRepo(forbidden.cf, { repo, org: 'o', name: 'n', tries: 3, waitMs: 0 }), /403/)
+  assert.equal(forbidden.calls.length, 1)
+  const otherNotFound = fakeCf(() => ({ ok: false, status: 404, json: { success: false, errors: [{ code: 12040, message: 'no such thing' }], result: null }, text: '' }))
+  await assert.rejects(connectRepo(otherNotFound.cf, { repo, org: 'o', name: 'n', tries: 3, waitMs: 0 }), /12040 no such thing/)
+  assert.equal(otherNotFound.calls.length, 1)
 })
 
 test('a build is judged by its outcome once it has stopped', () => {
