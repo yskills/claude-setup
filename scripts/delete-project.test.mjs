@@ -75,6 +75,8 @@ test('a real run deletes Worker, both D1, the unused build token, then the repo 
   assert.match(d.at(-1), new RegExp(`api.github.com/repos/${ORG}/app$`))
 })
 
-test('new-project still writes the marker delete-project looks for', () => {
-  assert.ok(readFileSync(new URL('./new-project.mjs', import.meta.url), 'utf8').includes(`description: '${MARKER}'`))
+test('new-project still writes the marker delete-project looks for', async () => {
+  const made = await import('./new-project.mjs')
+  assert.equal(made.MARKER, MARKER)
+  assert.ok(readFileSync(new URL('./new-project.mjs', import.meta.url), 'utf8').includes('description: MARKER'))
 })

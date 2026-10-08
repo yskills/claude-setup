@@ -52,10 +52,6 @@ jobs:
           path: incoming
           persist-credentials: false
           sparse-checkout: projects
-      - if: github.event_name == 'workflow_run'
-        run: |
-          mkdir -p projects
-          cp incoming/projects/*.json projects/ 2>/dev/null || echo "no projects/<name>.json on the branch, defaults apply"
       - uses: actions/setup-node@v5
         with:
           node-version: 24
