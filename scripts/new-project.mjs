@@ -216,7 +216,8 @@ async function firstBuild(cf, tag, branch) {
     const b = await cf(`/builds/builds/${uuid}`)
     const status = b.json?.result?.status
     log('build', status)
-    if (['success', 'failure', 'canceled', 'cancelled', 'error'].includes(status)) return { uuid, status }
+    const stillRunning = !status || ['queued', 'pending', 'initializing', 'running', 'in_progress'].includes(status)
+    if (!stillRunning) return { uuid, status }
   }
   return { uuid, status: 'timeout' }
 }
