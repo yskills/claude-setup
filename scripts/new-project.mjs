@@ -169,16 +169,17 @@ async function ensureWorker(cf, name, previewSecret) {
   return created.json.result
 }
 
-async function pickBuildToken(cf, token, preferredName) {
+async function pickBuildToken(cf, preferredName) {
+  // Never registers the setup token as a build token: every pushed branch of every project
+  // would then build with Workers Builds Configuration Edit and D1 create rights. Builds use
+  // the existing build token (duo-test's, Workers Scripts + D1 Edit), named by BUILD_TOKEN_NAME.
   const list = await cf('/builds/tokens')
   const tokens = list.json?.result || []
   const preferred = preferredName ? tokens.find((t) => t.build_token_name === preferredName) : null
-  const pick = preferred || tokens[0]
-  if (pick) { log('build token', `${pick.build_token_name} ${pick.build_token_uuid}`); return pick.build_token_uuid }
-  const verify = await api('https://api.cloudflare.com/client/v4', token, '/user/tokens/verify')
-  const created = await cf('/builds/tokens', { method: 'POST', body: { build_token_name: 'claude-setup', build_token_secret: token, cloudflare_token_id: verify.json.result.id } })
-  log('build token', `registered this token as claude-setup ${created.json.result.build_token_uuid}`)
-  return created.json.result.build_token_uuid
+  const pick = preferred || (preferredName ? null : tokens[0])
+  if (!pick) throw new Error(`no build token${preferredName ? ` named "${preferredName}"` : ''}: Cloudflare → a Worker → Settings → Builds → API token (publish skill, §A new project)`)
+  log('build token', `${pick.build_token_name} ${pick.build_token_uuid}`)
+  return pick.build_token_uuid
 }
 
 async function ensureBuilds(cf, { tag, repo, org, name, branch, d1, buildTokenUuid }) {
@@ -261,7 +262,7 @@ export async function main() {
   }
 
   const worker = await ensureWorker(cf, name, randomBytes(32).toString('base64url'))
-  const buildTokenUuid = await pickBuildToken(cf, cfToken, process.env.BUILD_TOKEN_NAME)
+  const buildTokenUuid = await pickBuildToken(cf, process.env.BUILD_TOKEN_NAME)
   await ensureBuilds(cf, { tag: worker.id, repo, org, name, branch, d1, buildTokenUuid })
   const build = await firstBuild(cf, worker.id, branch)
   if (build.status === 'success') await ensureSecret(cf, name, 'BETTER_AUTH_SECRET', randomBytes(32).toString('base64url'))

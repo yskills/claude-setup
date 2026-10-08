@@ -51,7 +51,9 @@ the two keys. Research and the routes weighed: `research/auto-deploy.md` in the 
    https://github.com/yskills/claude-setup/settings/secrets/actions → secrets
    `CLOUDFLARE_API_TOKEN` (step 3) and `PROJECTS_GITHUB_TOKEN` (step 4);
    https://github.com/yskills/claude-setup/settings/variables/actions → variable
-   `CLOUDFLARE_ACCOUNT_ID` (Workers & Pages → the id on the right, not a secret).
+   `CLOUDFLARE_ACCOUNT_ID` (Workers & Pages → the id on the right, not a secret). Builds deploy
+   with the build token duo-test already uses (Workers Scripts + D1 Edit), never with the setup
+   token; if the account ever has more than one build token, variable `BUILD_TOKEN_NAME` names it.
 
 What the keys can do if they leak, and why that is accepted: the Cloudflare token deploys or
 edits any Worker on the account and creates D1 databases, the same reach as the build token
