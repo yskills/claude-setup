@@ -9,7 +9,7 @@ Company XY's figures are not one-offs. The work builds a repeatable character-ge
 workflow and a library (bases, hair, outfits, clips, tools) that every later character and
 project reuses: the next figure should take a brief and a picture, not a new invention. In
 2026-10-08 the process switched around (VRoid samples instead of the chosen characters, a model
-file taken as "the basis", pictures without the reference beside them, eyes nobody could see),
+file taken as "the basis", pictures without the reference beside them, eyes that vanished in the game),
 and yskills had to say it twice. This page is the fix.
 
 ## The steps, in order
@@ -31,13 +31,17 @@ and yskills had to say it twice. This page is the fix.
      gets her adult look, never a school look.
    - Content line: lingerie at most, a smooth non-explicit base, no nude renders.
    - No paid assets. Free only, licence noted in the library's `library.json`. A free download that
-     needs a login may use Claude's own mail address (yskills, 2026-10-08).
+     needs a login is registered with the email yskills provides; its login is never guessed.
    - Poses and motion natural: clips from the library (Quaternius UAL, VRMA), spring bones settled,
      feet on the floor, arms outside the body.
 4. **Self-check before anyone sees it.** The builder renders every outfit under the office lights
    and fixes, before showing: washed-out fabric, white blotches, clipping, wrong colours, shirt
-   or skirt hems that gap or tear, eyes that don't read. `check_layers.py` prints ok. Renders sit
-   on a mid-tone background, never white, so eyes, pale skin and light clothes stay readable.
+   or skirt hems that gap or tear. `check_layers.py` prints ok.
+   - Eyes are checked in the exported game file as the game renders it (three-vrm), not only in
+     Blender: the iris has its own colour and clear contrast against the eye white. A colour boost
+     made in Blender that never reaches the export does not count (Hinata, 2026-10-08: a near-white
+     iris texture plus a big highlight vanished in the game).
+   - Renders sit on a mid-tone background, never white, so pale skin and light clothes stay readable.
 5. **Show yskills one way only: the comparison sheet.**
    - Reference picture beside the render, a face close-up, each outfit, the chibi.
    - Files `figure-shots/<slug>-v<n>-sheet-1440.png`, `-sheet-390.png`, `-face.png`, at 1440 and
