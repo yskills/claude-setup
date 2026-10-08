@@ -37,6 +37,10 @@ goes in its home only, everywhere else links it.
 - "Stop", "pause" and taste calls (a rejected asset or look) are final: stop at once, never argue.
 - Choices go out as tappable options (`AskUserQuestion` in Claude Code, a decision card in
   threads): short labels, recommendation first, multi-select when several answers can apply.
+  In a claude.ai project only the Project Manager posts a vote, in the project chat; a thread
+  sends it the options and goes on with its recommendation. When the options look different
+  (design, art, layout), each comes as a screenshot (390px and 1440px) posted right before the
+  card under the same label; never a vote on words alone (2026-10-08, Sofa-Shop).
 - A step only yskills can do: one line on why, then numbered steps with the exact official deep
   link and the exact names to type.
 - Replies: short and informal like yskills' messages. Lead with the result, then what they need

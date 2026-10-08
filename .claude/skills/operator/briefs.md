@@ -30,7 +30,8 @@ ok / no
 
 ## (b) Design pick
 
-Send 2-3 directions, each as one phone and one desktop screenshot (attach the images), each with
+The Project Manager posts it in the project chat (vote rule in CLAUDE.md, How to work). Send 2-3
+directions, each as one phone and one desktop screenshot (attach the images), each with
 a two-word name and one line on the feel, built from yskills' references and the `ui-review`
 skill's `TASTE.md`. Then tap options: the directions, plus "none, try again". yskills can also
 answer in words or pictures ("this one but darker", a screenshot): the design team revises and
