@@ -1,0 +1,32 @@
+{
+  "business": "duo-test (an example: Englisch lernen, a Duolingo-style web app)",
+  "target": "German speakers, 18 to 45, who want everyday English for work or travel and have tried an app before",
+  "where": "Germany, phone first",
+  "age": [18, 45],
+  "segments": [
+    {"name": "Student or trainee", "share": 0.30, "income": [8000, 20000]},
+    {"name": "Employee who needs English at work", "share": 0.50, "income": [28000, 60000]},
+    {"name": "Self-employed or manager", "share": 0.20, "income": [50000, 120000]}
+  ],
+  "behaviours": [
+    {"name": "Streak keeper", "share": 0.25, "how": "Opens an app most days, hates losing a streak."},
+    {"name": "Free-tier forever", "share": 0.25, "how": "Uses the free version of everything, never paid for an app."},
+    {"name": "Pays for results", "share": 0.15, "how": "Paid for a course before; expects measurable progress."},
+    {"name": "Deal hunter", "share": 0.15, "how": "Waits for a yearly offer, compares prices."},
+    {"name": "Loyal to Duolingo", "share": 0.20, "how": "Has a long streak elsewhere and a paid plan there."}
+  ],
+  "objections": [
+    "Duolingo is free, why pay here",
+    "4,99 € a month adds up",
+    "I would need to see it work for a week first",
+    "Another app I will drop after ten days",
+    "Is my data safe with a small provider",
+    "Is there enough content to get past the basics"
+  ],
+  "habits": [
+    "you commute 30 minutes by train",
+    "you have English calls at work twice a week",
+    "you plan a trip to London next spring",
+    "you learn on the couch in the evening"
+  ]
+}
