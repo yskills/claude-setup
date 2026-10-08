@@ -93,11 +93,13 @@ a subagent the phase starts goes into its `agents` with its `label` (agent type)
 are ISO from the real clock (`date -u +%FT%TZ`), never guessed. A finished thread leaves its row (it
 greys after 2 hours). Rule: `HQ.workTree` and `HQ.busyRoles` in company-xy's `hq-rules.js`.
 **Derived rows:** in the Company XY project the threads write none of this themselves; the HQ refresher derives them from
-`list_thread_sessions` on every run (company-xy `hq-refresh.md`): `work/<session>` per open thread with `by: 'refresher'`,
-`state` (running in a turn, waiting between turns, done once finished or resolved), `project`, `pr`, `started` and
-`lastActivity` added to the shape above and one phase for the whole thread; and `team/crew-<role>` per role word (working,
-waiting or idle, `task`, `link`, `threads`, `lastActivity`). A row a thread writes itself always wins: the refresher never
-touches a `work` row without `by: 'refresher'`, and deletes no `team` or `work` row.
+`list_thread_sessions` on every run (company-xy `hq-refresh.md`): `work/session_<id>` per open thread (the thread list spells
+the same session `cse_<id>`) with `by: 'refresher'`, `state` (running in a turn, waiting between turns, done once finished or
+resolved), `project`, `pr`, `started` and `lastActivity` added to the shape above and one phase for the whole thread; and
+`team/crew-<role>` per role word (working, waiting or idle, `task`, `link`, `threads`, `lastActivity`). A row a running thread
+writes itself wins: the refresher writes no row over it. Legacy rows retire (at most 20 a run, pinned, none on a partial read):
+hand-written work rows of finished threads, the refresher's own a day after, and hand-written team rows marked done;
+`team/manager` (the project chat's desk) stays.
 
 **Day one:** a new project first gets its ideaWorld entry with `repo:` (or the refresher deletes its rows), then writes, in the hour its plan is posted and in one batch, `projects/<id>`
 (traction fields 0, `firstEuroBy` = PLAN.md's go date, `revenueMode: 'test'`), the `<id>-` `phases` and
