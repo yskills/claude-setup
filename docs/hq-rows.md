@@ -52,6 +52,28 @@ coordinator, and on every open with an old list. Other threads do neither (prove
 `Researcher · <idea>` brainstorm thread whose brief names the request id, unless a thread for that
 id already runs (a resend repeats it); that thread sets the row to `started` with its thread link.
 
+**Projects come from ideaWorld (yskills 2026-10-08):** yskills' one project list is ideaWorld's `content/ideas/<slug>.md`.
+An entry is an idea until it has `repo:`; then it is a project, and only those are on HQ's Company page. A project that should
+show in HQ gets an entry there first (the operator's day one does it, slug = project id); a `projects/<id>` row no entry names
+is stale and the HQ refresher (company-xy `hq-refresh.md`) deletes it with its `phases`, `team` and `events` (a renamed repo keeps
+its row; no deletes on an empty or broken ideaWorld read or when over half would go; `finance` only on yskills' delete tap). The
+refresher owns `state` (from the file: `archived: true` = archived, `parked: true` = paused, else active), `stateAt`,
+`mirror` (repo, last commit, open PRs, PROGRESS.md, status by ideaWorld's own rules) and `working` (this project's working
+threads naming the repo); a PM keeps writing `name, note, you[], money` and never those. A repo pushed in the last 30 days
+without an entry shows in one "Unbetreute Repos" list (`unclaimed/now`) until yskills says keep (add an entry) or drop.
+**Pause, archive, delete:** the card's taps (one confirm) only write `requests/<id>` (`kind: 'lifecycle'`, `project, slug,
+act, repo`) and message the coordinator, which edits the ideaWorld file: pause = `parked: true`, archive (done or dropped) =
+`archived: true`, delete = remove the file after yskills' yes in words. Delete also removes every HQ row of it at once and
+writes `ignore/<id>`, which the refresher drops once the file is gone. The GitHub repo changes only on yskills' explicit yes.
+A paused project gets no new thread until yskills resumes it.
+
+**Idea whiteboard:** the staging area in yskills' office: `ideas/<slug>` (`{title, blurb, repo, parked, archived, planned,
+link, at}`, written by the refresher) for every entry not archived, as title, blurb and a derived status: Idee, Geplant (the
+file has a `## Plan`), Pausiert (parked, no repo), Läuft (it has `repo:`). The card opens the file on GitHub. Its two taps write `requests/<id>`
+(`kind: 'idea'`, `slug`, `act`) and message the coordinator: Planen (Idee) starts one thread that researches and writes
+`## Plan` and `## Research notes` below yskills' own words in the file; Starten (Geplant) starts the build from that plan
+with the operator workflow (slug = project, repo and Worker name) and sets `repo:` once the repo exists.
+
 **Roadmap:** HQ's Roadmap tab is one quest map per project, rendered only from these `phases` rows and the
 `work` rows they name (`HQ.questMap` in company-xy's `hq-rules.js`). A step shows as current only when its row is `active`
 and carries `project` and `at`; a row without `project` lands under "Ohne Projekt" and never counts as current. **At every
@@ -71,7 +93,7 @@ a subagent the phase starts goes into its `agents` with its `label` (agent type)
 are ISO from the real clock (`date -u +%FT%TZ`), never guessed. A finished thread leaves its row (it
 greys after 2 hours). Rule: `HQ.workTree` and `HQ.busyRoles` in company-xy's `hq-rules.js`.
 
-**Day one:** a new project writes, in the hour its plan is posted and in one batch, `projects/<id>`
+**Day one:** a new project first gets its ideaWorld entry with `repo:` (or the refresher deletes its rows), then writes, in the hour its plan is posted and in one batch, `projects/<id>`
 (traction fields 0, `firstEuroBy` = PLAN.md's go date, `revenueMode: 'test'`), the `<id>-` `phases` and
 `team` rows, one `work/<session>` row per thread started, and for a project meant to earn the
 **first euro list** in its `you[]` (`firstSeen` = now): Gewerbe, ELSTER tax registration, Stripe live,
