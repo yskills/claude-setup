@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 24
       - run: node scripts/check.mjs
-      - run: node --test scripts/new-project.test.mjs scripts/delete-project.test.mjs .claude/skills/game-3d/scripts/check-assets.test.mjs .claude/skills/operator/templates/loop/loop.test.mjs .claude/skills/operator/templates/mailbox/mailbox.test.mjs
+      - run: node --test scripts/new-project.test.mjs scripts/delete-project.test.mjs scripts/build-logs.test.mjs .claude/skills/game-3d/scripts/check-assets.test.mjs .claude/skills/operator/templates/loop/loop.test.mjs .claude/skills/operator/templates/mailbox/mailbox.test.mjs
       # Runs without a login (tested with an empty HOME on 2026-10-06).
       - name: team mod
         shell: bash
