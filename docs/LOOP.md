@@ -6,7 +6,7 @@ what went wrong or what users said. Deploys were a one-way street. This is the w
 
 ## Shape
 
-Three sensors, one inbox, one reader. Keys stay on the Worker and in GitHub; threads read issues.
+Three sensors, one inbox, one reader. Keys stay on the Worker and in GitHub; threads read issues. Issues quote error text (secrets redacted by `loop.mjs`), so the project repo stays private.
 
 | Part | What | Where | Key |
 |---|---|---|---|
