@@ -32,6 +32,7 @@ lives outside this repo.
 | PC install | `install.mjs`, `global/`, `config/plugins.json`, `mods/team` | Copies this repo into `~/.claude`, settings, status line, context guard, plugins, the team mod |
 | Cloud threads | `cloud/setup.sh` | Plugins and the context guard in a cloud environment (paste into Project settings) |
 | HQ rows | `docs/hq-rows.md` | What each Project Manager writes into HQ (the page itself lives in yskills/company-xy) |
+| Using it (for yskills) | `docs/USING.md` | One phone page: how to start an app, what you see, when Claude asks, what it costs |
 | After launch | `docs/LOOP.md` | Errors and feedback become issues and fix threads |
 | Setup loop | operator `SKILL.md` (Setup loop) | Friction with this repo becomes a `loop:setup` issue, then a fix thread through the gate |
 | Test runs | `docs/TEST-PROJECTS.md` | How the setup is tested end to end, and what each run taught |

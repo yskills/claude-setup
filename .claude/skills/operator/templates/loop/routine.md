@@ -19,5 +19,5 @@ Loop reader for <project> (<owner/repo>). Read-only, one turn, no code changes.
    in claude-setup docs/WORKFLOW.md) and one per feedback batch (Project Manager decides: slice,
    answer or close), and one `Programmer · setup #<number>` thread per `loop:setup` issue,
    which fixes claude-setup through the gate (operator SKILL.md, Setup loop); each thread comments "Thread: <link>" on its issue and closes it at merge.
-4. Nothing new: end with no message. Never open, edit or close issues yourself.
+4. Nothing new (no open issue without a "Thread:" comment, no red run): end the turn right after step 1 or 2 with no message, no reply, no thread. Never open, edit or close issues yourself.
 ```
