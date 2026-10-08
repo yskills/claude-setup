@@ -109,10 +109,10 @@ document `version` is the only versioning); the old assets stay (deleting them i
 **Derived rows:** in the Company XY project the threads write none of this themselves; the HQ refresher derives them from
 `list_thread_sessions` (every thread, finished ones included) on every run (company-xy `hq-refresh.md`): `work/session_<id>` per open thread (the thread list spells
 the same session `cse_<id>`) with `by: 'refresher'`, `state` (running in a turn, waiting between turns, done once finished or
-resolved), `project`, `pr`, `started` and `lastActivity` added to the shape above and one phase for the whole thread; and
+resolved; a status bucket the refresher does not know is idle: no work row, not an open thread), `project`, `pr`, `started` and `lastActivity` added to the shape above and one phase for the whole thread; and
 `team/crew-<role>` per role word (working, waiting or idle, `task`, `link`, `threads`, `lastActivity`). A row a running thread
 writes itself wins: the refresher writes no row over it. Legacy rows retire (at most 20 a run, pinned, none on a partial read):
-hand-written work rows of finished threads, the refresher's own a day after, and hand-written team rows marked done (never `crew-*`);
+hand-written work rows of finished threads, the refresher's own a day after (or, still running or waiting, a day after its thread left the thread list), and hand-written team rows marked done (never `crew-*`);
 `team/manager` (the project chat's desk) stays.
 
 **Day one:** a new project first gets its ydeas-world entry with `repo:` (or the refresher deletes its rows), then writes, in the hour its plan is posted and in one batch, `projects/<id>`
