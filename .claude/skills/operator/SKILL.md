@@ -144,7 +144,14 @@ Claude Code's safety checks are not friction to fix: only yskills' allow rules o
   (`global/context-guard.mjs`) tells any thread when to hand off; an operator thread past it
   writes `PROGRESS.md` and asks for a fresh one.
 - One job per thread. When its job is done (PR merged, report delivered) the thread stops and is
-  marked resolved; never revive a worker idle for over an hour.
+  marked resolved; never revive a worker idle for over an hour. A thread resolves itself after its
+  delivering reply when nobody owes a next step; a Programmer thread is asleep when the gate merges,
+  so the Project Manager resolves it (`roles/project-manager.md`, Close threads).
+- Connectors cost every thread: each connected one loads its tools into every thread's context
+  (six Google connectors were about 75 tools). Connect one only when a task needs it, the thread says
+  so, and disconnect it after.
+- A thread that needs another org repo calls `add_repo` (one Allow per thread; the project's repo
+  list must say `yverse-studio/<repo>`, not `yskills/<repo>`).
 - After a usage-limit stop a running thread waits and resumes by itself when the window resets;
   only Stop on the thread or Pause on the project holds it. The coordinator starts no new thread
   after a limit until yskills says go. To hold everything, yskills pauses the project. After
