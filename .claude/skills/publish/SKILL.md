@@ -104,6 +104,8 @@ from a pushed branch; private repo, no outside collaborators, `yskills-claude` i
    pushed in the repo, a missing repo stops the run, and a Worker of that name must not exist yet.
    Only main's registry may set these keys; a pushed `new/<name>` branch sets just `d1`.
    Example: `projects/mypage.json`.
+   A static Nuxt site needs `nitro.preset: 'static'`: Workers Builds sets `WORKERS_CI`, which otherwise
+   switches Nitro to a Worker build (MyPage, 2026-10-08).
 
 Without the five steps above the workflow fails on its first line with the missing name; a
 thread then sends yskills the step with its link, once.
