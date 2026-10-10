@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, readFileSync, existsSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold, describe, redact, hookIdFrom, connectRepo, ensureBuilds, buildState } from './new-project.mjs'
+import { projectFromBranch, validName, wranglerConfig, packageJson, buildCommands, writeScaffold, describe, redact, hookIdFrom, connectRepo, ensureBuilds, buildState, pickBuildToken } from './new-project.mjs'
 
 test('names are workers.dev safe', () => {
   assert.ok(validName('duo-test'))
@@ -141,4 +141,19 @@ test('every registered project is a valid config', async () => {
     assert.equal(`${cfg.name}.json`, file)
     assert.ok(validName(cfg.name) && validRepo(cfg.repo), file)
   }
+})
+
+const tokenList = (...names) => async () => ({ ok: true, json: { result: names.map((n, i) => ({ build_token_name: n, build_token_uuid: `u${i}` })) } })
+
+test('pickBuildToken takes claude-setup-builds when the account has a second token', async () => {
+  assert.equal(await pickBuildToken(tokenList('dashboard-token', 'claude-setup-builds'), undefined, undefined), 'u1')
+})
+
+test('pickBuildToken takes the only token, and honours BUILD_TOKEN_NAME', async () => {
+  assert.equal(await pickBuildToken(tokenList('duo-test'), undefined, undefined), 'u0')
+  assert.equal(await pickBuildToken(tokenList('a', 'b'), 'b', undefined), 'u1')
+})
+
+test('pickBuildToken still stops on two unknown tokens and no secret', async () => {
+  await assert.rejects(pickBuildToken(tokenList('a', 'b'), undefined, undefined), /none is named "claude-setup-builds"/)
 })
