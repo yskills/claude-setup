@@ -10,7 +10,7 @@ check is a hard yes or no from someone who didn't write the code.
 | 2 | Every acceptance criterion passes on the preview | `evaluator` | the head SHA's preview URL (from the Workers Builds check or Cloudflare's PR comment), the slice's criteria | always |
 | 3 | Nothing blocking | a **fresh** `code-reviewer` (the builder's last ship-check pass counts if its report names this head SHA) | the diff, the slice goal in 2 sentences | always |
 | 4 | Nothing blocking, no CRITICAL/HIGH | `security-reviewer` on the diff; `red-team` on the preview | the diff; the preview URL and routes | auth, payments, user input or secrets touched; red team always on the last PR before launch |
-| 5 | Nothing blocking | `design-critic`; `legal-reviewer` when pages, forms, tracking, embeds or AI output change | phone and desktop screenshots, the preview URL | UI changed; `legal-reviewer` always on the last PR before launch |
+| 5 | Nothing blocking | `design-critic`; `legal-reviewer` when pages, forms, tracking, embeds or AI output change | phone and desktop screenshots, the preview URL | UI changed (fails when `design/DESIGN.md` is missing or the PR body has no design-vote line); `legal-reviewer` always on the last PR before launch |
 
 A check that doesn't apply passes; say "n/a" in the table.
 
@@ -83,8 +83,9 @@ How to undo a merge, by kind of change (write the line into the PR's "undo" line
 - **Less:** post the blocking findings as one PR review and stop. The builder fixes them; the next
   round re-runs the failed checks with fresh agents on the new head.
 - **2 failed rounds:** send one message to yskills: what the PR does, what is wrong in plain words (from
-  the last reports), and two or three ways forward as tap options; under auto-run the recommended
-  option is taken at once and the card only lets yskills change course.
+  the last reports), and two or three ways forward as tap options; the thread goes on with the
+  recommended option and the card lets yskills change course; money, a new service, deleting and
+  anything irreversible wait for the tap (`CLAUDE.md`, Cards).
 
 **Important or hard PRs** (auth, payments, database migrations, secrets, anything that can lose
 data or money, the last PR before launch, any PR that needed a second gate round) merge at 5/5
