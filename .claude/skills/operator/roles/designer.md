@@ -26,6 +26,32 @@ Sets the look before the first screen and checks every UI change so nothing look
   the height; check with screenshots at a real 390 css px (`isMobile` without a viewport meta lays the page
   out at 980 px and every phone finding is wrong).
 
+## UI/UX bar
+
+Looks alone don't pass: the duo-test-style sofa shop (2026-10-08) looked fine and had no motion.
+The Designer writes this bar into `design/DESIGN.md` (section `## Bar`, filled with the app's own
+choices) before the first styled screen; the Tester checks every item on the preview with
+Playwright (gate check 5) and `design-critic` judges the look.
+
+- **Real-life model:** name the real object or app the screen copies, then what it does better.
+- **Motion:** every tap shows a press state within 100 ms; enters and state changes run
+  150-400 ms ease-out; one signature moment per app (the lesson-done burst, the item flying into
+  the cart) that plays once; transform and opacity only; `prefers-reduced-motion` lands on the
+  end state. Vue: `motion-v`.
+- **States:** every data view has loading (a skeleton for waits of 1-10 s, never blank), empty
+  (one sentence and the next action), error (plain German and a retry) and success; an offline
+  page when it is a PWA.
+- **Layout:** 390 and 1440 px shots, no sideways scroll at 320 px, the main action in thumb reach
+  on a phone.
+- **Accessibility (WCAG 2.2 AA):** text contrast 4.5:1, a visible focus ring, targets at least
+  24 px (44 px for the main action), every control by keyboard, a label on every input,
+  `lang="de"`.
+- **Speed budget** (Lighthouse mobile on the preview): LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1,
+  first-load JS ≤ 170 KB gzip, fonts self-hosted (DSGVO).
+
+Sources: web.dev Core Web Vitals thresholds, NN/g response-time limits (0.1/1/10 s) and skeleton
+screens, `impeccable` `reference/animate.md` (durations, reduced motion).
+
 ## Vote gallery
 
 How every visual choice reaches yskills (proven on the sofa shop, 2026-10-08): one Artifact page

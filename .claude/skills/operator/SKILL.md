@@ -102,8 +102,8 @@ Templates in `templates/`.
 - `PROGRESS.md`: the handoff. Done, next, broken, decisions and why, each thread's cost. Every
   thread reads it first; only the operator writes it. Under 100 lines.
 - `metrics/<yyyy>-W<ww>.json`: from launch on, the week's numbers. Luna's cockpit reads these.
-- **Dashboard: HQ is the only one.** yskills' live view of every project is HQ, "Company XY"
-  (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT; code in yverse-studio/company-xy). **A project never
+- **Dashboard: HQ is the only one.** yskills' live view of every project is the Claude Setup HQ
+  Artifact, Company view (https://claude.ai/artifact/TmQ7UpL6EPjXKkpR9S4kJT; code in yverse-studio/company-xy). **A project never
   publishes its own office page.** The Project Manager writes the project's rows into HQ's db with
   `ArtifactData`, in one batch with every `PROGRESS.md` write, exactly as `docs/hq-rows.md` says
   (phases, team, projects, events, today, requests, config/coordinator, work board; every row carries `at`).
@@ -124,7 +124,8 @@ yskills had to do by hand, a complaint yskills repeats. Search open `loop:setup`
 comment on a match instead of filing twice. The daily loop reader lists them with the app's own
 items; the coordinator starts one `Programmer · setup #<n>` thread per issue, which fixes
 it, passes `gate.md` and merges. A fix to a policy file (CLAUDE.md, `gate.md`, `global/`, `cloud/`,
-`install.mjs`) ends as exact paste text on the issue for yskills, never reworded to pass a check.
+`install.mjs`) that the safety check refuses waits for yskills' Allow in that thread (`gate.md`,
+Merge policy), never reworded to pass a check.
 Claude Code's safety checks are not friction to fix: only yskills' allow rules or taps pass them.
 
 ## 5. Spend little
@@ -147,9 +148,6 @@ Claude Code's safety checks are not friction to fix: only yskills' allow rules o
   marked resolved; never revive a worker idle for over an hour. A thread resolves itself after its
   delivering reply when nobody owes a next step; a Programmer thread is asleep when the gate merges,
   so the Project Manager resolves it (`roles/project-manager.md`, Close threads).
-- Connectors cost every thread: each connected one loads its tools into every thread's context
-  (six Google connectors were about 75 tools). Connect one only when a task needs it, the thread says
-  so, and disconnect it after.
 - A thread that needs another org repo calls `add_repo` (one Allow per thread; the project's repo
   list must say `yverse-studio/<repo>`, not `yskills/<repo>`).
 - After a usage-limit stop a running thread waits and resumes by itself when the window resets;
@@ -164,4 +162,4 @@ Claude Code's safety checks are not friction to fix: only yskills' allow rules o
 - The evaluator runs once per gate round. Red team and legal run per PR only when the gate's table
   says so, and once in full before launch.
 - Until the first paying user the gate runs in probe mode (`gate.md`): fewer reviewers, security
-  still on for anything a user typed.
+  still on for anything a user typed. Docs and config PRs get gate size S (`gate.md`, Gate size).

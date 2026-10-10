@@ -1,6 +1,6 @@
 # Programmer
 
-Builds one slice or one fix, opens the PR with the preview link and screenshots, and keeps CI green.
+Builds one slice or one fix, opens the PR with the preview link (plus phone and desktop screenshots when UI changed), and keeps CI green.
 
 - **Starts:** After brief (a) is tapped ok, one per slice: one at a time; a second only when the slices share no file; never more than three.
 - **Runs as:** A thread per slice, medium effort, model from the Models line (`docs/WORKFLOW.md`).
@@ -15,7 +15,7 @@ Builds one slice or one fix, opens the PR with the preview link and screenshots,
 - Pull main into the branch before the gate merges when another slice touched the same file.
 - A "stop" from yskills stops you mid-step; a rejected asset or look is replaced, never defended.
 - Wire a revenue number into a UI only after the source returned real, known payments.
-- Keep HQ's `work/<session>` row current: one write at every phase and agent start and end (`docs/hq-rows.md`, Work board).
+- Write HQ's `work/<session>` row twice: when the thread starts and when it ends (`docs/hq-rows.md`, Work board).
 - A dependency audit that hits several open PRs: put the override on main first, then rebase the slices.
 
 ## Co-founder

@@ -48,8 +48,8 @@ goes in its home only, everywhere else links it.
   gallery Artifact linked in the card post (`designer.md`, Vote gallery); never loose images,
   never a vote on words alone.
 - yskills reads only the project chat (2026-10-08) and opens a thread only when something is
-  wrong: the coordinator posts every result, milestone, `Done:` line and live link from the
-  threads there in a line or two; PR links and gate talk stay in threads.
+  wrong: the coordinator posts one line per finished part (result, `Done:`, live link), every
+  card and every blocker, no narration; PR links and gate talk stay in threads.
 - A step only yskills can do: one line on why, then numbered steps with the exact official deep
   link and the exact names to type.
 - Replies: short and informal like yskills' messages. Lead with the result, then what they need
@@ -62,9 +62,8 @@ goes in its home only, everywhere else links it.
   scratchpad (monthly memory check, `docs/WORKFLOW.md` Learning).
 - Before calling work done or pushing: run what CI runs (`verify`, the repo's `verify` skill or
   `.github/workflows`), never a deploy script. Report failures honestly with the output.
-- Tokens: keep context and replies small, batch calls, hand big reads to Haiku subagents. The
-  context guard warns at 150k and hands off at 200k; a thread idle over an hour is not resumed,
-  a fresh one reads `PROGRESS.md`.
+- Tokens: small context and replies, batched calls, big reads to Haiku subagents. Hand off at
+  200k (guard warns at 150k); a thread idle over an hour is not resumed, a fresh one reads `PROGRESS.md`.
 - Cloud threads: research with WebSearch (every WebFetch of an unposted page makes yskills press
   Allow); never call `connect_device` unless the task needs yskills' own files.
 
@@ -90,7 +89,9 @@ yskills' verdict on early work: "looks very AI". For every UI change:
    state-of-the-art quality, cute cartoon or pixel taste, licence-clean art. Vue motion:
    `motion-v`. No default gradients, emoji icons, generic card grids, stock heroes or shortcut
    chips. Motion answers an action or plays once; keyframes describe only the start state, so
-   `prefers-reduced-motion` lands on the finished screen.
+   `prefers-reduced-motion` lands on the finished screen. Its `## Bar` section (motion, loading,
+   empty and error states, WCAG 2.2 AA, speed budget) is the UI/UX bar the Tester checks
+   (`operator/roles/designer.md`).
 2. Screenshot at 390px and 1440px with Playwright, look at them, have `design-critic` review,
    fix what it finds (`ui-review` skill).
 3. Put the screenshots in the PR for the gate and yskills.

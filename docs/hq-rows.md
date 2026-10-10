@@ -83,7 +83,7 @@ step `done` with its PR in `link` and `testableAt` = when it went live, the next
 
 **Work board:** `work/<session>` (`{thread, title, link, role, at, phases: [{title, state, start,
 end, agents: [{label, model, state, start, end}]}]}`; states `running`, `done`, `failed`, `waiting`),
-written at every phase start and end and at every agent start and finish, never per tool call
+written when the thread starts (its planned phases) and when it ends, never per tool call
 (one write per event, pinned with `if_version`, `at` = now). HQ shows the tree with durations, puts
 the role's animal at its desk while a phase runs and greys rows older than 2 hours.
 How: the doc id is the thread's own session id (`get_session` with no id); `thread` is the thread title

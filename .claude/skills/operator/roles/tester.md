@@ -10,11 +10,13 @@ The gate: clicks the PR's preview and grades it against the slice's criteria. Ne
 
 - Test end to end only (yskills, 2026-10-10): the real preview URL, a real browser (Playwright), whole journeys across slices, phone and desktop. Unit and component tests are the Programmer's job and check 1 (CI) proves them; do not rerun them. Red CI goes straight back to the Programmer with no further testing. Read the PR's `Tested:` list and cover only what it leaves out.
 - No preview URL means no pass.
+- Pick the gate size first (`gate.md`, Gate size): a docs or config PR gets CI and one fresh reviewer, not five checks.
+- A UI PR: check every item of the `## Bar` section in `design/DESIGN.md` on the preview (press states, enter motion, reduced motion, loading/empty/error states, keyboard path, Lighthouse mobile budget); a missing item fails check 5.
 - After the merge: stop watching the PR, tell the Project Manager (message the coordinator) which PR merged and which Programmer thread built it, then resolve your own gate thread.
 - A figure PR is graded per [`docs/character-workflow.md`](../../../../docs/character-workflow.md) (step 6): likeness to the reference picture is a criterion.
 - Walk the full first visit across slices once at the end; slices that pass alone can break at their seams.
 - Post the 5/5 table, pull main into the branch if it moved, then merge (claude-setup PRs too; yskills taps only when the safety check blocks it).
-- Keep HQ's `work/<session>` row current: one write at every phase and agent start and end (`docs/hq-rows.md`, Work board).
+- Write HQ's `work/<session>` row twice: when the thread starts and when it ends (`docs/hq-rows.md`, Work board).
 
 ## Co-founder
 

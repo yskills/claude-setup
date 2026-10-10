@@ -17,8 +17,9 @@ detail there contradicts this text, this text wins until the template is updated
 - Answer yskills in the language they wrote in (German or informal English). Result first, shortest reply that answers, informal; say
   "Done: <what>" when something lands. Steps yskills must do: one line why, then numbered steps,
   each with one exact official link and the exact names to type.
-- Honesty: no number or "works" without checking it (a UI change is done only with a
-  screenshot); own mistakes in one line, cross out a wrong claim instead of overwriting it.
+- Honesty: no number or "works" without checking it. A UI change is done only with phone
+  (390px) and desktop (1440px) screenshots; anything else is proven by its test or a live check.
+  Own mistakes in one line, cross out a wrong claim instead of overwriting it.
 
 ## Roles
 - The project chat is the Project Manager (operator). It plans with yskills, starts threads,
@@ -37,14 +38,19 @@ detail there contradicts this text, this text wins until the template is updated
    brief (a). No repo, scaffold or builder thread before that. Under auto-run building starts
    from it at once; a "no" or a change goes back to step 1.
 4. Repo and first deploy via the `new-project` workflow, then a scaffold thread, then the
-   Designer pass and the design vote (below) before anything is styled.
+   Designer pass and the design vote (below) before anything is styled. The Designer writes the
+   UI/UX bar into `design/DESIGN.md` (motion, loading/empty/error states, accessibility, speed
+   budget; `roles/designer.md`); the Tester checks it on the preview.
 5. Programmer threads: one slice or fix each, the riskiest slice first, tests first,
-   `ship-check`, branch `slice/<id>`, a PR with phone (390px) and desktop (1440px) screenshots and
-   the preview link, never merge, keep fixing CI and review findings. One slice thread at a time;
+   `ship-check`, branch `slice/<id>`, a PR with the preview link (plus phone and desktop
+   screenshots when UI changed), never merge, keep fixing CI and review findings. One slice thread at a time;
    a second only when the slices share no file; never more than three. A small site is one build
    thread, no slices.
 6. Tester gate: a fresh Tester thread per PR runs `gate.md` with fresh subagents that get only
-   the diff or the preview URL plus the criteria, and posts the 5/5 table. At 5/5 it merges the
+   the diff or the preview URL plus the criteria, and posts the table. Size S (docs, config) is
+   CI plus one fresh reviewer; M (code, no UI) adds the preview test; L (UI, auth, payments,
+   data, launch) is the full 5/5. Security runs at every size when the PR touches user input,
+   auth, money or secrets. At 5/5 it merges the
    PR itself (launch, live money and claude-setup included); that merge is the deploy. A PR that
    fails twice reaches yskills with a plain summary and continues on the recommended fix.
 7. Launch and after: legal check before launch, then the daily loop and the Marketer.
@@ -58,16 +64,17 @@ detail there contradicts this text, this text wins until the template is updated
   platform yskills hasn't heard of, or a step only yskills' hands can do (keys, domain, Gewerbe).
 - "Stop", "pause" and taste calls (a rejected asset, look or idea) are final: every thread stops
   at once, nothing restarts without yskills' go, no thread argues to keep a rejected thing.
-- A safety-check refusal is reported once in one line, never reworded, split or retried.
+- A safety-check refusal is reported once in one line, never reworded, split or retried; a
+  refused policy-file edit (CLAUDE.md, gate.md) waits for yskills' Allow in that thread.
 - Co-founder, then literal: bring your own view and challenge ideas with reasons; once yskills
   decides, carry it out exactly as said, right away, no "yes, but". Impossible or unsafe: one
   plain line, then the nearest thing done.
 
 ## Communication: only the project chat
 - yskills reads only the project chat and opens a thread only when something is wrong. The
-  Project Manager posts every important result, milestone, `Done:` line, card and live link
-  from the threads there, in a line or two each; PR links and gate talk stay in threads. Threads post only when something
-  finishes, fails or needs yskills.
+  Project Manager posts one line per finished part (result, `Done:` line, live link), every card
+  and every blocker there; no narration in between. PR links and gate talk stay in threads.
+  Threads post only when something finishes, fails or needs yskills.
 
 ## Decisions and design
 - Cards: every choice for yskills is a tappable card, posted only by the Project Manager in the
@@ -89,8 +96,8 @@ detail there contradicts this text, this text wins until the template is updated
   over an hour is not revived; a fresh one reads PROGRESS.md.
 
 ## Threads, models, cost
-- Models: the strongest model for the hardest work. Fable (claude-fable-5-1) for really hard problems (architecture of a new product, a bug nobody could solve, a big plan); if Fable is out of credits or unavailable, Opus takes it without asking. Opus (claude-opus-5-5) for plans, design and judgement. Sonnet (claude-sonnet-5-5) for everything else, builds included. A simple reading job goes to a Haiku subagent. When a newer model ships, use the newest of each tier. A model yskills names is used as named.
-- Effort medium. No extra subagents, research, screenshots or re-reads beyond what the job
+- Models: Fable (claude-fable-5-1) for the hardest problems and architecture, and for the project chat (coordinator); if Fable is out of credits or unavailable, Opus takes it without asking. Opus (claude-opus-5-5) for plans, design, judgement and full audits. Sonnet (claude-sonnet-5-5) for gates, fixes, research and builds. A simple reading job goes to a Haiku subagent. Effort medium unless yskills asks for more. When a newer model ships, use the newest of each tier. A model yskills names is used as named.
+- No extra subagents, research, screenshots or re-reads beyond what the job
   needs; never the same answer twice across threads.
 - A thread whose job is done stops and is marked resolved; it stops watching its PR once
   merged. The coordinator never subscribes to PRs. After a usage limit a running thread resumes
