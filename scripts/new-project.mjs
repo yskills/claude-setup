@@ -18,6 +18,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+export const BUILD_TOKEN_NAME = 'claude-setup-builds'
 export const MARKER = 'made by claude-setup new-project'
 const TEMPLATE = new URL('../.claude/skills/publish/templates/new-project/', import.meta.url)
 const BUILD = 'npm run check && npm run build'
@@ -233,21 +234,23 @@ async function registerBuildToken(cf, buildToken) {
   // second, narrower user token (Workers Scripts Edit, D1 Edit) that builds deploy with.
   const verify = await api('https://api.cloudflare.com/client/v4', buildToken, '/user/tokens/verify')
   if (!verify.ok) throw new Error(`CLOUDFLARE_BUILD_TOKEN is not a valid token: ${verify.status}`)
-  const created = await cf('/builds/tokens', { method: 'POST', body: { build_token_name: 'claude-setup-builds', build_token_secret: buildToken, cloudflare_token_id: verify.json.result.id } })
-  log('build token', `registered claude-setup-builds ${created.json.result.build_token_uuid}`)
+  const created = await cf('/builds/tokens', { method: 'POST', body: { build_token_name: BUILD_TOKEN_NAME, build_token_secret: buildToken, cloudflare_token_id: verify.json.result.id } })
+  log('build token', `registered ${BUILD_TOKEN_NAME} ${created.json.result.build_token_uuid}`)
   return created.json.result.build_token_uuid
 }
 
-async function pickBuildToken(cf, preferredName, newToken) {
+export async function pickBuildToken(cf, preferredName, newToken) {
   // Never registers the setup token as a build token: every pushed branch of every project
   // would then build with Workers Builds Configuration Edit and D1 create rights. Builds use
-  // the existing build token (duo-test's, Workers Scripts + D1 Edit), named by BUILD_TOKEN_NAME.
+  // the token this script registers (claude-setup-builds, Workers Scripts + D1 Edit), or the one
+  // BUILD_TOKEN_NAME names. A second token in the account (one made in the dashboard) no longer
+  // stops the run: ux-proof, 2026-10-10.
   const list = await cf('/builds/tokens')
   const tokens = list.json?.result || []
-  const preferred = preferredName ? tokens.find((t) => t.build_token_name === preferredName) : null
-  if (!preferredName && tokens.length > 1) throw new Error(`${tokens.length} build tokens exist: set the variable BUILD_TOKEN_NAME to the one builds should deploy with`)
-  const pick = preferred || (preferredName ? null : tokens[0])
-  if (!pick && newToken) return registerBuildToken(cf, newToken)
+  const name = preferredName || BUILD_TOKEN_NAME
+  const pick = tokens.find((t) => t.build_token_name === name) || (!preferredName && tokens.length === 1 ? tokens[0] : null)
+  if (!pick && newToken && name === BUILD_TOKEN_NAME) return registerBuildToken(cf, newToken)
+  if (!pick && tokens.length > 1) throw new Error(`${tokens.length} build tokens exist and none is named "${name}": set the variable BUILD_TOKEN_NAME to the one builds should deploy with`)
   if (!pick) throw new Error(`no build token${preferredName ? ` named "${preferredName}"` : ''}: set the secret CLOUDFLARE_BUILD_TOKEN once (publish skill, §A new project)`)
   log('build token', `${pick.build_token_name} ${pick.build_token_uuid}`)
   return pick.build_token_uuid
