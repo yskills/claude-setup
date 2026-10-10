@@ -10,9 +10,20 @@ check is a hard yes or no from someone who didn't write the code.
 | 2 | Every acceptance criterion passes on the preview | `evaluator` | the head SHA's preview URL (from the Workers Builds check or Cloudflare's PR comment), the slice's criteria | always |
 | 3 | Nothing blocking | a **fresh** `code-reviewer` (the builder's last ship-check pass counts if its report names this head SHA) | the diff, the slice goal in 2 sentences | always |
 | 4 | Nothing blocking, no CRITICAL/HIGH | `security-reviewer` on the diff; `red-team` on the preview | the diff; the preview URL and routes | auth, payments, user input or secrets touched; red team always on the last PR before launch |
-| 5 | Nothing blocking | `design-critic`; `legal-reviewer` when pages, forms, tracking, embeds or AI output change | phone and desktop screenshots, the preview URL | UI changed (fails when `design/DESIGN.md` is missing or the PR body has no design-vote line); `legal-reviewer` always on the last PR before launch |
+| 5 | Nothing blocking | `design-critic`; `legal-reviewer` when pages, forms, tracking, embeds or AI output change | phone and desktop screenshots, the preview URL | UI changed (fails when `design/DESIGN.md` or its `## Bar` section is missing, or the PR body has no design-vote line; the evaluator checks each `## Bar` item on the preview); `legal-reviewer` always on the last PR before launch |
 
 A check that doesn't apply passes; say "n/a" in the table.
+
+## Gate size
+
+The PR's size decides which checks run; the headline names it: `Gate 5/5 (S, round <n>)`.
+Security never drops: any PR touching user input, auth, money or secrets runs check 4.
+
+| Size | PR | Checks |
+|---|---|---|
+| S | docs, skills, templates, config | 1 and one fresh `code-reviewer` (3); 2, 4, 5 n/a |
+| M | code without UI | 1, 2, 3; 4 when user input, auth, money or secrets are touched |
+| L | UI, auth, payments, data, migrations, launch | the full table |
 
 ## Mode: probe or product
 
@@ -28,8 +39,10 @@ whichever sees that payment first) switches it to `Mode: product`. Until someone
 
 No `Mode:` line in `PLAN.md` means product mode. Product mode is the full table above. The headline names the mode: `Gate 5/5 (probe, round <n>)`.
 
-**Preview test:** check 2 opens the live preview and the evaluator attaches a screenshot of it;
-nothing is called done without a screenshot of the live page (phone 390 px and desktop 1440 px).
+**Preview test:** check 2 opens the live preview. Screenshots are for UI only: the Programmer's
+390 px and 1440 px set from the preview is the one `design-critic` uses; the evaluator adds a
+screenshot only for a failed criterion or the journey run. A change without UI is proven by test
+output or a live check.
 Roblox projects have no preview URL: play the test place through the Studio MCP server and
 `screen_capture` it (`toolbox/catalog/roblox.md`, The loop).
 
@@ -50,9 +63,10 @@ production deploy. If Claude Code's safety check or auto mode refuses a merge, t
 yskills for the tap on the card and tries no other way. Other files say this in one line and
 point here.
 
-Policy files (`CLAUDE.md`, this file, `hq-refresh.md` in yverse-studio/company-xy, `global/`, `cloud/`, `install.mjs`) are the
-exception: the cloud safety check blocks commits to them, so a thread puts the diff in
-`/mnt/project-files/claude-setup/patches/<letter>/` and yskills applies it on the PC.
+Policy files (`CLAUDE.md`, this file, `hq-refresh.md` in yverse-studio/company-xy, `global/`, `cloud/`, `install.mjs`): the
+cloud safety check may refuse an edit to them. The thread says so once and asks yskills to tap
+Allow in that thread (it cleared this file on 2026-10-10); it never rewords, splits or routes the
+edit another way.
 
 How to undo a merge, by kind of change (write the line into the PR's "undo" line):
 
