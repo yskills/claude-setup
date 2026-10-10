@@ -39,10 +39,8 @@ before each step; builder, gate and fix threads read their `roles/<role>.md` ins
    verb; steps are ticked off by deleting the entry. Nothing waits for them except the live key.
    **Cross-project reach.** A project chat starts its own threads (`start_thread_session`) and
    messages another project's chat by session id (`send_message`, id from that project's
-   `config/coordinator` row). **In its first minute** the project chat checks it has
-   `create_session` and `send_message` (a ToolSearch each) and writes the result into its own
-   `config/coordinator` row (`{session, at, tools: {create_session, send_message}}`); a missing
-   tool is one line to yskills and the threads fall back to the coordinator relay (§ Starting threads).
+   `config/coordinator` row, `{session, at}`). No tool probe up front: the first failed call says
+   the same, and then the threads fall back to the coordinator relay (§ Starting threads).
 4. **Scaffold + design.** Scaffold thread: "Scaffold PLAN.md's app on branch `scaffold` with
    the `scaffold` skill (its file list, in order). Open a PR, don't merge." Its gate is CI only. The design team shoots 2-3
    directions. **Brief (b)** carries the design pick only: the deploy exists since the workflow. The gate
@@ -65,9 +63,8 @@ before each step; builder, gate and fix threads read their `roles/<role>.md` ins
    desktop screenshots and a 3-line progress note. Don't merge; keep fixing CI and the review
    findings on the PR until it is merged. Pull main into the branch right before the gate merges
    (other slices may edit the same file). yskills' pauses and taste calls are final: a 'stop'
-   stops you mid-step, a rejected asset or look is replaced, not defended. Keep HQ's
-   `work/<your session>` row current: one write at every phase and agent start and end
-   (`docs/hq-rows.md`, Work board)." The first
+   stops you mid-step, a rejected asset or look is replaced, not defended. Write HQ's
+   `work/<your session>` row when you start and when you end (`docs/hq-rows.md`, Work board)." The first
    slice also commits the D1 ids from
    `PROGRESS.md`. The operator copies each note and the thread's cost (`get_session`,
    `external_metadata.usage.cost_usd`) into `PROGRESS.md`.
@@ -76,7 +73,7 @@ before each step; builder, gate and fix threads read their `roles/<role>.md` ins
    every other slice: a landing page that names the offer and the price, a waitlist with
    double opt-in (no pre-orders: `sell` has no pre-order flow yet), Impressum and Datenschutz,
    and UTM-tagged visits. Once it is live, the marketing team pushes it in the plan's channel
-   for the probe period (default 14 days). PLAN.md fixes the go number before the probe starts
+   for the probe period (default 7 days: the money goal leaves no room for 14). PLAN.md fixes the go number before the probe starts
    (default: 100 confirmed waitlist signups). Met: the other slices start, nothing to
    ask. Missed: one tap card to yskills with the numbers: **kill** (archive, lessons into
    claude-setup), **change** (one new offer or channel, one more probe) or **build anyway**.

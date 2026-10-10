@@ -23,7 +23,8 @@ need it, and say so in the PR. Follow the order; each step commits on its own.
 4. `app/` skeleton: one home page, the layout, the two legal routes (step 8), a health route
    `/api/config` returning the build `commit` (`WORKERS_CI_COMMIT_SHA`) for the live check.
 5. `design/DESIGN.md` and `design/refs/` from the design team's pick (empty folder with a
-   `.gitkeep` until the design thread delivers); no UI beyond the skeleton before that.
+   `.gitkeep` until the design thread delivers), with its `## Bar` section filled
+   (`operator/roles/designer.md`, UI/UX bar); no UI beyond the skeleton before that.
 6. `wrangler.jsonc` per the `publish` skill: `name`, `workers_dev` and `preview_urls` true, a
    `previews` block (even empty), D1 `DB` plus `<name>-preview` with committed ids when PLAN.md
    has data. D1 scripts: `deploy` = migrate live, `wrangler deploy`, migrate preview;
